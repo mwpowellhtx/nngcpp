@@ -5,6 +5,3 @@ x64/
 x86/
 Debug/
 Release/
-
-# ignore committing anything inside the repos
-repos/
