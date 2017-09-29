@@ -42,45 +42,55 @@ endif()
 # Should be running this from the top-most repository directory. This
 # should also go without saying, but may not be as obvious to all.
 
-set (GIT_SUBMODULE_REPOS_DIR "${cppnng_SOURCE_DIR}/repos")
-set (GIT_SUBMODULE_NNG_REPO_DIR "${GIT_SUBMODULE_REPOS_DIR}/nng")
+set (CPPNN_REPOS_ROOT_DIR ${cppnng_SOURCE_DIR}/repos)
+set (CPPNN_REPO_RELATIVE_DIR nng)
+set (CPPNN_REPO_ROOT_DIR ${CPPNN_REPOS_ROOT_DIR}/${CPPNN_REPO_RELATIVE_DIR})
+set (CPPNN_GIT_REPO_URL "git@github.com:nanomsg/nng.git")
+set (CPPNNG_NNG_BUILD_DIR ${cppnng_SOURCE_DIR}/build/${CPPNN_REPO_RELATIVE_DIR})
 
-set (CPPNNG_NNG_BUILD_DIR ${cppnng_SOURCE_DIR}/build/nng)
+macro (cppnng_nng_git_clone_repo REPO_DIR)
 
-macro (cppnng_update_nng_git_submodule SUBMODULE_DIR)
+    if (NOT EXISTS "${CPPNN_REPOS_ROOT_DIR}")
+        make_directory ("${CPPNN_REPOS_ROOT_DIR}")
+    endif ()
 
-    set (REPO_DIR "${SUBMODULE_DIR}")
-
-    message (STATUS "Updating Git submodules ('${cppnng_SOURCE_DIR}') ...")
+    message (STATUS "Pulling NNG to ('${CPPNN_REPOS_ROOT_DIR}/${REPO_DIR}/') ...")
 
     # This would not evaluate correctly in the if (<expression/>), for whatever
     # reason. However, here I can capture the variable and test for it.
 
-    message (STATUS "Checking for existing repository '${REPO_DIR}' ...")
+    if (EXISTS "${CPPNN_REPOS_ROOT_DIR}/${REPO_DIR}/CMakeLists.txt")
 
-    if (EXISTS "${REPO_DIR}/CMakeLists.txt")
-
-        message (STATUS "Repository '${REPO_DIR}/CMakeLists.txt' already exists.")
+        message (STATUS "Repository '${CPPNN_REPOS_ROOT_DIR}/${REPO_DIR}/CMakeLists.txt' already exists.")
 
     else ()
 
-        message (STATUS "Running '\"${GIT_EXECUTABLE}\" submodule update --init --recursive' ...")
+        message (STATUS "\"${GIT_EXECUTABLE}\" clone ${CPPNN_GIT_REPO_URL} ${REPO_DIR}/ ...")
+        # message (FATAL_ERROR/ "\"${GIT_EXECUTABLE}\" clone ${CPPNN_GIT_REPO_URL} ${CPPNN_REPOS_ROOT_DIR}/${REPO_DIR}/ ...")
 
         execute_process (
-            COMMAND "${GIT_EXECUTABLE}" submodule update --init --recursive
-            WORKING_DIRECTORY "${cppnng_SOURCE_DIR}"
-            RESULT_VARIABLE GIT_EC
-            OUTPUT_VARIABLE GIT_OUTPUT
+            COMMAND "${GIT_EXECUTABLE}" clone ${CPPNN_GIT_REPO_URL} ${REPO_DIR}/
+            WORKING_DIRECTORY ${CPPNN_REPOS_ROOT_DIR}
+            RESULT_VARIABLE GIT_CLONE_EC
+            OUTPUT_VARIABLE GIT_CLONE_MSG
         )
 
-        if (NOT GIT_EC EQUAL 0)
-            message (STATUS "Failed updating Git submodules (${cppnng_SOURCE_DIR}).")
-            message (FATAL_ERROR "${GIT_OUTPUT} (${GIT_EC})")
+        # Ditto exit code handling string gymnastics...
+        if (GIT_CLONE_EC EQUAL 0)
+            if (GIT_CLONE_MSG STREQUAL "")
+                set (GIT_CLONE_MSG "Git succeeded.")
+            endif ()
+            message (STATUS "${GIT_CLONE_MSG} (${GIT_CLONE_EC})")
+        else ()
+            if (GIT_CLONE_MSG STREQUAL "")
+                set (GIT_CLONE_MSG "An error occurred.")
+            endif ()
+            message (FATAL_ERROR "${GIT_CLONE_MSG} (${GIT_CLONE_EC})")
         endif ()
 
     endif ()
 
-endmacro () # cppnng_update_nng_git_submodule
+endmacro () # cppnng_nng_git_clone_repo
 
 macro (cppnng_checkout_nng_git_revision REVISION SUBMODULE_DIR)
 
@@ -217,10 +227,10 @@ endmacro ()
 # We could try to jump through the hoops of the Swiss army knife ExternalProject_Add
 # and related machinations, however, this seems like the best possible option IMO.
 
-cppnng_update_nng_git_submodule ("${GIT_SUBMODULE_NNG_REPO_DIR}")
+cppnng_nng_git_clone_repo ("${CPPNN_REPO_RELATIVE_DIR}")
 
-cppnng_update_nng_git_submodule ("${NNG_REVISION}" "${GIT_SUBMODULE_NNG_REPO_DIR}")
+# cppnng_checkout_nng_git_revision ("${NNG_REVISION}" "${CPPNN_REPO_ROOT_DIR}")
 
-cppnng_configure_nng ("${GIT_SUBMODULE_NNG_REPO_DIR}" "${CPPNNG_NNG_BUILD_DIR}")
+cppnng_configure_nng ("${CPPNN_REPO_ROOT_DIR}" "${CPPNNG_NNG_BUILD_DIR}")
 
 cppnng_build_nng ("${CPPNNG_NNG_BUILD_DIR}")
