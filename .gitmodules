@@ -1,4 +1,0 @@
-[submodule "repos/nng"]
-	path = repos/nng
-	url = git@github.com:nanomsg/nng.git
-	branch = master
