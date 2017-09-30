@@ -1,0 +1,25 @@
+#ifndef CPPNNG_PROT_PULL_H
+#define CPPNNG_PROT_PULL_H
+
+#include "../../core/socket.h"
+
+namespace nng {
+
+    namespace protocol {
+
+        namespace v0 {
+            
+            class NNGCPP_DECLSPEC pull_socket : public socket {
+                public:
+
+                    pull_socket();
+
+                    virtual ~pull_socket();
+            };
+        }
+
+        typedef v0::pull_socket pull_socket;
+    }
+}
+
+#endif // CPPNNG_PROT_PULL_H
