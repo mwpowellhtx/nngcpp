@@ -28,35 +28,36 @@
 # Should be running this from the top-most repository directory. This
 # should also go without saying, but may not be as obvious to all.
 
-set (CPPNN_REPOS_ROOT_DIR ${cppnng_SOURCE_DIR}/repos)
-set (CPPNN_REPO_RELATIVE_DIR nng)
-set (CPPNN_REPO_ROOT_DIR ${CPPNN_REPOS_ROOT_DIR}/${CPPNN_REPO_RELATIVE_DIR})
-set (CPPNN_GIT_REPO_URL "git@github.com:nanomsg/nng.git")
-set (CPPNNG_NNG_BUILD_DIR ${cppnng_SOURCE_DIR}/build/${CPPNN_REPO_RELATIVE_DIR})
+set (NNGCPP_REPOS_ROOT_DIR ${nngcpp_SOURCE_DIR}/repos)
+set (NNGCPP_REPO_RELATIVE_DIR nng)
+set (NNGCPP_GIT_RELATIVE_DIR .git)
+set (NNGCPP_NNG_REPO_ROOT_DIR ${NNGCPP_REPOS_ROOT_DIR}/${NNGCPP_REPO_RELATIVE_DIR})
+set (NNGCPP_GIT_REPO_URL "git@github.com:nanomsg/nng.git")
+set (NNGCPP_NNG_BUILD_DIR ${nngcpp_SOURCE_DIR}/nngbuild)
 
-macro (cppnng_nng_git_clone_repo REPO_DIR)
-
-    if (NOT EXISTS "${CPPNN_REPOS_ROOT_DIR}")
-        make_directory ("${CPPNN_REPOS_ROOT_DIR}")
-    endif ()
-
-    message (STATUS "Pulling NNG to ('${CPPNN_REPOS_ROOT_DIR}/${REPO_DIR}/') ...")
+macro (nngcpp_nng_git_clone_repo REPO_DIR)
 
     # This would not evaluate correctly in the if (<expression/>), for whatever
     # reason. However, here I can capture the variable and test for it.
 
-    if (EXISTS "${CPPNN_REPOS_ROOT_DIR}/${REPO_DIR}/CMakeLists.txt")
+    if (EXISTS "${NNGCPP_NNG_REPO_ROOT_DIR}/${NNGCPP_GIT_RELATIVE_DIR}" AND EXISTS "${NNGCPP_REPOS_ROOT_DIR}/${REPO_DIR}/CMakeLists.txt")
 
-        message (STATUS "Repository '${CPPNN_REPOS_ROOT_DIR}/${REPO_DIR}/CMakeLists.txt' already exists.")
+        message (STATUS "Repository '${NNGCPP_REPOS_ROOT_DIR}/${REPO_DIR}/CMakeLists.txt' already exists.")
 
     else ()
 
-        message (STATUS "\"${GIT_EXECUTABLE}\" clone ${CPPNN_GIT_REPO_URL} ${REPO_DIR}/ ...")
-        # message (FATAL_ERROR/ "\"${GIT_EXECUTABLE}\" clone ${CPPNN_GIT_REPO_URL} ${CPPNN_REPOS_ROOT_DIR}/${REPO_DIR}/ ...")
+        if (NOT EXISTS "${NNGCPP_REPOS_ROOT_DIR}")
+            make_directory ("${NNGCPP_REPOS_ROOT_DIR}")
+        endif ()
+
+        message (STATUS "Pulling NNG to ('${NNGCPP_REPOS_ROOT_DIR}/${REPO_DIR}/') ...")
+
+        message (STATUS "\"${GIT_EXECUTABLE}\" clone ${NNGCPP_GIT_REPO_URL} ${REPO_DIR}/ ...")
+        # message (FATAL_ERROR/ "\"${GIT_EXECUTABLE}\" clone ${NNGCPP_GIT_REPO_URL} ${NNGCPP_REPOS_ROOT_DIR}/${REPO_DIR}/ ...")
 
         execute_process (
-            COMMAND "${GIT_EXECUTABLE}" clone ${CPPNN_GIT_REPO_URL} ${REPO_DIR}/
-            WORKING_DIRECTORY ${CPPNN_REPOS_ROOT_DIR}
+            COMMAND "${GIT_EXECUTABLE}" clone ${NNGCPP_GIT_REPO_URL} ${REPO_DIR}/
+            WORKING_DIRECTORY ${NNGCPP_REPOS_ROOT_DIR}
             RESULT_VARIABLE GIT_CLONE_EC
             OUTPUT_VARIABLE GIT_CLONE_MSG
         )
@@ -76,9 +77,9 @@ macro (cppnng_nng_git_clone_repo REPO_DIR)
 
     endif ()
 
-endmacro () # cppnng_nng_git_clone_repo
+endmacro () # nngcpp_nng_git_clone_repo
 
-macro (cppnng_checkout_nng_git_revision REVISION SUBMODULE_DIR)
+macro (nngcpp_checkout_nng_git_revision REVISION SUBMODULE_DIR)
 
     set (REVISION_PROVIDED_NOT_PROVIDED REVISION STREQUAL "")
     set (GIT_CHECKOUT_REVISION $"{REVISION}")
@@ -117,39 +118,39 @@ macro (cppnng_checkout_nng_git_revision REVISION SUBMODULE_DIR)
         message (FATAL_ERROR "${GIT_OUTPUT} (${GIT_EC})")
     endif ()
 
-endmacro () # cppnng_checkout_nng_git_revision
+endmacro () # nngcpp_checkout_nng_git_revision
 
-macro (cppnng_nng_add_cmake_generator GEN)
-    set (CPPNNG_NNG_CMAKE_OPTIONS "${CPPNNG_NNG_CMAKE_OPTIONS} -G \"${GEN}\"")
+macro (nngcpp_nng_add_cmake_generator GEN)
+    set (NNGCPP_NNG_CMAKE_OPTIONS "${NNGCPP_NNG_CMAKE_OPTIONS} -G \"${GEN}\"")
 endmacro ()
 
-macro (cppnng_nng_add_cmake_var OPT TYPE VALUE)
-    set (CPPNNG_NNG_CMAKE_OPTIONS "${CPPNNG_NNG_CMAKE_OPTIONS} -D ${OPT}:${TYPE}=${VALUE}")
+macro (nngcpp_nng_add_cmake_var OPT TYPE VALUE)
+    set (NNGCPP_NNG_CMAKE_OPTIONS "${NNGCPP_NNG_CMAKE_OPTIONS} -D ${OPT}:${TYPE}=${VALUE}")
 endmacro ()
 
-macro (cppnng_nng_add_custom_opt OPT VALUE)
-    set (CPPNNG_NNG_CMAKE_OPTIONS "${CPPNNG_NNG_CMAKE_OPTIONS} ${OPT} ${VALUE}")
+macro (nngcpp_nng_add_custom_opt OPT VALUE)
+    set (NNGCPP_NNG_CMAKE_OPTIONS "${NNGCPP_NNG_CMAKE_OPTIONS} ${OPT} ${VALUE}")
 endmacro ()
 
-macro (cppnng_configure_nng NNG_SRC_DIR NNG_BUILD_DIR)
+macro (nngcpp_configure_nng NNG_SRC_DIR NNG_BUILD_DIR)
 
     # Clear out the options.
-    set (CPPNNG_NNG_CMAKE_OPTIONS "")
+    set (NNGCPP_NNG_CMAKE_OPTIONS "")
 
-    cppnng_nng_add_cmake_generator ("${CMAKE_GENERATOR}")
+    nngcpp_nng_add_cmake_generator ("${CMAKE_GENERATOR}")
 
-    # Align the CMake CONFIGURATION types. Whatever we want to build for CPPNNG, we also want to build from NNG.
+    # Align the CMake CONFIGURATION types. Whatever we want to build for NNGCPP, we also want to build from NNG.
     # Also, apparently, no need to do any gymnastic delimter replacement, either, it seems.
-    cppnng_nng_add_cmake_var ("CMAKE_CONFIGURATION_TYPES" STRING "\"${CMAKE_CONFIGURATION_TYPES}\"")
+    nngcpp_nng_add_cmake_var ("CMAKE_CONFIGURATION_TYPES" STRING "\"${CMAKE_CONFIGURATION_TYPES}\"")
 
-    cppnng_nng_add_cmake_var ("CMAKE_INSTALL_PREFIX" STRING "\"${NNG_BUILD_DIR}\"")
-    cppnng_nng_add_cmake_var ("NNG_ENABLE_COVERAGE" BOOL OFF)
-    cppnng_nng_add_cmake_var ("NNG_ENABLE_DOC" BOOL OFF)
-    cppnng_nng_add_cmake_var ("NNG_ENABLE_NNGCAT" BOOL OFF)
-    cppnng_nng_add_cmake_var ("NNG_ENABLE_TESTS" BOOL OFF)
-    cppnng_nng_add_cmake_var ("NNG_ENABLE_TOOLS" BOOL OFF)
+    nngcpp_nng_add_cmake_var ("CMAKE_INSTALL_PREFIX" STRING "\"${NNG_BUILD_DIR}\"")
+    nngcpp_nng_add_cmake_var ("NNG_ENABLE_COVERAGE" BOOL OFF)
+    nngcpp_nng_add_cmake_var ("NNG_ENABLE_DOC" BOOL OFF)
+    nngcpp_nng_add_cmake_var ("NNG_ENABLE_NNGCAT" BOOL OFF)
+    nngcpp_nng_add_cmake_var ("NNG_ENABLE_TESTS" BOOL OFF)
+    nngcpp_nng_add_cmake_var ("NNG_ENABLE_TOOLS" BOOL OFF)
     # TODO: TBD: at the moment we do not care about ZeroTier, but this could change moving forward.
-    cppnng_nng_add_cmake_var ("NNG_ENABLE_ZEROTIER" BOOL OFF)
+    nngcpp_nng_add_cmake_var ("NNG_ENABLE_ZEROTIER" BOOL OFF)
 
     # Make sure the BUILD directory exists.
     if (NOT EXISTS "${NNG_BUILD_DIR}")
@@ -159,53 +160,53 @@ macro (cppnng_configure_nng NNG_SRC_DIR NNG_BUILD_DIR)
         message (STATUS "Directory '${NNG_BUILD_DIR}' already exists.")
     endif ()
 
-    message (STATUS "Invoking CMake: \"${CMAKE_COMMAND}\" ${CPPNNG_NNG_CMAKE_OPTIONS} \"${NNG_SRC_DIR}\"")
+    message (STATUS "Invoking CMake: \"${CMAKE_COMMAND}\" ${NNGCPP_NNG_CMAKE_OPTIONS} \"${NNG_SRC_DIR}\"")
 
     execute_process (
-        COMMAND "${CMAKE_COMMAND}" ${CPPNNG_NNG_CMAKE_OPTIONS} "${NNG_SRC_DIR}"
+        COMMAND "${CMAKE_COMMAND}" ${NNGCPP_NNG_CMAKE_OPTIONS} "${NNG_SRC_DIR}"
         WORKING_DIRECTORY ${NNG_BUILD_DIR}
-        RESULT_VARIABLE CPPNN_NNG_CONFIG_EC
-        OUTPUT_VARIABLE CPPNN_NNG_CONFIG_MSG
+        RESULT_VARIABLE NNGCPP_NNG_CONFIG_EC
+        OUTPUT_VARIABLE NNGCPP_NNG_CONFIG_MSG
     )
 
     # So I did try to setup a macro for one-stop shopping exit code handling, but this
     # was problematic at best, for the usually string versus variable gymnastics issues.
-    if (CPPNN_NNG_CONFIG_EC EQUAL 0)
-        if (CPPNN_NNG_CONFIG_MSG STREQUAL "")
-            set (CPPNN_NNG_CONFIG_MSG "CMake succeeded.")
+    if (NNGCPP_NNG_CONFIG_EC EQUAL 0)
+        if (NNGCPP_NNG_CONFIG_MSG STREQUAL "")
+            set (NNGCPP_NNG_CONFIG_MSG "CMake succeeded.")
         endif()
-        message (STATUS "${CPPNN_NNG_CONFIG_MSG} (${CPPNN_NNG_CONFIG_EC})")
+        message (STATUS "${NNGCPP_NNG_CONFIG_MSG} (${NNGCPP_NNG_CONFIG_EC})")
     else ()
-        if (CPPNN_NNG_CONFIG_MSG STREQUAL "")
-            set (CPPNN_NNG_CONFIG_MSG "An error occurred.")
+        if (NNGCPP_NNG_CONFIG_MSG STREQUAL "")
+            set (NNGCPP_NNG_CONFIG_MSG "An error occurred.")
         endif ()
-        message (FATAL_ERROR "${CPPNN_NNG_CONFIG_MSG} (${CPPNN_NNG_CONFIG_EC})")
+        message (FATAL_ERROR "${NNGCPP_NNG_CONFIG_MSG} (${NNGCPP_NNG_CONFIG_EC})")
     endif ()
     
 endmacro ()
 
-macro (cppnng_build_nng NNG_BUILD_DIR)
+macro (nngcpp_build_nng BUILD_DIR)
 
     message (STATUS "Invoking CMake: \"${CMAKE_COMMAND}\" --build .")
 
     execute_process (
         COMMAND "${CMAKE_COMMAND}" --build .
-        WORKING_DIRECTORY ${NNG_BUILD_DIR}
-        RESULT_VARIABLE CPPNN_NNG_BUILD_EC
-        OUTPUT_VARIABLE CPPNN_NNG_BUILD_MSG
+        WORKING_DIRECTORY ${BUILD_DIR}
+        RESULT_VARIABLE NNGCPP_NNG_BUILD_EC
+        OUTPUT_VARIABLE NNGCPP_NNG_BUILD_MSG
     )
 
     # Ditto string versus variable gymnastics issues.
-    if (CPPNN_NNG_BUILD_EC EQUAL 0)
-        if (CPPNN_NNG_BUILD_MSG STREQUAL "")
-            set (CPPNN_NNG_BUILD_MSG "CMake succeeded.")
+    if (NNGCPP_NNG_BUILD_EC EQUAL 0)
+        if (NNGCPP_NNG_BUILD_MSG STREQUAL "")
+            set (NNGCPP_NNG_BUILD_MSG "CMake succeeded.")
         endif()
-        message (STATUS "${CPPNN_NNG_BUILD_MSG} (${CPPNN_NNG_BUILD_EC})")
+        message (STATUS "${NNGCPP_NNG_BUILD_MSG} (${NNGCPP_NNG_BUILD_EC})")
     else ()
-        if (CPPNN_NNG_BUILD_MSG STREQUAL "")
-            set (CPPNN_NNG_BUILD_MSG "An error occurred.")
+        if (NNGCPP_NNG_BUILD_MSG STREQUAL "")
+            set (NNGCPP_NNG_BUILD_MSG "An error occurred.")
         endif ()
-        message (FATAL_ERROR "${CPPNN_NNG_BUILD_MSG} (${CPPNN_NNG_BUILD_EC})")
+        message (FATAL_ERROR "${NNGCPP_NNG_BUILD_MSG} (${NNGCPP_NNG_BUILD_EC})")
     endif ()
 
 endmacro ()
@@ -213,10 +214,11 @@ endmacro ()
 # We could try to jump through the hoops of the Swiss army knife ExternalProject_Add
 # and related machinations, however, this seems like the best possible option IMO.
 
-cppnng_nng_git_clone_repo ("${CPPNN_REPO_RELATIVE_DIR}")
+nngcpp_nng_git_clone_repo ("${NNGCPP_REPO_RELATIVE_DIR}")
 
-# cppnng_checkout_nng_git_revision ("${NNG_REVISION}" "${CPPNN_REPO_ROOT_DIR}")
+# # TODO: TBD: will want to revisit this one once we get going on a more or less stable version of NNG.
+# nngcpp_checkout_nng_git_revision ("${NNGCPP_NNG_REQUIRED_REVISION}" "${NNGCPP_NNG_REPO_ROOT_DIR}")
 
-cppnng_configure_nng ("${CPPNN_REPO_ROOT_DIR}" "${CPPNNG_NNG_BUILD_DIR}")
+nngcpp_configure_nng ("${NNGCPP_NNG_REPO_ROOT_DIR}" "${NNGCPP_NNG_BUILD_DIR}")
 
-cppnng_build_nng ("${CPPNNG_NNG_BUILD_DIR}")
+nngcpp_build_nng ("${NNGCPP_NNG_BUILD_DIR}")
