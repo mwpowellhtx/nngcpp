@@ -6,5 +6,6 @@ x86/
 Debug/
 Release/
 build/
+nngbuild/
 repos/
 repos/nng/
