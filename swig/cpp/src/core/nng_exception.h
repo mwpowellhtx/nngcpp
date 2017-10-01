@@ -62,6 +62,7 @@ namespace nng {
 }
 
 #define THROW_NNG_EXCEPTION() throw nng::nng_exception();
+// TODO: TBD: I'm not sure that error codes are always "negative" in nature...
 #define THROW_NNG_EXCEPTION_EC(ec) if (ec < 0) { throw nng:nng_exception(ec); }
 
 #endif // NNGCPP_NNG_EXCEPTION_H
