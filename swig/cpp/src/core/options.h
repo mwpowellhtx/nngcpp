@@ -46,8 +46,8 @@ namespace nng {
             static const std::string send_buffer;
             static const std::string receive_file_descriptor;
             static const std::string send_file_descriptor;
-            static const std::string receive_timeout;
-            static const std::string send_timeout;
+            static const std::string receive_timeout_usec;
+            static const std::string send_timeout_usec;
             static const std::string local_address;
             static const std::string remote_address;
             static const std::string url;
@@ -55,13 +55,13 @@ namespace nng {
             static const std::string protocol;
             static const std::string transport;
             static const std::string receive_max_size;
-            static const std::string min_reconnect_time;
-            static const std::string max_reconnect_time;
+            static const std::string min_reconnect_time_usec;
+            static const std::string max_reconnect_time_usec;
             static const std::string pair1_polyamorous;
             static const std::string sub_subscribe;
             static const std::string sub_unsubscribe;
-            static const std::string req_resend_time;
-            static const std::string surveyor_survey_time;
+            static const std::string req_resend_time_usec;
+            static const std::string surveyor_survey_time_usec;
     };
 }
 
