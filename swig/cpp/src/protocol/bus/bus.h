@@ -5,11 +5,13 @@
 
 namespace nng {
 
+    class socket;
+
     namespace protocol {
 
         namespace v0 {
             
-            class NNGCPP_DECLSPEC bus_socket : public socket {
+            class bus_socket : public socket {
                 public:
 
                     bus_socket();

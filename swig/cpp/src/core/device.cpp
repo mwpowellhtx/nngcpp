@@ -1,6 +1,7 @@
-#include "nng.h"
-#include "device.h"
 #include "socket.h"
+#include "device.h"
+
+#include <thread>
 
 namespace nng {
 
@@ -16,16 +17,17 @@ namespace nng {
         if (_bsockp) { _bsockp->close(); }
     }
 
-    void __cdecl thread_callback(void* arg) {
-        auto* const dp = static_cast<device_path* const>(arg);
-        ::nng_device(dp->_asockp->sid, dp->_bsockp->sid);
+    void install_device_sockets_callback(const device_path* const dpp) {
+        ::nng_device(dpp->_asockp->sid, dpp->_bsockp->sid);
     }
 
     device::device(socket* const asockp, socket* const bsockp, bool shouldCloseSockets)
         : thread(nullptr)
             , _pathp(std::make_unique<device_path>(asockp, bsockp, shouldCloseSockets)) {
 
-        auto ec = ::nng_thread_create(&thread, &nng::thread_callback, static_cast<void*>(_pathp.get()));
+        // Install the Device and Re-Join the Installer Thread.
+        std::thread installer(nng::install_device_sockets_callback, _pathp.get());
+        installer.join();
     }
 
     device::~device() {
@@ -34,6 +36,6 @@ namespace nng {
         the event this was still attached to a smart pointer in another scope. */
         _pathp.release();
 
-        ::nng_thread_destroy(thread);
+        // TODO: TBD: is there anything else to "destroy" at this time?
     }
 }

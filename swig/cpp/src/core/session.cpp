@@ -1,4 +1,3 @@
-#include "nng.h"
 #include "session.h"
 
 namespace nng {

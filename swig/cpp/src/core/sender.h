@@ -1,6 +1,8 @@
 #ifndef NNGCPP_SENDER_H
 #define NNGCPP_SENDER_H
 
+#include "../nngcpp_integration.h"
+
 #include <cstddef>
 #include <cstdint>
 #include <string>
@@ -8,7 +10,7 @@
 
 namespace nng {
 
-    class NNGCPP_DECLSPEC sender {
+    class sender {
         protected:
 
             typedef std::size_t send_size_type;
@@ -18,11 +20,11 @@ namespace nng {
 
         public:
 
-            virtual int send(std::string const& str, int flags = 0) = 0;
-            virtual int send(std::string const& str, send_size_type sz, int flags = 0) = 0;
+            virtual int send(const std::string& str, int flags = 0) = 0;
+            virtual int send(const std::string& str, send_size_type sz, int flags = 0) = 0;
 
-            virtual int send(send_vector const& buffer, int flags = 0) = 0;
-            virtual int send(send_vector const& buffer, send_size_type sz, int flags = 0) = 0;
+            virtual int send(const send_vector& buffer, int flags = 0) = 0;
+            virtual int send(const send_vector& buffer, send_size_type sz, int flags = 0) = 0;
     };
 }
 

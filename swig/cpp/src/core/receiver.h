@@ -1,6 +1,8 @@
 #ifndef NNGCPP_RECEIVER_H
 #define NNGCPP_RECEIVER_H
 
+#include "../nngcpp_integration.h"
+
 #include <cstddef>
 #include <cstdint>
 #include <string>
@@ -8,7 +10,7 @@
 
 namespace nng {
 
-    class NNGCPP_DECLSPEC receiver {
+    class receiver {
         protected:
 
             typedef std::size_t receive_size_type;

@@ -7,7 +7,7 @@
 
 namespace nng {
 
-    socket::socket(nng_ctor_func const& nng_ctor)
+    socket::socket(const nng_ctor_func& nng_ctor)
         : sid(0)
             , sender()
             , receiver()
@@ -22,19 +22,19 @@ namespace nng {
     }
 
     // TODO: TBD: ditto ec handling...
-    void socket::listen(std::string const& addr, int flags) {
+    void socket::listen(const std::string& addr, int flags) {
         auto ec = ::nng_listen(sid, addr.c_str(), nullptr, flags);
     }
 
-    void socket::listen(std::string const& addr, listener* const lp, int flags) {
+    void socket::listen(const std::string& addr, listener* const lp, int flags) {
         auto ec = ::nng_listen(sid, addr.c_str(), lp ? &(lp->lid) : nullptr, flags);
     }
 
-    void socket::dial(std::string const& addr, int flags) {
+    void socket::dial(const std::string& addr, int flags) {
         auto ec = ::nng_dial(sid, addr.c_str(), nullptr, flags);
     }
 
-    void socket::dial(std::string const& addr, dialer* const dp, int flags) {
+    void socket::dial(const std::string& addr, dialer* const dp, int flags) {
         auto ec = ::nng_dial(sid, addr.c_str(), dp ? &(dp->did) : nullptr, flags);
     }
 
@@ -52,7 +52,7 @@ namespace nng {
     }
     
     template<class Buffer>
-    int send(int id, Buffer const& buffer, int flags) {
+    int send(int id, const Buffer& buffer, int flags) {
         return send(id, buffer, buffer.size(), flags);
     }
 
@@ -63,19 +63,19 @@ namespace nng {
         return ec;
     }
 
-    int socket::send(std::string const& str, int flags) {
+    int socket::send(const std::string& str, int flags) {
         return nng::send(sid, str, str.size(), flags);
     }
 
-    int socket::send(std::string const& str, send_size_type sz, int flags) {
+    int socket::send(const std::string& str, send_size_type sz, int flags) {
         return nng::send(sid, str, sz, flags);
     }
 
-    int socket::send(send_vector const& buffer, int flags) {
+    int socket::send(const send_vector& buffer, int flags) {
         return nng::send(sid, buffer, buffer.size(), flags);
     }
 
-    int socket::send(send_vector const& buffer, send_size_type sz, int flags) {
+    int socket::send(const send_vector& buffer, send_size_type sz, int flags) {
         return nng::send(sid, buffer, sz, flags);
     }
 
@@ -99,47 +99,39 @@ namespace nng {
         return buffer;
     }
 
-    void socket::set_option(int opt, const void* val, option_size_type sz) {
-        auto ec = ::nng_setopt(sid, opt, val, sz);
-    }
-
-    void socket::get_option(int opt, void* val, option_size_type* szp) {
-        auto ec = ::nng_getopt(sid, opt, val, szp);
-    }
-
     // Convenience option wrappers.
-    void socket::set_option_int(int opt, int val) {
-        auto ec = ::nng_setopt_int(sid, opt, val);
+    void socket::set_option_int(const std::string* const cnamecp, int val) {
+        auto ec = ::nng_setopt_int(sid, cnamecp->c_str(), val);
     }
 
-    void socket::set_option_size(int opt, option_size_type val) {
-        auto ec = ::nng_setopt_size(sid, opt, val);
+    void socket::set_option_size(const std::string* const cnamecp, option_size_type val) {
+        auto ec = ::nng_setopt_size(sid, cnamecp->c_str(), val);
     }
 
-    void socket::set_option_usec(int opt, uint64_t val) {
-        auto ec = ::nng_setopt_usec(sid, opt, val);
+    void socket::set_option_usec(const std::string* const cnamecp, uint64_t val) {
+        auto ec = ::nng_setopt_usec(sid, cnamecp->c_str(), val);
     }
 
-    void socket::get_option_int(int opt, int* valp) {
-        auto ec = ::nng_getopt_int(sid, opt, valp);
+    void socket::get_option_int(const std::string* const cnamecp, int* valp) {
+        auto ec = ::nng_getopt_int(sid, cnamecp->c_str(), valp);
     }
 
-    void socket::get_option_size(int opt, option_size_type* valp) {
-        auto ec = ::nng_getopt_size(sid, opt, valp);
+    void socket::get_option_size(const std::string* const cnamecp, option_size_type* valp) {
+        auto ec = ::nng_getopt_size(sid, cnamecp->c_str(), valp);
     }
 
-    void socket::get_option_usec(int opt, uint64_t* valp) {
-        auto ec = ::nng_getopt_usec(sid, opt, valp);
+    void socket::get_option_usec(const std::string* const cnamecp, uint64_t* valp) {
+        auto ec = ::nng_getopt_usec(sid, cnamecp->c_str(), valp);
     }
 
     protocol_type to_protocol_type(int value) {
         return static_cast<protocol_type>(value);
     }
-    
+
     protocol_type socket::get_protocol() const {
         return to_protocol_type(::nng_protocol(sid));
     }
-    
+
     protocol_type socket::get_peer() const {
         return to_protocol_type(::nng_peer(sid));
     }

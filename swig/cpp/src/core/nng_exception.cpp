@@ -1,4 +1,3 @@
-#include "nng.h"
 #include "nng_exception.h"
 
 namespace nng {

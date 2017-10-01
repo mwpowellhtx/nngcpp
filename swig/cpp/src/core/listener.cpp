@@ -1,5 +1,5 @@
-#include "listener.h"
 #include "socket.h"
+#include "listener.h"
 #include "nng_exception.h"
 
 namespace nng {
@@ -30,35 +30,28 @@ namespace nng {
         }
     }
 
-    void listener::set_option(int opt, const void* v, option_size_type sz) {
-        auto ec = ::nng_listener_setopt(lid, opt, v, sz);
+
+    void listener::set_option_int(const std::string* const cnamecp, int val) {
+        auto ec = ::nng_listener_setopt_int(lid, cnamecp->c_str(), val);
     }
 
-    void listener::set_option_int(int opt, int val) {
-        auto ec = ::nng_listener_setopt_int(lid, opt, val);
+    void listener::set_option_size(const std::string* const cnamecp, option_size_type val) {
+        auto ec = ::nng_listener_setopt_size(lid, cnamecp->c_str(), val);
     }
 
-    void listener::set_option_size(int opt, option_size_type val) {
-        auto ec = ::nng_listener_setopt_size(lid, opt, val);
+    void listener::set_option_usec(const std::string* const cnamecp, option_ulonglong_type val) {
+        auto ec = ::nng_listener_setopt_usec(lid, cnamecp->c_str(), val);
     }
 
-    void listener::set_option_usec(int opt, option_ulonglong_type val) {
-        auto ec = ::nng_listener_setopt_usec(lid, opt, val);
+    void listener::get_option_int(const std::string* const cnamecp, int* valp) {
+        auto ec = ::nng_listener_getopt_int(lid, cnamecp->c_str(), valp);
     }
 
-    void listener::get_option(int opt, void* val, option_size_type* szp) {
-        auto ec = ::nng_listener_getopt(lid, opt, val, szp);
+    void listener::get_option_size(const std::string* const cnamecp, option_size_type* valp) {
+        auto ec = ::nng_listener_getopt_size(lid, cnamecp->c_str(), valp);
     }
 
-    void listener::get_option_int(int opt, int* valp) {
-        auto ec = ::nng_listener_getopt_int(lid, opt, valp);
-    }
-
-    void listener::get_option_size(int opt, option_size_type* valp) {
-        auto ec = ::nng_listener_getopt_size(lid, opt, valp);
-    }
-
-    void listener::get_option_usec(int opt, option_ulonglong_type* valp) {
-        auto ec = ::nng_listener_getopt_usec(lid, opt, valp);
+    void listener::get_option_usec(const std::string* const cnamecp, option_ulonglong_type* valp) {
+        auto ec = ::nng_listener_getopt_usec(lid, cnamecp->c_str(), valp);
     }
 }

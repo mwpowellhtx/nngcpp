@@ -9,7 +9,7 @@ namespace nng {
 
         namespace v0 {
             
-            class NNGCPP_DECLSPEC pub_socket : public socket {
+            class pub_socket : public socket {
                 public:
 
                     pub_socket();

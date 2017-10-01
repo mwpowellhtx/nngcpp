@@ -1,14 +1,16 @@
 #ifndef NNGCPP_DEVICE_H
 #define NNGCPP_DEVICE_H
 
+#include "../nngcpp_integration.h"
+
 #include <memory>
 
 namespace nng {
 
     class socket;
 
-    // TODO: TBD: should not expose device_path via SWIG.
-    struct NNGCPP_DECLSPEC device_path {
+    // TODO: TBD: should perhaps not expose device_path as an external resource, much less to SWIG
+    struct device_path {
         socket* const _asockp;
         socket* const _bsockp;
         bool _shouldClose;

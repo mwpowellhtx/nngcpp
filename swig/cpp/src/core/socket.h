@@ -1,15 +1,15 @@
 #ifndef NNGCPP_SOCKET_H
 #define NNGCPP_SOCKET_H
 
+#include "../nngcpp_integration.h"
+
 // nng should be in the include path.
 #include <functional>
 #include <string>
 
-#include "nng/core/sender.h"
-#include "nng/core/receiver.h"
-#include "nng/core/options.h"
-
-#include "../nng.h"
+#include "sender.h"
+#include "receiver.h"
+#include "options.h"
 
 namespace nng {
 
@@ -31,8 +31,9 @@ namespace nng {
 
     class listener;
     class dialer;
+    struct device_path;
 
-    class NNGCPP_DECLSPEC socket : public sender, public receiver, public options {
+    class socket : public sender, public receiver, public options {
         private:
 
             typedef std::size_t size_type;
@@ -41,7 +42,7 @@ namespace nng {
             friend class dialer;
 
             // For use with Device Thread Callback.
-            friend void thread_callback(void* arg);
+            friend void install_device_sockets_callback(const device_path* const);
 
             ::nng_socket sid;
 
@@ -49,37 +50,34 @@ namespace nng {
 
             typedef std::function<int(::nng_socket* const)> nng_ctor_func;
 
-            socket(nng_ctor_func const& nng_ctor);
+            socket(const nng_ctor_func& nng_ctor);
 
         public:
 
             virtual ~socket();
 
-            void listen(std::string const& addr, int flags = 0);
-            void listen(std::string const& addr, listener* const lp, int flags = 0);
+            void listen(const std::string& addr, int flags = 0);
+            void listen(const std::string& addr, listener* const lp, int flags = 0);
 
-            void dial(std::string const& addr, int flags = 0);
-            void dial(std::string const& addr, dialer* const dp, int flags = 0);
+            void dial(const std::string& addr, int flags = 0);
+            void dial(const std::string& addr, dialer* const dp, int flags = 0);
 
             void close();
 
-            void set_option(int opt, const void* val, option_size_type sz);
-            void get_option(int opt, void* val, option_size_type* szp);
-
             // Convenience option wrappers.
-            void set_option_int(int opt, int val);
-            void set_option_size(int opt, option_size_type val);
-            void set_option_usec(int opt, uint64_t val);
+            void set_option_int(const std::string* const cnamecp, int val);
+            void set_option_size(const std::string* const cnamecp, option_size_type val);
+            void set_option_usec(const std::string* const cnamecp, uint64_t val);
 
-            void get_option_int(int opt, int* valp);
-            void get_option_size(int opt, option_size_type* valp);
-            void get_option_usec(int opt, uint64_t* valp);
+            void get_option_int(const std::string* const cnamecp, int* valp);
+            void get_option_size(const std::string* const cnamecp, option_size_type* valp);
+            void get_option_usec(const std::string* const cnamecp, uint64_t* valp);
 
-            virtual int send(std::string const& str, int flags = 0);
-            virtual int send(std::string const& str, send_size_type sz, int flags = 0);
+            virtual int send(const std::string& str, int flags = 0);
+            virtual int send(const std::string& str, send_size_type sz, int flags = 0);
 
-            virtual int send(send_vector const& buffer, int flags = 0);
-            virtual int send(send_vector const& buffer, send_size_type sz, int flags = 0);
+            virtual int send(const send_vector& buffer, int flags = 0);
+            virtual int send(const send_vector& buffer, send_size_type sz, int flags = 0);
 
             virtual int try_receive(std::string& str, receive_size_type& sz, int flags = 0);
             virtual std::string socket::receive_str(receive_size_type& sz, int flags = 0);

@@ -9,7 +9,7 @@ namespace nng {
         
         namespace v1 {
             
-            class NNGCPP_DECLSPEC pair_socket : public socket {
+            class pair_socket : public socket {
                 public:
 
                     pair_socket();

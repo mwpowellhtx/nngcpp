@@ -1,5 +1,5 @@
-#include "dialer.h"
 #include "socket.h"
+#include "dialer.h"
 #include "nng_exception.h"
 
 namespace nng {
@@ -32,35 +32,27 @@ namespace nng {
         }
     }
 
-    void dialer::set_option(int opt, const void* v, option_size_type sz) {
-        auto ec = ::nng_dialer_setopt(did, opt, v, sz);
+    void dialer::set_option_int(const std::string* const cnamecp, int val) {
+        auto ec = ::nng_dialer_setopt_int(did, cnamecp->c_str(), val);
     }
 
-    void dialer::set_option_int(int opt, int val) {
-        auto ec = ::nng_dialer_setopt_int(did, opt, val);
+    void dialer::set_option_size(const std::string* const cnamecp, option_size_type val) {
+        auto ec = ::nng_dialer_setopt_size(did, cnamecp->c_str(), val);
     }
 
-    void dialer::set_option_size(int opt, option_size_type val) {
-        auto ec = ::nng_dialer_setopt_size(did, opt, val);
+    void dialer::set_option_usec(const std::string* const cnamecp, option_ulonglong_type val) {
+        auto ec = ::nng_dialer_setopt_usec(did, cnamecp->c_str(), val);
     }
 
-    void dialer::set_option_usec(int opt, option_ulonglong_type val) {
-        auto ec = ::nng_dialer_setopt_usec(did, opt, val);
+    void dialer::get_option_int(const std::string* const cnamecp, int* valp) {
+        auto ec = ::nng_dialer_getopt_int(did, cnamecp->c_str(), valp);
     }
 
-    void dialer::get_option(int opt, void* val, option_size_type* szp) {
-        auto ec = ::nng_dialer_getopt(did, opt, val, szp);
+    void dialer::get_option_size(const std::string* const cnamecp, option_size_type* valp) {
+        auto ec = ::nng_dialer_getopt_size(did, cnamecp->c_str(), valp);
     }
 
-    void dialer::get_option_int(int opt, int* valp) {
-        auto ec = ::nng_dialer_getopt_int(did, opt, valp);
-    }
-
-    void dialer::get_option_size(int opt, option_size_type* valp) {
-        auto ec = ::nng_dialer_getopt_size(did, opt, valp);
-    }
-
-    void dialer::get_option_usec(int opt, option_ulonglong_type* valp) {
-        auto ec = ::nng_dialer_getopt_usec(did, opt, valp);
+    void dialer::get_option_usec(const std::string* const cnamecp, option_ulonglong_type* valp) {
+        auto ec = ::nng_dialer_getopt_usec(did, cnamecp->c_str(), valp);
     }
 }

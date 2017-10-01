@@ -9,7 +9,7 @@ namespace nng {
 
         namespace v0 {
             
-            class NNGCPP_DECLSPEC push_socket : public socket {
+            class push_socket : public socket {
                 public:
 
                     push_socket();

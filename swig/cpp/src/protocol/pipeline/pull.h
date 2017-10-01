@@ -9,7 +9,7 @@ namespace nng {
 
         namespace v0 {
             
-            class NNGCPP_DECLSPEC pull_socket : public socket {
+            class pull_socket : public socket {
                 public:
 
                     pull_socket();

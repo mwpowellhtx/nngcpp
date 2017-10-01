@@ -9,21 +9,21 @@
 #define CPPNNG_PROT_V0_NAMESPACE nng::protocol::v0
 #define CPPNNG_PROT_V1_NAMESPACE nng::protocol::v1
 
-#include "nng/protocol/bus/bus.h"
+#include "bus/bus.h"
 
-#include "nng/protocol/pair/pair_v0.h"
-#include "nng/protocol/pair/pair_v1.h"
+#include "pair/pair_v0.h"
+#include "pair/pair_v1.h"
 
-#include "nng/protocol/pipeline/pull.h"
-#include "nng/protocol/pipeline/push.h"
+#include "pipeline/pull.h"
+#include "pipeline/push.h"
 
-#include "nng/protocol/pubsub/pub.h"
-#include "nng/protocol/pubsub/sub.h"
+#include "pubsub/pub.h"
+#include "pubsub/sub.h"
 
-#include "nng/protocol/reqrep/req.h"
-#include "nng/protocol/reqrep/rep.h"
+#include "reqrep/req.h"
+#include "reqrep/rep.h"
 
-#include "nng/protocol/survey/respond.h"
-#include "nng/protocol/survey/survey.h"
+#include "survey/respond.h"
+#include "survey/survey.h"
 
 #endif // CPPNNG_PROT_H
