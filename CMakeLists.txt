@@ -26,42 +26,67 @@
 #
 cmake_minimum_required (VERSION 3.1)
 
-project (nngcpp CXX)
+# Analog to the Visual Studio Solution paradigm.
+project (NngCppAndSwig CXX)
 
 include (GNUInstallDirs)
 
 option (CMAKE_CONFIGURATION_TYPES "" Debug)
 option (CMAKE_INSTALL_PREFIX "" install)
 
-find_package (Threads REQUIRED)
-find_package (Git REQUIRED)
-
-if (GIT_FOUND)
-    message (STATUS "Git found: ${GIT_EXECUTABLE} ${GIT_VERSION_STRING}")
-else ()
-    message (FATAL_ERROR "Git required: not found.")
-endif()
-
-set (_CPP .cpp)
-set (_H .h)
-set (_L .lib)
-set (_O .obj)
-set (_SO .dll)
-
-# Should be running this from the top-most repository directory. This
-# should also go without saying, but may not be as obvious to all.
-
-set (NNGCPP_SWIG_DIR ${nngcpp_SOURCE_DIR}/swig)
-
-# Building NNG is an internal external requirement, so to speak,
-# that we want to occur at the time of configuration.
-include (CMakeLists.nng.txt)
-
 option (NNGCPP_ENABLE_DOC "Enable building documentation." ON)
 option (NNGCPP_ENABLE_TESTS "Build and run tests" ON)
 option (NNGCPP_ENABLE_XTRA_TOOLS "Build extra tools" OFF)
 option (NNGCPP_ENABLE_NNGCAT "Enable building nngcat utility." ${NNG_TOOLS})
 option (NNGCPP_ENABLE_COVERAGE "Enable coverage reporting." OFF)
+
+find_package (Threads REQUIRED)
+
+macro (verify_git_exists)
+
+    find_package (Git REQUIRED)
+
+    if (GIT_FOUND)
+        message (STATUS "Git found: ${GIT_EXECUTABLE} ${GIT_VERSION_STRING}")
+    else ()
+        message (FATAL_ERROR "Git required: not found.")
+    endif()
+
+endmacro ()
+
+verify_git_exists()
+
+# Should be running this from the top-most repository directory. This
+# should also go without saying, but may not be as obvious to all.
+
+set (NNGCPP_SWIG_DIR ${NngCppAndSwig_SOURCE_DIR}/swig)
+
+set (NNG_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/nngbuild)
+
+if (OFF)
+
+    # Building NNG is an internal external requirement, so to speak,
+    # that we want to occur at the time of configuration.
+    include (CMakeLists.nng.txt)
+
+else ()
+
+    include (ExternalProject)
+
+    ExternalProject_Add (nng
+        # PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/repos/nng
+        GIT_REPOSITORY git@github.com:nanomsg/nng.git
+        GIT_TAG HEAD
+        GIT_PROGRESS ON
+        SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/repos/nng
+        CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:STRING=${NNG_INSTALL_PREFIX} -DNNG_ENABLE_COVERAGE:BOOL=OFF -DNNG_ENABLE_DOC:BOOL=OFF -DNNG_ENABLE_NNGCAT:BOOL=OFF -DNNG_ENABLE_TESTS:BOOL=OFF -DNNG_ENABLE_TOOLS:BOOL=OFF -DNNG_ENABLE_ZEROTIER:BOOL=OFF
+        LOG_DOWNLOAD ON
+        LOG_UPDATE ON
+        LOG_CONFIGURE ON
+        LOG_BUILD ON
+    )
+
+endif ()
 
 # if (NNG_ENABLE_COVERAGE)
 #     # NB: This only works for GCC and Clang 3.0 and newer.  If your stuff
@@ -81,13 +106,8 @@ option (NNGCPP_ENABLE_COVERAGE "Enable coverage reporting." OFF)
 #     endif()
 # endif()
 
-# Relative path from the top-level CMake working directory.
-add_subdirectory (swig/cpp)
-# include (swig/cpp/CMakeLists.txt)
-
-# # # TODO: TBD: include? or add? probably add is more appropriate...
-# # Connects Source directory to top level CMake.
-# add_subdirectory (src)
+# Connect the CMake chain to the next directory of interest.
+add_subdirectory (swig)
 
 # Build the tools
 
@@ -191,5 +211,6 @@ add_subdirectory (swig/cpp)
 
 # endif ()
 
-install (TARGETS LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
-install (TARGETS ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
+# # TODO: TBD: no, the install should happen as close to the "source" project(s) as possible
+# install (TARGETS LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+# install (TARGETS ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})

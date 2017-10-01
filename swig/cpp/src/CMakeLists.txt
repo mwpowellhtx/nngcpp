@@ -24,14 +24,15 @@
 #   IN THE SOFTWARE.
 #
 
-# TODO: TBD: should also include relavent dirs for Windows and across platforms
-include_directories (AFTER SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/swig/cpp/src")
+include_directories (AFTER SYSTEM "${NNG_INSTALL_PREFIX}/include")
 
+# It is recommended to list ALL of the source files like so; as compared/contrasted with, say,
+# file (GLOB) or even file (GLOB_RECURSE). This is because CMake fails to see new or updates
+# files that are GLOB'ed unless detectable changes also occur to the CMake files themselves.
 set (NNGCPP_CPP_SRCS
     nngcpp.h
-
+    nngcpp_integration.h
     core/core.h
-
     core/device.cpp
     core/device.h
     core/dialer.cpp
@@ -52,114 +53,109 @@ set (NNGCPP_CPP_SRCS
     core/session.h
     core/socket.cpp
     core/socket.h
-
     protocol/bus/bus.cpp
     protocol/bus/bus.h
-
     protocol/pair/pair_v0.cpp
     protocol/pair/pair_v0.h
     protocol/pair/pair_v1.cpp
     protocol/pair/pair_v1.h
-
     protocol/pipeline/pull.cpp
     protocol/pipeline/pull.h
     protocol/pipeline/push.cpp
-    protocol/pipeline/push.c
-
+    protocol/pipeline/push.h
     protocol/pubsub/pub.cpp
     protocol/pubsub/pub.h
     protocol/pubsub/sub.cpp
     protocol/pubsub/sub.h
-
     protocol/reqrep/rep.cpp
     protocol/reqrep/rep.h
     protocol/reqrep/req.cpp
     protocol/reqrep/req.h
-
     protocol/survey/respond.cpp
     protocol/survey/respond.h
     protocol/survey/survey.cpp
     protocol/survey/survey.h
-
-    # The Transports are an internal concern done within the NNG code itself, FOR NOW.
 )
+
+macro (process_source_groups)
+
+    message (STATUS "Processing source groups for project '${PROJECT_NAME}' ...")
+    foreach (f IN ITEMS ${ARGN})
+        if (IS_ABSOLUTE "${f}")
+            file (RELATIVE_PATH f_rel "${CMAKE_CURRENT_SOURCE_DIR}" "${f}")
+        else ()
+            set (f_rel "${f}")
+        endif ()
+        get_filename_component (f_path "${f_rel}" PATH)
+        # TODO: TBD: this one may get somewhat platform specific.
+        string (REPLACE / \\ f_path_msvc "${f_path}")
+        message (STATUS "Placing file '${f}' in source group [${f_path_msvc}] ...")
+        source_group ("${f_path_msvc}" FILES "${f}")
+    endforeach ()
+    message (STATUS "'${PROJECT_NAME}' source groups processing complete.")
+
+endmacro ()
+
+process_source_groups (${NNGCPP_CPP_SRCS})
 
 # Additionally, anything cross-platform is something tucked away in NNG itself.
 # NNG_PLATFORM_POSIX
 # NNG_PLATFORM_WINDOWS
 
-# Provide same folder structure in IDE as on disk.
-foreach (f ${NNGCPP_CPP_SRCS})
+# Technically, PROJECT_NAME is analogous to "Solution Name", which we do not want to confuse with the actual "PROJECTS".
+set (NNGCPP_PROJECT_NAME_BASE nngcpp)
 
-    # message (FATAL_ERROR "File '${f} in path '${CMAKE_CURRENT_SOURCE_DIR}' ...")
-
-    # Get the path of the file relative to source directory.
-    if (IS_ABSOLUTE ${f})
-        file (RELATIVE_PATH f ${CMAKE_CURRENT_SOURCE_DIR} ${f})
-    endif ()
-
-    # TODO: TBD: could (should?) potentially separate these into sources and headers, not unlike a "typical" VC project...
-    set (NNGCPP_CPP_SRC_GROUP "${f}")
-    set (f "${CMAKE_CURRENT_SOURCE_DIR}/${f}")
-
-    # Remove the filename part.
-    string (REGEX REPLACE "(.*)(/[^/]*)$" "\\1" NNGCPP_CPP_SRC_GROUP ${NNGCPP_CPP_SRC_GROUP})
-
-    # CMake source_group expects \\, not /.
-    string (REPLACE / \\ NNGCPP_CPP_SRC_GROUP ${NNGCPP_CPP_SRC_GROUP})
-    source_group ("${NNGCPP_CPP_SRC_GROUP}" FILES ${f})
-
-endforeach ()
-
-
-set (NNCPP_PROJECT_NAME_STATIC ${PROJECT_NAME}.lib)
+set (NNGCPP_PROJECT_NAME_STATIC ${NNGCPP_PROJECT_NAME_BASE}.lib)
 # TODO: TBD: Not .dll across all platforms: may be .so on Linux, for instance.
-set (NNCPP_PROJECT_NAME_SHARED ${PROJECT_NAME}.dll)
+set (NNGCPP_PROJECT_NAME_SHARED ${NNGCPP_PROJECT_NAME_BASE}.dll)
 
-set (NNCPP_PROJECT_STATIC_SOURCE_DIR ${PROJECT_SOURCE_DIR}/static)
-set (NNCPP_PROJECT_STATIC_BINARY_DIR ${PROJECT_BINARY_DIR}/static)
-set (NNCPP_PROJECT_SHARED_SOURCE_DIR ${PROJECT_SOURCE_DIR}/shared)
-set (NNCPP_PROJECT_SHARED_BINARY_DIR ${PROJECT_BINARY_DIR}/shared)
+set (NNGCPP_PROJECT_STATIC_SOURCE_DIR ${PROJECT_SOURCE_DIR}/static)
+set (NNGCPP_PROJECT_STATIC_BINARY_DIR ${PROJECT_BINARY_DIR}/static)
+set (NNGCPP_PROJECT_SHARED_SOURCE_DIR ${PROJECT_SOURCE_DIR}/shared)
+set (NNGCPP_PROJECT_SHARED_BINARY_DIR ${PROJECT_BINARY_DIR}/shared)
 
-set (NNCPP_INSTALL_STATIC_LIBDIR ${CMAKE_INSTALL_LIBDIR}/static)
-set (NNCPP_INSTALL_STATIC_BINDIR ${CMAKE_INSTALL_BINDIR}/static)
-set (NNCPP_INSTALL_SHARED_LIBDIR ${CMAKE_INSTALL_LIBDIR}/shared)
-set (NNCPP_INSTALL_SHARED_BINDIR ${CMAKE_INSTALL_BINDIR}/shared)
+set (NNGCPP_INSTALL_STATIC_LIBDIR ${CMAKE_INSTALL_LIBDIR}/static)
+set (NNGCPP_INSTALL_STATIC_BINDIR ${CMAKE_INSTALL_BINDIR}/static)
+set (NNGCPP_INSTALL_SHARED_LIBDIR ${CMAKE_INSTALL_LIBDIR}/shared)
+set (NNGCPP_INSTALL_SHARED_BINDIR ${CMAKE_INSTALL_BINDIR}/shared)
 
 
 # Configure the STATIC and then the SHARED libraries.
-add_library (${NNCPP_PROJECT_NAME_STATIC} STATIC ${NNGCPP_CPP_SRCS})
-target_compile_definitions (${NNCPP_PROJECT_NAME_STATIC} PUBLIC -D NNG_STATIC_LIB)
+add_library (${NNGCPP_PROJECT_NAME_STATIC} STATIC ${NNGCPP_CPP_SRCS})
+target_compile_definitions (${NNGCPP_PROJECT_NAME_STATIC} PUBLIC -D NNG_STATIC_LIB)
 
-add_library (${NNCPP_PROJECT_NAME_SHARED} SHARED ${NNGCPP_CPP_SRCS})
+add_library (${NNGCPP_PROJECT_NAME_SHARED} SHARED ${NNGCPP_CPP_SRCS})
 # This is where we experience a bit of demarcation from the underlying NNG. We want to
 # be consumers of the NNG static library in this instance, and not the shared library.
-target_compile_definitions (${NNCPP_PROJECT_NAME_SHARED} PRIVATE -D NNG_STATIC_LIB)
+target_compile_definitions (${NNGCPP_PROJECT_NAME_SHARED} PRIVATE -D NNG_STATIC_LIB)
 
 
 # Set library outputs same as top-level project binary outputs
-set_target_properties (${NNCPP_PROJECT_NAME_STATIC} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${NNCPP_PROJECT_STATIC_BINARY_DIR})
-set_target_properties (${NNCPP_PROJECT_NAME_STATIC} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${NNCPP_PROJECT_STATIC_BINARY_DIR})
-set_target_properties (${NNCPP_PROJECT_NAME_STATIC} PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${NNCPP_PROJECT_STATIC_BINARY_DIR})
-# set_target_properties (${NNCPP_PROJECT_NAME_STATIC} PROPERTIES PDB_OUTPUT_DIRECTORY ${NNCPP_PROJECT_STATIC_BINARY_DIR})
-# set_target_properties (${NNCPP_PROJECT_NAME_STATIC} PROPERTIES COMPILE_PDB_OUTPUT_DIRECTORY ${NNCPP_PROJECT_STATIC_SOURCE_DIR})
+set_target_properties (${NNGCPP_PROJECT_NAME_STATIC} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${NNGCPP_PROJECT_STATIC_BINARY_DIR})
+set_target_properties (${NNGCPP_PROJECT_NAME_STATIC} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${NNGCPP_PROJECT_STATIC_BINARY_DIR})
+set_target_properties (${NNGCPP_PROJECT_NAME_STATIC} PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${NNGCPP_PROJECT_STATIC_BINARY_DIR})
+# set_target_properties (${NNGCPP_PROJECT_NAME_STATIC} PROPERTIES PDB_OUTPUT_DIRECTORY ${NNGCPP_PROJECT_STATIC_BINARY_DIR})
+# set_target_properties (${NNGCPP_PROJECT_NAME_STATIC} PROPERTIES COMPILE_PDB_OUTPUT_DIRECTORY ${NNGCPP_PROJECT_STATIC_SOURCE_DIR})
 
-set_target_properties (${NNCPP_PROJECT_NAME_SHARED} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${NNCPP_PROJECT_SHARED_BINARY_DIR})
-set_target_properties (${NNCPP_PROJECT_NAME_SHARED} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${NNCPP_PROJECT_SHARED_BINARY_DIR})
-set_target_properties (${NNCPP_PROJECT_NAME_SHARED} PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${NNCPP_PROJECT_SHARED_BINARY_DIR})
-# set_target_properties (${NNCPP_PROJECT_NAME_SHARED} PROPERTIES PDB_OUTPUT_DIRECTORY ${NNCPP_PROJECT_SHARED_BINARY_DIR})
-# set_target_properties (${NNCPP_PROJECT_NAME_SHARED} PROPERTIES COMPILE_PDB_OUTPUT_DIRECTORY ${NNCPP_PROJECT_SHARED_SOURCE_DIR})
+set_target_properties (${NNGCPP_PROJECT_NAME_SHARED} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${NNGCPP_PROJECT_SHARED_BINARY_DIR})
+set_target_properties (${NNGCPP_PROJECT_NAME_SHARED} PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${NNGCPP_PROJECT_SHARED_BINARY_DIR})
+set_target_properties (${NNGCPP_PROJECT_NAME_SHARED} PROPERTIES ARCHIVE_OUTPUT_DIRECTORY ${NNGCPP_PROJECT_SHARED_BINARY_DIR})
+# set_target_properties (${NNGCPP_PROJECT_NAME_SHARED} PROPERTIES PDB_OUTPUT_DIRECTORY ${NNGCPP_PROJECT_SHARED_BINARY_DIR})
+# set_target_properties (${NNGCPP_PROJECT_NAME_SHARED} PROPERTIES COMPILE_PDB_OUTPUT_DIRECTORY ${NNGCPP_PROJECT_SHARED_SOURCE_DIR})
 
 # message (FATAL_ERROR "Target link libs for '${PROJECT_NAME}' including '${NNGCPP_REQUIRED_LIBS}' ...")
 
-target_link_libraries (${NNCPP_PROJECT_NAME_SHARED} ${NNGCPP_REQUIRED_LIBS})
+add_dependencies (${NNGCPP_PROJECT_NAME_SHARED} nng)
+add_dependencies (${NNGCPP_PROJECT_NAME_STATIC} nng)
+
+target_link_libraries (${NNGCPP_PROJECT_NAME_SHARED} ${NNGCPP_REQUIRED_LIBS})
 
 if (THREADS_HAVE_PTHREAD_ARG)
     add_definitions (-pthread)
 endif ()
 
 if (CMAKE_THREAD_LIBS_INIT)
-    target_link_libraries (${NNCPP_PROJECT_NAME_SHARED} "${CMAKE_THREAD_LIBS_INIT}")
+    target_link_libraries (${NNGCPP_PROJECT_NAME_SHARED} "${CMAKE_THREAD_LIBS_INIT}")
 endif ()
 
 # pkg-config file
@@ -178,41 +174,34 @@ endif()
 # #     DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
 # message (FATAL_ERROR
-    # "Static library dir: '${NNCPP_INSTALL_STATIC_LIBDIR}'"
-    # "Static binaries dir: '${NNCPP_INSTALL_STATIC_BINDIR}'"
-    # "Shared library dir: '${NNCPP_INSTALL_SHARED_LIBDIR}'"
-    # "Shared binaries dir: '${NNCPP_INSTALL_SHARED_BINDIR}'"
+    # "Static library dir: '${NNGCPP_INSTALL_STATIC_LIBDIR}'"
+    # "Static binaries dir: '${NNGCPP_INSTALL_STATIC_BINDIR}'"
+    # "Shared library dir: '${NNGCPP_INSTALL_SHARED_LIBDIR}'"
+    # "Shared binaries dir: '${NNGCPP_INSTALL_SHARED_BINDIR}'"
 # )
 
 # # ????
-# install (TARGETS ${NNCPP_PROJECT_NAME_STATIC}
-    # ARCHIVE DESTINATION ${NNCPP_INSTALL_STATIC_LIBDIR}
-    # LIBRARY DESTINATION ${NNCPP_INSTALL_STATIC_LIBDIR}
-    # RUNTIME DESTINATION ${NNCPP_INSTALL_STATIC_BINDIR}
+# install (TARGETS ${NNGCPP_PROJECT_NAME_STATIC}
+    # ARCHIVE DESTINATION ${NNGCPP_INSTALL_STATIC_LIBDIR}
+    # LIBRARY DESTINATION ${NNGCPP_INSTALL_STATIC_LIBDIR}
+    # RUNTIME DESTINATION ${NNGCPP_INSTALL_STATIC_BINDIR}
 # )
 
 # # ????
-# install (TARGETS ${NNCPP_PROJECT_NAME_SHARED}
-    # ARCHIVE DESTINATION ${NNCPP_INSTALL_SHARED_LIBDIR}
-    # LIBRARY DESTINATION ${NNCPP_INSTALL_SHARED_LIBDIR}
-    # RUNTIME DESTINATION ${NNCPP_INSTALL_SHARED_BINDIR}
+# install (TARGETS ${NNGCPP_PROJECT_NAME_SHARED}
+    # ARCHIVE DESTINATION ${NNGCPP_INSTALL_SHARED_LIBDIR}
+    # LIBRARY DESTINATION ${NNGCPP_INSTALL_SHARED_LIBDIR}
+    # RUNTIME DESTINATION ${NNGCPP_INSTALL_SHARED_BINDIR}
 # )
 
+# Yes, in fact we want install () to be as close to the specific source as possible.
 install (
-    TARGETS ${NNCPP_PROJECT_NAME_SHARED} ${NNCPP_PROJECT_NAME_STATIC}
+    TARGETS ${NNGCPP_PROJECT_NAME_SHARED} ${NNGCPP_PROJECT_NAME_STATIC}
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
-# # TODO: TBD: not here but at the top level then?
-# install (TARGETS LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
-# install (TARGETS ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
-
-# # TODO: TBD: GLOB may not be the best choice here...
-# file (GLOB_RECURSE NNCPP_HEADER_FILES ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
-# install (FILES ${NNCPP_HEADER_FILES} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-
-# if (NNCPP_ENABLE_NNGCAT)
+# if (NNGCPP_ENABLE_NNGCAT)
 #     install (TARGETS nngcat RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 # endif()

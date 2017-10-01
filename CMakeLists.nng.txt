@@ -28,12 +28,12 @@
 # Should be running this from the top-most repository directory. This
 # should also go without saying, but may not be as obvious to all.
 
-set (NNGCPP_REPOS_ROOT_DIR ${nngcpp_SOURCE_DIR}/repos)
+set (NNGCPP_REPOS_ROOT_DIR ${NngCppAndSwig_SOURCE_DIR}/repos)
 set (NNGCPP_REPO_RELATIVE_DIR nng)
 set (NNGCPP_GIT_RELATIVE_DIR .git)
 set (NNGCPP_NNG_REPO_ROOT_DIR ${NNGCPP_REPOS_ROOT_DIR}/${NNGCPP_REPO_RELATIVE_DIR})
 set (NNGCPP_GIT_REPO_URL "git@github.com:nanomsg/nng.git")
-set (NNGCPP_NNG_BUILD_DIR ${nngcpp_SOURCE_DIR}/nngbuild)
+set (NNGCPP_NNG_BUILD_DIR ${NngCppAndSwig_SOURCE_DIR}/nngbuild)
 
 macro (nngcpp_nng_git_clone_repo REPO_DIR)
 

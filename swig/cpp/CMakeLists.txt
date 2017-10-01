@@ -38,13 +38,13 @@ macro (nngcpp_verify_cxx_compiler)
 
     if (NOT CXX_COMPILER_HAS_11)
         message (FATAL_ERROR "C++11 support is required from the '${CMAKE_CXX_COMPILER}' compiler.")
-    else ()
-        # # TODO: TBD: may need/want to append the flags right here and now...
-        # set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-        # TODO: TBD: alternately, this may also work.
-        # Running with --std:c++11 for purposes of this wrapper.
-        set (CMAKE_CXX_STANDARD 11)
     endif ()
+
+    # # TODO: TBD: may need/want to append the flags right here and now...
+    # set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+    # TODO: TBD: alternately, this may also work.
+    # Running with --std:c++11 for purposes of this wrapper.
+    set (CMAKE_CXX_STANDARD 11)
 
 endmacro ()
 
@@ -102,6 +102,10 @@ macro (nngcpp_set_system_definitions SYS)
         add_definitions (-D _WIN32_WINNT=0x0600)
         list (APPEND CMAKE_REQUIRED_DEFINITIONS -D _WIN32_WINNT=0x0600)
 
+        # # TODO: TBD: we may not want this, but be ready for it anyway...
+        # set (CMAKE_VS_INCLUDE_INSTALL_TO_DEFAULT_BUILD 1)
+        # set (CMAKE_VS_INCLUDE_<project_name>_TO_DEFAULT_BUILD 1)
+
     else ()
         # message (AUTHOR_WARNING "WARNING: This platform may not be supported: ${SYS}")
         # message (AUTHOR_WARNING "${ISSUE_REPORT_MSG}")
@@ -152,8 +156,9 @@ endmacro ()
 
 macro (nngcpp_verify_required_build_opts)
 
-    # TODO: TBD: which should be copied from the nng_static.lib output discovered during the NNG configuration steps.
-    set (NNGCPP_REQUIRED_LIBS ${NNGCPP_REQUIRED_LIBS} nng)
+    # # # TODO: TBD: this one is taken care of by the external project; or it SHOULD be.
+    # # TODO: TBD: which should be copied from the nng_static.lib output discovered during the NNG configuration steps.
+    # set (NNGCPP_REQUIRED_LIBS ${NNGCPP_REQUIRED_LIBS} nng)
 
     if (WIN32)
 
@@ -218,6 +223,9 @@ nngcpp_set_system_definitions ("${CMAKE_SYSTEM_NAME}")
 nngcpp_set_build_definition ()
 
 nngcpp_verify_required_build_opts ()
+
+# Based on the fact that CMAKE_CURRENT_SOURCE_DIR should now be .../swig/cpp
+include_directories (AFTER SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/include")
 
 # Relative path from the top-level CMake working directory.
 add_subdirectory (src)
