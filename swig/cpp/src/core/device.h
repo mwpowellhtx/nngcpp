@@ -4,6 +4,7 @@
 #include "../nngcpp_integration.h"
 
 #include <memory>
+#include <thread>
 
 namespace nng {
 
@@ -23,9 +24,9 @@ namespace nng {
     class device {
         private:
 
-            void* thread;
-
             std::unique_ptr<device_path> _pathp;
+
+            std::unique_ptr<std::thread> _threadp;
 
         public:
 

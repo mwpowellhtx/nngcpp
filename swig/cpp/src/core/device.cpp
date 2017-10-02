@@ -1,8 +1,6 @@
 #include "socket.h"
 #include "device.h"
 
-#include <thread>
-
 namespace nng {
 
     device_path::device_path(socket* const asockp, socket* const bsockp, bool shouldClose)
@@ -22,20 +20,19 @@ namespace nng {
     }
 
     device::device(socket* const asockp, socket* const bsockp, bool shouldCloseSockets)
-        : thread(nullptr)
-            , _pathp(std::make_unique<device_path>(asockp, bsockp, shouldCloseSockets)) {
-
-        // Install the Device and Re-Join the Installer Thread.
-        std::thread installer(nng::install_device_sockets_callback, _pathp.get());
-        installer.join();
+        : _pathp(std::make_unique<device_path>(asockp, bsockp, shouldCloseSockets))
+            , _threadp(std::make_unique<std::thread>(nng::install_device_sockets_callback, _pathp.get())) {
     }
 
     device::~device() {
 
-        /* Which closes each Device, but does not actually delete the Socket itself, especially
-        the event this was still attached to a smart pointer in another scope. */
+        /* Which closes each component involved in the Device, but does not actually delete
+        the Socket itself, especially the event this was still attached to a smart pointer
+        in another scope. */
+
         _pathp.release();
 
-        // TODO: TBD: is there anything else to "destroy" at this time?
+        // Then we should be able to re-join the thread.
+        _threadp->join();
     }
 }
