@@ -53,11 +53,15 @@ namespace nng {
 
             nng_exception();
 
-            nng_exception(int error_code);
+            nng_exception(int errnum);
 
-            nng_exception(error_code_type error_code);
+            nng_exception(error_code_type ec);
 
             virtual ~nng_exception();
+
+            static const std::string strerror(int errnum);
+
+            static const std::string strerror(error_code_type ec);
     };
 }
 
