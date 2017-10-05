@@ -29,6 +29,9 @@ cmake_minimum_required (VERSION 3.1)
 # Analog to the Visual Studio Solution paradigm.
 project (NngCppAndSwig CXX)
 
+include (ExternalProject)
+# TODO: TBD: Processor Count was included for purposes of supporting a Boost build, but since then I've gone a different direction
+include (ProcessorCount)
 include (GNUInstallDirs)
 
 option (CMAKE_CONFIGURATION_TYPES "" Debug)
@@ -60,8 +63,9 @@ verify_git_exists()
 # should also go without saying, but may not be as obvious to all.
 
 set (NNGCPP_SWIG_DIR ${NngCppAndSwig_SOURCE_DIR}/swig)
-
 set (NNG_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/nngbuild)
+set (NNG_GIT_REPO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/repos/nng)
+set (CATCH_GIT_REPO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/repos/catch)
 
 if (OFF)
 
@@ -71,22 +75,42 @@ if (OFF)
 
 else ()
 
-    include (ExternalProject)
+    set (NNG_GIT_TAG HEAD)
 
     ExternalProject_Add (nng
-        # PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/repos/nng
         GIT_REPOSITORY git@github.com:nanomsg/nng.git
-        GIT_TAG HEAD
+        GIT_TAG ${NNG_GIT_TAG}
         GIT_PROGRESS ON
-        SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/repos/nng
+        SOURCE_DIR ${NNG_GIT_REPO_DIR}
         CMAKE_ARGS -DCMAKE_INSTALL_PREFIX:STRING=${NNG_INSTALL_PREFIX} -DNNG_ENABLE_COVERAGE:BOOL=OFF -DNNG_ENABLE_DOC:BOOL=OFF -DNNG_ENABLE_NNGCAT:BOOL=OFF -DNNG_ENABLE_TESTS:BOOL=OFF -DNNG_ENABLE_TOOLS:BOOL=OFF -DNNG_ENABLE_ZEROTIER:BOOL=OFF
         LOG_DOWNLOAD ON
-        LOG_UPDATE ON
-        LOG_CONFIGURE ON
-        LOG_BUILD ON
     )
 
+    message (STATUS "NNG '${NNG_GIT_TAG}' build configured.")
+
 endif ()
+
+macro (nngcpp_get_test_dependencies TESTS_ENABLED)
+
+    if (${TESTS_ENABLED})
+
+        set (CATCH_GIT_TAG v1.10.0)
+
+        ExternalProject_Add (download_catch
+            GIT_REPOSITORY git@github.com:philsquared/Catch.git
+            GIT_TAG ${CATCH_GIT_TAG}
+            GIT_PROGRESS ON
+            SOURCE_DIR ${CATCH_GIT_REPO_DIR}
+            LOG_DOWNLOAD ON
+        )
+
+        message (STATUS "Catch '${CATCH_GIT_TAG}' download configured.")
+
+    endif ()
+
+endmacro ()
+
+nngcpp_get_test_dependencies (${NNGCPP_ENABLE_TESTS})
 
 # if (NNG_ENABLE_COVERAGE)
 #     # NB: This only works for GCC and Clang 3.0 and newer.  If your stuff
