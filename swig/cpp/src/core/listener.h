@@ -34,13 +34,13 @@ namespace nng {
             void start(int flags);
             void close();
 
-            virtual void set_option_int(const std::string* const cnamecp, int val);
-            virtual void set_option_size(const std::string* const cnamecp, option_size_type val);
-            virtual void set_option_usec(const std::string* const cnamecp, option_ulonglong_type val);
+            virtual void set_option_int(const std::string& name, int val);
+            virtual void set_option_size(const std::string& name, option_size_type val);
+            virtual void set_option_usec(const std::string& name, option_ulonglong_type val);
 
-            virtual void get_option_int(const std::string* const cnamecp, int* valp);
-            virtual void get_option_size(const std::string* const cnamecp, option_size_type* valp);
-            virtual void get_option_usec(const std::string* const cnamecp, option_ulonglong_type* valp);
+            virtual void get_option_int(const std::string& name, int* valp);
+            virtual void get_option_size(const std::string& name, option_size_type* valp);
+            virtual void get_option_usec(const std::string& name, option_ulonglong_type* valp);
     };
 }
 

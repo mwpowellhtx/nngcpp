@@ -47,15 +47,10 @@ namespace nng {
 
     template<class Buffer>
     int send(int id, Buffer const& buffer, std::size_t sz, int flags) {
-        auto ec = ::nng_send(id, (void*)buffer.data(), buffer.size(), flags);
+        auto ec = ::nng_send(id, (void*)&buffer[0], sz, flags);
         return ec;
     }
     
-    template<class Buffer>
-    int send(int id, const Buffer& buffer, int flags) {
-        return send(id, buffer, buffer.size(), flags);
-    }
-
     template<class Buffer>
     int try_receive(int id, Buffer& buffer, std::size_t& sz, int flags) {
         buffer.resize(sz);
@@ -64,7 +59,7 @@ namespace nng {
     }
 
     int socket::send(const std::string& str, int flags) {
-        return nng::send(sid, str, str.size(), flags);
+        return nng::send(sid, str, str.length() + 1, flags);
     }
 
     int socket::send(const std::string& str, send_size_type sz, int flags) {
@@ -100,28 +95,28 @@ namespace nng {
     }
 
     // Convenience option wrappers.
-    void socket::set_option_int(const std::string* const cnamecp, int val) {
-        auto ec = ::nng_setopt_int(sid, cnamecp->c_str(), val);
+    void socket::set_option_int(const std::string& name, int val) {
+        auto ec = ::nng_setopt_int(sid, name.c_str(), val);
     }
 
-    void socket::set_option_size(const std::string* const cnamecp, option_size_type val) {
-        auto ec = ::nng_setopt_size(sid, cnamecp->c_str(), val);
+    void socket::set_option_size(const std::string& name, option_size_type val) {
+        auto ec = ::nng_setopt_size(sid, name.c_str(), val);
     }
 
-    void socket::set_option_usec(const std::string* const cnamecp, uint64_t val) {
-        auto ec = ::nng_setopt_usec(sid, cnamecp->c_str(), val);
+    void socket::set_option_usec(const std::string& name, uint64_t val) {
+        auto ec = ::nng_setopt_usec(sid, name.c_str(), val);
     }
 
-    void socket::get_option_int(const std::string* const cnamecp, int* valp) {
-        auto ec = ::nng_getopt_int(sid, cnamecp->c_str(), valp);
+    void socket::get_option_int(const std::string& name, int* valp) {
+        auto ec = ::nng_getopt_int(sid, name.c_str(), valp);
     }
 
-    void socket::get_option_size(const std::string* const cnamecp, option_size_type* valp) {
-        auto ec = ::nng_getopt_size(sid, cnamecp->c_str(), valp);
+    void socket::get_option_size(const std::string& name, option_size_type* valp) {
+        auto ec = ::nng_getopt_size(sid, name.c_str(), valp);
     }
 
-    void socket::get_option_usec(const std::string* const cnamecp, uint64_t* valp) {
-        auto ec = ::nng_getopt_usec(sid, cnamecp->c_str(), valp);
+    void socket::get_option_usec(const std::string& name, uint64_t* valp) {
+        auto ec = ::nng_getopt_usec(sid, name.c_str(), valp);
     }
 
     protocol_type to_protocol_type(int value) {

@@ -31,27 +31,27 @@ namespace nng {
     }
 
 
-    void listener::set_option_int(const std::string* const cnamecp, int val) {
-        auto ec = ::nng_listener_setopt_int(lid, cnamecp->c_str(), val);
+    void listener::set_option_int(const std::string& name, int val) {
+        auto ec = ::nng_listener_setopt_int(lid, name.c_str(), val);
     }
 
-    void listener::set_option_size(const std::string* const cnamecp, option_size_type val) {
-        auto ec = ::nng_listener_setopt_size(lid, cnamecp->c_str(), val);
+    void listener::set_option_size(const std::string& name, option_size_type val) {
+        auto ec = ::nng_listener_setopt_size(lid, name.c_str(), val);
     }
 
-    void listener::set_option_usec(const std::string* const cnamecp, option_ulonglong_type val) {
-        auto ec = ::nng_listener_setopt_usec(lid, cnamecp->c_str(), val);
+    void listener::set_option_usec(const std::string& name, option_ulonglong_type val) {
+        auto ec = ::nng_listener_setopt_usec(lid, name.c_str(), val);
     }
 
-    void listener::get_option_int(const std::string* const cnamecp, int* valp) {
-        auto ec = ::nng_listener_getopt_int(lid, cnamecp->c_str(), valp);
+    void listener::get_option_int(const std::string& name, int* valp) {
+        auto ec = ::nng_listener_getopt_int(lid, name.c_str(), valp);
     }
 
-    void listener::get_option_size(const std::string* const cnamecp, option_size_type* valp) {
-        auto ec = ::nng_listener_getopt_size(lid, cnamecp->c_str(), valp);
+    void listener::get_option_size(const std::string& name, option_size_type* valp) {
+        auto ec = ::nng_listener_getopt_size(lid, name.c_str(), valp);
     }
 
-    void listener::get_option_usec(const std::string* const cnamecp, option_ulonglong_type* valp) {
-        auto ec = ::nng_listener_getopt_usec(lid, cnamecp->c_str(), valp);
+    void listener::get_option_usec(const std::string& name, option_ulonglong_type* valp) {
+        auto ec = ::nng_listener_getopt_usec(lid, name.c_str(), valp);
     }
 }

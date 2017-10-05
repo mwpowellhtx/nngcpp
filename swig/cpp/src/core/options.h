@@ -23,13 +23,13 @@ namespace nng {
             //virtual void set_option(const char* name, const void* v, option_size_type sz) = 0;
             //virtual void get_option(const char* name, void* val, option_size_type* szp) = 0;
 
-            virtual void set_option_int(const std::string* const cnamecp, int val) = 0;
-            virtual void set_option_size(const std::string* const cnamecp, option_size_type val) = 0;
-            virtual void set_option_usec(const std::string* const cnamecp, option_ulonglong_type val) = 0;
+            virtual void set_option_int(const std::string& name, int val) = 0;
+            virtual void set_option_size(const std::string& name, option_size_type val) = 0;
+            virtual void set_option_usec(const std::string& name, option_ulonglong_type val) = 0;
 
-            virtual void get_option_int(const std::string* const cnamecp, int* valp) = 0;
-            virtual void get_option_size(const std::string* const cnamecp, option_size_type* valp) = 0;
-            virtual void get_option_usec(const std::string* const cnamecp, option_ulonglong_type* valp) = 0;
+            virtual void get_option_int(const std::string& name, int* valp) = 0;
+            virtual void get_option_size(const std::string& name, option_size_type* valp) = 0;
+            virtual void get_option_usec(const std::string& name, option_ulonglong_type* valp) = 0;
     };
 
     struct option_names {

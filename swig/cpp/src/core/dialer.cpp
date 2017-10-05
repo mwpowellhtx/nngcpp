@@ -32,27 +32,27 @@ namespace nng {
         }
     }
 
-    void dialer::set_option_int(const std::string* const cnamecp, int val) {
-        auto ec = ::nng_dialer_setopt_int(did, cnamecp->c_str(), val);
+    void dialer::set_option_int(const std::string& name, int val) {
+        auto ec = ::nng_dialer_setopt_int(did, name.c_str(), val);
     }
 
-    void dialer::set_option_size(const std::string* const cnamecp, option_size_type val) {
-        auto ec = ::nng_dialer_setopt_size(did, cnamecp->c_str(), val);
+    void dialer::set_option_size(const std::string& name, option_size_type val) {
+        auto ec = ::nng_dialer_setopt_size(did, name.c_str(), val);
     }
 
-    void dialer::set_option_usec(const std::string* const cnamecp, option_ulonglong_type val) {
-        auto ec = ::nng_dialer_setopt_usec(did, cnamecp->c_str(), val);
+    void dialer::set_option_usec(const std::string& name, option_ulonglong_type val) {
+        auto ec = ::nng_dialer_setopt_usec(did, name.c_str(), val);
     }
 
-    void dialer::get_option_int(const std::string* const cnamecp, int* valp) {
-        auto ec = ::nng_dialer_getopt_int(did, cnamecp->c_str(), valp);
+    void dialer::get_option_int(const std::string& name, int* valp) {
+        auto ec = ::nng_dialer_getopt_int(did, name.c_str(), valp);
     }
 
-    void dialer::get_option_size(const std::string* const cnamecp, option_size_type* valp) {
-        auto ec = ::nng_dialer_getopt_size(did, cnamecp->c_str(), valp);
+    void dialer::get_option_size(const std::string& name, option_size_type* valp) {
+        auto ec = ::nng_dialer_getopt_size(did, name.c_str(), valp);
     }
 
-    void dialer::get_option_usec(const std::string* const cnamecp, option_ulonglong_type* valp) {
-        auto ec = ::nng_dialer_getopt_usec(did, cnamecp->c_str(), valp);
+    void dialer::get_option_usec(const std::string& name, option_ulonglong_type* valp) {
+        auto ec = ::nng_dialer_getopt_usec(did, name.c_str(), valp);
     }
 }

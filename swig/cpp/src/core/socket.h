@@ -82,13 +82,13 @@ namespace nng {
             void close();
 
             // Convenience option wrappers.
-            void set_option_int(const std::string* const cnamecp, int val);
-            void set_option_size(const std::string* const cnamecp, option_size_type val);
-            void set_option_usec(const std::string* const cnamecp, uint64_t val);
+            void set_option_int(const std::string& name, int val);
+            void set_option_size(const std::string& name, option_size_type val);
+            void set_option_usec(const std::string& name, uint64_t val);
 
-            void get_option_int(const std::string* const cnamecp, int* valp);
-            void get_option_size(const std::string* const cnamecp, option_size_type* valp);
-            void get_option_usec(const std::string* const cnamecp, uint64_t* valp);
+            void get_option_int(const std::string& name, int* valp);
+            void get_option_size(const std::string& name, option_size_type* valp);
+            void get_option_usec(const std::string& name, uint64_t* valp);
 
             virtual int send(const std::string& str, int flags = 0);
             virtual int send(const std::string& str, send_size_type sz, int flags = 0);
