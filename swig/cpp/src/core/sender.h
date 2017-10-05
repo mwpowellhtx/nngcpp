@@ -11,9 +11,12 @@
 namespace nng {
 
     class sender {
-        protected:
+        public:
 
             typedef std::size_t send_size_type;
+
+        protected:
+
             typedef std::vector<uint8_t> send_vector;
 
             sender();

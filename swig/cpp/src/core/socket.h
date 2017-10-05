@@ -13,6 +13,13 @@
 
 namespace nng {
 
+    // Flags.
+    enum flag_type {
+        flag_allog = ::NNG_FLAG_ALLOC,
+        flag_nonblock = ::NNG_FLAG_NONBLOCK,
+        flag_dryrun = NNG_FLAG_DRYRUN
+    };
+
     enum protocol_type {
         protocol_none = ::NNG_PROTO_NONE,
 
@@ -44,6 +51,10 @@ namespace nng {
     };
 
     protocol_type to_protocol_type(int value);
+    flag_type to_flag_type(int value);
+
+    int to_int(const protocol_type value);
+    int to_int(const flag_type value);
 
     class listener;
     class dialer;
@@ -96,7 +107,7 @@ namespace nng {
             virtual int send(const send_vector& buffer, int flags = 0);
             virtual int send(const send_vector& buffer, send_size_type sz, int flags = 0);
 
-            virtual int try_receive(std::string& str, receive_size_type& sz, int flags = 0);
+            virtual int try_receive(std::string& str, const receive_size_type sz, int flags = 0);
             virtual std::string socket::receive_str(receive_size_type& sz, int flags = 0);
 
             virtual int try_receive(receive_vector& str, receive_size_type& sz, int flags = 0);

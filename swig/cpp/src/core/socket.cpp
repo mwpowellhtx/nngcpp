@@ -74,7 +74,7 @@ namespace nng {
         return nng::send(sid, buffer, sz, flags);
     }
 
-    int socket::try_receive(std::string& str, receive_size_type& sz, int flags) {
+    int socket::try_receive(std::string& str, receive_size_type sz, int flags) {
         return nng::try_receive(sid, str, sz, flags);
     }
 
@@ -121,6 +121,18 @@ namespace nng {
 
     protocol_type to_protocol_type(int value) {
         return static_cast<protocol_type>(value);
+    }
+
+    flag_type to_flag_type(int value) {
+        return static_cast<flag_type>(value);
+    }
+
+    int to_int(const protocol_type value) {
+        return static_cast<int>(value);
+    }
+
+    int to_int(const flag_type value) {
+        return static_cast<int>(value);
     }
 
     protocol_type socket::get_protocol() const {
