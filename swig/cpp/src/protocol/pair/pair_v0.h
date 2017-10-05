@@ -18,7 +18,8 @@ namespace nng {
             };
         }
 
-        typedef v0::pair_socket pair_socket;
+        //// TODO: TBD: will assume that v1 is the appropriate version for the time being.
+        //typedef v0::pair_socket latest_pair_socket;
     }
 }
 

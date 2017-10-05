@@ -18,7 +18,7 @@ namespace nng {
             };
         }
 
-        typedef v0::respond_socket respond_socket;
+        typedef v0::respond_socket latest_respond_socket;
     }
 }
 

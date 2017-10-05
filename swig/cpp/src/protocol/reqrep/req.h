@@ -18,7 +18,7 @@ namespace nng {
             };
         }
 
-        typedef v0::req_socket req_socket;
+        typedef v0::req_socket latest_req_socket;
     }
 }
 

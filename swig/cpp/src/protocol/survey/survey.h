@@ -18,7 +18,7 @@ namespace nng {
             };
         }
 
-        typedef v0::survey_socket survey_socket;
+        typedef v0::survey_socket latest_survey_socket;
     }
 }
 

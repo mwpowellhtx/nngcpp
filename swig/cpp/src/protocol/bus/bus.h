@@ -20,7 +20,7 @@ namespace nng {
             };
         }
 
-        typedef v0::bus_socket bus_socket;
+        typedef v0::bus_socket latest_bus_socket;
     }
 }
 

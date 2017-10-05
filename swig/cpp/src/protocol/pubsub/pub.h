@@ -18,7 +18,7 @@ namespace nng {
             };
         }
 
-        typedef v0::pub_socket pub_socket;
+        typedef v0::pub_socket latest_pub_socket;
     }
 }
 

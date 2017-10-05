@@ -18,7 +18,7 @@ namespace nng {
             };
         }
 
-        typedef v0::rep_socket rep_socket;
+        typedef v0::rep_socket latest_rep_socket;
     }
 }
 

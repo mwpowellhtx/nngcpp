@@ -18,7 +18,7 @@ namespace nng {
             };
         }
 
-        typedef v0::pull_socket pull_socket;
+        typedef v0::pull_socket latest_pull_socket;
     }
 }
 

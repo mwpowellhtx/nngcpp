@@ -18,7 +18,7 @@ namespace nng {
             };
         }
 
-        typedef v1::pair_socket pair_socket;
+        typedef v1::pair_socket latest_pair_socket;
     }
 }
 

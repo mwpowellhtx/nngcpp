@@ -18,7 +18,7 @@ namespace nng {
             };
         }
 
-        typedef v0::sub_socket sub_socket;
+        typedef v0::sub_socket latest_sub_socket;
     }
 }
 

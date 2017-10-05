@@ -18,7 +18,7 @@ namespace nng {
             };
         }
 
-        typedef v0::push_socket push_socket;
+        typedef v0::push_socket latest_push_socket;
     }
 }
 
