@@ -1,8 +1,8 @@
 #ifndef NNGCPP_H
 #define NNGCPP_H
 
-#include "nngcpp_integration.h"
+#include "core/session.h"
 
-#include "protocol/protocol.h"
+#include "core/nng_exception.h"
 
 #endif // NNGCPP_H

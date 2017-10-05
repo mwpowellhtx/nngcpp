@@ -23,7 +23,4 @@
 #pragma comment(lib, "nng_static.lib")
 #endif // defined(NNGCPP_SHARED_LIB)
 
-#include "core/options.h"
-#include "core/nng_exception.h"
-
 #endif // NNGCPP_INTEGRATION_H
