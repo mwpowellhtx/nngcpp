@@ -24,6 +24,7 @@ namespace nng {
     const std::string option_names::transport = NNG_OPT_TRANSPORT;
     const std::string option_names::receive_max_size = NNG_OPT_RECVMAXSZ;
     const std::string option_names::min_reconnect_time_usec = NNG_OPT_RECONNMINT;
+    const std::string option_names::max_reconnect_time_usec = NNG_OPT_RECONNMAXT;
     const std::string option_names::sub_subscribe = NNG_OPT_SUB_SUBSCRIBE;
     const std::string option_names::surveyor_survey_time_usec = NNG_OPT_SURVEYOR_SURVEYTIME;
 }
