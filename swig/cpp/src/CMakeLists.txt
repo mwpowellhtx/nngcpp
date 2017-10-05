@@ -105,7 +105,7 @@ process_source_groups (${NNGCPP_CPP_SRCS})
 # Technically, PROJECT_NAME is analogous to "Solution Name", which we do not want to confuse with the actual "PROJECTS".
 set (NNGCPP_PROJECT_NAME_BASE nngcpp)
 
-set (NNGCPP_PROJECT_NAME_STATIC ${NNGCPP_PROJECT_NAME_BASE}.lib)
+set (NNGCPP_PROJECT_NAME_STATIC ${NNGCPP_PROJECT_NAME_BASE}.lib CACHE INTERNAL "")
 # TODO: TBD: Not .dll across all platforms: may be .so on Linux, for instance.
 set (NNGCPP_PROJECT_NAME_SHARED ${NNGCPP_PROJECT_NAME_BASE}.dll)
 
@@ -122,12 +122,13 @@ set (NNGCPP_INSTALL_SHARED_BINDIR ${CMAKE_INSTALL_BINDIR}/shared)
 
 # Configure the STATIC and then the SHARED libraries.
 add_library (${NNGCPP_PROJECT_NAME_STATIC} STATIC ${NNGCPP_CPP_SRCS})
-target_compile_definitions (${NNGCPP_PROJECT_NAME_STATIC} PUBLIC -D NNG_STATIC_LIB)
+# TODO: TBD: /Zc:wchar_t- is for Visual Studio CL.EXE, I think.
+target_compile_definitions (${NNGCPP_PROJECT_NAME_STATIC} PUBLIC -D NNG_STATIC_LIB -D NNGCPP_STATIC_LIB)
 
 add_library (${NNGCPP_PROJECT_NAME_SHARED} SHARED ${NNGCPP_CPP_SRCS})
 # This is where we experience a bit of demarcation from the underlying NNG. We want to
 # be consumers of the NNG static library in this instance, and not the shared library.
-target_compile_definitions (${NNGCPP_PROJECT_NAME_SHARED} PRIVATE -D NNG_STATIC_LIB)
+target_compile_definitions (${NNGCPP_PROJECT_NAME_SHARED} PRIVATE -D NNG_STATIC_LIB -D NNGCPP_SHARED_LIB)
 
 
 # Set library outputs same as top-level project binary outputs
