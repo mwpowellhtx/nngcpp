@@ -168,7 +168,7 @@ macro (nngcpp_verify_required_build_opts)
         set (NNGCPP_REQUIRED_LIBS ${NNGCPP_REQUIRED_LIBS} advapi32)
 
         # nngcpp_check_symbol (InitializeConditionVariable windows.h NNGCPP_HAVE_CONDVAR)
-        # nngcpp_check_symbol (snprintf stdio${_H} NNGCPP_HAVE_SNPRINTF)
+        # nngcpp_check_symbol (snprintf stdio.h NNGCPP_HAVE_SNPRINTF)
 
         # # TODO: TBD: debatable whether this is that required for purposes of supporting the C++ wrapper
         # if (NOT (NNGCPP_HAVE_CONDVAR AND NNGCPP_HAVE_SNPRINTF))
@@ -225,8 +225,12 @@ nngcpp_set_build_definition ()
 nngcpp_verify_required_build_opts ()
 
 # Based on the fact that CMAKE_CURRENT_SOURCE_DIR should now be .../swig/cpp
-include_directories (AFTER SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/include")
+# include_directories (AFTER SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/include")
+# TODO: TBD: for now, includes are represented from the source tree; would be better if we could isolate the header files
+include_directories (AFTER SYSTEM "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 # Relative path from the top-level CMake working directory.
 add_subdirectory (src)
 # include (swig/cpp/src/CMakeLists.txt)
+
+add_subdirectory (tests)
