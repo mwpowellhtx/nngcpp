@@ -31,8 +31,17 @@ namespace nng {
 
             virtual ~dialer();
 
-            void start(int flags);
-            void close();
+            virtual void start(int flags = 0);
+            virtual void close();
+
+            virtual void set_option(const std::string& name, const std::string& val, option_size_type sz);
+            virtual void set_option(const std::string& name, const std::string& val);
+
+            virtual void get_option(const std::string& name, std::string& val);
+            virtual void get_option(const std::string& name, std::string& val, option_size_type& sz);
+
+            virtual void set_option(const std::string& name, const void* v, option_size_type sz);
+            virtual void get_option(const std::string& name, void* val, option_size_type* szp);
 
             virtual void set_option_int(const std::string& name, int val);
             virtual void set_option_size(const std::string& name, option_size_type val);

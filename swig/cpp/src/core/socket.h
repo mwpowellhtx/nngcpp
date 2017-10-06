@@ -15,7 +15,7 @@ namespace nng {
 
     // Flags.
     enum flag_type {
-        flag_allog = ::NNG_FLAG_ALLOC,
+        flag_alloc = ::NNG_FLAG_ALLOC,
         flag_nonblock = ::NNG_FLAG_NONBLOCK,
         flag_dryrun = NNG_FLAG_DRYRUN
     };
@@ -91,8 +91,18 @@ namespace nng {
             void dial(const std::string& addr, dialer* const dp, int flags = 0);
 
             void close();
+            void shutdown();
 
             // Convenience option wrappers.
+            virtual void set_option(const std::string& name, const std::string& val, option_size_type sz);
+            virtual void set_option(const std::string& name, const std::string& val);
+
+            virtual void get_option(const std::string& name, std::string& val);
+            virtual void get_option(const std::string& name, std::string& val, option_size_type& sz);
+
+            virtual void set_option(const std::string& name, const void* v, option_size_type sz);
+            virtual void get_option(const std::string& name, void* val, option_size_type* szp);
+
             void set_option_int(const std::string& name, int val);
             void set_option_size(const std::string& name, option_size_type val);
             void set_option_usec(const std::string& name, uint64_t val);

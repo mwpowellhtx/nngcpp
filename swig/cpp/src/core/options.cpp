@@ -22,7 +22,7 @@ namespace nng {
     const std::string option_names::max_ttl = NNG_OPT_MAXTTL;
     const std::string option_names::protocol = NNG_OPT_PROTOCOL;
     const std::string option_names::transport = NNG_OPT_TRANSPORT;
-    const std::string option_names::receive_max_size = NNG_OPT_RECVMAXSZ;
+    const std::string option_names::max_receive_size = NNG_OPT_RECVMAXSZ;
     const std::string option_names::min_reconnect_time_usec = NNG_OPT_RECONNMINT;
     const std::string option_names::max_reconnect_time_usec = NNG_OPT_RECONNMAXT;
     const std::string option_names::sub_subscribe = NNG_OPT_SUB_SUBSCRIBE;

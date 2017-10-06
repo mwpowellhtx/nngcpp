@@ -14,6 +14,9 @@ namespace nng {
         public:
 
             virtual ~endpoint();
+
+            virtual void start(int flags = 0) = 0;
+            virtual void close() = 0;
     };
 }
 
