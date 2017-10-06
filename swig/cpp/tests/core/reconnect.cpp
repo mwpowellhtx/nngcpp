@@ -15,25 +15,15 @@
 #include <memory>
 #include <thread>
 
-#define APPENDSTR(m, s) nng_msg_append(m, s, strlen(s))
-#define CHECKSTR(m, s)                   \
-	So(nng_msg_len(m) == strlen(s)); \
-	So(memcmp(nng_msg_body(m), s, strlen(s)) == 0)
+//#define APPENDSTR(m, s) nng_msg_append(m, s, strlen(s))
+//#define CHECKSTR(m, s)\ 
+//So(nng_msg_len(m) == strlen(s)); \
+//So(memcmp(nng_msg_body(m), s, strlen(s)) == 0)
 
-namespace nng {
-    struct messages {
-    private:
-        messages() {}
-
-    public:
-
-        static const std::string hello;
-        static const std::string again;
-    };
+namespace constants {
+    const std::string hello = "hello";
+    const std::string again = "again";
 }
-
-const std::string nng::messages::hello = "hello";
-const std::string nng::messages::again = "again";
 
 TEST_CASE("Reconnect works", "[reconnect]") {
 
@@ -41,8 +31,8 @@ TEST_CASE("Reconnect works", "[reconnect]") {
     using namespace std::chrono;
     using namespace nng;
     using namespace nng::protocol;
+    using namespace constants;
     using _opt_ = option_names;
-    using msgs = messages;
 
     // Which "at-exit" destructor handles cleaning up the NNG resources: i.e. ::nng_fini.
     session _session_;
@@ -76,7 +66,6 @@ TEST_CASE("Reconnect works", "[reconnect]") {
             per se. Rather, we should simply be able to "frame" buffers or strings, accordingly. */
             SECTION("We can send a frame") {
                 this_thread::sleep_for(100ms);
-                const auto& hello = msgs::hello;
                 REQUIRE_NOTHROW(push->send(hello, hello.length()));
                 string r;
                 REQUIRE_NOTHROW(pull->try_receive(r, hello.length()));
@@ -89,14 +78,14 @@ TEST_CASE("Reconnect works", "[reconnect]") {
             REQUIRE_NOTHROW(push->dial(addr, to_int(flag_nonblock)));
 
             {
-                auto lp = _session_.create_listener();
-                REQUIRE(lp.get());
+                shared_ptr<listener> lp;
+
+                REQUIRE_NOTHROW(lp = _session_.create_listener_ep());
 
                 REQUIRE_NOTHROW(pull->listen(addr, lp.get()));
                 this_thread::sleep_for(100ms);
 
-                _session_.remove_listener(lp.get());
-                lp.reset();
+                REQUIRE_NOTHROW(_session_.remove_listener_ep(lp.get()));
             }
 
             REQUIRE_NOTHROW(pull->listen(addr));
