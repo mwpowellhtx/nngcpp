@@ -34,8 +34,9 @@ namespace nng {
                 const auto after = now();
 
                 // TODO: TBD: ugh... timing is such a difficult thing to gauge accurately...
-                REQUIRE(after >= (before + timeout));
-                REQUIRE(after < (before + timeout * 2));
+                // TODO: TBD: Catch does not support std::chrono::duration (yet...), so in the meantime, this will at least yield numbers that we can review in the logs.
+                REQUIRE(after.time_since_epoch().count() >= (before + timeout).time_since_epoch().count());
+                REQUIRE(after.time_since_epoch().count() < (before + timeout * 2).time_since_epoch().count());
             }
     };
 
