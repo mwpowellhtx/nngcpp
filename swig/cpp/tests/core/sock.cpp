@@ -18,8 +18,73 @@
 #include <memory>
 #include <thread>
 #include <algorithm>
+#include <ostream>
 
 #define STRINGIFY(x)    #x
+
+/* Translating from std::exception parlance, we have:
+http://www.cplusplus.com/reference/exception/exception/what/ */
+CATCH_TRANSLATE_EXCEPTION(std::exception& ex) {
+    return (std::string("std::exception: ") + ex.what()).c_str();
+}
+
+CATCH_TRANSLATE_EXCEPTION(nng::nng_exception& ex) {
+    return (std::string("nng::nng_exception: ") + ex.what()).c_str();
+}
+
+////// TODO: TBD: methinks at this point that "matchers" are not what I'm thinking they are: i.e. not for "aligning with exceptions"
+////// TODO: TBD: Rather, that seems to be reserved for the REQUIRE_THROWS_WITH, which itself requires some comprehension of a string representation for my exceptions
+//// TODO: TBD: this one is definitely potentially deserving of a dedicated header file, especially considering its broad utility
+//struct nng_exception_matcher : Catch::MatcherBase<nng::nng_exception> {
+//private:
+//    nng::error_code_type _expected_error_code;
+//    std::string _nameof;
+//
+//public:
+//
+//    // TODO: TBD: is there a better way to "stringify" the name of a C++ enum?
+//    nng_exception_matcher(nng::error_code_type expected_error_code, const std::string& nameof)
+//        : MatcherBase()
+//        , _expected_error_code(expected_error_code)
+//        , _nameof(nameof) {
+//    }
+//
+//    virtual bool match(const nng::nng_exception& ex) const override {
+//        return ex.error_code == _expected_error_code;
+//    }
+//
+//    virtual std::string describe() const {
+//        std::ostringstream os;
+//        os << "expected exception '" << _nameof << "' (" << _expected_error_code << ")";
+//        return os.str();
+//    }
+//};
+//
+//namespace Catch {
+//    //template <typename ArgT>
+//    //inline void ResultBuilder::captureMatch<ArgT, nng_exception_matcher>(
+//    //    ArgT const& arg, nng_exception_matcher const& matcher, char const* matcherString) {
+//
+//    //    MatchExpression<ArgT const&, nng_exception_matcher const&> expr(arg, matcher, matcherString);
+//    //    setResultType(matcher.match(arg));
+//    //    endExpression(expr);
+//    //}
+//
+//    template <>
+//    inline void ResultBuilder::captureMatch<nng::nng_exception, nng_exception_matcher>(
+//        nng::nng_exception const& ex, nng_exception_matcher const& matcher, char const* matcherString) {
+//
+//        MatchExpression<nng::nng_exception const&, nng_exception_matcher const&> expr(ex, matcher, matcherString);
+//        setResultType(matcher.match(ex));
+//        endExpression(expr);
+//    }
+//}
+//
+//inline nng_exception_matcher MatchesException(nng::error_code_type expected_error_code, const std::string& nameof) {
+//    return nng_exception_matcher(expected_error_code, nameof);
+//}
+//
+//#define MATCHES_EXCEPTION_WITH_EC(expected) MatchesException(expected, #expected)
 
 // TODO: TBD: these are a couple of interesting methods that might be interesting to include apart from the unit test itself.
 template<class It_ = std::string::const_iterator>
@@ -38,6 +103,30 @@ std::string trim_right(It_ cbegin, It_ cend) {
         s = *it + s;
     } while (it-- != cbegin);
     return s;
+}
+
+template<class It_ = std::string::const_iterator>
+std::string trim_left(It_ cbegin, It_ cend) {
+    std::string s;
+    It_ it = cbegin;
+    auto is_trimming = true;
+    do
+    {
+        // Trim while we are trimming.
+        if (is_trimming) {
+            if (iswspace(*it)) { continue; }
+            // Once we are no longer trimming, then accept everything else that we identity.
+            is_trimming = false;
+        }
+        s = s + *it;
+    } while (it++ != cend);
+    return s;
+}
+
+template<class It_ = std::string::const_iterator>
+std::string trim(It_ cbegin, It_ cend) {
+    auto s = trim_left(cbegin, cend);
+    return trim_right(s.cbegin(), s.cend());
 }
 
 template <class At_, class Bt_>
@@ -68,6 +157,8 @@ namespace constants {
 
 TEST_CASE("Socket Operations", "[sock]") {
 
+    using namespace Catch;
+    using namespace Catch::Matchers;
     using namespace std;
     using namespace std::chrono;
     using namespace nng;
@@ -86,11 +177,12 @@ TEST_CASE("Socket Operations", "[sock]") {
 
         SECTION("And we can shut it down") {
             REQUIRE_NOTHROW(s1->shutdown());
-            // TODO: TBD: with the breadth of unit testing here, I think it might be time to seriously consider how best to perform error handling
             REQUIRE_THROWS_AS(s1->shutdown(), nng_exception);
+            //// TODO: TBD: with the breadth of unit testing here, I think it might be time to seriously consider how best to perform error handling
+            // REQUIRE_THAT(s1->shutdown(), MATCHES_EXCEPTION_WITH_EC(ec_eclosed));
+            // REQUIRE_THROWS_MATCHING(s1->shutdown(), nng_exception, MATCHES_EXCEPTION_WITH_EC(ec_eclosed)); // ???? apparently from a development branch?
 
             SECTION("It cannot receive") {
-                FAIL();
                 string r;
                 socket::receive_size_type sz = 0;
                 // TODO: TBD: was using flag_alloc
@@ -98,33 +190,33 @@ TEST_CASE("Socket Operations", "[sock]") {
             }
 
             SECTION("It cannot send") {
-                FAIL();
                 REQUIRE_THROWS_AS(s1->send(""), nng_exception);
             }
 
             SECTION("Cannot create Endpoints based on Socket") {
-                FAIL();
-                shared_ptr<dialer> dp;
-                shared_ptr<listener> lp;
 
                 SECTION("Session cannot create Dialer given Socket and Address") {
-                    FAIL();
-                    REQUIRE_THROWS_AS(dp = _session_.create_dialer_ep(*s1, closed_addr), nng_exception);
+                    // Do not keep track of these pointers.
+                    REQUIRE_THROWS_AS(_session_.create_dialer_ep(*s1, closed_addr), nng_exception);
                 }
 
                 SECTION("Session cannot create Listener given Socket and Address") {
-                    FAIL();
-                    REQUIRE_THROWS_AS(lp = _session_.create_listener_ep(*s1, closed_addr), nng_exception);
+                    // Do not keep track of these pointers.
+                    REQUIRE_THROWS_AS(_session_.create_listener_ep(*s1, closed_addr), nng_exception);
                 }
 
                 SECTION("Cannot Dial Socket and receive Dialer back") {
-                    FAIL();
+                    auto dp = _session_.create_dialer_ep();
+                    REQUIRE(dp != nullptr);
                     REQUIRE_THROWS_AS(s1->dial(closed_addr, dp.get()), nng_exception);
+                    REQUIRE_NOTHROW(_session_.remove_dialer_ep(dp.get()));
                 }
 
                 SECTION("Cannot Listen Socket and receive Listener back") {
-                    FAIL();
+                    auto lp = _session_.create_listener_ep();
+                    REQUIRE(lp != nullptr);
                     REQUIRE_THROWS_AS(s1->listen(closed_addr, lp.get()), nng_exception);
+                    REQUIRE_NOTHROW(_session_.remove_listener_ep(lp.get()));
                 }
             }
         }
@@ -136,6 +228,22 @@ TEST_CASE("Socket Operations", "[sock]") {
 
         SECTION("Receive with no Pipes times out correctly") {
 
+#if 0 // The original
+            Convey("Recv with no pipes times out correctly", {
+                nng_msg *msg = NULL;
+            int64_t  to = 100000;
+            uint64_t now;
+
+            now = nng_clock();
+            So(now > 0);
+            So(nng_setopt_usec(s1, NNG_OPT_RECVTIMEO, to) == 0);
+            So(nng_recvmsg(s1, &msg, 0) == NNG_ETIMEDOUT);
+            So(msg == NULL);
+            So(nng_clock() >= (now + to));
+            So(nng_clock() < (now + (to * 2)));
+            });
+#endif //0
+
             const auto timeout = 100ms;
 
             RUN_TIMED_SECTION_MILLISECONDS(timeout, [&]() {
@@ -144,31 +252,34 @@ TEST_CASE("Socket Operations", "[sock]") {
                     , duration_cast<microseconds>(timeout).count()));
 
                 string r;
-                socket::receive_size_type sz = 1;
+                socket::receive_size_type sz = 0;
+                // TODO: TBD: was working with
+                // TODO: TBD: ec_etimedout ...
                 REQUIRE_THROWS_AS(s1->try_receive(r, sz), nng_exception);
-                REQUIRE(!r.length());
+                REQUIRE(r == "");
             });
         }
 
-        SECTION("Receive non-blocking with no Pipes gives ec_again") {
+        SECTION("Receive non-blocking with no Pipes gives " STRINGIFY(ec_eagain)) {
             string r;
-            socket::receive_size_type sz = 1;
-            // TODO: TBD: ec_again ...
+            socket::receive_size_type sz = 0;
+            // TODO: TBD: ec_eagain ...
             REQUIRE_THROWS_AS(s1->try_receive(r, sz, to_int(flag_nonblock)), nng_exception);
-            REQUIRE(!r.length());
+            REQUIRE(r == "");
         }
 
         SECTION("Send with no Pipes times out correctly") {
 
+            // TODO: TBD: this one is failing: seems to be returning sooner than expected.
             const auto timeout = 100ms;
 
             RUN_TIMED_SECTION_MILLISECONDS(timeout, [&]() {
 
-                REQUIRE_THROWS_AS(s1->set_option_usec(_opt_::send_timeout_usec,
-                    duration_cast<microseconds>(timeout).count()), nng_exception);
+                const auto timeout_microseconds = duration_cast<microseconds>(timeout);
 
-                string s;
-                REQUIRE_THROWS_AS(s1->send(s), nng_exception);
+                REQUIRE_NOTHROW(s1->set_option_usec(_opt_::send_timeout_usec, timeout_microseconds.count()));
+
+                REQUIRE_THROWS_AS(s1->send(""), nng_exception);
             });
         }
 
@@ -202,7 +313,7 @@ TEST_CASE("Socket Operations", "[sock]") {
                 REQUIRE_NOTHROW(lp->get_option(_opt_::url, url));
                 // Check length as a smoke test, followed by string equality.
                 REQUIRE(url.length() == url1_addr.length());
-                REQUIRE(url == url1_addr);
+                REQUIRE_THAT(url, Equals(url1_addr, CaseSensitive::Yes));
 
                 // TODO: TBD: ec_ereadonly ...
                 REQUIRE_THROWS_AS(lp->set_option(_opt_::url, url), nng_exception);
@@ -211,7 +322,7 @@ TEST_CASE("Socket Operations", "[sock]") {
                 REQUIRE_NOTHROW(dp->get_option(_opt_::url, url));
                 // Check length as a smoke test, followed by string equality.
                 REQUIRE(url.length() == url2_addr.length());
-                REQUIRE(url == url2_addr);
+                REQUIRE_THAT(url, Equals(url2_addr, CaseSensitive::Yes));
 
                 // TODO: TBD: ec_ereadonly ...
                 REQUIRE_THROWS_AS(dp->set_option(_opt_::url, url), nng_exception);
@@ -232,10 +343,10 @@ TEST_CASE("Socket Operations", "[sock]") {
                 }
             }
 
-            SECTION("Dialing synch can get refused") {
+            SECTION("Dialing sync can get refused") {
 
                 // TODO: TBD: ec_econnrefused ...
-                REQUIRE_THROWS_AS(_session_.create_dialer_ep(*s1, no_addr), nng_exception);
+                REQUIRE_THROWS_AS(s1->dial(no_addr), nng_exception);
             }
 
             SECTION("Dialing async does not get refused") {
@@ -272,15 +383,13 @@ TEST_CASE("Socket Operations", "[sock]") {
 
                 SECTION("Listening works") {
 
-                    shared_ptr<listener> lp;
+                    auto lp = _session_.create_listener_ep();
 
-                    REQUIRE_NOTHROW(lp = _session_.create_listener_ep(*s1, here_addr));
-                    // TODO: TBD: test for "has 'id'" ?
-                    REQUIRE(s1.get());
+                    REQUIRE_NOTHROW(s1->listen(here_addr, lp.get()));
 
-                    SECTION("Second Listener fails with Address In Use") {
+                    SECTION("Second Listen fails with " STRINGIFY(ec_eaddrinuse)) {
                         // TODO: TBD: ec_eaddrinuse ...
-                        REQUIRE_THROWS_AS(_session_.create_listener_ep(*s1, here_addr), nng_exception);
+                        REQUIRE_THROWS_AS(s1->listen(here_addr), nng_exception);
                     }
 
                     SECTION("We cannot try to Start a Listener again") {
@@ -457,7 +566,7 @@ TEST_CASE("Socket Operations", "[sock]") {
                     // TODO: TBD: I'm not sure that this is quite right here... or that it should even be that necessary...
                     actual = trim_right(actual.cbegin(), actual.cend());
                     REQUIRE(actual.size() == sz);
-                    REQUIRE(actual == expected);
+                    REQUIRE_THAT(actual, Equals(expected, CaseSensitive::Yes));
 
                     REQUIRE_NOTHROW(_session_.remove_pair_socket(s2.get()));
                 }
