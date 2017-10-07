@@ -27,4 +27,8 @@ namespace nng {
     const std::string nng_exception::strerror(error_code_type ec) {
         return strerror(static_cast<int>(ec));
     }
+
+    char const* nng_exception::what() const {
+        return "";
+    }
 }

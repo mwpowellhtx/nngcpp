@@ -12,6 +12,7 @@ namespace nng {
     // https://www.gnu.org/software/libc/manual/html_node/Error-Codes.html
     enum error_code_type {
         ec_eunknown = -1,
+        ec_enone = 0,
         ec_eintr = ::NNG_EINTR,
         ec_enomem = ::NNG_ENOMEM,
         ec_einval = NNG_EINVAL,
@@ -62,11 +63,19 @@ namespace nng {
             static const std::string strerror(int errnum);
 
             static const std::string strerror(error_code_type ec);
+
+            // TODO: TBD: this may not be what we're after here. or that we need another API to work with Catch...
+            virtual char const* what() const override;
     };
 }
 
-#define THROW_NNG_EXCEPTION() throw nng::nng_exception();
-// TODO: TBD: I'm not sure that error codes are always "negative" in nature...
-#define THROW_NNG_EXCEPTION_EC(ec) if (ec < 0) { throw nng:nng_exception(ec); }
+#define THROW_NNG_EXCEPTION() throw nng::nng_exception()
+
+#define SHOULD_THROW_NNG_EXCEPTION(condition) if (condition) THROW_NNG_EXCEPTION()
+
+#define SHOULD_THROW_NNG_EXCEPTION_EC(ec_or_errnum, condition) if (condition) throw nng::nng_exception(ec_or_errnum)
+
+// TODO: TBD: I don't know if -1 (unknown) is a possibility, but we will include it there for now.
+#define THROW_NNG_EXCEPTION_EC(ec_or_errnum) SHOULD_THROW_NNG_EXCEPTION_EC(ec_or_errnum, !(ec_or_errnum == nng::ec_eunknown || ec_or_errnum == nng::ec_enone))
 
 #endif // NNGCPP_NNG_EXCEPTION_H
