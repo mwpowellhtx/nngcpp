@@ -1,5 +1,9 @@
 #include "nng_exception.h"
 
+int to_int(nng::error_code_type value) {
+    return static_cast<int>(value);
+}
+
 namespace nng {
 
     nng_exception::nng_exception() : exception() {

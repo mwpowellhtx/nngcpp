@@ -69,6 +69,8 @@ namespace nng {
     };
 }
 
+int to_int(nng::error_code_type value);
+
 #define THROW_NNG_EXCEPTION() throw nng::nng_exception()
 
 #define SHOULD_THROW_NNG_EXCEPTION(condition) if (condition) THROW_NNG_EXCEPTION()
