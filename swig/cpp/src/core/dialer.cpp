@@ -17,12 +17,6 @@ namespace nng {
         , options() {
 
         const auto errnum = ::nng_dialer_create(&did, s.sid, addr.c_str());
-        //if (errnum) {
-        //    std::string buffer;
-        //    buffer.resize(128);
-        //    _itoa(errnum, &buffer[0], 10);
-        //    throw std::exception(("errnum: " + buffer).c_str());
-        //}
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
