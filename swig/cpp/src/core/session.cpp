@@ -9,7 +9,8 @@ namespace nng {
         , _listener_eps()
         , _pair_sockets()
         , _push_sockets()
-        , _pull_sockets() {
+        , _pull_sockets()
+        , _devices() {
     }
 
     template<class Type_>
@@ -26,6 +27,7 @@ namespace nng {
         __release_all(_pair_sockets);
         __release_all(_push_sockets);
         __release_all(_pull_sockets);
+        __release_all(_devices);
         ::nng_fini();
     }
 
@@ -83,5 +85,13 @@ namespace nng {
 
     std::shared_ptr<protocol::latest_pull_socket> session::create_pull_socket() {
         return __create(_pull_sockets);
+    }
+
+    std::shared_ptr<device> session::create_device(socket* const asockp, socket* const bsockp, bool shouldCloseSockets) {
+        return __create(_devices, asockp, bsockp, shouldCloseSockets);
+    }
+
+    void session::remove_device(const device* const dp) {
+        __remove(_devices, dp);
     }
 }

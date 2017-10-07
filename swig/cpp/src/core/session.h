@@ -5,6 +5,7 @@
 #include "core/options.h"
 #include "core/listener.h"
 #include "core/dialer.h"
+#include "core/device.h"
 #include "protocol/protocol.h"
 
 #include <memory>
@@ -24,6 +25,8 @@ namespace nng {
 
             std::vector<std::shared_ptr<protocol::latest_push_socket>> _push_sockets;
             std::vector<std::shared_ptr<protocol::latest_pull_socket>> _pull_sockets;
+
+            std::vector<std::shared_ptr<device>> _devices;
 
         public:
 
@@ -45,6 +48,9 @@ namespace nng {
 
             std::shared_ptr<protocol::latest_push_socket> create_push_socket();
             std::shared_ptr<protocol::latest_pull_socket> create_pull_socket();
+
+            std::shared_ptr<device> create_device(socket* const asockp, socket* const bsockp, bool shouldCloseSockets);
+            void remove_device(const device* const dp);
     };
 }
 
