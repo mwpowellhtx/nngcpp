@@ -1,4 +1,5 @@
 //
+// Copyright (c) 2017 Michael W Powell <mwpowellhtx@gmail.com>
 // Copyright 2017 Garrett D'Amore <garrett@damore.org>
 // Copyright 2017 Capitar IT Group BV <info@capitar.com>
 //
@@ -18,6 +19,7 @@
 #include <memory>
 #include <thread>
 #include <algorithm>
+#include <regex>
 #include <ostream>
 
 #define STRINGIFY(x)    #x
@@ -29,7 +31,50 @@ CATCH_TRANSLATE_EXCEPTION(std::exception& ex) {
 }
 
 CATCH_TRANSLATE_EXCEPTION(nng::nng_exception& ex) {
-    return (std::string("nng::nng_exception: ") + ex.what()).c_str();
+    // TODO: TBD: consider making this a part of the nng::nng_exception::what method...
+    std::ostringstream os;
+    const auto errnum = to_int(ex.error_code);
+    os << "nng::nng_exception: " << "error_code = " << errnum;
+    return os.str();
+}
+
+namespace Catch {
+    namespace Matchers {
+        namespace RegEx {
+
+            struct RegExMatcher : MatcherBase<std::string> {
+            private:
+
+                const std::string _pattern;
+                const std::regex _regex;
+
+            public:
+
+                RegExMatcher(std::string pattern)
+                    : MatcherBase()
+                    , _pattern(pattern)
+                    , _regex(pattern) {
+                }
+
+                virtual bool match(const std::string& subject) const override {
+                    std::smatch m;
+                    const auto& s = subject;
+                    std::regex_match(s.cbegin(), s.cend(), m, _regex);
+                    return m.ready() && !m.empty();
+                }
+
+                virtual std::string describe() const {
+                    std::ostringstream os;
+                    os << "expected regular expression matching pattern ( " << _pattern << " )";
+                    return os.str();
+                }
+            };
+        }
+
+        RegEx::RegExMatcher MatchesRegEx(const std::string& pattern) {
+            return RegEx::RegExMatcher(pattern);
+        }
+    }
 }
 
 ////// TODO: TBD: methinks at this point that "matchers" are not what I'm thinking they are: i.e. not for "aligning with exceptions"
@@ -142,6 +187,13 @@ bool starts_with(At_ abegin, At_ aend, Bt_ bbegin, Bt_ bend) {
 
 // TODO: TBD: debatable how many of the constants should be included apart from the unit test itself...
 namespace constants {
+
+    std::string to_str(int value) {
+        std::ostringstream os;
+        os << value;
+        return os.str();
+    }
+
     const std::string url1_addr = "inproc://url1";
     const std::string url2_addr = "inproc://url2";
     const std::string bogus1_addr = "bogus://1";
@@ -149,7 +201,8 @@ namespace constants {
     const std::string no_addr = "inproc://no";
     const std::string asy_addr = "inproc://asy";
     const std::string here_addr = "inproc://here";
-    const std::string loopback_addr = "tcp://127.0.0.1:" STRINGIFY(TEST_PORT);
+    const std::string loopback_addr = "tcp://127.0.0.1:" + to_str(TEST_PORT);
+    const std::string loopback_addr_regex_pattern = "tcp://[\\d]+\\.[\\d]+\\.[\\d]+\\.[\\d]+:[\\d]+";
     const std::string t1_addr = "inproc://t1";
     const std::string closed_addr = "inproc://closed";
     const size_t max_addr_length = NNG_MAXADDRLEN;
@@ -165,6 +218,8 @@ TEST_CASE("Socket Operations", "[sock]") {
     using namespace nng::protocol;
     using namespace constants;
     using _opt_ = option_names;
+
+    const auto WithCaseSensitivity = CaseSensitive::Yes;
 
     session _session_;
 
@@ -313,7 +368,7 @@ TEST_CASE("Socket Operations", "[sock]") {
                 REQUIRE_NOTHROW(lp->get_option(_opt_::url, url));
                 // Check length as a smoke test, followed by string equality.
                 REQUIRE(url.length() == url1_addr.length());
-                REQUIRE_THAT(url, Equals(url1_addr, CaseSensitive::Yes));
+                REQUIRE_THAT(url, Equals(url1_addr, WithCaseSensitivity));
 
                 // TODO: TBD: ec_ereadonly ...
                 REQUIRE_THROWS_AS(lp->set_option(_opt_::url, url), nng_exception);
@@ -322,7 +377,7 @@ TEST_CASE("Socket Operations", "[sock]") {
                 REQUIRE_NOTHROW(dp->get_option(_opt_::url, url));
                 // Check length as a smoke test, followed by string equality.
                 REQUIRE(url.length() == url2_addr.length());
-                REQUIRE_THAT(url, Equals(url2_addr, CaseSensitive::Yes));
+                REQUIRE_THAT(url, Equals(url2_addr, WithCaseSensitivity));
 
                 // TODO: TBD: ec_ereadonly ...
                 REQUIRE_THROWS_AS(dp->set_option(_opt_::url, url), nng_exception);
@@ -413,6 +468,8 @@ TEST_CASE("Socket Operations", "[sock]") {
 
                     shared_ptr<dialer> dp;
 
+                    CHECK_THAT(loopback_addr, MatchesRegEx(loopback_addr_regex_pattern));
+
                     REQUIRE_NOTHROW(dp = _session_.create_dialer_ep(*s1, loopback_addr));
 
                     SECTION("Options work") {
@@ -449,6 +506,8 @@ TEST_CASE("Socket Operations", "[sock]") {
                 SECTION("Listener creation ok") {
 
                     shared_ptr<listener> lp;
+
+                    CHECK_THAT(loopback_addr, MatchesRegEx(loopback_addr_regex_pattern));
 
                     REQUIRE_NOTHROW(lp = _session_.create_listener_ep(*s1, loopback_addr));
 
@@ -566,7 +625,7 @@ TEST_CASE("Socket Operations", "[sock]") {
                     // TODO: TBD: I'm not sure that this is quite right here... or that it should even be that necessary...
                     actual = trim_right(actual.cbegin(), actual.cend());
                     REQUIRE(actual.size() == sz);
-                    REQUIRE_THAT(actual, Equals(expected, CaseSensitive::Yes));
+                    REQUIRE_THAT(actual, Equals(expected, WithCaseSensitivity));
 
                     REQUIRE_NOTHROW(_session_.remove_pair_socket(s2.get()));
                 }
