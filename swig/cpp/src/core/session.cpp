@@ -38,10 +38,9 @@ namespace nng {
 
     template<class Type_>
     void __remove(std::vector<std::shared_ptr<Type_>>& values, const Type_* const valuep) {
-        const auto __where = [&](std::shared_ptr<Type_> x) {
-            return x.get() == valuep;
-        };
-        std::remove_if(values.begin(), values.end(), __where);
+        std::remove_if(values.begin(), values.end(), [&](const std::shared_ptr<Type_>& sp) {
+            return sp.get() == valuep;
+        });
     }
 
     std::shared_ptr<dialer> session::create_dialer_ep() {
