@@ -15,7 +15,6 @@ namespace nng {
 
         const auto errnum = nng_ctor(&sid);
         THROW_NNG_EXCEPTION_EC(errnum);
-        // TODO: TBD: if ec is other than 0, throw nng_exception ...
     }
 
     socket::~socket() {
