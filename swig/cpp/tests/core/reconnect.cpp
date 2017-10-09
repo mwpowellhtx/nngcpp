@@ -15,11 +15,6 @@
 #include <memory>
 #include <thread>
 
-//#define APPENDSTR(m, s) nng_msg_append(m, s, strlen(s))
-//#define CHECKSTR(m, s)\ 
-//So(nng_msg_len(m) == strlen(s)); \
-//So(memcmp(nng_msg_body(m), s, strlen(s)) == 0)
-
 namespace constants {
     const std::string hello = "hello";
     const std::string again = "again";
