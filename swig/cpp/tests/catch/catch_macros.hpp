@@ -14,7 +14,7 @@
                 __catchResult.captureResult( Catch::ResultWas::DidntThrowException ); \
             } \
             catch( const exceptionType& ex ) { \
-                if ( excpetionMatcher.match( ex ) ) { \
+                if ( exceptionMatcher.match( ex ) ) { \
                     __catchResult.captureResult( Catch::ResultWas::Ok ); \
                 } \
                 else { \
@@ -32,11 +32,11 @@
 #endif // INTERNAL_CATCH_THROWS_AS_MATCHING
 
 #ifndef CATCH_CHECK_THROWS_AS_MATCHING
-#define CATCH_CHECK_THROWS_AS_MATCHING( expr, exceptionType, exceptionMatcher ) INTERNAL_CATCH_THROWS_AS_MATCHING( "CATCH_CHECK_THROWS_AS", exceptionType, Catch::ResultDisposition::ContinueOnFailure, expr )
+#define CATCH_CHECK_THROWS_AS_MATCHING( expr, exceptionType, exceptionMatcher ) INTERNAL_CATCH_THROWS_AS_MATCHING( "CATCH_CHECK_THROWS_AS", exceptionType, exceptionMatcher, Catch::ResultDisposition::ContinueOnFailure, expr )
 #endif // CATCH_CHECK_THROWS_AS_MATCHING
 
 #ifndef REQUIRE_THROWS_AS_MATCHING
-#define REQUIRE_THROWS_AS_MATCHING( expr, exceptionType, exceptionMatcher ) INTERNAL_CATCH_THROWS_AS_MATCHING( "REQUIRE_THROWS_AS", exceptionType, Catch::ResultDisposition::Normal, expr )
+#define REQUIRE_THROWS_AS_MATCHING( expr, exceptionType, exceptionMatcher ) INTERNAL_CATCH_THROWS_AS_MATCHING( "REQUIRE_THROWS_AS", exceptionType, exceptionMatcher, Catch::ResultDisposition::Normal, expr )
 #endif // REQUIRE_THROWS_AS_MATCHING
 
 #endif // CATCH_MACROS_HPP
