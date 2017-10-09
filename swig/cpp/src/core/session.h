@@ -26,6 +26,9 @@ namespace nng {
             std::vector<std::shared_ptr<protocol::latest_push_socket>> _push_sockets;
             std::vector<std::shared_ptr<protocol::latest_pull_socket>> _pull_sockets;
 
+            std::vector<std::shared_ptr<protocol::latest_req_socket>> _req_sockets;
+            std::vector<std::shared_ptr<protocol::latest_rep_socket>> _rep_sockets;
+
             std::vector<std::shared_ptr<device>> _devices;
 
         public:
@@ -48,6 +51,12 @@ namespace nng {
 
             std::shared_ptr<protocol::latest_push_socket> create_push_socket();
             std::shared_ptr<protocol::latest_pull_socket> create_pull_socket();
+
+            std::shared_ptr<protocol::latest_req_socket> create_req_socket();
+            void remove_req_socket(const protocol::latest_req_socket* const rp);
+
+            std::shared_ptr<protocol::latest_rep_socket> create_rep_socket();
+            void remove_rep_socket(const protocol::latest_rep_socket* const rp);
 
             std::shared_ptr<device> create_device(socket* const asockp, socket* const bsockp, bool shouldCloseSockets);
             void remove_device(const device* const dp);

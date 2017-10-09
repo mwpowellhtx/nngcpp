@@ -10,6 +10,8 @@ namespace nng {
         , _pair_sockets()
         , _push_sockets()
         , _pull_sockets()
+        , _req_sockets()
+        , _rep_sockets()
         , _devices() {
     }
 
@@ -27,6 +29,8 @@ namespace nng {
         __release_all(_pair_sockets);
         __release_all(_push_sockets);
         __release_all(_pull_sockets);
+        __release_all(_req_sockets);
+        __release_all(_rep_sockets);
         __release_all(_devices);
         ::nng_fini();
     }
@@ -85,6 +89,22 @@ namespace nng {
 
     std::shared_ptr<protocol::latest_pull_socket> session::create_pull_socket() {
         return __create(_pull_sockets);
+    }
+
+    std::shared_ptr<protocol::latest_req_socket> session::create_req_socket() {
+        return __create(_req_sockets);
+    }
+
+    void session::remove_req_socket(const protocol::latest_req_socket* const rp) {
+        __remove(_req_sockets, rp);
+    }
+
+    void session::remove_rep_socket(const protocol::latest_rep_socket* const rp) {
+        __remove(_rep_sockets, rp);
+    }
+
+    std::shared_ptr<protocol::latest_rep_socket> session::create_rep_socket() {
+        return __create(_rep_sockets);
     }
 
     std::shared_ptr<device> session::create_device(socket* const asockp, socket* const bsockp, bool shouldCloseSockets) {
