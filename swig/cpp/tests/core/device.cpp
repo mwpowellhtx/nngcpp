@@ -17,13 +17,7 @@
 #include <chrono>
 #include <ostream>
 
-CATCH_TRANSLATE_EXCEPTION(nng::nng_exception& ex) {
-    // TODO: TBD: consider making this a part of the nng::nng_exception::what method...
-    std::ostringstream os;
-    const auto errnum = to_int(ex.error_code);
-    os << "nng::nng_exception: " << "error_code = " << errnum;
-    return os.str();
-}
+#include "../catch/catch_exception_translations.hpp"
 
 namespace constants {
     const std::string dev1_addr = "inproc://dev1";
