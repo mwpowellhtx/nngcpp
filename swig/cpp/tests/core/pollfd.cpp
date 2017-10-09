@@ -9,7 +9,11 @@
 // found online at https://opensource.org/licenses/MIT.
 //
 
-#include <catch.hpp>
+#include "../catch/catch_exception_matcher_base.hpp"
+#include "../catch/catch_exception_translations.hpp"
+#include "../catch/catch_nng_exception_matcher.hpp"
+#include "../catch/catch_macros.hpp"
+
 #include <nngcpp.h>
 
 #include <string>
@@ -38,28 +42,35 @@
 
 #endif // _WIN32
 
+namespace constants {
+    const std::string addr = "inproc://yeahbaby";
+}
+
 TEST_CASE("Poll FDs", "[pollfd]") {
 
     using namespace std;
     using namespace nng;
     using namespace nng::protocol;
+    using namespace Catch::Matchers;
+    using namespace constants;
     using _opt_ = option_names;
 
-    std::unique_ptr<latest_pair_socket> s1;
-    std::unique_ptr<latest_pair_socket> s2;
+    std::unique_ptr<latest_pair_socket> s1, s2;
+
+    REQUIRE(s1 == nullptr);
+    REQUIRE(s2 == nullptr);
 
     SECTION("Given a connected Pair of Sockets") {
 
         // Same as ::nng_pair_open(...) == 0
-        REQUIRE_NOTHROW(s1 = std::make_unique<latest_pair_socket>());
-        REQUIRE_NOTHROW(s2 = std::make_unique<latest_pair_socket>());
+        REQUIRE_NOTHROW(s1 = make_unique<latest_pair_socket>());
+        REQUIRE_NOTHROW(s2 = make_unique<latest_pair_socket>());
 
         /* It is a known idiomatic thing that Windows Sockets are treated as 64-bit integers, sort of.
         Yet, cross platform, and with the options, it is more accurate to simply treat them as 32-bit
         integers. */
 
         const auto inv_sock = INVALID_SOCKET;
-        const string addr = "inproc://yeahbaby";
 
         // Should be ~= ::nng_listen(s, addr, listenerp, 0) == 0
         REQUIRE_NOTHROW(s1->listen(addr));
@@ -108,34 +119,38 @@ TEST_CASE("Poll FDs", "[pollfd]") {
         SECTION("We cannot get a Send File Descriptor for Pull Socket") {
 
             std::unique_ptr<latest_pull_socket> s3;
-            REQUIRE_NOTHROW(s3 = std::make_unique<latest_pull_socket>());
+            REQUIRE_NOTHROW(s3 = make_unique<latest_pull_socket>());
 
             int fd;
-            // TODO: TBD: work on exception handling...
-            REQUIRE_THROWS_AS(s3->get_option_int(_opt_::send_file_descriptor, &fd), nng_exception);
+            // TODO: TBD: ditto working interim answer...
+            REQUIRE_THROWS_AS_MATCHING(s3->get_option_int(_opt_::send_file_descriptor, &fd), nng_exception, ThrowsNngException(ec_enotsup));
 
             SECTION("Destructor cleans up correctly") {
-                REQUIRE(s3.release() == nullptr);
+                REQUIRE_NOTHROW(s3.reset());
+                REQUIRE(s3 == nullptr);
             }
         }
 
         SECTION("We cannot get a Receive File Descriptor for Push Socket") {
 
             std::unique_ptr<latest_push_socket> s3;
-            REQUIRE_NOTHROW(s3 = std::make_unique<latest_push_socket>());
+            REQUIRE_NOTHROW(s3 = make_unique<latest_push_socket>());
 
             int fd;
-            // TODO: TBD: work on exception handling...
-            REQUIRE_THROWS_AS(s3->get_option_int(_opt_::receive_file_descriptor, &fd), nng_exception);
+            // TODO: TBD: this works as an interim measure, although the ResultBuilder needs a little help to better comprehend the result.
+            REQUIRE_THROWS_AS_MATCHING(s3->get_option_int(_opt_::receive_file_descriptor, &fd), nng_exception, ThrowsNngException(ec_enotsup));
 
             SECTION("Destructor cleans up correctly") {
-                REQUIRE(s3.release() == nullptr);
+                REQUIRE_NOTHROW(s3.reset());
+                REQUIRE(s3 == nullptr);
             }
         }
     }
 
     SECTION("Destructors do not throw") {
-        REQUIRE_NOTHROW(s1.release() == nullptr);
-        REQUIRE_NOTHROW(s2.release() == nullptr);
+        REQUIRE_NOTHROW(s1.reset());
+        REQUIRE_NOTHROW(s2.reset());
+        REQUIRE(s1 == nullptr);
+        REQUIRE(s2 == nullptr);
     }
 }
