@@ -20,6 +20,10 @@ namespace Catch {
                 const nng::error_code_type _expected_ec;
                 nng::error_code_type _actual_ec;
 
+                void set_expected_ec(nng::error_code_type ec) {
+                    _actual_ec = ec;
+                }
+
             public:
 
             NngExceptionMatcher(const nng::error_code_type expected_ec)
@@ -29,7 +33,9 @@ namespace Catch {
             }
 
                 virtual bool match(const nng::nng_exception& ex) const override {
-                    return (_actual_ec = ex.error_code) == _expected_ec;
+                    // This may not be the safest thing to do here...
+                    const_cast<NngExceptionMatcher*>(this)->set_expected_ec(ex.error_code);
+                    return ex.error_code == _expected_ec;
                 }
 
                 virtual std::string describe() const override {
