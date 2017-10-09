@@ -89,10 +89,10 @@ namespace nng {
         return nng::send(sid, buffer, sz, flags);
     }
 
-    int socket::try_receive(std::string& str, receive_size_type sz, int flags) {
+    int socket::try_receive(std::string& str, receive_size_type& sz, int flags) {
         const auto errnum = nng::try_receive(sid, str, sz, flags);
         if (!errnum) {
-            str.resize(sz - 1);
+            str.resize(--sz);
         }
         return errnum;
     }

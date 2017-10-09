@@ -117,7 +117,7 @@ namespace nng {
             virtual int send(const send_vector& buffer, int flags = 0);
             virtual int send(const send_vector& buffer, send_size_type sz, int flags = 0);
 
-            virtual int try_receive(std::string& str, const receive_size_type sz, int flags = 0);
+            virtual int try_receive(std::string& str, receive_size_type& sz, int flags = 0);
             virtual std::string socket::receive_str(receive_size_type& sz, int flags = 0);
 
             virtual int try_receive(receive_vector& str, receive_size_type& sz, int flags = 0);

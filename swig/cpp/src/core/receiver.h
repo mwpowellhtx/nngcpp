@@ -23,7 +23,7 @@ namespace nng {
 
         public:
 
-            virtual int try_receive(std::string& str, const receive_size_type sz, int flags = 0) = 0;
+            virtual int try_receive(std::string& str, receive_size_type& sz, int flags = 0) = 0;
             virtual std::string receive_str(receive_size_type& sz, int flags = 0) = 0;
 
             virtual int try_receive(receive_vector& buffer, receive_size_type& sz, int flags = 0) = 0;
