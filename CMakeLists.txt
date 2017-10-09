@@ -66,6 +66,9 @@ set (NNGCPP_SWIG_DIR ${NngCppAndSwig_SOURCE_DIR}/swig)
 set (NNG_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/nngbuild)
 set (NNG_GIT_REPO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/repos/nng)
 set (CATCH_GIT_REPO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/repos/catch)
+# TODO: TBD: for now adding a second CATCH2_GIT_REPO_DIR definition.
+set (CATCH2_GIT_REPO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/repos/catch2)
+set (QUICKCXXLIP_GIT_REPO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/repos/quickcpplib)
 
 if (OFF)
 
@@ -90,11 +93,18 @@ else ()
 
 endif ()
 
-macro (nngcpp_get_test_dependencies TESTS_ENABLED)
+macro (nngcpp_test_dependencies_cxx_catch TESTS_ENABLED)
 
     if (${TESTS_ENABLED})
 
-        set (CATCH_GIT_TAG v1.10.0)
+        # set (CATCH_GIT_TAG v1.10.0)
+        # # TODO: TBD: something about the format of the tag name is causing issues.
+        # set (CATCH_GIT_TAG v2.0.0-develop.4)
+        # # TODO: TBD: furthermore, something about the hash isn't right either.
+        # set (CATCH_GIT_TAG bd46f66754f11b5644913f6eb8a1900971f3e0ad)
+        # # TODO: TBD: both appear to be a CMake issue.
+        # Talk about 'bleeding edge'... I do not like being on the HEAD, I would prefer to be checking out against a "stable" tag.
+        set (CATCH_GIT_TAG HEAD)
 
         ExternalProject_Add (download_catch
             GIT_REPOSITORY git@github.com:philsquared/Catch.git
@@ -110,7 +120,34 @@ macro (nngcpp_get_test_dependencies TESTS_ENABLED)
 
 endmacro ()
 
-nngcpp_get_test_dependencies (${NNGCPP_ENABLE_TESTS})
+macro (nngcpp_test_dependencies_cxx_quickcxxlib TESTS_ENABLED)
+
+    # Running with CXX naming aligned with CMake conventions.
+    if (${TESTS_ENABLED})
+
+        set (QUICKCXXLIB_GIT_TAG HEAD)
+
+        ExternalProject_Add (download_quickcpplib
+            GIT_REPOSITORY git@github.com:ned14/quickcpplib.git
+            GIT_TAG ${QUICKCXXLIB_GIT_TAG}
+            GIT_PROGRESS ON
+            SOURCE_DIR ${QUICKCXXLIP_GIT_REPO_DIR}
+            CMAKE_ARGS -DPROJECT_IS_DEPENDENCY:bool=ON -Dquickcpplib_DISABLE_DOC_GEN:bool=ON
+            LOG_DOWNLOAD ON
+            CONFIGURE_COMMAND cmake -E echo "Skipping configure step."
+            BUILD_COMMAND cmake -E echo "Skipping build step."
+            INSTALL_COMMAND cmake -E echo "Skipping install step."
+            TEST_COMMAND cmake -E echo "Skipping test step."
+        )
+
+        message (STATUS "QuickCppLib '${QUICKCXXLIB_GIT_TAG}' download configured.")
+
+    endif ()
+
+endmacro ()
+
+nngcpp_test_dependencies_cxx_catch (${NNGCPP_ENABLE_TESTS})
+nngcpp_test_dependencies_cxx_quickcxxlib (${NNGCPP_ENABLE_TESTS})
 
 # if (NNG_ENABLE_COVERAGE)
 #     # NB: This only works for GCC and Clang 3.0 and newer.  If your stuff
