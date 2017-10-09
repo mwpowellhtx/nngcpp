@@ -48,4 +48,4 @@ namespace nng {
 #define RUN_TIMED_SECTION_MILLISECONDS(timeout, callback) nng::millisecond_timed_section_impl::run(timeout, callback)
 
 
-#endif //NNGCPP_TIMED_SECTION_IMPL_HPP
+#endif // NNGCPP_TIMED_SECTION_IMPL_HPP
