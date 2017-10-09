@@ -12,6 +12,8 @@
 // Which also includes Catch, as well as Chrono and Functional.
 #include "../catch/catch_matchers_regex.hpp"
 #include "../catch/catch_exception_translations.hpp"
+#include "../catch/catch_nng_exception_matcher.hpp"
+#include "../catch/catch_macros.hpp"
 #include "../catch/timed_section_impl.hpp"
 
 #include <nngcpp.h>
@@ -130,22 +132,22 @@ TEST_CASE("Socket Operations", "[sock]") {
         SECTION("And we can shut it down") {
 
             REQUIRE_NOTHROW(s1->shutdown());
-            REQUIRE_THROWS_AS(s1->shutdown(), nng_exception);
-            //// TODO: TBD: with the breadth of unit testing here, I think it might be time to seriously consider how best to perform error handling
-            // REQUIRE_THAT(s1->shutdown(), MATCHES_EXCEPTION_WITH_EC(ec_eclosed));
-            // REQUIRE_THROWS_MATCHING(s1->shutdown(), nng_exception, MATCHES_EXCEPTION_WITH_EC(ec_eclosed)); // ???? apparently from a development branch?
+            // TODO: TBD: this will work for now as a rough cut Exception match...
+            REQUIRE_THROWS_AS_MATCHING(s1->shutdown(), nng_exception, ThrowsNngException(ec_eclosed));
 
             SECTION("It cannot receive") {
 
                 string r;
                 socket::receive_size_type sz = 0;
                 // TODO: TBD: was using flag_alloc
-                REQUIRE_THROWS_AS(s1->try_receive(r, sz), nng_exception);
+                // TODO: TBD: this will work for now as a rough cut Exception match...
+                REQUIRE_THROWS_AS_MATCHING(s1->try_receive(r, sz), nng_exception, ThrowsNngException(ec_eclosed));
             }
 
             SECTION("It cannot send") {
 
-                REQUIRE_THROWS_AS(s1->send(""), nng_exception);
+                // TODO: TBD: this will work for now as a rough cut Exception match...
+                REQUIRE_THROWS_AS_MATCHING(s1->send(""), nng_exception, ThrowsNngException(ec_eclosed));
             }
 
             SECTION("Cannot create Endpoints based on Socket") {
@@ -153,20 +155,23 @@ TEST_CASE("Socket Operations", "[sock]") {
                 SECTION("Session cannot create Dialer given Socket and Address") {
 
                     // Do not keep track of these pointers.
-                    REQUIRE_THROWS_AS(_session_.create_dialer_ep(*s1, closed_addr), nng_exception);
+                    // TODO: TBD: this will work for now as a rough cut Exception match...
+                    REQUIRE_THROWS_AS_MATCHING(_session_.create_dialer_ep(*s1, closed_addr), nng_exception, ThrowsNngException(ec_eclosed));
                 }
 
                 SECTION("Session cannot create Listener given Socket and Address") {
 
                     // Do not keep track of these pointers.
-                    REQUIRE_THROWS_AS(_session_.create_listener_ep(*s1, closed_addr), nng_exception);
+                    // TODO: TBD: this will work for now as a rough cut Exception match...
+                    REQUIRE_THROWS_AS_MATCHING(_session_.create_listener_ep(*s1, closed_addr), nng_exception, ThrowsNngException(ec_eclosed));
                 }
 
                 SECTION("Cannot Dial Socket and receive Dialer back") {
 
                     auto dp = _session_.create_dialer_ep();
                     REQUIRE(dp != nullptr);
-                    REQUIRE_THROWS_AS(s1->dial(closed_addr, dp.get()), nng_exception);
+                    // TODO: TBD: this will work for now as a rough cut Exception match...
+                    REQUIRE_THROWS_AS_MATCHING(s1->dial(closed_addr, dp.get()), nng_exception, ThrowsNngException(ec_eclosed));
                     REQUIRE_NOTHROW(_session_.remove_dialer_ep(dp.get()));
                 }
 
@@ -174,7 +179,8 @@ TEST_CASE("Socket Operations", "[sock]") {
 
                     auto lp = _session_.create_listener_ep();
                     REQUIRE(lp != nullptr);
-                    REQUIRE_THROWS_AS(s1->listen(closed_addr, lp.get()), nng_exception);
+                    // TODO: TBD: this will work for now as a rough cut Exception match...
+                    REQUIRE_THROWS_AS_MATCHING(s1->listen(closed_addr, lp.get()), nng_exception, ThrowsNngException(ec_eclosed));
                     REQUIRE_NOTHROW(_session_.remove_listener_ep(lp.get()));
                 }
             }
@@ -214,8 +220,8 @@ TEST_CASE("Socket Operations", "[sock]") {
                 string r;
                 socket::receive_size_type sz = 0;
                 // TODO: TBD: was working with
-                // TODO: TBD: ec_etimedout ...
-                REQUIRE_THROWS_AS(s1->try_receive(r, sz), nng_exception);
+                // TODO: TBD: this will work for now as a rough cut Exception match...
+                REQUIRE_THROWS_AS_MATCHING(s1->try_receive(r, sz), nng_exception, ThrowsNngException(ec_etimedout));
                 REQUIRE(r == "");
             });
         }
@@ -224,8 +230,8 @@ TEST_CASE("Socket Operations", "[sock]") {
 
             string r;
             socket::receive_size_type sz = 0;
-            // TODO: TBD: ec_eagain ...
-            REQUIRE_THROWS_AS(s1->try_receive(r, sz, to_int(flag_nonblock)), nng_exception);
+            // TODO: TBD: this will work for now as a rough cut Exception match...
+            REQUIRE_THROWS_AS_MATCHING(s1->try_receive(r, sz, to_int(flag_nonblock)), nng_exception, ThrowsNngException(ec_eagain));
             REQUIRE(r == "");
         }
 
@@ -236,11 +242,11 @@ TEST_CASE("Socket Operations", "[sock]") {
 
             RUN_TIMED_SECTION_MILLISECONDS(timeout, [&]() {
 
-                const auto timeout_microseconds = duration_cast<microseconds>(timeout);
+                const auto titimeout = duration_cast<microseconds>(timeout);
 
-                REQUIRE_NOTHROW(s1->set_option_usec(_opt_::send_timeout_usec, timeout_microseconds.count()));
-
-                REQUIRE_THROWS_AS(s1->send(""), nng_exception);
+                REQUIRE_NOTHROW(s1->set_option_usec(_opt_::send_timeout_usec, timeout.count()));
+                // TODO: TBD: this will work for now as a rough cut Exception match...
+                REQUIRE_THROWS_AS_MATCHING(s1->send(""), nng_exception, ThrowsNngException(ec_etimedout));
             });
         }
 
@@ -254,10 +260,10 @@ TEST_CASE("Socket Operations", "[sock]") {
 
             SECTION("Read-only options handled properly") {
 
-                // TODO: TBD: should return: ec_ereadonly
-                REQUIRE_THROWS_AS(s1->set_option_int(_opt_::receive_file_descriptor, 0), nng_exception);
-                REQUIRE_THROWS_AS(s1->set_option_int(_opt_::send_file_descriptor, 0), nng_exception);
-                REQUIRE_THROWS_AS(s1->set_option(_opt_::local_address, "a"), nng_exception);
+                // TODO: TBD: this will work for now as a rough cut Exception match...
+                REQUIRE_THROWS_AS_MATCHING(s1->set_option_int(_opt_::receive_file_descriptor, 0), nng_exception, ThrowsNngException(ec_ereadonly));
+                REQUIRE_THROWS_AS_MATCHING(s1->set_option_int(_opt_::send_file_descriptor, 0), nng_exception, ThrowsNngException(ec_ereadonly));
+                REQUIRE_THROWS_AS_MATCHING(s1->set_option(_opt_::local_address, "a"), nng_exception, ThrowsNngException(ec_ereadonly));
             }
 
             SECTION("Url option works") {
@@ -276,8 +282,8 @@ TEST_CASE("Socket Operations", "[sock]") {
                 REQUIRE(url.length() == url1_addr.length());
                 REQUIRE_THAT(url, Equals(url1_addr, WithCaseSensitivity));
 
-                // TODO: TBD: ec_ereadonly ...
-                REQUIRE_THROWS_AS(lp->set_option(_opt_::url, url), nng_exception);
+                // TODO: TBD: this will work for now as a rough cut Exception match...
+                REQUIRE_THROWS_AS_MATCHING(lp->set_option(_opt_::url, url), nng_exception, ThrowsNngException(ec_ereadonly));
 
                 (url = "").resize(max_addr_length);
                 REQUIRE_NOTHROW(dp->get_option(_opt_::url, url));
@@ -285,29 +291,29 @@ TEST_CASE("Socket Operations", "[sock]") {
                 REQUIRE(url.length() == url2_addr.length());
                 REQUIRE_THAT(url, Equals(url2_addr, WithCaseSensitivity));
 
-                // TODO: TBD: ec_ereadonly ...
-                REQUIRE_THROWS_AS(dp->set_option(_opt_::url, url), nng_exception);
+                // TODO: TBD: this will work for now as a rough cut Exception match...
+                REQUIRE_THROWS_AS_MATCHING(dp->set_option(_opt_::url, url), nng_exception, ThrowsNngException(ec_ereadonly));
             }
 
             SECTION("Bogus Urls not supported") {
 
                 SECTION("Dialing fails properly") {
 
-                    // TODO: TBD: ec_enotsup ...
-                    REQUIRE_THROWS_AS(_session_.create_dialer_ep(*s1, bogus1_addr), nng_exception);
+                    // TODO: TBD: this will work for now as a rough cut Exception match...
+                    REQUIRE_THROWS_AS_MATCHING(_session_.create_dialer_ep(*s1, bogus1_addr), nng_exception, ThrowsNngException(ec_enotsup));
 
                     SECTION("Listening fails properly") {
 
-                        // TODO: TBD: ec_enotsup ...
-                        REQUIRE_THROWS_AS(_session_.create_listener_ep(*s1, bogus2_addr), nng_exception);
+                        // TODO: TBD: this will work for now as a rough cut Exception match...
+                        REQUIRE_THROWS_AS_MATCHING(_session_.create_listener_ep(*s1, bogus2_addr), nng_exception, ThrowsNngException(ec_enotsup));
                     }
                 }
             }
 
             SECTION("Dialing sync can get refused") {
 
-                // TODO: TBD: ec_econnrefused ...
-                REQUIRE_THROWS_AS(s1->dial(no_addr), nng_exception);
+                // TODO: TBD: this will work for now as a rough cut Exception match...
+                REQUIRE_THROWS_AS_MATCHING(s1->dial(no_addr), nng_exception, ThrowsNngException(ec_econnrefused));
             }
 
             SECTION("Dialing async does not get refused") {
@@ -350,14 +356,14 @@ TEST_CASE("Socket Operations", "[sock]") {
 
                     SECTION("Second Listen fails with " STRINGIFY(ec_eaddrinuse)) {
 
-                        // TODO: TBD: ec_eaddrinuse ...
-                        REQUIRE_THROWS_AS(s1->listen(here_addr), nng_exception);
+                        // TODO: TBD: this will work for now as a rough cut Exception match...
+                        REQUIRE_THROWS_AS_MATCHING(s1->listen(here_addr), nng_exception, ThrowsNngException(ec_eaddrinuse));
                     }
 
                     SECTION("We cannot try to Start a Listener again") {
 
-                        // TODO: TBD: ec_estate ...
-                        REQUIRE_THROWS_AS(lp->start(), nng_exception);
+                        // TODO: TBD: this will work for now as a rough cut Exception match...
+                        REQUIRE_THROWS_AS_MATCHING(lp->start(), nng_exception, ThrowsNngException(ec_estate));
                     }
 
                     SECTION("We can connect to it") {
@@ -392,17 +398,15 @@ TEST_CASE("Socket Operations", "[sock]") {
                     SECTION("Socket options not supported for Dialer") {
 
                         // Not appropriate for dialer.
-                        // TODO: TBD: ec_enotsup ...
-                        REQUIRE_THROWS_AS(dp->set_option_int(_opt_::raw, 1), nng_exception);
-                        // TODO: TBD: ec_enotsup ...
-                        REQUIRE_THROWS_AS(dp->set_option_usec(_opt_::min_reconnect_time_usec, 1), nng_exception);
+                        // TODO: TBD: this will work for now as a rough cut Exception match...
+                        REQUIRE_THROWS_AS_MATCHING(dp->set_option_int(_opt_::raw, 1), nng_exception, ThrowsNngException(ec_enotsup));
+                        REQUIRE_THROWS_AS_MATCHING(dp->set_option_usec(_opt_::min_reconnect_time_usec, 1), nng_exception, ThrowsNngException(ec_enotsup));
                     }
 
                     SECTION("Bad size checks") {
 
-                        const string a = "a";
-                        // TODO: TBD: ec_einval ...
-                        REQUIRE_THROWS_AS(dp->set_option(_opt_::max_reconnect_time_usec, (void*)&a[0], 1), nng_exception);
+                        // TODO: TBD: this will work for now as a rough cut Exception match...
+                        REQUIRE_THROWS_AS_MATCHING(dp->set_option(_opt_::max_receive_size, "a", 1), nng_exception, ThrowsNngException(ec_einval));
                     }
                     //// TODO: TBD: the NNG testing tested for confusion between dialer and listener ID, API, etc; however, that really isn't possible under the C++ paradigm. it is a "use case" that has been designed out of the picture.
                     //SECTION("Cannot listen") {
@@ -434,16 +438,15 @@ TEST_CASE("Socket Operations", "[sock]") {
                     SECTION("Socket options not supported for Listener") {
 
                         // Not appropriate for dialer.
-                        // TODO: TBD: ex_enotsup ...
-                        REQUIRE_THROWS_AS(lp->set_option_int(_opt_::raw, 1), nng_exception);
-                        // TODO: TBD: ex_enotsup ...
-                        REQUIRE_THROWS_AS(lp->set_option_usec(_opt_::min_reconnect_time_usec, 1), nng_exception);
+                        // TODO: TBD: this will work for now as a rough cut Exception match...
+                        REQUIRE_THROWS_AS_MATCHING(lp->set_option_int(_opt_::raw, 1), nng_exception, ThrowsNngException(ec_enotsup));
+                        REQUIRE_THROWS_AS_MATCHING(lp->set_option_usec(_opt_::min_reconnect_time_usec, 1), nng_exception, ThrowsNngException(ec_enotsup));
                     }
 
                     SECTION("Bad size checks") {
 
-                        // TODO: TBD: ec_einval ...
-                        REQUIRE_THROWS_AS(lp->set_option(_opt_::max_reconnect_time_usec, "a", 1), nng_exception);
+                        // TODO: TBD: this will work for now as a rough cut Exception match...
+                        REQUIRE_THROWS_AS_MATCHING(lp->set_option(_opt_::max_receive_size, "a", 1), nng_exception, ThrowsNngException(ec_einval));
                     }
 
                     // TODO: ditto dialer unit testing above: dialer cannot listen; listener cannot dial, this is a design decision not a test decision.
@@ -459,23 +462,20 @@ TEST_CASE("Socket Operations", "[sock]") {
                     listener l;
 
                     // TODO: TBD: a lot of gets here, but only one set?
-                    // TODO: TBD: ec_enoent ...
-                    REQUIRE_THROWS_AS(l.set_option_size(_opt_::max_receive_size, 0), nng_exception);
+                    // TODO: TBD: this will work for now as a rough cut Exception match...
+                    REQUIRE_THROWS_AS_MATCHING(l.set_option_size(_opt_::max_receive_size, 0), nng_exception, ThrowsNngException(ec_enoent));
 
                     int value;
                     size_t sz = 1;
 
-                    // TODO: TBD: ec_enoent ...
-                    REQUIRE_THROWS_AS(l.get_option(_opt_::raw, (void*)&value, &sz), nng_exception);
-                    // TODO: TBD: ec_enoent ...
-                    REQUIRE_THROWS_AS(l.get_option_size(_opt_::max_receive_size, &sz), nng_exception);
-                    // TODO: TBD: ec_enoent ...
-                    REQUIRE_THROWS_AS(l.get_option_int(_opt_::raw, &value), nng_exception);
+                    // TODO: TBD: this will work for now as a rough cut Exception match...
+                    REQUIRE_THROWS_AS_MATCHING(l.get_option(_opt_::raw, (void*)&value, &sz), nng_exception, ThrowsNngException(ec_enoent));
+                    REQUIRE_THROWS_AS_MATCHING(l.get_option_size(_opt_::max_receive_size, &sz), nng_exception, ThrowsNngException(ec_enoent));
+                    REQUIRE_THROWS_AS_MATCHING(l.get_option_int(_opt_::raw, &value), nng_exception, ThrowsNngException(ec_enoent));
 
                     uint64_t timeout;
 
-                    // TODO: TBD: ec_enoent ...
-                    REQUIRE_THROWS_AS(l.get_option_usec(_opt_::linger, &timeout), nng_exception);
+                    REQUIRE_THROWS_AS_MATCHING(l.get_option_usec(_opt_::linger_usec, &timeout), nng_exception, ThrowsNngException(ec_enoent));
                 }
 
                 SECTION("Cannot access absent Dialer Endpoint options") {
@@ -484,23 +484,19 @@ TEST_CASE("Socket Operations", "[sock]") {
                     dialer d;
 
                     // TODO: TBD: a lot of gets here, but only one set?
-                    // TODO: TBD: ec_enoent ...
-                    REQUIRE_THROWS_AS(d.set_option_size(_opt_::max_receive_size, 0), nng_exception);
+                    // TODO: TBD: this will work for now as a rough cut Exception match...
+                    REQUIRE_THROWS_AS_MATCHING(d.set_option_size(_opt_::max_receive_size, 0), nng_exception, ThrowsNngException(ec_enoent));
 
                     int value;
                     size_t sz = 1;
 
-                    // TODO: TBD: ec_enoent ...
-                    REQUIRE_THROWS_AS(d.get_option(_opt_::raw, (void*)&value, &sz), nng_exception);
-                    // TODO: TBD: ec_enoent ...
-                    REQUIRE_THROWS_AS(d.get_option_size(_opt_::max_receive_size, &sz), nng_exception);
-                    // TODO: TBD: ec_enoent ...
-                    REQUIRE_THROWS_AS(d.get_option_int(_opt_::raw, &value), nng_exception);
+                    REQUIRE_THROWS_AS_MATCHING(d.get_option(_opt_::raw, (void*)&value, &sz), nng_exception, ThrowsNngException(ec_enoent));
+                    REQUIRE_THROWS_AS_MATCHING(d.get_option_size(_opt_::max_receive_size, &sz), nng_exception, ThrowsNngException(ec_enoent));
+                    REQUIRE_THROWS_AS_MATCHING(d.get_option_int(_opt_::raw, &value), nng_exception, ThrowsNngException(ec_enoent));
 
                     uint64_t timeout;
 
-                    // TODO: TBD: ec_enoent ...
-                    REQUIRE_THROWS_AS(d.get_option_usec(_opt_::linger, &timeout), nng_exception);
+                    REQUIRE_THROWS_AS_MATCHING(d.get_option_usec(_opt_::linger_usec, &timeout), nng_exception, ThrowsNngException(ec_enoent));
                 }
 
                 SECTION("We can send and receive messages") {
