@@ -19,7 +19,7 @@
                 } \
                 else { \
                     /* TODO: TBD: report not only that Did Not Throw Exception, but may also report Matcher Describe result. */ \
-                    __catchResult.captureResult( Catch::ResultWas::DidntThrowException ); \
+                    __catchResult.useActiveException( resultDisposition ); \
                 } \
             } \
             catch( ... ) { \
