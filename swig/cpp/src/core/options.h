@@ -47,7 +47,7 @@ namespace nng {
 
             // TODO: TBD: provide time-units to make the times more obvious: i.e. Seconds? Milliseconds? Microseconds? Nanoseconds?
             static const std::string raw;
-            static const std::string linger;
+            static const std::string linger_usec;
             static const std::string receive_buffer;
             static const std::string send_buffer;
             static const std::string receive_file_descriptor;

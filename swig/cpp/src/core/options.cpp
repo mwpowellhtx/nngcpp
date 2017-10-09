@@ -9,7 +9,7 @@ namespace nng {
     }
 
     const std::string option_names::raw = NNG_OPT_RAW;
-    const std::string option_names::linger = NNG_OPT_LINGER;
+    const std::string option_names::linger_usec = NNG_OPT_LINGER;
     const std::string option_names::receive_buffer = NNG_OPT_RECVBUF;
     const std::string option_names::send_buffer = NNG_OPT_SENDBUF;
     const std::string option_names::receive_file_descriptor = NNG_OPT_RECVFD;
