@@ -114,7 +114,8 @@ nngcpp_add_test (core/sock 5)
 nngcpp_add_test (core/device 5)
 nngcpp_add_test (core/scalability 20)
 
-# nngcpp_add_test(bus 5)
+nngcpp_add_test(protocol/bus 5)
+
 # nngcpp_add_test(event 5)
 # nngcpp_add_test(idhash 5)
 # nngcpp_add_test(inproc 5)
