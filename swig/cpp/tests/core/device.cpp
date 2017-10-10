@@ -9,15 +9,13 @@
 // found online at https://opensource.org/licenses/MIT.
 //
 
-#include <catch.hpp>
+#include "../catch/catch_exception_translations.hpp"
 
 #include <nngcpp.h>
 
 #include <string>
 #include <chrono>
 #include <ostream>
-
-#include "../catch/catch_exception_translations.hpp"
 
 namespace constants {
     const std::string dev1_addr = "inproc://dev1";
@@ -75,6 +73,7 @@ TEST_CASE("Test that device functions properly", "[device]") {
             this_thread::sleep_for(100ms);
 
             string actual;
+            socket::receive_size_type sz;
 
             SECTION("Device can send and receive") {
 
@@ -84,9 +83,11 @@ TEST_CASE("Test that device functions properly", "[device]") {
 
                     (actual = "").resize(expected.length() + 1);
 
+                    sz = actual.size();
+
                     // Send from 1->2 via the listening Device sockets.
                     REQUIRE_NOTHROW(es1->send(value));
-                    REQUIRE_NOTHROW(es2->try_receive(actual, actual.size()));
+                    REQUIRE_NOTHROW(es2->try_receive(actual, sz));
                     REQUIRE(actual == expected);
                 }
 
@@ -96,9 +97,11 @@ TEST_CASE("Test that device functions properly", "[device]") {
 
                     (actual = "").resize(expected.length() + 1);
 
+                    sz = actual.size();
+
                     // Now respond from 2->1 via the listening Device sockets.
                     REQUIRE_NOTHROW(es2->send(value));
-                    REQUIRE_NOTHROW(es1->try_receive(actual, actual.size()));
+                    REQUIRE_NOTHROW(es1->try_receive(actual, sz));
                     REQUIRE(actual == expected);
                 }
 			}
