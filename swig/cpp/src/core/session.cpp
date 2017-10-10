@@ -7,6 +7,7 @@ namespace nng {
     session::session()
         : _dialer_eps()
         , _listener_eps()
+        , _bus_sockets()
         , _pair_sockets()
         , _push_sockets()
         , _pull_sockets()
@@ -26,6 +27,7 @@ namespace nng {
     session::~session() {
         __release_all(_dialer_eps);
         __release_all(_listener_eps);
+        __release_all(_bus_sockets);
         __release_all(_pair_sockets);
         __release_all(_push_sockets);
         __release_all(_pull_sockets);
@@ -73,6 +75,14 @@ namespace nng {
     void session::remove_listener_ep(const listener* const lp) {
         // Ditto smart pointers.
         __remove(_listener_eps, lp);
+    }
+
+    std::shared_ptr<protocol::latest_bus_socket> session::create_bus_socket() {
+        return __create(_bus_sockets);
+    }
+
+    void session::remove_bus_socket(const protocol::latest_bus_socket* const sp) {
+        __remove(_bus_sockets, sp);
     }
 
     std::shared_ptr<protocol::latest_pair_socket> session::create_pair_socket() {
