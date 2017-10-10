@@ -10,6 +10,7 @@
 //
 
 #include "../catch/catch_exception_translations.hpp"
+#include "../helpers/chrono.hpp"
 
 #include <nngcpp.h>
 
@@ -21,8 +22,6 @@ namespace constants {
     const std::string dev1_addr = "inproc://dev1";
     const std::string dev2_addr = "inproc://dev2";
 }
-
-#define CAST_DURATION_TO_USEC std::chrono::duration_cast<microseconds>
 
 TEST_CASE("Test that device functions properly", "[device]") {
 
