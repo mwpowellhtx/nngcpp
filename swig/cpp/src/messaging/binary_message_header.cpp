@@ -47,8 +47,8 @@ namespace nng {
         }
 
         void binary_message_header::clear() {
-            if (_msgp == nullptr) { return; }
-            ::nng_msg_header_clear(_msgp);
+            const auto op = std::bind(&::nng_msg_header_clear, _1);
+            do_clear_op(op, _msgp);
         }
 
         bool binary_message_header::has_message() const {

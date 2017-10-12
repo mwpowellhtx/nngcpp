@@ -47,7 +47,8 @@ namespace nng {
         }
 
         void binary_message_body::clear() {
-            ::nng_msg_clear(_msgp);
+            const auto op = std::bind(&::nng_msg_clear, _1);
+            do_clear_op(op, _msgp);
         }
 
         void binary_message_body::append(const buffer_vector_type& buf) {

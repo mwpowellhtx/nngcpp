@@ -68,6 +68,13 @@ namespace nng {
                 return (_msgp != nullptr) && (value.size() > 0);
             }
 
+            typedef std::function<void(::nng_msg*)> clear_op;
+
+            static void do_clear_op(const clear_op& op, ::nng_msg* msgp) {
+                if (msgp == nullptr) { return; }
+                op(msgp);
+            }
+
         public:
 
             virtual ~messaging_api() {}
