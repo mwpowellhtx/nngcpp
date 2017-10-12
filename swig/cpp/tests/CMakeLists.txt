@@ -52,7 +52,7 @@ if (NNGCPP_ENABLE_TESTS)
         # So it does not appear to be enough to Add the Dependency; we must ALSO configure Target Link Libraries.
         target_link_libraries (${TEST_NAME} ${NNGCPP_REQUIRED_LIBS} nng_static ${NNGCPP_PROJECT_NAME_STATIC})
         # TODO: TBD: c++14? or c++11?
-        target_compile_definitions (${TEST_NAME} PUBLIC -D NNG_STATIC_LIB -D NNGCPP_STATIC_LIB -D TEST_PORT=${TEST_PORT})
+        target_compile_definitions (${TEST_NAME} PUBLIC -D NNG_STATIC_LIB -D NNGCPP_STATIC_LIB -D CATCH_CONFIG_ENABLE_CHRONO_STRINGMAKER -D TEST_PORT=${TEST_PORT})
         if (CMAKE_THREAD_LIBS_INIT)
             target_link_libraries (${TEST_NAME} "${CMAKE_THREAD_LIBS_INIT}")
         endif ()
