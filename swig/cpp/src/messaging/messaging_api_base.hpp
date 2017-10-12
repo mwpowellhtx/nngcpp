@@ -18,29 +18,54 @@ namespace nng {
         class messaging_api : public message_base {
         protected:
 
+            typedef messaging_api<Type_> messaging_api_type;
+
             messaging_api() : message_base() {}
 
             messaging_api(::nng_msg* msgp) : message_base(msgp) {};
 
         protected:
 
-            typedef std::function<int(::nng_msg*, const message_base::part_type, message_base::size_type)> type_based_op;
+            typedef std::function<void*(::nng_msg*)> get_buffer_op;
+
+        private:
+
+            static void* do_get_buffer_op(const get_buffer_op& op, ::nng_msg* msgp) {
+                return msgp == nullptr ? (void*) nullptr : op(msgp);
+            }
+
+        protected:
+
+            typedef std::function<int(::nng_msg*, const part_type, size_type)> type_based_op;
 
             static void do_type_based_op(const type_based_op& op, ::nng_msg* msgp, const Type_& x) {
                 if (msgp == nullptr) { return; }
                 const auto* _x_data = x.data();
                 const auto _x_sz = x.size();
                 // Be careful of the operation. We want to expand errnum in the macro, NOT the operation itself.
-                const auto errnum = op(msgp, (const message_base::part_type)_x_data, _x_sz);
+                const auto errnum = op(msgp, (const part_type)_x_data, _x_sz);
                 THROW_NNG_EXCEPTION_EC(errnum);
             }
 
-            typedef std::function<int(::nng_msg*, message_base::size_type)> size_based_op;
+            typedef std::function<int(::nng_msg*, size_type)> size_based_op;
 
-            static void do_size_based_op(const size_based_op& op, ::nng_msg* msgp, message_base::size_type sz) {
+            static void do_size_based_op(const size_based_op& op, ::nng_msg* msgp, size_type sz) {
                 // Ditto above. Be careful of the macro expansion.
                 const auto errnum = op(msgp, sz);
                 THROW_NNG_EXCEPTION_EC(errnum);
+            }
+
+            bool try_get(buffer_vector_type& value, const get_buffer_op& op, size_type sz) const {
+
+                const auto* src = (buffer_vector_type::value_type*)do_get_buffer_op(op, _msgp);
+
+                if (src != nullptr) {
+                    for (size_type i = 0; i < sz; i++) {
+                        value.push_back((src + i)[0]);
+                    }
+                }
+
+                return (_msgp != nullptr) && (value.size() > 0);
             }
 
         public:
@@ -48,6 +73,8 @@ namespace nng {
             virtual ~messaging_api() {}
 
             virtual const Type_ get() const = 0;
+
+            virtual bool try_get(Type_& value) const = 0;
 
             virtual void append(const Type_& x) = 0;
 

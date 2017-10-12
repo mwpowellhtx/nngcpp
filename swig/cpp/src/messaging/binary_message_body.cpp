@@ -26,27 +26,24 @@ namespace nng {
         binary_message_body::~binary_message_body() {
         }
 
-        const binary_message_body::buffer_vector_type binary_message_body::get() const {
-
-            // TODO: TBD: string may not be a great assumption in the long run; rather we would want binary. then leave it to layers closer to the application whether buffers were string or not.
-            buffer_vector_type buf;
-
-            const size_type sz = get_size();
-
-            // TODO: TBD: but for the binding, this could be a useful templatized function.
-            part_type data = ::nng_msg_body(_msgp);
-
-            auto src = (buffer_vector_type::value_type*) data;
-
-            for (size_type i = 0; i < sz; i++) {
-                buf.push_back((src + i)[0]);
-            }
-
-            return buf;
-        }
-
         binary_message_body::size_type binary_message_body::get_size() const {
             return _msgp == nullptr ? 0 : ::nng_msg_len(_msgp);
+        }
+
+        const binary_message_body::buffer_vector_type binary_message_body::get() const {
+
+            buffer_vector_type buf;
+
+            return try_get(buf) ? buf : buffer_vector_type();
+        }
+
+        bool binary_message_body::try_get(buffer_vector_type& value) const {
+
+            const auto sz = get_size();
+
+            const auto op = std::bind(&::nng_msg_body, _1);
+
+            return messaging_api_type::try_get(value, op, sz);
         }
 
         void binary_message_body::clear() {

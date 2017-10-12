@@ -41,6 +41,8 @@ namespace nng {
 
             virtual const message_base::buffer_vector_type get() const override;
 
+            virtual bool try_get(buffer_vector_type& value) const override;
+
             virtual message_base::size_type get_size() const override;
 
             virtual void clear() override;
