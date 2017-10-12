@@ -29,14 +29,21 @@ namespace nng {
                 const auto before = now();
                 REQUIRE(before.time_since_epoch().count() > 0);
 
+                const auto expected_min_timeout = before + timeout;
+                const auto expected_max_timeout = before + timeout * 2;
+
                 callback();
 
                 const auto after = now();
 
                 // TODO: TBD: ugh... timing is such a difficult thing to gauge accurately...
                 // TODO: TBD: Catch does not support std::chrono::duration (yet...), so in the meantime, this will at least yield numbers that we can review in the logs.
-                REQUIRE(after.time_since_epoch().count() >= (before + timeout).time_since_epoch().count());
-                REQUIRE(after.time_since_epoch().count() < (before + timeout * 2).time_since_epoch().count());
+
+                REQUIRE(after.time_since_epoch().count() >= expected_min_timeout.time_since_epoch().count());
+                REQUIRE(after.time_since_epoch().count() < expected_max_timeout.time_since_epoch().count());
+
+                //REQUIRE(after.time_since_epoch().count() >= (before + timeout).time_since_epoch().count());
+                //REQUIRE(after.time_since_epoch().count() < (before + timeout * 2).time_since_epoch().count());
             }
     };
 

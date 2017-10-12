@@ -101,26 +101,36 @@ namespace constants {
     const std::string loopback_addr_regex_pattern = "tcp://[\\d]+\\.[\\d]+\\.[\\d]+\\.[\\d]+:[\\d]+";
     const std::string t1_addr = "inproc://t1";
     const std::string closed_addr = "inproc://closed";
+
     const size_t max_addr_length = NNG_MAXADDRLEN;
+
+    const nng::messaging::message_base::buffer_vector_type empty_buf;
+    const nng::messaging::message_base::buffer_vector_type data_buf = { (uint8_t)'a',(uint8_t)'b',(uint8_t)'c',(uint8_t)'\0' };
 }
 
-TEST_CASE("Socket Operations", "[sock]") {
+TEST_CASE("Socket Operations", "[socket][operations]") {
 
     using namespace std;
     using namespace std::chrono;
     using namespace nng;
+    using namespace nng::messaging;
     using namespace nng::protocol;
     using namespace Catch;
     using namespace Catch::Matchers;
     using namespace constants;
     using _opt_ = option_names;
 
-    const auto WithCaseSensitivity = CaseSensitive::Yes;
+    typedef socket::size_type size_type;
+    typedef socket::buffer_vector_type buffer_vector_type;
+
+    // TODO: TBD: re-work this in better alignment with whatever message-based API was being tested.
 
     //// TODO: TBD: this is useful when troubleshooting hard crashes.
     // cout << __FUNCSIG__ << " (" << __FILE__ << ":" << __LINE__ << ")" << endl;
 
     session _session_;
+
+    CHECK_THAT(loopback_addr, MatchesRegEx(loopback_addr_regex_pattern));
 
     SECTION("We are able to open a Pair Socket") {
 
@@ -137,17 +147,18 @@ TEST_CASE("Socket Operations", "[sock]") {
 
             SECTION("It cannot receive") {
 
-                string r;
-                socket::receive_size_type sz = 0;
+                size_type sz = 0;
+                buffer_vector_type buf;
+
                 // TODO: TBD: was using flag_alloc
                 // TODO: TBD: this will work for now as a rough cut Exception match...
-                REQUIRE_THROWS_AS_MATCHING(s1->try_receive(r, sz), nng_exception, ThrowsNngException(ec_eclosed));
+                REQUIRE_THROWS_AS_MATCHING(s1->try_receive(&buf, sz), nng_exception, ThrowsNngException(ec_eclosed));
             }
 
             SECTION("It cannot send") {
 
                 // TODO: TBD: this will work for now as a rough cut Exception match...
-                REQUIRE_THROWS_AS_MATCHING(s1->send(""), nng_exception, ThrowsNngException(ec_eclosed));
+                REQUIRE_THROWS_AS_MATCHING(s1->send(&empty_buf), nng_exception, ThrowsNngException(ec_eclosed));
             }
 
             SECTION("Cannot create Endpoints based on Socket") {
@@ -217,22 +228,23 @@ TEST_CASE("Socket Operations", "[sock]") {
                 REQUIRE_NOTHROW(s1->set_option_usec(_opt_::receive_timeout_usec
                     , duration_cast<microseconds>(timeout).count()));
 
-                string r;
-                socket::receive_size_type sz = 0;
+                size_type sz = 0;
+                buffer_vector_type buf;
+                s1->try_receive(&buf, sz);
                 // TODO: TBD: was working with
                 // TODO: TBD: this will work for now as a rough cut Exception match...
-                REQUIRE_THROWS_AS_MATCHING(s1->try_receive(r, sz), nng_exception, ThrowsNngException(ec_etimedout));
-                REQUIRE(r == "");
+                REQUIRE_THROWS_AS_MATCHING(s1->try_receive(&buf, sz), nng_exception, ThrowsNngException(ec_etimedout));
+                REQUIRE_THAT(buf, Equals(empty_buf));
             });
         }
 
         SECTION("Receive non-blocking with no Pipes gives " STRINGIFY(ec_eagain)) {
 
-            string r;
-            socket::receive_size_type sz = 0;
+            buffer_vector_type buf;
+            size_type sz = 0;
             // TODO: TBD: this will work for now as a rough cut Exception match...
-            REQUIRE_THROWS_AS_MATCHING(s1->try_receive(r, sz, to_int(flag_nonblock)), nng_exception, ThrowsNngException(ec_eagain));
-            REQUIRE(r == "");
+            REQUIRE_THROWS_AS_MATCHING(s1->try_receive(&buf, sz, to_int(flag_nonblock)), nng_exception, ThrowsNngException(ec_eagain));
+            REQUIRE_THAT(buf, Equals(empty_buf));
         }
 
         SECTION("Send with no Pipes times out correctly") {
@@ -242,11 +254,12 @@ TEST_CASE("Socket Operations", "[sock]") {
 
             RUN_TIMED_SECTION_MILLISECONDS(timeout, [&]() {
 
-                const auto titimeout = duration_cast<microseconds>(timeout);
+                const auto timeout_microseconds = duration_cast<microseconds>(timeout);
 
-                REQUIRE_NOTHROW(s1->set_option_usec(_opt_::send_timeout_usec, timeout.count()));
+                REQUIRE_NOTHROW(s1->set_option_usec(_opt_::send_timeout_usec, timeout_microseconds.count()));
                 // TODO: TBD: this will work for now as a rough cut Exception match...
-                REQUIRE_THROWS_AS_MATCHING(s1->send(""), nng_exception, ThrowsNngException(ec_etimedout));
+                REQUIRE_THROWS_AS_MATCHING(s1->send(&empty_buf), nng_exception, ThrowsNngException(ec_etimedout));
+
             });
         }
 
@@ -280,7 +293,7 @@ TEST_CASE("Socket Operations", "[sock]") {
                 REQUIRE_NOTHROW(lp->get_option(_opt_::url, url));
                 // Check length as a smoke test, followed by string equality.
                 REQUIRE(url.length() == url1_addr.length());
-                REQUIRE_THAT(url, Equals(url1_addr, WithCaseSensitivity));
+                REQUIRE_THAT(url, Equals(url1_addr, CaseSensitive::Yes));
 
                 // TODO: TBD: this will work for now as a rough cut Exception match...
                 REQUIRE_THROWS_AS_MATCHING(lp->set_option(_opt_::url, url), nng_exception, ThrowsNngException(ec_ereadonly));
@@ -289,7 +302,7 @@ TEST_CASE("Socket Operations", "[sock]") {
                 REQUIRE_NOTHROW(dp->get_option(_opt_::url, url));
                 // Check length as a smoke test, followed by string equality.
                 REQUIRE(url.length() == url2_addr.length());
-                REQUIRE_THAT(url, Equals(url2_addr, WithCaseSensitivity));
+                REQUIRE_THAT(url, Equals(url2_addr, CaseSensitive::Yes));
 
                 // TODO: TBD: this will work for now as a rough cut Exception match...
                 REQUIRE_THROWS_AS_MATCHING(dp->set_option(_opt_::url, url), nng_exception, ThrowsNngException(ec_ereadonly));
@@ -331,19 +344,17 @@ TEST_CASE("Socket Operations", "[sock]") {
                     // TODO: TBD: had to increase this from 100ms; and then, I'm not sure that was enough, or there might actually be something blocking
                     this_thread::sleep_for(1000ms);
 
-                    const string data = "abc";
-                    string buffer;
-
-                    REQUIRE_NOTHROW(s1->send(data, 4));
+                    REQUIRE_NOTHROW(s1->send(&data_buf, data_buf.size()));
 
                     /* This is a departure from the original unit testing in which allocation was expected,
                     i.e. was being called with flags = flag_alloc. In this case, we fully expect the client
                     to do the allocation and handling of its own buffers. */
 
                     sz = 4;
-                    REQUIRE_NOTHROW(s2->try_receive(buffer, sz));
-                    REQUIRE(buffer.size() == sz);
-                    REQUIRE_THAT(buffer, Equals(data, WithCaseSensitivity));
+                    buffer_vector_type buf;
+                    REQUIRE_NOTHROW(s2->try_receive(&buf, sz));
+                    REQUIRE(buf.size() == sz);
+                    REQUIRE_THAT(buf, Equals(data_buf));
 
                     REQUIRE_NOTHROW(_session_.remove_pair_socket(s2.get()));
                 }
@@ -382,8 +393,6 @@ TEST_CASE("Socket Operations", "[sock]") {
 
                     shared_ptr<dialer> dp;
 
-                    CHECK_THAT(loopback_addr, MatchesRegEx(loopback_addr_regex_pattern));
-
                     REQUIRE_NOTHROW(dp = _session_.create_dialer_ep(*s1, loopback_addr));
 
                     SECTION("Options work") {
@@ -421,8 +430,6 @@ TEST_CASE("Socket Operations", "[sock]") {
                 SECTION("Listener creation ok") {
 
                     shared_ptr<listener> lp;
-
-                    CHECK_THAT(loopback_addr, MatchesRegEx(loopback_addr_regex_pattern));
 
                     REQUIRE_NOTHROW(lp = _session_.create_listener_ep(*s1, loopback_addr));
 
@@ -524,17 +531,17 @@ TEST_CASE("Socket Operations", "[sock]") {
                     REQUIRE_NOTHROW(s2->dial(t1_addr));
 
                     size_t sz = 4;
-                    const string sent = "abc", expected = sent;
+                    const auto expected = data_buf;
 
-                    REQUIRE_NOTHROW(s1->send(sent, sz));
+                    REQUIRE_NOTHROW(s1->send(&data_buf, sz));
 
-                    string actual;
+                    buffer_vector_type actual;
                     actual.resize(sz);
 
-                    REQUIRE_NOTHROW(s2->try_receive(actual, sz));
+                    REQUIRE_NOTHROW(s2->try_receive(&actual, sz));
 
                     //REQUIRE(actual.size() == sz);
-                    REQUIRE_THAT(actual, Equals(expected, WithCaseSensitivity));
+                    REQUIRE_THAT(actual, Equals(expected));
 
                     REQUIRE_NOTHROW(_session_.remove_pair_socket(s2.get()));
                 }
