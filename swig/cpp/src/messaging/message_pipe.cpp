@@ -1,6 +1,6 @@
 #include "message_pipe.h"
 #include "message_base.h"
-#include "../core/nng_exception.h"
+#include "../core/exceptions.hpp"
 
 namespace nng {
 

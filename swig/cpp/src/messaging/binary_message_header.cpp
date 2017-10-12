@@ -49,24 +49,25 @@ namespace nng {
             return message_base::has_message();
         }
 
-        void binary_message_header::append(const message_base::buffer_vector_type& buf) {
-            static const auto op = std::bind(&::nng_msg_header_append, _1, _2, _3);
-            do_type_based_op(op, _msgp, buf);
-        }
+        //// TODO: TBD: for the moment, these are overridden at the read-only API level with empty implementations.
+        //void binary_message_header::append(const message_base::buffer_vector_type& buf) {
+        //    static const auto op = std::bind(&::nng_msg_header_append, _1, _2, _3);
+        //    do_type_based_op(op, _msgp, buf);
+        //}
 
-        void binary_message_header::insert(const message_base::buffer_vector_type& buf) {
-            static const auto op = std::bind(&::nng_msg_header_insert, _1, _2, _3);
-            do_type_based_op(op, _msgp, buf);
-        }
+        //void binary_message_header::insert(const message_base::buffer_vector_type& buf) {
+        //    static const auto op = std::bind(&::nng_msg_header_insert, _1, _2, _3);
+        //    do_type_based_op(op, _msgp, buf);
+        //}
 
-        void binary_message_header::trim(size_type sz) {
-            static const auto op = std::bind(&::nng_msg_header_trim, _1, _2);
-            do_size_based_op(op, _msgp, sz);
-        }
+        //void binary_message_header::trim(size_type sz) {
+        //    static const auto op = std::bind(&::nng_msg_header_trim, _1, _2);
+        //    do_size_based_op(op, _msgp, sz);
+        //}
 
-        void binary_message_header::chop(size_type sz) {
-            static const auto op = std::bind(&::nng_msg_header_chop, _1, _2);
-            do_size_based_op(op, _msgp, sz);
-        }
+        //void binary_message_header::chop(size_type sz) {
+        //    static const auto op = std::bind(&::nng_msg_header_chop, _1, _2);
+        //    do_size_based_op(op, _msgp, sz);
+        //}
     }
 }

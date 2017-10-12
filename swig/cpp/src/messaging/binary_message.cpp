@@ -1,6 +1,6 @@
 #include "binary_message.h"
 
-#include "../core/nng_exception.h"
+#include "../core/exceptions.hpp"
 
 #include <functional>
 

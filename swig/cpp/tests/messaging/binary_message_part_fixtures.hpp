@@ -13,18 +13,26 @@
 #include <catch.hpp>
 #include <nng/nng.h>
 
+#include "messaging/message_base.h"
+
 namespace nng {
     namespace messaging {
 
         template<class Base_>
         struct binary_message_part_fixture : public Base_ {
 
+            typedef Base_ base_type;
+
+            typedef message_base::buffer_vector_type buffer_vector_type;
+
+            typedef message_base::size_type size_type;
+
             binary_message_part_fixture()
-                : Base_() {
+                : base_type() {
             }
 
             binary_message_part_fixture(::nng_msg* msgp)
-                : Base_(msgp) {
+                : base_type(msgp) {
             }
 
             virtual ~binary_message_part_fixture() {
@@ -36,6 +44,22 @@ namespace nng {
 
                 _msgp = nullptr;
                 CHECK(_msgp == nullptr);
+            }
+
+            virtual void append(const buffer_vector_type& x) override {
+                base_type::append(x);
+            }
+
+            virtual void insert(const buffer_vector_type& x) override {
+                base_type::insert(x);
+            }
+
+            virtual void trim(size_type sz = 0) override {
+                base_type::trim(sz);
+            }
+
+            virtual void chop(size_type sz = 0) override {
+                base_type::chop(sz);
             }
         };
 

@@ -3,6 +3,6 @@
 
 #include "core/session.h"
 
-#include "core/nng_exception.h"
+#include "core/exceptions.hpp"
 
 #endif // NNGCPP_H

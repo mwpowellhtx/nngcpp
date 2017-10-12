@@ -78,6 +78,7 @@ TEST_CASE("Test that the default message works", "[messaging][binary][header][de
 
 TEST_CASE("::nng_msg* based ctor works", "[messaging][binary][header][alloc]") {
 
+    using namespace trx;
     using namespace nng::messaging;
     using namespace constants;
     using namespace Catch::Matchers;
@@ -97,12 +98,12 @@ TEST_CASE("::nng_msg* based ctor works", "[messaging][binary][header][alloc]") {
 
     verify_default_message_part(part, msgp);
 
-    // TODO: TBD: may open up the append and other header operations as makes sense to do so
-    //REQUIRE_NOTHROW(part.append(data));
+    // TODO: TBD: may want to further verify the exception what message is correct...
+    REQUIRE_THROWS_AS(part.append(data), not_implemented);
 
-    //const auto& expected = data;
-    //const auto _got_actual = part.get();
+    REQUIRE_THROWS_AS(part.insert(data), not_implemented);
 
-    //CHECK(part.get_size() == expected.size());
-    //REQUIRE_THAT(_got_actual, Equals(expected));
+    REQUIRE_THROWS_AS(part.chop(), not_implemented);
+
+    REQUIRE_THROWS_AS(part.trim(), not_implemented);
 }

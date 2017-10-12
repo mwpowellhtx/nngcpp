@@ -27,6 +27,11 @@ namespace nng {
 
         // TODO: TBD: potentially handling these as a string-based as well...
         class binary_message_header : public readonly_messaging_api<message_base::buffer_vector_type> {
+        public:
+
+            typedef readonly_messaging_api<message_base::buffer_vector_type>::size_type size_type;
+            typedef readonly_messaging_api<message_base::buffer_vector_type>::buffer_vector_type buffer_vector_type;
+
         protected:
 
             friend class binary_message;
@@ -43,20 +48,21 @@ namespace nng {
 
             virtual message_base::size_type get_size() const override;
 
+            // TODO: TBD: so if header is truly "read-only" then it is debatable whether "clear" should be exposed via header...
             virtual void clear() override;
 
             virtual bool has_message() const override;
 
-            // TODO: TBD: technically we should not be doing anything with header, per se; however, that being said, future efforts may involve moving from msg/header/body to "scatter/gather" pattern.
-        protected:
+        //    // TODO: TBD: technically we should not be doing anything with header, per se; however, that being said, future efforts may involve moving from msg/header/body to "scatter/gather" pattern.
+        //protected:
 
-            virtual void append(const message_base::buffer_vector_type& buf) override;
+        //    virtual void append(const message_base::buffer_vector_type& buf) override;
 
-            virtual void insert(const message_base::buffer_vector_type& buf) override;
+        //    virtual void insert(const message_base::buffer_vector_type& buf) override;
 
-            virtual void trim(size_type sz) override;
+        //    virtual void trim(size_type sz) override;
 
-            virtual void chop(size_type sz) override;
+        //    virtual void chop(size_type sz) override;
         };
     }
 }

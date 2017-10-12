@@ -1,6 +1,6 @@
 #include "socket.h"
 #include "listener.h"
-#include "nng_exception.h"
+#include "exceptions.hpp"
 
 namespace nng {
 

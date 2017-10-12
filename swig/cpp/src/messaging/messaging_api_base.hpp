@@ -2,10 +2,14 @@
 #define NNGCPP_MESSAGING_API_HPP
 
 #include "message_base.h"
-#include "../core/nng_exception.h"
+#include "../core/exceptions.hpp"
 
 #include <memory>
 #include <functional>
+
+#ifndef THROW_API_IS_READ_ONLY
+#define THROW_API_IS_READ_ONLY() throw trx::not_implemented("API is read-only")
+#endif //THROW_API_IS_READ_ONLY
 
 namespace nng {
 
@@ -103,13 +107,21 @@ namespace nng {
 
             readonly_messaging_api(::nng_msg* msgp) : messaging_api(msgp) {}
 
-            virtual void append(const Type_& x) override {}
+            virtual void append(const Type_& x) override {
+                THROW_API_IS_READ_ONLY();
+            }
 
-            virtual void insert(const Type_& x) override {}
+            virtual void insert(const Type_& x) override {
+                THROW_API_IS_READ_ONLY();
+            }
 
-            virtual void trim(size_type sz) override {}
+            virtual void trim(size_type sz) override {
+                THROW_API_IS_READ_ONLY();
+            }
 
-            virtual void chop(size_type sz) override {}
+            virtual void chop(size_type sz) override {
+                THROW_API_IS_READ_ONLY();
+            }
 
         public:
 

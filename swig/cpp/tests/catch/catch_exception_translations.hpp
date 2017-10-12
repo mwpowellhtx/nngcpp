@@ -12,7 +12,7 @@
 
 #include <catch.hpp>
 
-#include <core/nng_exception.h>
+#include <core/exceptions.hpp>
 
 #ifndef STRINGIFY
 #define STRINGIFY(x)    #x
@@ -33,6 +33,13 @@ CATCH_TRANSLATE_EXCEPTION(nng::nng_exception& ex) {
     const auto errnum = to_int(ex.error_code);
     os << STRINGIFY(nng::nng_exception) << ": " << "error_code = " << errnum;
     return os.str();
+}
+
+CATCH_TRANSLATE_EXCEPTION(trx::not_implemented& ex) {
+    const auto ex_what_ = std::string(ex.what());
+    return ex_what_.empty()
+        ? "unknown " STRINGIFY(std::exception)
+        : ("std::exception: " + ex_what_).c_str();
 }
 
 #endif // NNGCPP_CATCH_EXCEPTION_TRANSLATIONS_HPP
