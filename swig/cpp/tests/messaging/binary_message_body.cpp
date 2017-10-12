@@ -31,7 +31,7 @@ TEST_CASE("Test that the data is as expected", "[messaging][data]") {
     REQUIRE_THAT(data, Equals(expected));
 }
 
-TEST_CASE("Test that C style NNG message body appends", "[messaging][body][nng][append]") {
+TEST_CASE("Test that C style NNG message appends", "[messaging][body][nng][append]") {
 
     using namespace nng::messaging;
     using namespace constants;
@@ -64,7 +64,7 @@ TEST_CASE("Test that C style NNG message body appends", "[messaging][body][nng][
     ::nng_msg_free(msgp);
 }
 
-TEST_CASE("Test that the default message body works", "[messaging][binary][body][default]") {
+TEST_CASE("Test that the default message works", "[messaging][binary][body][default]") {
 
     using namespace nng::messaging;
     using namespace constants;

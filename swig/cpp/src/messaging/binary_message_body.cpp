@@ -1,3 +1,12 @@
+//
+// Copyright (c) 2017 Michel W Powell <mwpowellhtx@gmail.com>
+//
+// This software is supplied under the terms of the MIT License, a
+// copy of which should be located in the distribution where this
+// file was obtained (LICENSE.txt).  A copy of the license may also be
+// found online at https://opensource.org/licenses/MIT.
+//
+
 #include "binary_message_body.h"
 
 namespace nng {

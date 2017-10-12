@@ -1,40 +1,108 @@
-#include <catch.hpp>
+//
+// Copyright (c) 2017 Michel W Powell <mwpowellhtx@gmail.com>
+//
+// This software is supplied under the terms of the MIT License, a
+// copy of which should be located in the distribution where this
+// file was obtained (LICENSE.txt).  A copy of the license may also be
+// found online at https://opensource.org/licenses/MIT.
+//
 
-#include "messaging_gymnastics.h"
+#include "binary_message_part_fixtures.hpp"
 
-namespace nng {
-    namespace messaging {
+#include <nngcpp.h>
 
-        void binary_message_converter::append_to(const string_type& src, binary_message_type& dest) {
-            REQUIRE(src.length() > 0);
-            const auto _src_buf = messaging_utils::to_buffer(&src);
-            REQUIRE(src.length() == _src_buf.size());
-            REQUIRE(dest.body() != nullptr);
-            dest.body()->append(&_src_buf);
-        }
+#include "../src/messaging/binary_message_header.h"
 
-        void binary_message_converter::get_from(string_type& dest, binary_message_type& src) {
-            // It is managable, but just so we are aware.
-            const auto _got_src = src.body()->get();
-            REQUIRE(_got_src.size() > 0);
-            dest = messaging_utils::to_string(&_got_src);
-            REQUIRE(dest.length() == _got_src.size());
-        }
+#include "../catch/catch_exception_translations.hpp"
 
-        binary_message_converter::binary_message_type& operator<<(
-            binary_message_converter::binary_message_type& bm
-            , const binary_message_converter::string_type& s) {
+namespace constants {
+    const nng::messaging::message_base::buffer_vector_type data = { 1,2,3 };
+}
 
-            binary_message_converter::append_to(s, bm);
-            return bm;
-        }
+TEST_CASE("Test that the data is as expected", "[messaging][data]") {
 
-        binary_message_converter::string_type& operator<<(
-            binary_message_converter::string_type& s
-            , binary_message_converter::binary_message_type& bm) {
+    using namespace nng::messaging;
+    using namespace constants;
+    using namespace Catch::Matchers;
+    using buffer_vector_type = message_base::buffer_vector_type;
 
-            binary_message_converter::get_from(s, bm);
-            return s;
-        }
+    buffer_vector_type expected = { 1,2,3 };
+    REQUIRE(data.size() == expected.size());
+    REQUIRE_THAT(data, Equals(expected));
+}
+
+TEST_CASE("Test that C style NNG message appends", "[messaging][header][nng][append]") {
+
+    using namespace nng::messaging;
+    using namespace constants;
+
+    ::nng_msg* msgp;
+
+    typedef message_base::buffer_vector_type buffer_vector_type;
+
+    REQUIRE(::nng_msg_alloc(&msgp, 0) == 0);
+
+    REQUIRE(::nng_msg_header_len(msgp) == 0);
+
+    REQUIRE(data.size() == 3);
+
+    REQUIRE(::nng_msg_header_append(msgp, (const void*)&data[0], data.size()) == 0);
+
+    auto actual_len = ::nng_msg_header_len(msgp);
+
+    REQUIRE(actual_len == data.size());
+
+    auto* p = (buffer_vector_type::value_type*)::nng_msg_header(msgp);
+
+    // Do a poor-man's comparison of each individual element; should align with the expected.
+    for (auto i = 0; i < actual_len; i++) {
+        const auto expected = *(data.begin() + i);
+        const auto actual = (p + i)[0];
+        REQUIRE(actual == expected);
     }
+
+    ::nng_msg_free(msgp);
+}
+
+TEST_CASE("Test that the default message works", "[messaging][binary][header][default]") {
+
+    using namespace nng::messaging;
+    using namespace constants;
+    using namespace Catch::Matchers;
+    using buffer_vector_type = message_base::buffer_vector_type;
+
+    auto part = binary_message_part_fixture<binary_message_header>();
+
+    verify_default_message_part(part);
+}
+
+TEST_CASE("::nng_msg* based ctor works", "[messaging][binary][header][alloc]") {
+
+    using namespace nng::messaging;
+    using namespace constants;
+    using namespace Catch::Matchers;
+    using buffer_vector_type = message_base::buffer_vector_type;
+
+    ::nng_msg* msgp = nullptr;
+
+    CHECK(msgp == nullptr);
+
+    // In context with the Messaging framework, this would be provided from the binary_message.
+    REQUIRE(::nng_msg_alloc(&msgp, 0) == 0);
+
+    REQUIRE(msgp != nullptr);
+
+    // For test purposes, the fixture will assume ownership of the pointer, which will clean up on destruction.
+    auto part = binary_message_part_fixture<binary_message_header>(msgp);
+
+    verify_default_message_part(part, msgp);
+
+    // TODO: TBD: may open up the append and other header operations as makes sense to do so
+    //REQUIRE_NOTHROW(part.append(data));
+
+    //const auto& expected = data;
+    //const auto _got_actual = part.get();
+
+    //CHECK(part.get_size() == expected.size());
+    //REQUIRE_THAT(_got_actual, Equals(expected));
 }

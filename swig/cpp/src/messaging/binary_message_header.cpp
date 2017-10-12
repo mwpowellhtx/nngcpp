@@ -1,3 +1,12 @@
+//
+// Copyright (c) 2017 Michel W Powell <mwpowellhtx@gmail.com>
+//
+// This software is supplied under the terms of the MIT License, a
+// copy of which should be located in the distribution where this
+// file was obtained (LICENSE.txt).  A copy of the license may also be
+// found online at https://opensource.org/licenses/MIT.
+//
+
 #include "binary_message_header.h"
 
 namespace nng {
@@ -37,10 +46,11 @@ namespace nng {
         }
 
         message_base::size_type binary_message_header::get_size() const {
-            return ::nng_msg_header_len(_msgp);
+            return _msgp == nullptr ? 0 : ::nng_msg_header_len(_msgp);
         }
 
         void binary_message_header::clear() {
+            if (_msgp == nullptr) { return; }
             ::nng_msg_header_clear(_msgp);
         }
 
