@@ -62,11 +62,14 @@ namespace nng {
     struct device_path;
 
     class socket : public sender, public receiver, public messenger, public options {
+    public:
+
+        typedef messaging::message_base::size_type size_type;
+        typedef messaging::message_base::buffer_vector_type buffer_vector_type;
+
     private:
 
         typedef messaging::binary_message binary_message_type;
-        typedef messaging::message_base::size_type size_type;
-        typedef messaging::message_base::buffer_vector_type buffer_vector_type;
 
         friend class listener;
         friend class dialer;
