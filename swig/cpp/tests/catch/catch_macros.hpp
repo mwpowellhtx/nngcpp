@@ -32,11 +32,11 @@
 #endif // INTERNAL_CATCH_THROWS_AS_MATCHING
 
 #ifndef CATCH_CHECK_THROWS_AS_MATCHING
-#define CATCH_CHECK_THROWS_AS_MATCHING( expr, exceptionType, exceptionMatcher ) INTERNAL_CATCH_THROWS_AS_MATCHING( "CATCH_CHECK_THROWS_AS", exceptionType, exceptionMatcher, Catch::ResultDisposition::ContinueOnFailure, expr )
+#define CATCH_CHECK_THROWS_AS_MATCHING( expr, exceptionType, exceptionMatcher ) INTERNAL_CATCH_THROWS_AS_MATCHING( "CATCH_CHECK_THROWS_AS_MATCHING", exceptionType, exceptionMatcher, Catch::ResultDisposition::ContinueOnFailure, expr )
 #endif // CATCH_CHECK_THROWS_AS_MATCHING
 
 #ifndef REQUIRE_THROWS_AS_MATCHING
-#define REQUIRE_THROWS_AS_MATCHING( expr, exceptionType, exceptionMatcher ) INTERNAL_CATCH_THROWS_AS_MATCHING( "REQUIRE_THROWS_AS", exceptionType, exceptionMatcher, Catch::ResultDisposition::Normal, expr )
+#define REQUIRE_THROWS_AS_MATCHING( expr, exceptionType, exceptionMatcher ) INTERNAL_CATCH_THROWS_AS_MATCHING( "REQUIRE_THROWS_AS_MATCHING", exceptionType, exceptionMatcher, Catch::ResultDisposition::Normal, expr )
 #endif // REQUIRE_THROWS_AS_MATCHING
 
 #endif // CATCH_MACROS_HPP

@@ -97,14 +97,14 @@ macro (nngcpp_test_dependencies_cxx_catch TESTS_ENABLED)
 
     if (${TESTS_ENABLED})
 
-        # set (CATCH_GIT_TAG v1.10.0)
-        # # TODO: TBD: something about the format of the tag name is causing issues.
+        set (CATCH_GIT_TAG v1.10.0)
+        # TODO: TBD: something about the format of the tag name is causing issues.
         # set (CATCH_GIT_TAG v2.0.0-develop.4)
         # # TODO: TBD: furthermore, something about the hash isn't right either.
         # set (CATCH_GIT_TAG bd46f66754f11b5644913f6eb8a1900971f3e0ad)
         # # TODO: TBD: both appear to be a CMake issue.
-        # Talk about 'bleeding edge'... I do not like being on the HEAD, I would prefer to be checking out against a "stable" tag.
-        set (CATCH_GIT_TAG HEAD)
+        # # Talk about 'bleeding edge'... I do not like being on the HEAD, I would prefer to be checking out against a "stable" tag.
+        # set (CATCH_GIT_TAG HEAD)
 
         ExternalProject_Add (download_catch
             GIT_REPOSITORY git@github.com:philsquared/Catch.git

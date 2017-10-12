@@ -42,7 +42,7 @@ if (NNGCPP_ENABLE_TESTS)
         # list (APPEND all_tests ${NAME})
         set (TEST_PATH ${TEST_FILENAME}.cpp)
         get_filename_component (TEST_NAME ${TEST_FILENAME} NAME_WE)
-        add_executable (${TEST_NAME} main.cpp ${TEST_PATH})
+        add_executable (${TEST_NAME} main.cpp messaging/messaging_gymnastics.h messaging/messaging_gymnastics.cpp ${TEST_PATH})
         # Treat NNG and NNGCPP as DEPENDENCIES rather than link libraries.
         add_dependencies (${TEST_NAME} nng)
         add_dependencies (${TEST_NAME} ${NNGCPP_PROJECT_NAME_STATIC})
@@ -113,6 +113,9 @@ nngcpp_add_test (core/reconnect 5)
 nngcpp_add_test (core/sock 5)
 nngcpp_add_test (core/device 5)
 nngcpp_add_test (core/scalability 20)
+
+nngcpp_add_test (messaging/binary_message_body 0)
+nngcpp_add_test (messaging/binary_message_header 0)
 
 nngcpp_add_test(protocol/bus 5)
 

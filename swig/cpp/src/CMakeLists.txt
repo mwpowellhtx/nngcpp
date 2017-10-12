@@ -41,6 +41,8 @@ set (NNGCPP_CPP_SRCS
     core/endpoint.h
     core/listener.cpp
     core/listener.h
+    core/messenger.cpp
+    core/messenger.h
     core/nng_exception.cpp
     core/nng_exception.h
     core/options.cpp
@@ -53,6 +55,19 @@ set (NNGCPP_CPP_SRCS
     core/session.h
     core/socket.cpp
     core/socket.h
+    messaging/binary_message.cpp
+    messaging/binary_message.h
+    messaging/binary_message_body.cpp
+    messaging/binary_message_body.h
+    messaging/binary_message_header.cpp
+    messaging/binary_message_header.h
+    messaging/message_base.cpp
+    messaging/message_base.h
+    messaging/message_pipe.cpp
+    messaging/message_pipe.h
+    messaging/messaging_utils.cpp
+    messaging/messaging_utils.h
+    messaging/messaging_api_base.hpp
     protocol/bus/bus.cpp
     protocol/bus/bus.h
     protocol/pair/pair_v0.cpp

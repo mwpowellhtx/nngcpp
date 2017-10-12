@@ -11,6 +11,7 @@ namespace nng {
         : sid(0)
         , sender()
         , receiver()
+        , messenger()
         , options() {
 
         const auto errnum = nng_ctor(&sid);
@@ -58,59 +59,67 @@ namespace nng {
         }
     }
 
-    template<class Buffer>
-    int send(int id, Buffer const& buffer, std::size_t sz, int flags) {
-        const auto errnum = ::nng_send(id, (void*)&buffer[0], sz, flags);
+    template<class Buffer_>
+    int send(int id, const Buffer_& buf, std::size_t sz, int flags) {
+        const auto errnum = ::nng_send(id, (void*)&buf[0], sz, flags);
         THROW_NNG_EXCEPTION_EC(errnum);
         return errnum;
     }
     
-    template<class Buffer>
-    int try_receive(int id, Buffer& buffer, std::size_t& sz, int flags) {
-        buffer.resize(sz);
-        const auto errnum = ::nng_recv(id, &buffer[0], &sz, flags);
+    template<class Buffer_>
+    int try_receive(int id, Buffer_& buf, std::size_t& sz, int flags) {
+        buf.resize(sz);
+        const auto errnum = ::nng_recv(id, &buf[0], &sz, flags);
         THROW_NNG_EXCEPTION_EC(errnum);
         return errnum;
     }
 
-    int socket::send(const std::string& str, int flags) {
-        return nng::send(sid, str, str.length() + 1, flags);
+    void socket::send(const binary_message_type* const bmp, int flags) {
+        auto* msgp = bmp->get_msgp();
+        const auto errnum = ::nng_sendmsg(sid, msgp, flags);
+        THROW_NNG_EXCEPTION_EC(errnum);
     }
 
-    int socket::send(const std::string& str, send_size_type sz, int flags) {
-        return nng::send(sid, str, sz, flags);
+    int socket::send(const buffer_vector_type* const bufp, int flags) {
+        return nng::send(sid, *bufp, bufp->size(), flags);
     }
 
-    int socket::send(const send_vector& buffer, int flags) {
-        return nng::send(sid, buffer, buffer.size(), flags);
+    int socket::send(const buffer_vector_type* const bufp, size_type sz, int flags) {
+        return nng::send(sid, *bufp, sz, flags);
     }
 
-    int socket::send(const send_vector& buffer, send_size_type sz, int flags) {
-        return nng::send(sid, buffer, sz, flags);
+    std::unique_ptr<socket::binary_message_type> socket::receive(int flags) {
+        auto bmup = std::make_unique<binary_message_type>();
+        try_receive(bmup.get(), flags);
+        return bmup;
     }
 
-    int socket::try_receive(std::string& str, receive_size_type& sz, int flags) {
-        const auto errnum = nng::try_receive(sid, str, sz, flags);
-        if (!errnum) {
-            str.resize(--sz);
+    int socket::try_receive(binary_message_type* const bmp, int flags) {
+        ::nng_msg* msgp = nullptr;
+        const auto errnum = ::nng_recvmsg(sid, &msgp, flags);
+        try {
+            THROW_NNG_EXCEPTION_EC(errnum);
         }
+        catch (...) {
+            // TODO: TBD: this is probably (PROBABLY) about as good as we can expect here...
+            if (msgp != nullptr) {
+                ::nng_msg_free(msgp);
+            }
+            // Re-throw the exception after taking care of potential memory allocation.
+            throw;
+        }
+        bmp->set_msgp(msgp);
         return errnum;
     }
 
-    std::string socket::receive_str(receive_size_type& sz, int flags) {
-        std::string str;
-        const auto errnum = nng::try_receive(sid, str, sz, flags);
-        return str;
+    socket::buffer_vector_type socket::receive(size_type& sz, int flags) {
+        buffer_vector_type buf;
+        try_receive(&buf, sz, flags);
+        return buf;
     }
 
-    int socket::try_receive(receive_vector& buffer, receive_size_type& sz, int flags) {
-        return nng::try_receive(sid, buffer, sz, flags);
-    }
-
-    socket::receive_vector socket::receive_buffer(receive_size_type& sz, int flags) {
-        receive_vector buffer;
-        nng::try_receive(sid, buffer, sz, flags);
-        return buffer;
+    int socket::try_receive(buffer_vector_type* const bufp, size_type& sz, int flags) {
+        return nng::try_receive(sid, *bufp, sz, flags);
     }
 
     // Convenience option wrappers.
@@ -139,8 +148,8 @@ namespace nng {
         val.resize(sz - 1);
     }
 
-    void socket::set_option(const std::string& name, const void* bp, option_size_type sz) {
-        const auto errnum = ::nng_setopt(sid, name.c_str(), bp, sz);
+    void socket::set_option(const std::string& name, const void* valp, option_size_type sz) {
+        const auto errnum = ::nng_setopt(sid, name.c_str(), valp, sz);
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 

@@ -124,4 +124,13 @@ namespace nng {
     void session::remove_device(const device* const dp) {
         __remove(_devices, dp);
     }
+
+    // TODO: TBD: string based? or vector based?
+    std::shared_ptr<messaging::binary_message> session::create_message() {
+        return __create(_messages);
+    }
+
+    void session::remove_message(const messaging::binary_message* const mp) {
+        __remove(_messages, mp);
+    }
 }

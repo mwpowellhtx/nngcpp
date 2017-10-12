@@ -9,6 +9,7 @@
 
 #include "sender.h"
 #include "receiver.h"
+#include "messenger.h"
 #include "options.h"
 
 namespace nng {
@@ -60,75 +61,76 @@ namespace nng {
     class dialer;
     struct device_path;
 
-    class socket : public sender, public receiver, public options {
-        private:
+    class socket : public sender, public receiver, public messenger, public options {
+    private:
 
-            typedef std::size_t size_type;
+        typedef messaging::binary_message binary_message_type;
+        typedef messaging::message_base::size_type size_type;
+        typedef messaging::message_base::buffer_vector_type buffer_vector_type;
 
-            friend class listener;
-            friend class dialer;
+        friend class listener;
+        friend class dialer;
 
-            // For use with Device Thread Callback.
-            friend void install_device_sockets_callback(const device_path* const);
+        // For use with Device Thread Callback.
+        friend void install_device_sockets_callback(const device_path* const);
 
-            ::nng_socket sid;
+        ::nng_socket sid;
 
-        protected:
+    protected:
 
-            typedef std::function<int(::nng_socket* const)> nng_ctor_func;
+        typedef std::function<int(::nng_socket* const)> nng_ctor_func;
 
-            socket(const nng_ctor_func& nng_ctor);
+        socket(const nng_ctor_func& nng_ctor);
 
-        public:
+    public:
 
-            virtual ~socket();
+        virtual ~socket();
 
-            // TODO: TBD: may want to comprehend nng's NNG_MAXADDRLEN at some level... expose as a static constant, for instance, bare minimum
-            void listen(const std::string& addr, int flags = 0);
-            void listen(const std::string& addr, listener* const lp, int flags = 0);
+        // TODO: TBD: may want to comprehend nng's NNG_MAXADDRLEN at some level... expose as a static constant, for instance, bare minimum
+        void listen(const std::string& addr, int flags = 0);
+        void listen(const std::string& addr, listener* const lp, int flags = 0);
 
-            void dial(const std::string& addr, int flags = 0);
-            void dial(const std::string& addr, dialer* const dp, int flags = 0);
+        void dial(const std::string& addr, int flags = 0);
+        void dial(const std::string& addr, dialer* const dp, int flags = 0);
 
-            void close();
-            void shutdown();
+        void close();
+        void shutdown();
 
-            // Convenience option wrappers.
-            virtual void set_option(const std::string& name, const std::string& val, option_size_type sz);
-            virtual void set_option(const std::string& name, const std::string& val);
+        // Convenience option wrappers.
+        virtual void set_option(const std::string& name, const std::string& val, option_size_type sz) override;
+        virtual void set_option(const std::string& name, const std::string& val) override;
 
-            virtual void get_option(const std::string& name, std::string& val);
-            virtual void get_option(const std::string& name, std::string& val, option_size_type& sz);
+        virtual void get_option(const std::string& name, std::string& val) override;
+        virtual void get_option(const std::string& name, std::string& val, option_size_type& sz) override;
 
-            virtual void set_option(const std::string& name, const void* v, option_size_type sz);
-            virtual void get_option(const std::string& name, void* val, option_size_type* szp);
+        virtual void set_option(const std::string& name, const void* valp, option_size_type sz) override;
+        virtual void get_option(const std::string& name, void* valp, option_size_type* szp) override;
 
-            void set_option_int(const std::string& name, int val);
-            void set_option_size(const std::string& name, option_size_type val);
-            void set_option_usec(const std::string& name, uint64_t val);
+        void set_option_int(const std::string& name, int val);
+        void set_option_size(const std::string& name, option_size_type val);
+        void set_option_usec(const std::string& name, uint64_t val);
 
-            void get_option_int(const std::string& name, int* valp);
-            void get_option_size(const std::string& name, option_size_type* valp);
-            void get_option_usec(const std::string& name, uint64_t* valp);
+        void get_option_int(const std::string& name, int* valp);
+        void get_option_size(const std::string& name, option_size_type* valp);
+        void get_option_usec(const std::string& name, uint64_t* valp);
 
-            virtual int send(const std::string& str, int flags = 0);
-            virtual int send(const std::string& str, send_size_type sz, int flags = 0);
+        virtual void send(const binary_message_type* const bmp, int flags = 0) override;
 
-            virtual int send(const send_vector& buffer, int flags = 0);
-            virtual int send(const send_vector& buffer, send_size_type sz, int flags = 0);
+        virtual int send(const buffer_vector_type* const bufp, int flags = 0) override;
+        virtual int send(const buffer_vector_type* const bufp, size_type sz, int flags = 0) override;
 
-            virtual int try_receive(std::string& str, receive_size_type& sz, int flags = 0);
-            virtual std::string socket::receive_str(receive_size_type& sz, int flags = 0);
+        virtual std::unique_ptr<binary_message_type> receive(int flags = 0) override;
+        virtual int try_receive(binary_message_type* const bmp, int flags = 0) override;
 
-            virtual int try_receive(receive_vector& str, receive_size_type& sz, int flags = 0);
-            virtual receive_vector socket::receive_buffer(receive_size_type& sz, int flags = 0);
+        virtual buffer_vector_type receive(size_type& sz, int flags = 0) override;
+        virtual int try_receive(buffer_vector_type* const bufp, size_type& sz, int flags = 0) override;
 
-            protocol_type get_protocol() const;
-            protocol_type get_peer() const;
-
-            // TODO: TBD: I'm not sure it makes that much quite as much sense to ask whether the socket is this that or the other protocol type...
-            bool is_protocol_configured() const;
-            bool is_peer_configured() const;
+        protocol_type get_protocol() const;
+        protocol_type get_peer() const;
+        
+        // TODO: TBD: I'm not sure it makes that much quite as much sense to ask whether the socket is this that or the other protocol type...
+        bool is_protocol_configured() const;
+        bool is_peer_configured() const;
     };
 }
 

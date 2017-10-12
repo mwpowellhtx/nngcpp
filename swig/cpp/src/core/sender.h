@@ -3,31 +3,31 @@
 
 #include "../nngcpp_integration.h"
 
+#include "nngcpp_messaging.hpp"
+
 #include <cstddef>
 #include <cstdint>
-#include <string>
 #include <vector>
 
 namespace nng {
 
     class sender {
-        public:
+    protected:
 
-            typedef std::size_t send_size_type;
+        sender();
 
-        protected:
+    private:
 
-            typedef std::vector<uint8_t> send_vector;
+        typedef messaging::binary_message binary_message_type;
+        typedef messaging::message_base::size_type size_type;
+        typedef messaging::message_base::buffer_vector_type buffer_vector_type;
 
-            sender();
+    public:
 
-        public:
+        virtual void send(const binary_message_type* const bmp, int flags = 0) = 0;
 
-            virtual int send(const std::string& str, int flags = 0) = 0;
-            virtual int send(const std::string& str, send_size_type sz, int flags = 0) = 0;
-
-            virtual int send(const send_vector& buffer, int flags = 0) = 0;
-            virtual int send(const send_vector& buffer, send_size_type sz, int flags = 0) = 0;
+        virtual int send(const buffer_vector_type* const bufp, int flags = 0) = 0;
+        virtual int send(const buffer_vector_type* const bufp, size_type sz, int flags = 0) = 0;
     };
 }
 

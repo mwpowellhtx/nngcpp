@@ -51,6 +51,7 @@ TEST_CASE("Poll FDs", "[pollfd]") {
     using namespace std;
     using namespace nng;
     using namespace nng::protocol;
+    using namespace nng::messaging;
     using namespace Catch::Matchers;
     using namespace constants;
     using _opt_ = option_names;
@@ -92,28 +93,47 @@ TEST_CASE("Poll FDs", "[pollfd]") {
             }
 
             SECTION("And they start non pollable") {
-                pollfd pfd{ (SOCKET)fd, POLLIN, 0 };
+                pollfd pfd{ (SOCKET)fd , POLLIN, 0 };
                 REQUIRE(::poll(&pfd, 1, 0) == 0);
                 REQUIRE(pfd.revents == 0);
             }
 
             SECTION("But if we write they are pollable") {
-                pollfd pfd{ (SOCKET)fd, POLLIN, 0 };
-                REQUIRE_NOTHROW(s2->send("kick")); // TODO: TBD: send appears to be blocking
+                pollfd pfd{ (SOCKET)fd , POLLIN, 0 };
+                const messaging_utils::buffer_vector_type _kick_buf = { 'k','i','c','k','\0' };
+                REQUIRE_NOTHROW(s2->send(&_kick_buf, _kick_buf.size())); // TODO: TBD: was blocking prior to this...
                 REQUIRE(::poll(&pfd, 1, 1000) == 1);
                 REQUIRE((pfd.revents&POLLIN));
             }
         }
 
         SECTION("We can get a Send File Descriptor") {
+
             int fd;
+            std::size_t sz;
+
+            sz = sizeof(fd);
             REQUIRE_NOTHROW(s1->get_option_int(_opt_::send_file_descriptor, &fd));
+            REQUIRE_NOTHROW(s1->get_option(_opt_::send_file_descriptor, &fd, &sz));
             REQUIRE(fd != inv_sock);
-            REQUIRE_NOTHROW(s1->send("oops"));
+
+            const auto buf = messaging_utils::to_buffer("oops");
+            sz = 4;
+
+            REQUIRE_NOTHROW(s1->send(&buf, sz));
         }
 
         SECTION("Must have big enough size") {
-            INFO("At least for now, we simply do not expose the general get/set options API through the C++ wrapper.");
+
+            int fd;
+            std::size_t sz;
+
+            sz = 1;
+            REQUIRE_THROWS_AS_MATCHING(s1->get_option(_opt_::receive_file_descriptor, &fd, &sz), nng_exception, ThrowsNngException(ec_einval));
+
+            sz = 128;
+            REQUIRE_NOTHROW(s1->get_option(_opt_::receive_file_descriptor, &fd, &sz));
+            REQUIRE(sz == sizeof(fd));
         }
 
         SECTION("We cannot get a Send File Descriptor for Pull Socket") {
@@ -122,13 +142,15 @@ TEST_CASE("Poll FDs", "[pollfd]") {
             REQUIRE_NOTHROW(s3 = make_unique<latest_pull_socket>());
 
             int fd;
+            std::size_t sz;
+
+            sz = sizeof(fd);
             // TODO: TBD: ditto working interim answer...
+            REQUIRE_THROWS_AS_MATCHING(s3->get_option(_opt_::send_file_descriptor, &fd, &sz), nng_exception, ThrowsNngException(ec_enotsup));
             REQUIRE_THROWS_AS_MATCHING(s3->get_option_int(_opt_::send_file_descriptor, &fd), nng_exception, ThrowsNngException(ec_enotsup));
 
-            SECTION("Destructor cleans up correctly") {
-                REQUIRE_NOTHROW(s3.reset());
-                REQUIRE(s3 == nullptr);
-            }
+            REQUIRE_NOTHROW(s3.reset());
+            REQUIRE(s3 == nullptr);
         }
 
         SECTION("We cannot get a Receive File Descriptor for Push Socket") {
@@ -137,13 +159,15 @@ TEST_CASE("Poll FDs", "[pollfd]") {
             REQUIRE_NOTHROW(s3 = make_unique<latest_push_socket>());
 
             int fd;
+            std::size_t sz;
+
+            sz = sizeof(fd);
             // TODO: TBD: this works as an interim measure, although the ResultBuilder needs a little help to better comprehend the result.
+            REQUIRE_THROWS_AS_MATCHING(s3->get_option(_opt_::receive_file_descriptor, &fd, &sz), nng_exception, ThrowsNngException(ec_enotsup));
             REQUIRE_THROWS_AS_MATCHING(s3->get_option_int(_opt_::receive_file_descriptor, &fd), nng_exception, ThrowsNngException(ec_enotsup));
 
-            SECTION("Destructor cleans up correctly") {
-                REQUIRE_NOTHROW(s3.reset());
-                REQUIRE(s3 == nullptr);
-            }
+            REQUIRE_NOTHROW(s3.reset());
+            REQUIRE(s3 == nullptr);
         }
     }
 

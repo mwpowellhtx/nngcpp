@@ -3,31 +3,33 @@
 
 #include "../nngcpp_integration.h"
 
+#include "nngcpp_messaging.hpp"
+
 #include <cstddef>
 #include <cstdint>
-#include <string>
 #include <vector>
 
 namespace nng {
 
     class receiver {
-        public:
+    protected:
 
-            typedef std::size_t receive_size_type;
+        receiver();
 
-        protected:
+    private:
 
-            typedef std::vector<uint8_t> receive_vector;
+        typedef messaging::binary_message binary_message_type;
+        typedef messaging::message_base::size_type size_type;
+        typedef messaging::message_base::buffer_vector_type buffer_vector_type;
 
-            receiver();
+    public:
 
-        public:
+        // TODO: TBD: this one may get somewhat involved...
+        virtual std::unique_ptr<binary_message_type> receive(int flags = 0) = 0;
+        virtual int try_receive(binary_message_type* const bmp, int flags = 0) = 0;
 
-            virtual int try_receive(std::string& str, receive_size_type& sz, int flags = 0) = 0;
-            virtual std::string receive_str(receive_size_type& sz, int flags = 0) = 0;
-
-            virtual int try_receive(receive_vector& buffer, receive_size_type& sz, int flags = 0) = 0;
-            virtual receive_vector receive_buffer(receive_size_type& sz, int flags = 0) = 0;
+        virtual buffer_vector_type receive(size_type& sz, int flags = 0) = 0;
+        virtual int try_receive(buffer_vector_type* const bufp, size_type& sz, int flags = 0) = 0;
     };
 }
 

@@ -36,7 +36,7 @@ TEST_CASE("Error messages work", "[errors]") {
     }
 
     SECTION("System errors work") {
-        REQUIRE(nng_exception::strerror(static_cast<int>(ec_esyserr) + ENOENT) == strerror(ENOENT));
-        REQUIRE(nng_exception::strerror(static_cast<int>(ec_esyserr) + EINVAL) == strerror(EINVAL));
+        REQUIRE(nng_exception::strerror(static_cast<int>(ec_esyserr) + ENOENT) == ::strerror(ENOENT));
+        REQUIRE(nng_exception::strerror(static_cast<int>(ec_esyserr) + EINVAL) == ::strerror(EINVAL));
     }
 }
