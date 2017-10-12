@@ -38,8 +38,6 @@ namespace nng {
 
             virtual ~binary_message_body();
 
-            virtual const buffer_vector_type get() const override;
-
             virtual bool try_get(buffer_vector_type& value) const override;
 
             virtual size_type get_size() const override;

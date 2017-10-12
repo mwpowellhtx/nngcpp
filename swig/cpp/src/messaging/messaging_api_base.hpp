@@ -79,9 +79,12 @@ namespace nng {
 
             virtual ~messaging_api() {}
 
-            virtual const Type_ get() const = 0;
-
             virtual bool try_get(Type_& value) const = 0;
+
+            virtual const Type_ get() const {
+                Type_ result;
+                return try_get(result) ? result : Type_();
+            }
 
             virtual void append(const Type_& x) = 0;
 
@@ -99,6 +102,14 @@ namespace nng {
             readonly_messaging_api() : messaging_api() {}
 
             readonly_messaging_api(::nng_msg* msgp) : messaging_api(msgp) {}
+
+            virtual void append(const Type_& x) override {}
+
+            virtual void insert(const Type_& x) override {}
+
+            virtual void trim(size_type sz) override {}
+
+            virtual void chop(size_type sz) override {}
 
         public:
 

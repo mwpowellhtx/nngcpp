@@ -30,13 +30,6 @@ namespace nng {
             return _msgp == nullptr ? 0 : ::nng_msg_len(_msgp);
         }
 
-        const binary_message_body::buffer_vector_type binary_message_body::get() const {
-
-            buffer_vector_type buf;
-
-            return try_get(buf) ? buf : buffer_vector_type();
-        }
-
         bool binary_message_body::try_get(buffer_vector_type& value) const {
 
             const auto sz = get_size();
