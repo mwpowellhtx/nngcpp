@@ -5,7 +5,7 @@
 
 #include <ostream>
 
-#include <core/nng_exception.h>
+#include <core/exceptions.hpp>
 
 namespace Catch {
     namespace Matchers {
