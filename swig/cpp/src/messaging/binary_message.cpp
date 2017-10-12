@@ -59,19 +59,17 @@ namespace nng {
         }
 
         void binary_message::allocate(size_type sz) {
-            if (_msgp != nullptr) { return; }
-            const auto errnum = ::nng_msg_alloc(&_msgp, sz);
+            if (has_message()) { return; }
+            ::nng_msg* msgp;
+            const auto errnum = ::nng_msg_alloc(&msgp, sz);
             THROW_NNG_EXCEPTION_EC(errnum);
-            // This may be a little redundant at that point, but it will work.
-            binary_message::set_msgp(_msgp);
+            binary_message::set_msgp(msgp);
         }
 
         void binary_message::free() {
-            if (_msgp == nullptr) { return; }
-            ::nng_msg_free(_msgp);
-            _msgp = nullptr;
-            _header.set_msgp(_msgp);
-            _body.set_msgp(_msgp);
+            if (!has_message()) { return; }
+            ::nng_msg_free(get_msgp());
+            binary_message::set_msgp(nullptr);
         }
     }
 }

@@ -44,6 +44,8 @@ namespace nng {
 
             virtual ~binary_message_header();
 
+            virtual ::nng_msg* get_msgp() const override;
+
             virtual bool try_get(buffer_vector_type& value) const override;
 
             virtual message_base::size_type get_size() const override;

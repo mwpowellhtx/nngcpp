@@ -26,6 +26,10 @@ namespace nng {
         binary_message_header::~binary_message_header() {
         }
 
+        ::nng_msg* binary_message_header::get_msgp() const {
+            return message_base::get_msgp();
+        }
+
         message_base::size_type binary_message_header::get_size() const {
             return _msgp == nullptr ? 0 : ::nng_msg_header_len(_msgp);
         }

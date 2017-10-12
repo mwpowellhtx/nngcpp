@@ -52,7 +52,7 @@ namespace nng {
 
             virtual void set_msgp(::nng_msg* msgp);
 
-            ::nng_msg* get_msgp() const;
+            virtual ::nng_msg* get_msgp() const;
 
             virtual bool has_message() const;
         };
