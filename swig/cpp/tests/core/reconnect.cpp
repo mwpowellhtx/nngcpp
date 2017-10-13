@@ -66,20 +66,6 @@ of a legit failure, we see the actual line IN-SITU where the test case ACTUALLY 
 
 #define NNGCPP_TESTS_ALLOCATE_MSG(m) NNGCPP_TESTS_ALLOCATE_MSG_SZ(m, 0)
 
-//// todo:
-//TEST_CASE("Do some math tests", "[math][foo][bar]") {
-//
-//    SECTION("This is a test") {
-//
-//        REQUIRE(2 + 2 != 4);
-//    }
-//
-//    SECTION("This is a test 2") {
-//
-//        REQUIRE(3 + 3 != 6);
-//    }
-//}
-
 struct c_style_fixture {
 
     ::nng_socket push;
