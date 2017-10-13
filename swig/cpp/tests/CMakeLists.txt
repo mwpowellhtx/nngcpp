@@ -116,6 +116,7 @@ nngcpp_add_test (core/scalability 20)
 
 nngcpp_add_test (messaging/binary_message_body 0)
 nngcpp_add_test (messaging/binary_message_header 0)
+nngcpp_add_test (messaging/binary_message 0)
 
 nngcpp_add_test(protocol/bus 5)
 
