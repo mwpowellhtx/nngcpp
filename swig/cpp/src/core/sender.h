@@ -24,10 +24,10 @@ namespace nng {
 
     public:
 
-        virtual void send(const binary_message_type* const bmp, int flags = 0) = 0;
+        virtual void send(binary_message_type* const bmp, flag_type flags = flag_none) = 0;
 
-        virtual int send(const buffer_vector_type* const bufp, int flags = 0) = 0;
-        virtual int send(const buffer_vector_type* const bufp, size_type sz, int flags = 0) = 0;
+        virtual int send(const buffer_vector_type* const bufp, flag_type flags = flag_none) = 0;
+        virtual int send(const buffer_vector_type* const bufp, size_type sz, flag_type flags = flag_none) = 0;
     };
 }
 

@@ -1,9 +1,9 @@
-#include <vector>
-
 #include "socket.h"
 #include "dialer.h"
 #include "listener.h"
 #include "exceptions.hpp"
+
+#include <vector>
 
 namespace nng {
 
@@ -23,22 +23,22 @@ namespace nng {
     }
 
     // TODO: TBD: ditto ec handling...
-    void socket::listen(const std::string& addr, int flags) {
+    void socket::listen(const std::string& addr, flag_type flags) {
         const auto errnum = ::nng_listen(sid, addr.c_str(), nullptr, flags);
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
-    void socket::listen(const std::string& addr, listener* const lp, int flags) {
+    void socket::listen(const std::string& addr, listener* const lp, flag_type flags) {
         const auto errnum = ::nng_listen(sid, addr.c_str(), lp ? &(lp->lid) : nullptr, flags);
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
-    void socket::dial(const std::string& addr, int flags) {
+    void socket::dial(const std::string& addr, flag_type flags) {
         const auto errnum = ::nng_dial(sid, addr.c_str(), nullptr, flags);
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
-    void socket::dial(const std::string& addr, dialer* const dp, int flags) {
+    void socket::dial(const std::string& addr, dialer* const dp, flag_type flags) {
         const auto errnum = ::nng_dial(sid, addr.c_str(), dp ? &(dp->did) : nullptr, flags);
         THROW_NNG_EXCEPTION_EC(errnum);
     }
@@ -60,43 +60,49 @@ namespace nng {
     }
 
     template<class Buffer_>
-    int send(int id, const Buffer_& buf, std::size_t sz, int flags) {
-        const auto errnum = ::nng_send(id, (void*)&buf[0], sz, flags);
+    int send(int id, const Buffer_& buf, std::size_t sz, flag_type flags) {
+        const auto errnum = ::nng_send(id, (void*)&buf[0], sz, static_cast<int>(flags));
         THROW_NNG_EXCEPTION_EC(errnum);
         return errnum;
     }
     
     template<class Buffer_>
-    int try_receive(int id, Buffer_& buf, std::size_t& sz, int flags) {
+    int try_receive(int id, Buffer_& buf, std::size_t& sz, flag_type flags) {
         buf.resize(sz);
-        const auto errnum = ::nng_recv(id, &buf[0], &sz, flags);
+        const auto errnum = ::nng_recv(id, &buf[0], &sz, static_cast<int>(flags));
         THROW_NNG_EXCEPTION_EC(errnum);
         return errnum;
     }
 
-    void socket::send(const binary_message_type* const bmp, int flags) {
+    void socket::send(binary_message_type* const bmp, flag_type flags) {
         auto* msgp = bmp->get_msgp();
-        const auto errnum = ::nng_sendmsg(sid, msgp, flags);
+        const auto errnum = ::nng_sendmsg(sid, msgp, static_cast<int>(flags));
         THROW_NNG_EXCEPTION_EC(errnum);
+        /* Yes, this is not a mistake. Message passing semantics means that NNG assumes
+        ownership of the message after passing. Effectively, this nullifies the message. */
+        bmp->set_msgp(nullptr);
     }
 
-    int socket::send(const buffer_vector_type* const bufp, int flags) {
+    int socket::send(const buffer_vector_type* const bufp, flag_type flags) {
         return nng::send(sid, *bufp, bufp->size(), flags);
     }
 
-    int socket::send(const buffer_vector_type* const bufp, size_type sz, int flags) {
+    int socket::send(const buffer_vector_type* const bufp, size_type sz, flag_type flags) {
         return nng::send(sid, *bufp, sz, flags);
     }
 
-    std::unique_ptr<socket::binary_message_type> socket::receive(int flags) {
+    std::unique_ptr<socket::binary_message_type> socket::receive(flag_type flags) {
         auto bmup = std::make_unique<binary_message_type>();
         try_receive(bmup.get(), flags);
         return bmup;
     }
 
-    int socket::try_receive(binary_message_type* const bmp, int flags) {
+    int socket::try_receive(binary_message_type* const bmp, flag_type flags) {
+        /* So this is somewhat of a long way around, but it represents the cost of NNG message
+        ownership semantics. The cost has to be paid at some point, either on the front side or
+        the back side, so we pay for it here in additional semantics. */
         ::nng_msg* msgp = nullptr;
-        const auto errnum = ::nng_recvmsg(sid, &msgp, flags);
+        const auto errnum = ::nng_recvmsg(sid, &msgp, static_cast<int>(flags));
         try {
             THROW_NNG_EXCEPTION_EC(errnum);
         }
@@ -112,13 +118,13 @@ namespace nng {
         return errnum;
     }
 
-    socket::buffer_vector_type socket::receive(size_type& sz, int flags) {
+    socket::buffer_vector_type socket::receive(size_type& sz, flag_type flags) {
         buffer_vector_type buf;
         try_receive(&buf, sz, flags);
         return buf;
     }
 
-    int socket::try_receive(buffer_vector_type* const bufp, size_type& sz, int flags) {
+    int socket::try_receive(buffer_vector_type* const bufp, size_type& sz, flag_type flags) {
         return nng::try_receive(sid, *bufp, sz, flags);
     }
 
@@ -192,15 +198,7 @@ namespace nng {
         return static_cast<protocol_type>(value);
     }
 
-    flag_type to_flag_type(int value) {
-        return static_cast<flag_type>(value);
-    }
-
     int to_int(const protocol_type value) {
-        return static_cast<int>(value);
-    }
-
-    int to_int(const flag_type value) {
         return static_cast<int>(value);
     }
 

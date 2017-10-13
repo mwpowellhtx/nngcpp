@@ -24,16 +24,13 @@ namespace nng {
         close();
     }
 
-    void dialer::start(int flags) {
-        const auto errnum = ::nng_dialer_start(did, flags);
+    void dialer::start(flag_type flags) {
+        const auto errnum = ::nng_dialer_start(did, static_cast<int>(flags));
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
     void dialer::close() {
         if (did) {
-            //std::string buffer;
-            //buffer.resize(128);
-            //_itoa(did, &buffer[0], 10);
             const auto errnum = ::nng_dialer_close(did);
             THROW_NNG_EXCEPTION_EC(errnum);
             did = 0;

@@ -3,6 +3,8 @@
 
 #include "../nngcpp_integration.h"
 
+#include "enums.h"
+
 namespace nng {
 
     // TODO: TBD: carries along with it information about ::nng_pipe ... just a matter of how to present it to the C++ (or SWIG) community...
@@ -15,7 +17,7 @@ namespace nng {
 
             virtual ~endpoint();
 
-            virtual void start(int flags = 0) = 0;
+            virtual void start(flag_type flags = flag_none) = 0;
             virtual void close() = 0;
     };
 }

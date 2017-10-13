@@ -24,8 +24,8 @@ namespace nng {
         close();
     }
 
-    void listener::start(int flags) {
-        const auto errnum = ::nng_listener_start(lid, flags);
+    void listener::start(flag_type flags) {
+        const auto errnum = ::nng_listener_start(lid, static_cast<int>(flags));
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 

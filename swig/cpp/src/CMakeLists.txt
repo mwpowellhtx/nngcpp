@@ -32,6 +32,8 @@ include_directories (AFTER SYSTEM "${NNG_INSTALL_PREFIX}/include")
 set (NNGCPP_CPP_SRCS
     nngcpp.h
     nngcpp_integration.h
+    core/enums.h
+    core/enums.cpp
     core/core.h
     core/device.cpp
     core/device.h

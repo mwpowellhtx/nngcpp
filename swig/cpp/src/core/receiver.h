@@ -25,11 +25,11 @@ namespace nng {
     public:
 
         // TODO: TBD: this one may get somewhat involved...
-        virtual std::unique_ptr<binary_message_type> receive(int flags = 0) = 0;
-        virtual int try_receive(binary_message_type* const bmp, int flags = 0) = 0;
+        virtual std::unique_ptr<binary_message_type> receive(flag_type flags = flag_none) = 0;
+        virtual int try_receive(binary_message_type* const bmp, flag_type flags = flag_none) = 0;
 
-        virtual buffer_vector_type receive(size_type& sz, int flags = 0) = 0;
-        virtual int try_receive(buffer_vector_type* const bufp, size_type& sz, int flags = 0) = 0;
+        virtual buffer_vector_type receive(size_type& sz, flag_type flags = flag_none) = 0;
+        virtual int try_receive(buffer_vector_type* const bufp, size_type& sz, flag_type flags = flag_none) = 0;
     };
 }
 

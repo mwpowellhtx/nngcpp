@@ -7,19 +7,13 @@
 #include <functional>
 #include <string>
 
+#include "enums.h"
 #include "sender.h"
 #include "receiver.h"
 #include "messenger.h"
 #include "options.h"
 
 namespace nng {
-
-    // Flags.
-    enum flag_type {
-        flag_alloc = ::NNG_FLAG_ALLOC,
-        flag_nonblock = ::NNG_FLAG_NONBLOCK,
-        flag_dryrun = NNG_FLAG_DRYRUN
-    };
 
     enum protocol_type {
         protocol_none = ::NNG_PROTO_NONE,
@@ -52,10 +46,7 @@ namespace nng {
     };
 
     protocol_type to_protocol_type(int value);
-    flag_type to_flag_type(int value);
-
     int to_int(const protocol_type value);
-    int to_int(const flag_type value);
 
     class listener;
     class dialer;
@@ -90,11 +81,11 @@ namespace nng {
         virtual ~socket();
 
         // TODO: TBD: may want to comprehend nng's NNG_MAXADDRLEN at some level... expose as a static constant, for instance, bare minimum
-        void listen(const std::string& addr, int flags = 0);
-        void listen(const std::string& addr, listener* const lp, int flags = 0);
+        void listen(const std::string& addr, flag_type flags = flag_none);
+        void listen(const std::string& addr, listener* const lp, flag_type flags = flag_none);
 
-        void dial(const std::string& addr, int flags = 0);
-        void dial(const std::string& addr, dialer* const dp, int flags = 0);
+        void dial(const std::string& addr, flag_type flags = flag_none);
+        void dial(const std::string& addr, dialer* const dp, flag_type flags = flag_none);
 
         void close();
         void shutdown();
@@ -117,16 +108,16 @@ namespace nng {
         void get_option_size(const std::string& name, option_size_type* valp);
         void get_option_usec(const std::string& name, uint64_t* valp);
 
-        virtual void send(const binary_message_type* const bmp, int flags = 0) override;
+        virtual void send(binary_message_type* const bmp, flag_type flags = flag_none) override;
 
-        virtual int send(const buffer_vector_type* const bufp, int flags = 0) override;
-        virtual int send(const buffer_vector_type* const bufp, size_type sz, int flags = 0) override;
+        virtual int send(const buffer_vector_type* const bufp, flag_type flags = flag_none) override;
+        virtual int send(const buffer_vector_type* const bufp, size_type sz, flag_type flags = flag_none) override;
 
-        virtual std::unique_ptr<binary_message_type> receive(int flags = 0) override;
-        virtual int try_receive(binary_message_type* const bmp, int flags = 0) override;
+        virtual std::unique_ptr<binary_message_type> receive(flag_type flags = flag_none) override;
+        virtual int try_receive(binary_message_type* const bmp, flag_type flags = flag_none) override;
 
-        virtual buffer_vector_type receive(size_type& sz, int flags = 0) override;
-        virtual int try_receive(buffer_vector_type* const bufp, size_type& sz, int flags = 0) override;
+        virtual buffer_vector_type receive(size_type& sz, flag_type flags = flag_none) override;
+        virtual int try_receive(buffer_vector_type* const bufp, size_type& sz, flag_type flags = flag_none) override;
 
         protocol_type get_protocol() const;
         protocol_type get_peer() const;

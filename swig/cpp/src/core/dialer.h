@@ -3,6 +3,7 @@
 
 #include "../nngcpp_integration.h"
 
+#include "enums.h"
 #include "endpoint.h"
 #include "options.h"
 
@@ -31,7 +32,7 @@ namespace nng {
 
             virtual ~dialer();
 
-            virtual void start(int flags = 0);
+            virtual void start(flag_type flags = flag_none);
             virtual void close();
 
             virtual void set_option(const std::string& name, const std::string& val, option_size_type sz);
