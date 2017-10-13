@@ -130,10 +130,10 @@ namespace nng {
 }
 
 #define NNG_TESTS_VERIFY_TEST_CASE_DATA() \
-    REQUIRE(std::memcmp(constants::hello.c_str(), "hello", std::strlen("hello")) == 0); \
-    REQUIRE(std::memcmp(constants::again.c_str(), "again", std::strlen("again")) == 0); \
-    REQUIRE(std::memcmp(constants::nng_addr.c_str(), "inproc://nng", std::strlen("inproc://nng")) == 0); \
-    REQUIRE(std::memcmp(constants::test_addr.c_str(), "inproc://test", std::strlen("inproc://test")) == 0)
+    REQUIRE_THAT(constants::hello, Catch::Matchers::Equals("hello")); \
+    REQUIRE_THAT(constants::again, Catch::Matchers::Equals("again")); \
+    REQUIRE_THAT(constants::nng_addr, Catch::Matchers::Equals("inproc://nng")); \
+    REQUIRE_THAT(constants::test_addr, Catch::Matchers::Equals("inproc://test"))
 
 TEST_CASE("Catch translation of NNG C reconnect unit tests", "[nng][c][reconnect]") {
 
