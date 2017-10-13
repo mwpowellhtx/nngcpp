@@ -17,28 +17,6 @@
 #include <memory>
 #include <thread>
 
-void allocate(nng::messaging::binary_message* const bmp
-    , nng::messaging::message_base::size_type sz = 0) {
-
-    REQUIRE(bmp != nullptr);
-    REQUIRE(bmp->has_message() == false);
-    REQUIRE(bmp->get_msgp() == nullptr);
-
-    REQUIRE_NOTHROW(bmp->allocate(sz));
-    REQUIRE(bmp->has_message() == true);
-
-    REQUIRE(bmp->get_msgp() != nullptr);
-    const auto* msgp = bmp->get_msgp();
-
-    REQUIRE(bmp->header() != nullptr);
-    REQUIRE(bmp->header()->has_message());
-    REQUIRE(bmp->header()->get_msgp() == msgp);
-
-    REQUIRE(bmp->body() != nullptr);
-    REQUIRE(bmp->body()->has_message());
-    REQUIRE(bmp->body()->get_msgp() == msgp);
-}
-
 namespace constants {
 
     const std::string nng_addr = "inproc://nng";
@@ -69,6 +47,24 @@ of a legit failure, we see the actual line IN-SITU where the test case ACTUALLY 
     REQUIRE(m != nullptr); \
     REQUIRE(::nng_msg_len(m) == std::strlen(s)); \
     REQUIRE(std::memcmp(::nng_msg_body(m), s, std::strlen(s)) == 0)
+
+#define NNGCPP_TESTS_ALLOCATE_MSG_SZ(m, sz) \
+    REQUIRE(m.has_message() == false); \
+    REQUIRE(m.get_msgp() == nullptr); \
+    \
+    REQUIRE_NOTHROW(m.allocate(sz)); \
+    REQUIRE(m.has_message() == true); \
+    REQUIRE(m.get_msgp() != nullptr); \
+    \
+    REQUIRE(m.header() != nullptr); \
+    REQUIRE(m.header()->has_message()); \
+    REQUIRE(m.header()->get_msgp() == m.get_msgp()); \
+    \
+    REQUIRE(m.body() != nullptr); \
+    REQUIRE(m.body()->has_message()); \
+    REQUIRE(m.body()->get_msgp() == m.get_msgp());
+
+#define NNGCPP_TESTS_ALLOCATE_MSG(m) NNGCPP_TESTS_ALLOCATE_MSG_SZ(m, 0)
 
 //// todo:
 //TEST_CASE("Do some math tests", "[math][foo][bar]") {
@@ -104,6 +100,34 @@ struct c_style_fixture {
         ::nng_fini();
     }
 };
+
+namespace nng {
+    namespace messaging {
+
+        struct message_pipe_fixture : public message_pipe {
+
+            message_pipe_fixture(const message_base* const mbp) : message_pipe(mbp) {
+            }
+
+            ::nng_pipe get_pid() const {
+                return pid;
+            }
+        };
+
+        struct binary_message_fixture : public binary_message {
+
+            binary_message_fixture() : binary_message() {
+            }
+
+            binary_message_fixture(::nng_msg* msgp) : binary_message(msgp) {
+            }
+
+            virtual void free() override {
+                binary_message::free();
+            }
+        };
+    }
+}
 
 #define NNG_TESTS_VERIFY_TEST_CASE_DATA() \
     REQUIRE(std::memcmp(constants::hello.c_str(), "hello", std::strlen("hello")) == 0); \
@@ -221,6 +245,7 @@ TEST_CASE("NNG C++ wrapper reconnect works", "[reconnect][cxx][wrapper]") {
     using namespace Catch::Matchers;
     using _opt_ = option_names;
 
+    // TODO: not sure if I like having "session" part of these unit tests, per se. I almost want session to be the subject of its own set of unit tests (it should be, anyway).
     // Which "at-exit" destructor handles cleaning up the NNG resources: i.e. ::nng_fini.
     session _session_;
 
@@ -241,141 +266,100 @@ TEST_CASE("NNG C++ wrapper reconnect works", "[reconnect][cxx][wrapper]") {
 
         SECTION("Dialing before listening works") {
 
-            REQUIRE_NOTHROW(push->dial(test_addr, to_int(flag_nonblock)));
+            REQUIRE_NOTHROW(push->dial(test_addr, flag_nonblock));
             this_thread::sleep_for(100ms);
-
             REQUIRE_NOTHROW(pull->listen(test_addr));
 
             /* 'Frame' in this case is loosely speaking. We do not care about exposing the NNG msg structure,
             per se. Rather, we should simply be able to "frame" buffers or strings, accordingly. */
             SECTION("We can send a frame") {
 
+                binary_message_fixture bm;
                 this_thread::sleep_for(100ms);
-
-                binary_message bm;
-
-                allocate(&bm);
-
+                NNGCPP_TESTS_ALLOCATE_MSG(bm);
                 // And with a little C++ operator overloading help:
                 REQUIRE_NOTHROW(bm << hello);
-
+                // TODO: TBD: this sort of testing deserves a dedicated unit test so that we aren't polluting integration scenarios such as this quite as much
                 REQUIRE_THAT(bm.body()->get(), Equals(hello_buf));
-
-                push->send(&bm);
-
-                FAIL();
                 REQUIRE_NOTHROW(push->send(&bm));
+                /* Ditto message passing semantics. The Send() operation effectively
+                nullifies the internal message. */
+                REQUIRE(bm.has_message() == false);
+
+                // TODO: TBD: message ownership semantics really deserves a unit test all its own...
                 REQUIRE_NOTHROW(pull->try_receive(&bm));
-
-                std::string _pulled_actual;
-
-                // Ditto C++ operator overloading.
-                _pulled_actual << bm;
-
-                REQUIRE_THAT(_pulled_actual, Equals(hello));
+                REQUIRE(bm.has_message() == true);
+                // Just verify that the message matches the buffer.
+                REQUIRE_THAT(bm.body()->get(), Equals(hello_buf));
             }
         }
 
         SECTION("Reconnection works") {
 
-            FAIL();
-
-            REQUIRE_NOTHROW(push->dial(test_addr, to_int(flag_nonblock)));
+            REQUIRE_NOTHROW(push->dial(test_addr, flag_nonblock));
 
             {
-                shared_ptr<listener> lp;
-
-                REQUIRE_NOTHROW(lp = _session_.create_listener_ep());
-                REQUIRE(lp != nullptr);
-
+                // We do not need to see the Listener beyond this block.
+                auto lp = std::make_unique<listener>();
                 REQUIRE_NOTHROW(pull->listen(test_addr, lp.get()));
                 this_thread::sleep_for(100ms);
-
-                REQUIRE_NOTHROW(_session_.remove_listener_ep(lp.get()));
+                // No need to burden "session" with this one, either.
                 REQUIRE_NOTHROW(lp.reset());
             }
 
+            // Then re-listen to the address.
             REQUIRE_NOTHROW(pull->listen(test_addr));
 
             // TODO: TBD: This was heavily nng_pipe based from reconnect.c
             // TODO: TBD: we may provide comprehension of nng_pipe from a nngcpp POV, but I'm not sure the complexity of nng_msg how that is different from a simple send/receive?
             SECTION("They still exchange frames") {
 
-                FAIL();
-
-                std::unique_ptr<binary_message> bmp;
+                binary_message_fixture bm;
 
                 this_thread::sleep_for(100ms);
+                NNGCPP_TESTS_ALLOCATE_MSG(bm);
+                REQUIRE_NOTHROW(bm << hello);
+                REQUIRE_NOTHROW(push->send(&bm));
+                REQUIRE(bm.has_message() == false);
 
-                REQUIRE_NOTHROW(bmp = std::make_unique<binary_message>());
-                REQUIRE(bmp != nullptr);
+                // See notes above. Sending transfers ownership of the internal message to NNG.
+                REQUIRE_NOTHROW(pull->try_receive(&bm));
+                REQUIRE(bm.has_message() == true);
+                // Just verify that the message matches the buffer.
+                REQUIRE_THAT(bm.body()->get(), Equals(hello_buf));
 
-                allocate(bmp.get());
-
-                *bmp << hello;
-
-                REQUIRE_NOTHROW(push->send(bmp.get()));
-
-                /* The C-based tests simple "reset" the pointer to NULL. Clearly a memory leak in the making.
-                Instead, we will make the effort to be friendly to our memory consumption. */
-                REQUIRE_NOTHROW(bmp = std::make_unique<binary_message>());
-                REQUIRE(bmp != nullptr);
-
-                REQUIRE_NOTHROW(pull->try_receive(bmp.get()));
-
-                REQUIRE(bmp->has_message() == true);
-                REQUIRE(bmp->header()->has_message() == true);
-                REQUIRE(bmp->body()->has_message() == true);
-
-                // Type conversion magic from the Message to a std::string.
-                std::string _gotten_actual = *bmp;
-
-                REQUIRE_THAT(_gotten_actual, Equals(hello));
-
-                std::unique_ptr<message_pipe> mpp1;
-
-                REQUIRE_NOTHROW(mpp1 = std::make_unique<message_pipe>(bmp.get()));
-                REQUIRE(mpp1 != nullptr);
-
-                // Now both we and the original C-based unit test agree, reset the memory.
-                REQUIRE_NOTHROW(bmp.reset());
-                REQUIRE(bmp == nullptr);
+                // TODO: TBD: this one deserves its own unit test as well so that we are not cluttering the integration tests
+                message_pipe_fixture mp1(&bm);
+                REQUIRE(mp1.is_valid() == true);
+                // TODO: TBD: deserves its own unit testing...
+                REQUIRE(mp1.get_pid() > 0);
+                // We would not normally want to free under any circumstances, except here it is useful to fixture it.
+                REQUIRE_NOTHROW(bm.free());
+                REQUIRE(bm.has_message() == false);
 
                 SECTION("Even after pipe close") {
 
-                    FAIL();
-
-                    std::unique_ptr<message_pipe> mpp2;
-
-                    REQUIRE_NOTHROW(mpp1->close());
+                    // Get the fixtured PID for test purposes prior to closing.
+                    auto mp1_pid = mp1.get_pid();
+                    REQUIRE_NOTHROW(mp1.close());
+                    REQUIRE(mp1.is_valid() == false);
 
                     this_thread::sleep_for(100ms);
+                    NNGCPP_TESTS_ALLOCATE_MSG(bm);
+                    REQUIRE_NOTHROW(bm << again);
+                    // TODO: TBD: send/no-message -> receive/message is a pattern that deserves its own focused unit test...
+                    REQUIRE_NOTHROW(push->send(&bm));
+                    REQUIRE(bm.has_message() == false);
 
-                    allocate(bmp.get());
+                    REQUIRE_NOTHROW(pull->try_receive(&bm));
+                    REQUIRE(bm.has_message() == true);
+                    // Just verify that the message matches the buffer.
+                    REQUIRE_THAT(bm.body()->get(), Equals(again_buf));
 
-                    *bmp << again;
-
-                    REQUIRE_NOTHROW(push->send(bmp.get()));
-
-                    // Ditto C-based NULL-ifying the pointers without freeing them.
-                    REQUIRE_NOTHROW(bmp = std::make_unique<binary_message>());
-                    REQUIRE(bmp != nullptr);
-
-                    REQUIRE_NOTHROW(pull->try_receive(bmp.get()));
-
-                    REQUIRE(bmp->has_message() == true);
-                    REQUIRE(bmp->header()->has_message() == true);
-                    REQUIRE(bmp->body()->has_message() == true);
-
-                    // Type conversion magic from the Message to a std::string.
-                    _gotten_actual = *bmp;
-
-                    REQUIRE_THAT(_gotten_actual, Equals(again));
-
-                    auto mp2 = message_pipe(bmp.get());
-
-                    // TODO: TBD: so, we can define the != operator alone, but there is no std::not_equal_to implemented. is there a patch? or migration path from 2015 -> 2017?
-                    REQUIRE((*mpp1.get()) != mp2);
+                    message_pipe_fixture mp2(&bm);
+                    REQUIRE(mp2.is_valid() == true);
+                    REQUIRE_NOTHROW(bm.free());
+                    REQUIRE(mp2.get_pid() != mp1_pid);
                 }
             }
         }

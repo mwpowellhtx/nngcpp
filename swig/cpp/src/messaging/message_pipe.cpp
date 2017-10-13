@@ -16,12 +16,17 @@ namespace nng {
         // TODO: TBD: this is looking very similar to socket. perhaps it is...
         message_pipe::~message_pipe() {
             close();
-            pid = 0;
         }
 
         void message_pipe::close() {
+            if (!is_valid()) { return; }
             const auto errnum = ::nng_pipe_close(pid);
             THROW_NNG_EXCEPTION_EC(errnum);
+            pid = 0;
+        }
+
+        bool message_pipe::is_valid() const {
+            return pid > 0;
         }
 
         bool message_pipe::operator==(const message_pipe& rhs) {
