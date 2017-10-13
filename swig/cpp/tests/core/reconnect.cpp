@@ -42,7 +42,6 @@ void allocate(nng::messaging::binary_message* const bmp
 namespace constants {
 
     const std::string nng_addr = "inproc://nng";
-
     const std::string test_addr = "inproc://test";
 
     const std::string hello = "hello";
@@ -52,8 +51,15 @@ namespace constants {
     const nng::messaging::message_base::buffer_vector_type again_buf = { 'a','g','a','i','n' };
 }
 
+/* This is interesting in the event we actually need/want to separate the code under
+test with a returning error number. */
 #define NNG_TESTS_INIT() int errnum
 
+#define NNG_TESTS_REQUIRE_ERR_EQ(code, expected) errnum = code; \
+    REQUIRE(errnum == expected)
+
+/* While I despise macro code expansion, this is "better" for us because in the event
+of a legit failure, we see the actual line IN-SITU where the test case ACTUALLY IS. */
 #define NNG_TESTS_APPEND_STR(m, s) \
     REQUIRE(::nng_msg_append(m, s, std::strlen(s)) == 0); \
     REQUIRE(::nng_msg_len(m) == std::strlen(s)); \
@@ -84,8 +90,12 @@ struct c_style_fixture {
     ::nng_socket pull;
 
     c_style_fixture() : push(0), pull(0) {
+
         REQUIRE(::nng_push_open(&push) == 0);
         REQUIRE(::nng_pull_open(&pull) == 0);
+
+        REQUIRE(push > 0);
+        REQUIRE(pull > 0);
     }
 
     virtual ~c_style_fixture() {
@@ -95,142 +105,112 @@ struct c_style_fixture {
     }
 };
 
-TEST_CASE("C style NNG reconnect works", "[reconnect][nng]") {
+#define NNG_TESTS_VERIFY_TEST_CASE_DATA() \
+    REQUIRE(std::memcmp(constants::hello.c_str(), "hello", std::strlen("hello")) == 0); \
+    REQUIRE(std::memcmp(constants::again.c_str(), "again", std::strlen("again")) == 0); \
+    REQUIRE(std::memcmp(constants::nng_addr.c_str(), "inproc://nng", std::strlen("inproc://nng")) == 0); \
+    REQUIRE(std::memcmp(constants::test_addr.c_str(), "inproc://test", std::strlen("inproc://test")) == 0)
+
+TEST_CASE("Catch translation of NNG C reconnect unit tests", "[nng][c][reconnect]") {
 
     using namespace std;
     using namespace std::chrono;
     using namespace constants;
 
+    SECTION("Verify that we have the required data") {
+        NNG_TESTS_VERIFY_TEST_CASE_DATA();
+    }
+
     SECTION("We can create a pipeline") {
 
-        NNG_TESTS_INIT();
-
+        /* When the scope rolls back, we want to destroy the fixture, which
+        effectively closes the sockets, and finishes the NNG session. */
         c_style_fixture $;
 
-        REQUIRE(::nng_setopt_usec($.pull, NNG_OPT_RECONNMINT, 10000) == 0);
-        REQUIRE(::nng_setopt_usec($.pull, NNG_OPT_RECONNMAXT, 10000) == 0);
+        auto& pull = $.pull;
+        auto& push = $.push;
 
-        // Strictly adapted from the NNG C-style unit tests, but for std::thread specifics.
+        REQUIRE(::nng_setopt_usec(pull, NNG_OPT_RECONNMINT, 10000) == 0);
+        REQUIRE(::nng_setopt_usec(pull, NNG_OPT_RECONNMAXT, 10000) == 0);
+
         SECTION("Dialing before listening works") {
 
-            INFO("Dialing push on address: '" + nng_addr + "'");
-
             // With Reconnect Times configured, Should re-dial until Listener comes online.
-            REQUIRE(::nng_dial($.push, nng_addr.c_str(), nullptr, NNG_FLAG_NONBLOCK) == 0);
-
+            REQUIRE(::nng_dial(push, test_addr.c_str(), nullptr, NNG_FLAG_NONBLOCK) == 0);
             this_thread::sleep_for(100ms);
+            REQUIRE(::nng_listen(pull, test_addr.c_str(), nullptr, 0) == 0);
 
-            INFO("Pull listening on address: '" + nng_addr + "'");
-
-            REQUIRE(::nng_listen($.pull, nng_addr.c_str(), nullptr, 0) == 0);
-
-            // TODO: TBD: for comparison, so far the original C-style approach is working
             SECTION("We can send a frame") {
 
-                struct ::nng_msg *msgp = nullptr;
+                ::nng_msg* msgp = nullptr;
 
                 this_thread::sleep_for(100ms);
 
                 REQUIRE(::nng_msg_alloc(&msgp, 0) == 0);
                 REQUIRE(msgp != nullptr);
-
                 NNG_TESTS_APPEND_STR(msgp, hello.c_str());
+                REQUIRE(::nng_sendmsg(push, msgp, 0) == 0);
 
-                //::nng_tests_append_str(msgp, hello.c_str());
-                REQUIRE(::nng_sendmsg($.push, msgp, 0) == 0);
-
-                ::nng_msg_free(msgp);
+                /* Nullifying the pointer is NOT a mistake. It is part of the zero-copy message ownership
+                semantics. Once the message is "sent", the framework effectively assumes ownership. */
                 msgp = nullptr;
 
-                ::nng_msg_alloc(&msgp, 0);
-                REQUIRE(msgp != nullptr);
-
                 // Which Receiving a Message should allocate when we did not provide one.
-                errnum = ::nng_recvmsg($.pull, &msgp, 0);
-                REQUIRE(errnum == 0);
-                REQUIRE(msgp != nullptr);
-
+                REQUIRE(::nng_recvmsg(pull, &msgp, 0) == 0);
                 NNG_TESTS_CHECK_STR(msgp, hello.c_str());
 
                 ::nng_msg_free(msgp);
             }
-
-            // TODO: TBD: continue appending sections of the original test.
         }
 
-        //SECTION("Reconnection works") {
+        SECTION("Reconnection works") {
 
-        //    ::nng_listener l;
+            ::nng_listener l;
 
-        //    REQUIRE(::nng_dial($.push, nng_addr.c_str(), nullptr, NNG_FLAG_NONBLOCK) == 0);
-        //    REQUIRE(::nng_listen($.pull, nng_addr.c_str(), &l, 0) == 0);
+            REQUIRE(::nng_dial(push, test_addr.c_str(), nullptr, NNG_FLAG_NONBLOCK) == 0);
+            REQUIRE(::nng_listen(pull, test_addr.c_str(), &l, 0) == 0);
+            this_thread::sleep_for(100ms);
+            REQUIRE(::nng_listener_close(l) == 0);
+            REQUIRE(::nng_listen(pull, test_addr.c_str(), nullptr, 0) == 0);
 
-        //    this_thread::sleep_for(100ms);
+            SECTION("They still exchange frames") {
+                ::nng_msg *msgp;
+                ::nng_pipe p1;
 
-        //    REQUIRE(::nng_listener_close(l) == 0);
-        //    REQUIRE(::nng_listen($.pull, nng_addr.c_str(), nullptr, 0) == 0);
+                this_thread::sleep_for(100ms);
+                REQUIRE(::nng_msg_alloc(&msgp, 0) == 0);
+                NNG_TESTS_APPEND_STR(msgp, hello.c_str());
+                REQUIRE(::nng_sendmsg(push, msgp, 0) == 0);
+                // Ditto message passing ownership semantics.
+                msgp = nullptr;
+                REQUIRE(::nng_recvmsg(pull, &msgp, 0) == 0);
+                REQUIRE(msgp != nullptr);
+                NNG_TESTS_CHECK_STR(msgp, hello.c_str());
+                REQUIRE((p1 = ::nng_msg_get_pipe(msgp)) > 0);
+                ::nng_msg_free(msgp);
 
-        //    SECTION("They still exchange frames") {
+                SECTION("Even after pipe close") {
+                    ::nng_pipe p2;
 
-        //        ::nng_msg* msgp;
-        //        ::nng_pipe p1;
-
-        //        this_thread::sleep_for(100ms);
-
-        //        REQUIRE(::nng_msg_alloc(&msgp, 0) == 0);
-
-        //        NNG_TESTS_APPEND_STR(msgp, hello.c_str());
-        //        REQUIRE(::nng_sendmsg($.push, msgp, 0) == 0);
-
-        //        ::nng_msg_free(msgp);
-        //        msgp = nullptr;
-
-        //        REQUIRE(::nng_recvmsg($.pull, &msgp, 0) == 0);
-        //        REQUIRE(msgp != nullptr);
-
-        //        NNG_TESTS_CHECK_STR(msgp, hello.c_str());
-
-        //        p1 = ::nng_msg_get_pipe(msgp);
-
-        //        ::nng_msg_free(msgp);
-
-        //        SECTION("Even after pipe close") {
-
-        //            ::nng_pipe p2;
-
-        //            ::nng_pipe_close(p1);
-
-        //            this_thread::sleep_for(100ms);
-
-        //            REQUIRE(::nng_msg_alloc(&msgp, 0) == 0);
-        //            NNG_TESTS_APPEND_STR(msgp, again.c_str());
-        //        }
-        //    }
-        //}
-
-        //Convey("Reconnection works", {
-
-        //Convey("They still exchange frames",{
-
-
-        //Convey("Even after pipe close",{
-
-        //APPENDSTR(msg, "again");
-        //So(nng_sendmsg(push, msg, 0) == 0);
-        //msg = NULL;
-        //So(nng_recvmsg(pull, &msg, 0) == 0);
-        //So(msg != NULL);
-        //CHECKSTR(msg, "again");
-        //p2 = nng_msg_get_pipe(msg);
-        //nng_msg_free(msg);
-        //So(p2 != p1);
-        //});
-        //});
-        //});
+                    REQUIRE(::nng_pipe_close(p1) == 0);
+                    this_thread::sleep_for(100ms);
+                    REQUIRE(::nng_msg_alloc(&msgp, 0) == 0);
+                    NNG_TESTS_APPEND_STR(msgp, again.c_str());
+                    REQUIRE(::nng_sendmsg(push, msgp, 0) == 0);
+                    msgp = nullptr;
+                    REQUIRE(::nng_recvmsg(pull, &msgp, 0) == 0);
+                    REQUIRE(msgp != nullptr);
+                    NNG_TESTS_CHECK_STR(msgp, again.c_str());
+                    REQUIRE((p2 = nng_msg_get_pipe(msgp)) > 0);
+                    ::nng_msg_free(msgp);
+                    REQUIRE(p2 != p1);
+                }
+            }
+        }
     }
 }
 
-TEST_CASE("Wrapper style reconnect works", "[reconnect][cxx]") {
+TEST_CASE("NNG C++ wrapper reconnect works", "[reconnect][cxx][wrapper]") {
 
     using namespace std;
     using namespace std::chrono;
