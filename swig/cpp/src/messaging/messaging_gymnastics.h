@@ -22,37 +22,39 @@ namespace nng {
         typedef message_base::buffer_vector_type buffer_vector_type;
 
         template<class Target_, class Message_>
-        struct message_conversion_proxy {
+        struct message_conversion_getter_policy {
 
             typedef Target_ target_type;
             typedef Message_ message_type;
-            typedef message_conversion_proxy<Target_, Message_> base_type;
+            typedef message_conversion_getter_policy<Target_, Message_> base_type;
 
             virtual target_type get(const message_type& rhs) {
                 return rhs.get();
             }
+        };
+
+        template<class Target_, class Message_>
+        struct message_conversion_appender_policy {
+
+            typedef Target_ target_type;
+            typedef Message_ message_type;
+            typedef message_conversion_appender_policy<Target_, Message_> base_type;
 
             virtual void append(message_type& lhs, const target_type& rhs) {
                 lhs.append(rhs);
             }
         };
 
-        //template<class Target_>
-        //struct message_conversion_proxy<Target_, messaging_api<buffer_vector_type>> {
-        //};
-
-        //// TODO: TBD: will not worry about whether readonly at this time... perhaps later, and only if necessary...
-        //template<typename Target_>
-        //struct readonly_message_conversion_proxy : message_conversion_proxy<
-        //    Target_, readonly_messaging_api<buffer_vector_type>> {
-        //};
-
         template<>
-        struct message_conversion_proxy<buffer_vector_type, messaging_api<buffer_vector_type>> {
+        struct message_conversion_getter_policy<buffer_vector_type, messaging_api<buffer_vector_type>> {
 
             virtual buffer_vector_type get(const messaging_api<buffer_vector_type>& rhs) {
                 return rhs.get();
             }
+        };
+
+        template<>
+        struct message_conversion_appender_policy<buffer_vector_type, messaging_api<buffer_vector_type>> {
 
             virtual void append(messaging_api<buffer_vector_type>& lhs, const buffer_vector_type& rhs) {
                 lhs.append(rhs);
@@ -71,12 +73,16 @@ namespace nng {
         }
 
         template<>
-        struct message_conversion_proxy<std::string, messaging_api<buffer_vector_type>> {
+        struct message_conversion_getter_policy<std::string, messaging_api<buffer_vector_type>> {
 
             virtual std::string get(const messaging_api<buffer_vector_type>& rhs) {
                 auto lhs_ = rhs.get();
                 return gymanstic_convert<buffer_vector_type, std::string, std::string::value_type>(lhs_);
             }
+        };
+
+        template<>
+        struct message_conversion_appender_policy<std::string, messaging_api<buffer_vector_type>> {
 
             virtual void append(messaging_api<buffer_vector_type>& lhs, const std::string& rhs) {
                 auto buf_ = gymanstic_convert<std::string, buffer_vector_type, buffer_vector_type::value_type>(rhs);
@@ -85,12 +91,16 @@ namespace nng {
         };
 
         template<>
-        struct message_conversion_proxy<std::string, binary_message> {
+        struct message_conversion_getter_policy<std::string, binary_message> {
 
             virtual std::string get(const binary_message& rhs) {
                 const auto lhs_ = const_cast<binary_message&>(rhs).body()->get();
                 return gymanstic_convert<buffer_vector_type, std::string, std::string::value_type>(lhs_);
             }
+        };
+
+        template<>
+        struct message_conversion_appender_policy<std::string, binary_message> {
 
             virtual void append(binary_message& lhs, const std::string& rhs) {
                 const auto buf_ = gymanstic_convert<std::string, buffer_vector_type, buffer_vector_type::value_type>(rhs);
@@ -99,11 +109,15 @@ namespace nng {
         };
 
         template<>
-        struct message_conversion_proxy<buffer_vector_type, binary_message> {
+        struct message_conversion_getter_policy<buffer_vector_type, binary_message> {
 
             virtual buffer_vector_type get(const binary_message& rhs) {
                 return const_cast<binary_message&>(rhs).body()->get();
             }
+        };
+
+        template<>
+        struct message_conversion_appender_policy<buffer_vector_type, binary_message> {
 
             virtual void append(binary_message& lhs, const buffer_vector_type& rhs) {
                 auto buf_ = gymanstic_convert<buffer_vector_type, buffer_vector_type, buffer_vector_type::value_type>(rhs);
