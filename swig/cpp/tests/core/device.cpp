@@ -112,11 +112,8 @@ TEST_CASE("Test that device functions properly", "[device]") {
 
             SECTION("Device can send and receive") {
 
-                binary_message bm;
-
-                REQUIRE_NOTHROW(bm.allocate());
-                REQUIRE(bm.has_message() == true);
                 // No need to vet "message free" at the end of this on account of message dtor.
+                binary_message bm;
 
                 SECTION("Device can send") {
 

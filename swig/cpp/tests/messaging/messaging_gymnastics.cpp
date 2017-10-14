@@ -39,9 +39,7 @@ TEST_CASE("Run some gymnastic conversion scenarios", "[convert][messaging][gymna
 /* If we want more in depth surface testing, look at binary_message tests. Short
 of a full on verification, howevre, we do require that a message is allocated. */
 #define NNGCPP_TESTS_INITIALIZE_BINARY_MESSAGE(m) \
-    nng::messaging::binary_message m; \
-    REQUIRE_NOTHROW((m).allocate()); \
-    REQUIRE((m).has_message() == true)
+    nng::messaging::binary_message m
 
 TEST_CASE("Can write (append) to and read (get) from binary message using byte vector"
     , "[vector][write][append][read][get][binary][message][messaging][messages][gymnastics][cxx]") {

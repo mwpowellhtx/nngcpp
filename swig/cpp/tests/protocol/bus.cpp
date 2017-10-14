@@ -97,8 +97,6 @@ TEST_CASE("Bus pattern tests", "[protocol][bus]") {
             REQUIRE_THROWS_AS_MATCHING(busp2->try_receive(bmp.get()), nng_exception, ThrowsNngException(ec_etimedout));
             REQUIRE_THROWS_AS_MATCHING(busp3->try_receive(bmp.get()), nng_exception, ThrowsNngException(ec_etimedout));
 
-            REQUIRE_NOTHROW(bmp->allocate());
-
             SECTION("Bus2 delivers message to Bus1, Bus3 times out") {
 
                 REQUIRE_NOTHROW(*bmp << _99bits);

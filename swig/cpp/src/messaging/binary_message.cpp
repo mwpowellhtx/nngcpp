@@ -34,10 +34,12 @@ namespace nng {
         }
 
         binary_message_header* const binary_message::header() {
+            if (!has_message()) { allocate(); }
             return &_header;
         }
 
         binary_message_body* const binary_message::body() {
+            if (!has_message()) { allocate(); }
             return &_body;
         }
 

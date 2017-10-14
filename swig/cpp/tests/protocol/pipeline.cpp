@@ -226,7 +226,6 @@ TEST_CASE("We can create a linked push/pull pair", "[pipeline][push][pull][linke
 
         binary_message bm;
 
-        REQUIRE_NOTHROW(bm.allocate());
         REQUIRE_NOTHROW(bm << hello);
         REQUIRE_NOTHROW(pushsp->send(&bm));
         REQUIRE_NOTHROW(pullsp->try_receive(&bm));
@@ -285,9 +284,6 @@ TEST_CASE("Load balancing works", "[pipeline][push][pull][load][balancing]") {
 
     REQUIRE_NOTHROW(abcsp = make_unique<binary_message>());
     REQUIRE_NOTHROW(defsp = make_unique<binary_message>());
-
-    REQUIRE_NOTHROW(abcsp->allocate());
-    REQUIRE_NOTHROW(defsp->allocate());
 
     REQUIRE_NOTHROW(*abcsp << abc);
     REQUIRE_NOTHROW(*defsp << def);
