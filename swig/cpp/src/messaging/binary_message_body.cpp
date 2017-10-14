@@ -31,39 +31,39 @@ namespace nng {
         }
 
         bool binary_message_body::try_get(buffer_vector_type& value) const {
-
+            if (_msgp == nullptr) { return false; }
             const auto sz = get_size();
-
             const auto op = std::bind(&::nng_msg_body, _1);
-
             return messaging_api_type::try_get(value, op, sz);
         }
 
         void binary_message_body::clear() {
+            if (_msgp == nullptr) { return; }
             const auto op = std::bind(&::nng_msg_clear, _1);
             do_clear_op(op, _msgp);
         }
 
         void binary_message_body::append(const buffer_vector_type& buf) {
-            static const auto op = std::bind(&::nng_msg_append, _1, _2, _3);
+            if (_msgp == nullptr) { return; }
+            const auto op = std::bind(&::nng_msg_append, _1, _2, _3);
             do_type_based_op(op, _msgp, buf);
         }
 
         void binary_message_body::insert(const buffer_vector_type& buf) {
             if (_msgp == nullptr) { return; }
-            static const auto op = std::bind(&::nng_msg_insert, _1, _2, _3);
+            const auto op = std::bind(&::nng_msg_insert, _1, _2, _3);
             do_type_based_op(op, _msgp, buf);
         }
 
         void binary_message_body::trim(size_type sz) {
             if (_msgp == nullptr) { return; }
-            static const auto op = std::bind(&::nng_msg_trim, _1, _2);
+            const auto op = std::bind(&::nng_msg_trim, _1, _2);
             do_size_based_op(op, _msgp, sz);
         }
 
         void binary_message_body::chop(size_type sz) {
             if (_msgp == nullptr) { return; }
-            static const auto op = std::bind(&::nng_msg_chop, _1, _2);
+            const auto op = std::bind(&::nng_msg_chop, _1, _2);
             do_size_based_op(op, _msgp, sz);
         }
     }
