@@ -1,4 +1,5 @@
 //
+// Copyright 2017 Michael W Powell <mwpowellhtx@gmail.com>
 // Copyright 2017 Garrett D'Amore <garrett@damore.org>
 // Copyright 2017 Capitar IT Group BV <info@capitar.com>
 //
@@ -18,15 +19,19 @@
 #include <string>
 #include <chrono>
 
-//#define APPENDSTR(m, s) nng_msg_append(m, s, strlen(s))
-//#define CHECKSTR(m, s)                   \
-//	So(nng_msg_len(m) == strlen(s)); \
-//	So(memcmp(nng_msg_body(m), s, strlen(s)) == 0)
+struct bus_fixture {
+
+    virtual ~bus_fixture() {
+        ::nng_fini();
+    }
+};
 
 namespace constants {
     const std::string test_addr = "inproc://test";
     const std::string _99bits = "99bits";
     const std::string onthe = "onthe";
+    const nng::messaging::message_base::buffer_vector_type _99bits_buf = { '9','9','b','i','t','s' };
+    const nng::messaging::message_base::buffer_vector_type onthe_buf = { 'o','n','t','h','e' };
 }
 
 TEST_CASE("Bus pattern tests", "[protocol][bus]") {
@@ -35,112 +40,105 @@ TEST_CASE("Bus pattern tests", "[protocol][bus]") {
     using namespace std::chrono;
     using namespace nng;
     using namespace nng::protocol;
+    using namespace nng::messaging;
     using namespace constants;
     using namespace Catch::Matchers;
     using _opt_ = option_names;
 
-    session _session_;
+    bus_fixture fixture;
 
 
 	SECTION("We can create a Bus socket") {
 
-        shared_ptr<latest_bus_socket> sp;
+        auto busp = std::make_unique<latest_bus_socket>();
 
-        REQUIRE_NOTHROW(sp = _session_.create_bus_socket());
+        REQUIRE(busp != nullptr);
 
-		SECTION("Protocols match") {
+        SECTION("Protocols match") {
 
-            REQUIRE(sp->get_protocol() == proto_bus_v0);
-            REQUIRE(sp->get_protocol() == proto_bus);
+            REQUIRE(busp->get_protocol() == proto_bus_v0);
+            REQUIRE(busp->get_protocol() == proto_bus);
 
-            REQUIRE(sp->get_peer() == proto_bus_v0);
-            REQUIRE(sp->get_peer() == proto_bus);
+            REQUIRE(busp->get_peer() == proto_bus_v0);
+            REQUIRE(busp->get_peer() == proto_bus);
 		}
 
-        REQUIRE_NOTHROW(_session_.remove_bus_socket(sp.get()));
-
-        REQUIRE_NOTHROW(sp.reset());
+        SECTION("Can close") {
+            REQUIRE_NOTHROW(busp.reset());
+        }
     }
 
-	SECTION("We can create a linked Bus topology") {
+    SECTION("We can create a linked Bus topology") {
 
-        shared_ptr<latest_bus_socket> sp1, sp2, sp3;
+        auto busp1 = std::make_unique<latest_bus_socket>()
+            , busp2 = std::make_unique<latest_bus_socket>()
+            , busp3 = std::make_unique<latest_bus_socket>()
+            ;
 
-        REQUIRE_NOTHROW(sp1 = _session_.create_bus_socket());
-        REQUIRE_NOTHROW(sp2 = _session_.create_bus_socket());
-        REQUIRE_NOTHROW(sp3 = _session_.create_bus_socket());
+        REQUIRE(busp1 != nullptr);
+        REQUIRE(busp2 != nullptr);
+        REQUIRE(busp3 != nullptr);
 
-        REQUIRE(sp1 != nullptr);
-        REQUIRE(sp2 != nullptr);
-        REQUIRE(sp3 != nullptr);
+        REQUIRE_NOTHROW(busp1->listen(test_addr));
+        REQUIRE_NOTHROW(busp2->dial(test_addr));
+        REQUIRE_NOTHROW(busp3->dial(test_addr));
 
-        SECTION("First Bus Listens, second and third Buses Dial") {
-            REQUIRE_NOTHROW(sp1->listen(test_addr));
-            REQUIRE_NOTHROW(sp2->dial(test_addr));
-            REQUIRE_NOTHROW(sp3->dial(test_addr));
-        }
+        const auto receive_timeout = 50ms;
 
-        SECTION("Configure Bus receive timeouts to 50 milliseconds") {
-            INFO("TODO: TBD: currently failing to Listen: crashes with segmentation fault.");
-            const auto receive_timeout = 50ms;
-            REQUIRE_NOTHROW(sp1->set_option_usec(_opt_::receive_timeout_usec, CAST_DURATION_TO_USEC(receive_timeout).count()));
-            REQUIRE_NOTHROW(sp2->set_option_usec(_opt_::receive_timeout_usec, CAST_DURATION_TO_USEC(receive_timeout).count()));
-            REQUIRE_NOTHROW(sp3->set_option_usec(_opt_::receive_timeout_usec, CAST_DURATION_TO_USEC(receive_timeout).count()));
-        }
+        REQUIRE_NOTHROW(busp1->set_option_usec(_opt_::receive_timeout_usec, CAST_DURATION_TO_USEC(receive_timeout).count()));
+        REQUIRE_NOTHROW(busp2->set_option_usec(_opt_::receive_timeout_usec, CAST_DURATION_TO_USEC(receive_timeout).count()));
+        REQUIRE_NOTHROW(busp3->set_option_usec(_opt_::receive_timeout_usec, CAST_DURATION_TO_USEC(receive_timeout).count()));
 
         SECTION("Messages delivered") {
 
-            string r1, r2, r3;
-            socket::receive_size_type sz1, sz2, sz3;
+            auto bmp = std::make_unique<binary_message>();
 
-            SECTION("Conduct a poor man's timeout") {
+            // This is just a poor man's sleep.
+            REQUIRE_THROWS_AS_MATCHING(busp1->try_receive(bmp.get()), nng_exception, ThrowsNngException(ec_etimedout));
+            REQUIRE_THROWS_AS_MATCHING(busp2->try_receive(bmp.get()), nng_exception, ThrowsNngException(ec_etimedout));
+            REQUIRE_THROWS_AS_MATCHING(busp3->try_receive(bmp.get()), nng_exception, ThrowsNngException(ec_etimedout));
 
-                // TODO: TBD: these calls are blocking. But we are also trying to receive a "string", not using the send/recv-msg API...
-                sz1 = sz2 = sz3 = 1;
+            REQUIRE_NOTHROW(bmp->allocate());
 
-                // This is just a poor man's sleep.
-                REQUIRE_THROWS_AS_MATCHING(sp1->try_receive(r1, sz1), nng_exception, ThrowsNngException(ec_etimedout));
-                REQUIRE_THROWS_AS_MATCHING(sp2->try_receive(r2, sz2), nng_exception, ThrowsNngException(ec_etimedout));
-                REQUIRE_THROWS_AS_MATCHING(sp3->try_receive(r3, sz3), nng_exception, ThrowsNngException(ec_etimedout));
+            SECTION("Bus2 delivers message to Bus1, Bus3 times out") {
+
+                REQUIRE_NOTHROW(*bmp << _99bits);
+                REQUIRE_NOTHROW(busp2->send(bmp.get()));
+                REQUIRE_NOTHROW(busp1->try_receive(bmp.get()));
+                REQUIRE_THAT(bmp->body()->get(), Equals(_99bits_buf));
+
+                REQUIRE_NOTHROW(bmp = std::make_unique<binary_message>());
+                REQUIRE_THROWS_AS_MATCHING(busp3->try_receive(bmp.get()), nng_exception, ThrowsNngException(ec_etimedout));
             }
 
-            SECTION("First Client Sends to Server, second Client does not Receive") {
+            SECTION ("Bus1 delivers message to both Bus2 and Bus3") {
 
-                FAIL();
+                REQUIRE_NOTHROW(*bmp << onthe);
+                REQUIRE_NOTHROW(busp1->send(bmp.get()));
 
-                REQUIRE_NOTHROW(sp2->send(_99bits));
+                REQUIRE_NOTHROW(busp2->try_receive(bmp.get()));
+                // Will compare with the second received message.
+               const auto* const msgp1 = bmp->get_msgp();
+                REQUIRE_THAT(bmp->body()->get(), Equals(onthe_buf));
 
-                r1.resize(sz1 = _99bits.length());
-
-                REQUIRE_NOTHROW(sp1->try_receive(r1, sz1));
-                REQUIRE_THROWS_AS_MATCHING(sp3->try_receive(r2, sz2), nng_exception, ThrowsNngException(ec_etimedout));
-                REQUIRE_THAT(r1, Equals(_99bits));
-            }
-
-            SECTION ("Server Sends to the Clients, both Clients receive") {
-
-                FAIL();
-
-                REQUIRE_NOTHROW(sp1->send(onthe));
-
-                r2.resize(sz2 = onthe.length());
-
-                REQUIRE_NOTHROW(sp2->try_receive(r2, sz2));
-                REQUIRE_THAT(r2, Equals(onthe));
-
-                r3.resize(sz3 = onthe.length());
-
-                REQUIRE_NOTHROW(sp3->try_receive(r3, sz3));
-                REQUIRE_THAT(r3, Equals(onthe));
+                REQUIRE_NOTHROW(bmp = std::make_unique<binary_message>());
+                REQUIRE_NOTHROW(busp3->try_receive(bmp.get()));
+                // To demonstrate this is an entirely new message received.
+                const auto* const msgp2 = bmp->get_msgp();
+                REQUIRE_THAT(bmp->body()->get(), Equals(onthe_buf));
+                REQUIRE(msgp1 != msgp2);
             }
 		}
 
-        REQUIRE_NOTHROW(_session_.remove_bus_socket(sp1.get()));
-        REQUIRE_NOTHROW(_session_.remove_bus_socket(sp2.get()));
-        REQUIRE_NOTHROW(_session_.remove_bus_socket(sp3.get()));
+        SECTION("Can close bus sockets") {
 
-        REQUIRE_NOTHROW(sp1.reset());
-        REQUIRE_NOTHROW(sp2.reset());
-        REQUIRE_NOTHROW(sp3.reset());
+            REQUIRE_NOTHROW(busp1.reset());
+            REQUIRE_NOTHROW(busp2.reset());
+            REQUIRE_NOTHROW(busp3.reset());
+
+            REQUIRE(busp1 == nullptr);
+            REQUIRE(busp2 == nullptr);
+            REQUIRE(busp3 == nullptr);
+        }
     }
 }
