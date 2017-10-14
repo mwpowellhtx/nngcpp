@@ -5,4 +5,6 @@
 
 #include "core/exceptions.hpp"
 
+#include "nngcpp_messaging.hpp"
+
 #endif // NNGCPP_H

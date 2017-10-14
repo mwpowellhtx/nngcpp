@@ -73,6 +73,8 @@ set (NNGCPP_CPP_SRCS
     messaging/messaging_utils.cpp
     messaging/messaging_utils.h
     messaging/messaging_api_base.hpp
+    messaging/messaging_gymnastics.cpp
+    messaging/messaging_gymnastics.h
     protocol/bus/bus.cpp
     protocol/bus/bus.h
     protocol/pair/pair_v0.cpp

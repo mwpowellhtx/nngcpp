@@ -1,6 +1,5 @@
 //
-// Copyright 2017 Garrett D'Amore <garrett@damore.org>
-// Copyright 2017 Capitar IT Group BV <info@capitar.com>
+// Copyright (c) 2017 Michael W Powell <mwpowellhtx@gmail.com>
 //
 // This software is supplied under the terms of the MIT License, a
 // copy of which should be located in the distribution where this
@@ -11,9 +10,6 @@
 #include <catch.hpp>
 #include <nngcpp.h>
 
-#include "../tests/messaging/messaging_gymnastics.h"
-
-#include <string>
 #include <memory>
 #include <thread>
 
@@ -112,6 +108,57 @@ namespace nng {
                 binary_message::free();
             }
         };
+
+        template<>
+        struct message_conversion_proxy<buffer_vector_type, binary_message_fixture> {
+
+            virtual buffer_vector_type get(const binary_message_fixture& rhs) {
+                return const_cast<binary_message_fixture&>(rhs).body()->get();
+            }
+
+            virtual void append(binary_message_fixture& lhs, const buffer_vector_type& rhs) {
+                auto buf_ = gymanstic_convert<buffer_vector_type, buffer_vector_type, buffer_vector_type::value_type>(rhs);
+                lhs.body()->append(buf_);
+            }
+        };
+
+        template<>
+        struct message_conversion_proxy<std::string, binary_message_fixture> {
+
+            virtual std::string get(const binary_message_fixture& rhs) {
+                const auto lhs_ = const_cast<binary_message_fixture&>(rhs).body()->get();
+                return gymanstic_convert<buffer_vector_type, std::string, std::string::value_type>(lhs_);
+            }
+
+            virtual void append(binary_message_fixture lhs, const std::string& rhs) {
+                auto buf_ = gymanstic_convert<std::string, buffer_vector_type, buffer_vector_type::value_type>(rhs);
+                lhs.body()->append(buf_);
+            }
+        };
+
+        buffer_vector_type& operator<<(buffer_vector_type& lhs, binary_message_fixture& rhs) {
+            auto ops = message_conversion_proxy<buffer_vector_type, binary_message_fixture>();
+            lhs = ops.get(rhs);
+            return lhs;
+        }
+
+        std::string& operator<<(std::string& lhs, const binary_message_fixture& rhs) {
+            auto ops = message_conversion_proxy<std::string, binary_message_fixture>();
+            lhs = ops.get(rhs);
+            return lhs;
+        }
+
+        binary_message_fixture& operator<<(binary_message_fixture& lhs, buffer_vector_type& rhs) {
+            auto ops = message_conversion_proxy<buffer_vector_type, binary_message_fixture>();
+            ops.append(lhs, rhs);
+            return lhs;
+        }
+
+        binary_message_fixture& operator<<(binary_message_fixture& lhs, const std::string& rhs) {
+            auto ops = message_conversion_proxy<std::string, binary_message_fixture>();
+            ops.append(lhs, rhs);
+            return lhs;
+        }
     }
 }
 
@@ -265,8 +312,6 @@ TEST_CASE("NNG C++ wrapper reconnect works", "[reconnect][cxx][wrapper]") {
                 NNGCPP_TESTS_ALLOCATE_MSG(bm);
                 // And with a little C++ operator overloading help:
                 REQUIRE_NOTHROW(bm << hello);
-                // TODO: TBD: this sort of testing deserves a dedicated unit test so that we aren't polluting integration scenarios such as this quite as much
-                REQUIRE_THAT(bm.body()->get(), Equals(hello_buf));
                 REQUIRE_NOTHROW(push->send(&bm));
                 /* Ditto message passing semantics. The Send() operation effectively
                 nullifies the internal message. */
@@ -296,7 +341,6 @@ TEST_CASE("NNG C++ wrapper reconnect works", "[reconnect][cxx][wrapper]") {
             // Then re-listen to the address.
             REQUIRE_NOTHROW(pull->listen(test_addr));
 
-            // TODO: TBD: This was heavily nng_pipe based from reconnect.c
             // TODO: TBD: we may provide comprehension of nng_pipe from a nngcpp POV, but I'm not sure the complexity of nng_msg how that is different from a simple send/receive?
             SECTION("They still exchange frames") {
 

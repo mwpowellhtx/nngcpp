@@ -1,40 +1,169 @@
+//
+// Copyright (c) 2017 Michael W Powell <mwpowellhtx@gmail.com>
+//
+// This software is supplied under the terms of the MIT License, a
+// copy of which should be located in the distribution where this
+// file was obtained (LICENSE.txt).  A copy of the license may also be
+// found online at https://opensource.org/licenses/MIT.
+//
+
 #include <catch.hpp>
 
-#include "messaging_gymnastics.h"
+#include "../src/nngcpp_messaging.hpp"
 
-namespace nng {
-    namespace messaging {
+namespace constants {
+    const std::string hello = "hello";
+    const nng::messaging::buffer_vector_type hello_buf = { 'h','e','l','l','o' };
+}
 
-        void binary_message_converter::append_to(const string_type& src, binary_message_type& dest) {
-            REQUIRE(src.length() > 0);
-            const auto _src_buf = messaging_utils::to_buffer(&src);
-            REQUIRE(src.length() == _src_buf.size());
-            REQUIRE(dest.body() != nullptr);
-            dest.body()->append(_src_buf);
-        }
+TEST_CASE("Run some gymnastic conversion scenarios", "[convert][messaging][gymnastics][cxx]") {
 
-        void binary_message_converter::get_from(string_type& dest, binary_message_type& src) {
-            // It is managable, but just so we are aware.
-            const auto _got_src = src.body()->get();
-            REQUIRE(_got_src.size() > 0);
-            dest = messaging_utils::to_string(&_got_src);
-            REQUIRE(dest.length() == _got_src.size());
-        }
+    using namespace std;
+    using namespace nng::messaging;
+    using namespace Catch::Matchers;
+    using namespace constants;
 
-        binary_message_converter::binary_message_type& operator<<(
-            binary_message_converter::binary_message_type& bm
-            , const binary_message_converter::string_type& s) {
+    SECTION("Convert from vector to string") {
 
-            binary_message_converter::append_to(s, bm);
-            return bm;
-        }
+        const auto converted_ = gymanstic_convert<buffer_vector_type, string, string::value_type>(hello_buf);
+        REQUIRE_THAT(converted_, Equals(hello));
+    }
 
-        binary_message_converter::string_type& operator<<(
-            binary_message_converter::string_type& s
-            , binary_message_converter::binary_message_type& bm) {
+    SECTION("Convert from string tp vector") {
 
-            binary_message_converter::get_from(s, bm);
-            return s;
+        const auto converted_ = gymanstic_convert<string, buffer_vector_type, buffer_vector_type::value_type>(hello);
+        REQUIRE_THAT(converted_, Equals(hello_buf));
+    }
+}
+
+/* If we want more in depth surface testing, look at binary_message tests. Short
+of a full on verification, howevre, we do require that a message is allocated. */
+#define NNGCPP_TESTS_INITIALIZE_BINARY_MESSAGE(m) \
+    nng::messaging::binary_message m; \
+    REQUIRE_NOTHROW((m).allocate()); \
+    REQUIRE((m).has_message() == true)
+
+TEST_CASE("Can write (append) to and read (get) from binary message using byte vector"
+    , "[vector][write][append][read][get][binary][message][messaging][messages][gymnastics][cxx]") {
+
+    using namespace std;
+    using namespace nng::messaging;
+    using namespace Catch::Matchers;
+    using namespace constants;
+
+    NNGCPP_TESTS_INITIALIZE_BINARY_MESSAGE(bm);
+
+    SECTION("Can write (append) to") {
+
+        REQUIRE_NOTHROW(bm << hello_buf);
+
+        // Do a quick smoke test.
+        REQUIRE(bm.get_size() == hello_buf.size());
+
+        SECTION("Can read (get) from") {
+
+            buffer_vector_type read_;
+            REQUIRE_NOTHROW(bm >> read_);
+
+            // And do a simple comparison of the result.
+            REQUIRE_THAT(read_, Equals(hello_buf));
         }
     }
 }
+
+TEST_CASE("Can write (append) to and read (get) from binary message using string"
+    , "[string][write][append][read][get][binary][message][messaging][messages][gymnastics][cxx]") {
+
+    using namespace std;
+    using namespace nng::messaging;
+    using namespace Catch::Matchers;
+    using namespace constants;
+
+    NNGCPP_TESTS_INITIALIZE_BINARY_MESSAGE(bm);
+
+    SECTION("Can write (append) to") {
+
+        REQUIRE_NOTHROW(bm << hello);
+
+        // Do a quick smoke test.
+        REQUIRE(bm.get_size() == hello.length());
+
+        SECTION("Can read (get) from") {
+
+            string read_;
+            REQUIRE_NOTHROW(bm >> read_);
+
+            // And do a simple comparison of the result.
+            REQUIRE_THAT(read_, Equals(hello));
+        }
+    }
+}
+
+// I dislike declarations via MACRO, but in this case I will make an exception.
+#define NNGCPP_TESTS_EXPOSE_BINARY_MESSAGE_BODY(bm, bmb) \
+    auto * const bmb = bm.body(); \
+    REQUIRE(bmb != nullptr)
+
+TEST_CASE("Can write (append) to and read (get) from binary message body using byte vector"
+    , "[vector][write][append][read][get][binary][message][body][messaging][messages][gymnastics][cxx]") {
+
+    using namespace std;
+    using namespace nng::messaging;
+    using namespace Catch::Matchers;
+    using namespace constants;
+
+    NNGCPP_TESTS_INITIALIZE_BINARY_MESSAGE(bm);
+
+    // map - Message API pointer.
+    NNGCPP_TESTS_EXPOSE_BINARY_MESSAGE_BODY(bm, mapip);
+
+    SECTION("Can write (append) to") {
+
+        REQUIRE_NOTHROW(*mapip << hello_buf);
+
+        // Do a quick smoke test.
+        REQUIRE(mapip->get_size() == hello_buf.size());
+
+        SECTION("Can read (get) from") {
+
+            buffer_vector_type read_;
+            REQUIRE_NOTHROW(*mapip >> read_);
+
+            // And do a simple comparison of the result.
+            REQUIRE_THAT(read_, Equals(hello_buf));
+        }
+    }
+}
+
+TEST_CASE("Can write (append) to and read (get) from binary message body using string"
+    , "[string][write][append][read][get][binary][message][body][messaging][messages][gymnastics][cxx]") {
+
+    using namespace std;
+    using namespace nng::messaging;
+    using namespace Catch::Matchers;
+    using namespace constants;
+
+    NNGCPP_TESTS_INITIALIZE_BINARY_MESSAGE(bm);
+
+    NNGCPP_TESTS_EXPOSE_BINARY_MESSAGE_BODY(bm, mapip);
+
+    SECTION("Can write (append) to") {
+
+        REQUIRE_NOTHROW(*mapip << hello);
+
+        // Do a quick smoke test.
+        REQUIRE(mapip->get_size() == hello.length());
+
+        SECTION("Can read (get) from") {
+
+            string read_;
+            REQUIRE_NOTHROW(*mapip >> read_);
+
+            // And do a simple comparison of the result.
+            REQUIRE_THAT(read_, Equals(hello));
+        }
+    }
+}
+
+/* I was going to put test cases in for the header, but I think for the moment will hold off
+on that due to the fact that we really should not be mucking around in the header. */
