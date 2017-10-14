@@ -57,10 +57,9 @@ namespace nng {
 
         typedef messaging::message_base::size_type size_type;
         typedef messaging::message_base::buffer_vector_type buffer_vector_type;
+        typedef messaging::binary_message binary_message_type;
 
     private:
-
-        typedef messaging::binary_message binary_message_type;
 
         friend class listener;
         friend class dialer;
