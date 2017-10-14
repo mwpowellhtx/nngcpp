@@ -45,20 +45,20 @@ of a legit failure, we see the actual line IN-SITU where the test case ACTUALLY 
     REQUIRE(std::memcmp(::nng_msg_body(m), s, std::strlen(s)) == 0)
 
 #define NNGCPP_TESTS_ALLOCATE_MSG_SZ(m, sz) \
-    REQUIRE(m.has_message() == false); \
-    REQUIRE(m.get_msgp() == nullptr); \
+    REQUIRE((m).has_message() == false); \
+    REQUIRE((m).get_msgp() == nullptr); \
     \
-    REQUIRE_NOTHROW(m.allocate(sz)); \
-    REQUIRE(m.has_message() == true); \
-    REQUIRE(m.get_msgp() != nullptr); \
+    REQUIRE_NOTHROW((m).allocate(sz)); \
+    REQUIRE((m).has_message() == true); \
+    REQUIRE((m).get_msgp() != nullptr); \
     \
-    REQUIRE(m.header() != nullptr); \
-    REQUIRE(m.header()->has_message()); \
-    REQUIRE(m.header()->get_msgp() == m.get_msgp()); \
+    REQUIRE((m).header() != nullptr); \
+    REQUIRE((m).header()->has_message()); \
+    REQUIRE((m).header()->get_msgp() == (m).get_msgp()); \
     \
-    REQUIRE(m.body() != nullptr); \
-    REQUIRE(m.body()->has_message()); \
-    REQUIRE(m.body()->get_msgp() == m.get_msgp());
+    REQUIRE((m).body() != nullptr); \
+    REQUIRE((m).body()->has_message()); \
+    REQUIRE((m).body()->get_msgp() == (m).get_msgp());
 
 #define NNGCPP_TESTS_ALLOCATE_MSG(m) NNGCPP_TESTS_ALLOCATE_MSG_SZ(m, 0)
 
@@ -95,70 +95,6 @@ namespace nng {
                 return pid;
             }
         };
-
-        struct binary_message_fixture : public binary_message {
-
-            binary_message_fixture() : binary_message() {
-            }
-
-            binary_message_fixture(::nng_msg* msgp) : binary_message(msgp) {
-            }
-
-            virtual void free() override {
-                binary_message::free();
-            }
-        };
-
-        template<>
-        struct message_conversion_proxy<buffer_vector_type, binary_message_fixture> {
-
-            virtual buffer_vector_type get(const binary_message_fixture& rhs) {
-                return const_cast<binary_message_fixture&>(rhs).body()->get();
-            }
-
-            virtual void append(binary_message_fixture& lhs, const buffer_vector_type& rhs) {
-                auto buf_ = gymanstic_convert<buffer_vector_type, buffer_vector_type, buffer_vector_type::value_type>(rhs);
-                lhs.body()->append(buf_);
-            }
-        };
-
-        template<>
-        struct message_conversion_proxy<std::string, binary_message_fixture> {
-
-            virtual std::string get(const binary_message_fixture& rhs) {
-                const auto lhs_ = const_cast<binary_message_fixture&>(rhs).body()->get();
-                return gymanstic_convert<buffer_vector_type, std::string, std::string::value_type>(lhs_);
-            }
-
-            virtual void append(binary_message_fixture lhs, const std::string& rhs) {
-                auto buf_ = gymanstic_convert<std::string, buffer_vector_type, buffer_vector_type::value_type>(rhs);
-                lhs.body()->append(buf_);
-            }
-        };
-
-        buffer_vector_type& operator<<(buffer_vector_type& lhs, binary_message_fixture& rhs) {
-            auto ops = message_conversion_proxy<buffer_vector_type, binary_message_fixture>();
-            lhs = ops.get(rhs);
-            return lhs;
-        }
-
-        std::string& operator<<(std::string& lhs, const binary_message_fixture& rhs) {
-            auto ops = message_conversion_proxy<std::string, binary_message_fixture>();
-            lhs = ops.get(rhs);
-            return lhs;
-        }
-
-        binary_message_fixture& operator<<(binary_message_fixture& lhs, buffer_vector_type& rhs) {
-            auto ops = message_conversion_proxy<buffer_vector_type, binary_message_fixture>();
-            ops.append(lhs, rhs);
-            return lhs;
-        }
-
-        binary_message_fixture& operator<<(binary_message_fixture& lhs, const std::string& rhs) {
-            auto ops = message_conversion_proxy<std::string, binary_message_fixture>();
-            ops.append(lhs, rhs);
-            return lhs;
-        }
     }
 }
 
@@ -307,21 +243,20 @@ TEST_CASE("NNG C++ wrapper reconnect works", "[reconnect][cxx][wrapper]") {
             per se. Rather, we should simply be able to "frame" buffers or strings, accordingly. */
             SECTION("We can send a frame") {
 
-                binary_message_fixture bm;
+                auto bmp = std::make_unique<binary_message>();
                 this_thread::sleep_for(100ms);
-                NNGCPP_TESTS_ALLOCATE_MSG(bm);
+                NNGCPP_TESTS_ALLOCATE_MSG(*bmp);
                 // And with a little C++ operator overloading help:
-                REQUIRE_NOTHROW(bm << hello);
-                REQUIRE_NOTHROW(push->send(&bm));
+                REQUIRE_NOTHROW(*bmp << hello);
+                REQUIRE_NOTHROW(push->send(bmp.get()));
                 /* Ditto message passing semantics. The Send() operation effectively
                 nullifies the internal message. */
-                REQUIRE(bm.has_message() == false);
+                REQUIRE(bmp->has_message() == false);
 
-                // TODO: TBD: message ownership semantics really deserves a unit test all its own...
-                REQUIRE_NOTHROW(pull->try_receive(&bm));
-                REQUIRE(bm.has_message() == true);
+                REQUIRE_NOTHROW(pull->try_receive(bmp.get()));
+                REQUIRE(bmp->has_message() == true);
                 // Just verify that the message matches the buffer.
-                REQUIRE_THAT(bm.body()->get(), Equals(hello_buf));
+                REQUIRE_THAT(bmp->body()->get(), Equals(hello_buf));
             }
         }
 
@@ -344,28 +279,29 @@ TEST_CASE("NNG C++ wrapper reconnect works", "[reconnect][cxx][wrapper]") {
             // TODO: TBD: we may provide comprehension of nng_pipe from a nngcpp POV, but I'm not sure the complexity of nng_msg how that is different from a simple send/receive?
             SECTION("They still exchange frames") {
 
-                binary_message_fixture bm;
+                auto bmp = std::make_unique<binary_message>();
 
                 this_thread::sleep_for(100ms);
-                NNGCPP_TESTS_ALLOCATE_MSG(bm);
-                REQUIRE_NOTHROW(bm << hello);
-                REQUIRE_NOTHROW(push->send(&bm));
-                REQUIRE(bm.has_message() == false);
+                NNGCPP_TESTS_ALLOCATE_MSG(*bmp);
+                REQUIRE_NOTHROW(*bmp << hello);
+                REQUIRE_NOTHROW(push->send(bmp.get()));
+                REQUIRE(bmp->has_message() == false);
 
                 // See notes above. Sending transfers ownership of the internal message to NNG.
-                REQUIRE_NOTHROW(pull->try_receive(&bm));
-                REQUIRE(bm.has_message() == true);
+                REQUIRE_NOTHROW(pull->try_receive(bmp.get()));
+                REQUIRE(bmp->has_message() == true);
                 // Just verify that the message matches the buffer.
-                REQUIRE_THAT(bm.body()->get(), Equals(hello_buf));
+                REQUIRE_THAT(bmp->body()->get(), Equals(hello_buf));
 
                 // TODO: TBD: this one deserves its own unit test as well so that we are not cluttering the integration tests
-                message_pipe_fixture mp1(&bm);
+                message_pipe_fixture mp1(bmp.get());
                 REQUIRE(mp1.is_valid() == true);
                 // TODO: TBD: deserves its own unit testing...
                 REQUIRE(mp1.get_pid() > 0);
-                // We would not normally want to free under any circumstances, except here it is useful to fixture it.
-                REQUIRE_NOTHROW(bm.free());
-                REQUIRE(bm.has_message() == false);
+                /* Resetting the message pointer is effectively the same, if stronger, for purposes
+                of this unit test, without necessarily needing to expose the free method. */
+                REQUIRE_NOTHROW(bmp.reset());
+                REQUIRE(bmp.get() == nullptr);
 
                 SECTION("Even after pipe close") {
 
@@ -375,20 +311,23 @@ TEST_CASE("NNG C++ wrapper reconnect works", "[reconnect][cxx][wrapper]") {
                     REQUIRE(mp1.is_valid() == false);
 
                     this_thread::sleep_for(100ms);
-                    NNGCPP_TESTS_ALLOCATE_MSG(bm);
-                    REQUIRE_NOTHROW(bm << again);
+                    auto bmp2 = std::make_unique<binary_message>();
+                    NNGCPP_TESTS_ALLOCATE_MSG(*bmp2);
+                    REQUIRE_NOTHROW(*bmp2 << again);
                     // TODO: TBD: send/no-message -> receive/message is a pattern that deserves its own focused unit test...
-                    REQUIRE_NOTHROW(push->send(&bm));
-                    REQUIRE(bm.has_message() == false);
+                    REQUIRE_NOTHROW(push->send(bmp2.get()));
+                    REQUIRE(bmp2->has_message() == false);
 
-                    REQUIRE_NOTHROW(pull->try_receive(&bm));
-                    REQUIRE(bm.has_message() == true);
+                    REQUIRE_NOTHROW(pull->try_receive(bmp2.get()));
+                    REQUIRE(bmp2->has_message() == true);
                     // Just verify that the message matches the buffer.
-                    REQUIRE_THAT(bm.body()->get(), Equals(again_buf));
+                    REQUIRE_THAT(bmp2->body()->get(), Equals(again_buf));
 
-                    message_pipe_fixture mp2(&bm);
+                    message_pipe_fixture mp2(bmp2.get());
                     REQUIRE(mp2.is_valid() == true);
-                    REQUIRE_NOTHROW(bm.free());
+                    // Ditto resetting the pointer versus exposing the free method.
+                    REQUIRE_NOTHROW(bmp2.reset());
+                    REQUIRE(bmp2.get() == nullptr);
                     REQUIRE(mp2.get_pid() != mp1_pid);
                 }
             }
