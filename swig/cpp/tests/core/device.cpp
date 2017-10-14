@@ -18,9 +18,51 @@
 #include <chrono>
 #include <ostream>
 
+struct device_fixture {
+
+    typedef nng::protocol::latest_pair_socket latest_pair_socket;
+    typedef nng::device device;
+
+private:
+
+    std::unique_ptr<device> devp;
+
+public:
+
+    device_fixture() : devp() {
+    }
+
+    virtual ~device_fixture() {
+        REQUIRE(devp != nullptr);
+        REQUIRE_NOTHROW(devp.reset());
+        ::nng_fini();
+    }
+
+    void install(latest_pair_socket* const sp1, latest_pair_socket* const sp2, bool shouldCloseSockets) {
+        REQUIRE(devp == nullptr);
+        REQUIRE(sp1 != nullptr);
+        REQUIRE(sp2 != nullptr);
+        devp = std::make_unique<device>(sp1, sp2, shouldCloseSockets);
+        REQUIRE(devp != nullptr);
+    }
+
+    bool is_installed() const {
+        return devp != nullptr;
+    }
+
+    device* const get_device() {
+        REQUIRE(devp != nullptr);
+        return devp.get();
+    }
+};
+
 namespace constants {
     const std::string dev1_addr = "inproc://dev1";
     const std::string dev2_addr = "inproc://dev2";
+    const std::string alpha = "alpha";
+    const std::string omega = "omega";
+    const nng::messaging::message_base::buffer_vector_type alpha_buf = { 'a','l','p','h','a' };
+    const nng::messaging::message_base::buffer_vector_type omega_buf = { 'o','m','e','g','a' };
 }
 
 TEST_CASE("Test that device functions properly", "[device]") {
@@ -31,79 +73,64 @@ TEST_CASE("Test that device functions properly", "[device]") {
     using namespace std::chrono;
     using namespace nng;
     using namespace nng::protocol;
+    using namespace nng::messaging;
     using namespace constants;
     using _opt_ = option_names;
 
-    session _session_;
+    device_fixture fixture;
 
     SECTION("nng::protocol::v1::pair_socket based device functions properly") {
 
 		SECTION("We can create a nng::protocol::v1::pair_socket device") {
 
-            shared_ptr<latest_pair_socket> sp1, sp2;
-
-            REQUIRE_NOTHROW(sp1 = _session_.create_pair_socket());
-            REQUIRE_NOTHROW(sp2 = _session_.create_pair_socket());
+            latest_pair_socket p1, p2;
 
             // TODO: TBD: in the grand scheme of things, I'm not really sure what purpose these two assertions are serving...
-            REQUIRE_NOTHROW(sp1->set_option_int(_opt_::raw, 1));
-            REQUIRE_NOTHROW(sp2->set_option_int(_opt_::raw, 1));
+            REQUIRE_NOTHROW(p1.set_option_int(_opt_::raw, 1));
+            REQUIRE_NOTHROW(p2.set_option_int(_opt_::raw, 1));
 
-            shared_ptr<device> devp;
+            REQUIRE_NOTHROW(fixture.install(&p1, &p2, true));
+            REQUIRE(fixture.is_installed() == true);
 
-            REQUIRE_NOTHROW(devp = _session_.create_device(sp1.get(), sp2.get(), true));
+            REQUIRE_NOTHROW(p1.listen(dev1_addr));
+            REQUIRE_NOTHROW(p2.listen(dev2_addr));
 
-            REQUIRE_NOTHROW(sp1->listen(dev1_addr));
-            REQUIRE_NOTHROW(sp2->listen(dev2_addr));
+            latest_pair_socket e1, e2;
 
-            shared_ptr<latest_pair_socket> es1, es2;
-
-            REQUIRE_NOTHROW(es1 = _session_.create_pair_socket());
-            REQUIRE_NOTHROW(es2 = _session_.create_pair_socket());
-
-            REQUIRE_NOTHROW(es1->dial(dev1_addr));
-            REQUIRE_NOTHROW(es2->dial(dev1_addr));
+            REQUIRE_NOTHROW(e1.dial(dev1_addr));
+            REQUIRE_NOTHROW(e2.dial(dev2_addr));
 
             const auto timeout = 1000ms;
 
-            REQUIRE_NOTHROW(es1->set_option_usec(_opt_::receive_timeout_usec, CAST_DURATION_TO_USEC(timeout).count()));
-            REQUIRE_NOTHROW(es2->set_option_usec(_opt_::receive_timeout_usec, CAST_DURATION_TO_USEC(timeout).count()));
+            REQUIRE_NOTHROW(e1.set_option_usec(_opt_::receive_timeout_usec, CAST_DURATION_TO_USEC(timeout).count()));
+            REQUIRE_NOTHROW(e2.set_option_usec(_opt_::receive_timeout_usec, CAST_DURATION_TO_USEC(timeout).count()));
 
             this_thread::sleep_for(100ms);
 
-            string actual;
-            socket::receive_size_type sz;
-
             SECTION("Device can send and receive") {
+
+                binary_message bm;
+
+                REQUIRE_NOTHROW(bm.allocate());
+                REQUIRE(bm.has_message() == true);
+                // No need to vet "message free" at the end of this on account of message dtor.
 
                 SECTION("Device can send") {
 
-                    const string value = "ALPHA", expected = value;
-
-                    (actual = "").resize(expected.length() + 1);
-
-                    sz = actual.size();
-
-                    // Send from 1->2 via the listening Device sockets.
-                    REQUIRE_NOTHROW(es1->send(value));
-                    REQUIRE_NOTHROW(es2->try_receive(actual, sz));
-                    REQUIRE(actual == expected);
+                    REQUIRE_NOTHROW(bm << alpha);
+                    REQUIRE_NOTHROW(e1.send(&bm));
+                    REQUIRE_NOTHROW(e2.try_receive(&bm));
+                    REQUIRE_THAT(bm.body()->get(), Equals(alpha_buf));
                 }
 
                 SECTION("Device can receive") {
 
-                    const string value = "OMEGA", expected = value;
-
-                    (actual = "").resize(expected.length() + 1);
-
-                    sz = actual.size();
-
-                    // Now respond from 2->1 via the listening Device sockets.
-                    REQUIRE_NOTHROW(es2->send(value));
-                    REQUIRE_NOTHROW(es1->try_receive(actual, sz));
-                    REQUIRE(actual == expected);
+                    REQUIRE_NOTHROW(bm << omega);
+                    REQUIRE_NOTHROW(e2.send(&bm));
+                    REQUIRE_NOTHROW(e1.try_receive(&bm));
+                    REQUIRE_THAT(bm.body()->get(), Equals(omega_buf));
                 }
-			}
+            }
 		}
 	}
 }
