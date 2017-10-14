@@ -38,8 +38,15 @@ CATCH_TRANSLATE_EXCEPTION(nng::nng_exception& ex) {
 CATCH_TRANSLATE_EXCEPTION(trx::not_implemented& ex) {
     const auto ex_what_ = std::string(ex.what());
     return ex_what_.empty()
-        ? "unknown " STRINGIFY(std::exception)
-        : ("std::exception: " + ex_what_).c_str();
+        ? "unknown " STRINGIFY(trx::not_implemented)
+        : ("trx::not_implemented: " + ex_what_).c_str();
+}
+
+CATCH_TRANSLATE_EXCEPTION(trx::invalid_operation& ex) {
+    const auto ex_what_ = std::string(ex.what());
+    return ex_what_.empty()
+        ? "unknown " STRINGIFY(trx::invalid_operation)
+        : ("trx::invalid_operation: " + ex_what_).c_str();
 }
 
 #endif // NNGCPP_CATCH_EXCEPTION_TRANSLATIONS_HPP

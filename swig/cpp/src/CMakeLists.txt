@@ -60,6 +60,8 @@ set (NNGCPP_CPP_SRCS
     core/exceptions/nng_exception.h
     core/exceptions/not_implemented.cpp
     core/exceptions/not_implemented.h
+    core/exceptions/invalid_operation.cpp
+    core/exceptions/invalid_operation.h
     messaging/binary_message.cpp
     messaging/binary_message.h
     messaging/binary_message_body.cpp
