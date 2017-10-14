@@ -10,11 +10,19 @@ namespace nng {
         namespace v0 {
             
             class push_socket : public socket {
-                public:
+            public:
 
-                    push_socket();
+                push_socket();
 
-                    virtual ~push_socket();
+                virtual ~push_socket();
+
+            protected:
+
+                virtual std::unique_ptr<binary_message_type> receive(flag_type flags = flag_none) override;
+                virtual int try_receive(binary_message_type* const bmp, flag_type flags = flag_none) override;
+
+                virtual buffer_vector_type receive(size_type& sz, flag_type flags = flag_none) override;
+                virtual int try_receive(buffer_vector_type* const bufp, size_type& sz, flag_type flags = flag_none) override;
             };
         }
 

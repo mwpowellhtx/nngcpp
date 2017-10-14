@@ -1,5 +1,7 @@
 #include "push.h"
 
+#define THROW_PUSH_SOCKET_INV_OP() throw trx::invalid_operation("push sockets cannot receive")
+
 namespace nng {
     namespace protocol {
         namespace v0 {
@@ -11,6 +13,22 @@ namespace nng {
             }
 
             push_socket::~push_socket() {
+            }
+
+            std::unique_ptr<push_socket::binary_message_type> push_socket::receive(flag_type flags) {
+                THROW_PUSH_SOCKET_INV_OP();
+            }
+
+            int push_socket::try_receive(binary_message_type* const bmp, flag_type flags) {
+                THROW_PUSH_SOCKET_INV_OP();
+            }
+
+            push_socket::buffer_vector_type push_socket::receive(size_type& sz, flag_type flags) {
+                THROW_PUSH_SOCKET_INV_OP();
+            }
+
+            int push_socket::try_receive(buffer_vector_type* const bufp, size_type& sz, flag_type flags) {
+                THROW_PUSH_SOCKET_INV_OP();
             }
         }
     }

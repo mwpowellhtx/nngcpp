@@ -10,11 +10,18 @@ namespace nng {
         namespace v0 {
             
             class pull_socket : public socket {
-                public:
+            public:
 
-                    pull_socket();
+                pull_socket();
+                
+                virtual ~pull_socket();
 
-                    virtual ~pull_socket();
+            protected:
+
+                virtual void send(binary_message_type* const bmp, flag_type flags = flag_none) override;
+
+                virtual int send(const buffer_vector_type* const bufp, flag_type flags = flag_none) override;
+                virtual int send(const buffer_vector_type* const bufp, size_type sz, flag_type flags = flag_none) override;
             };
         }
 
