@@ -77,6 +77,9 @@ TEST_CASE("Test that device functions properly", "[device]") {
     using namespace constants;
     using _opt_ = option_names;
 
+    /* No need to involve any "sessions" at this level. In fact, I think that having
+    a device "fixture" better focuses the unit test on just what should be vetted. */
+
     device_fixture fixture;
 
     SECTION("nng::protocol::v1::pair_socket based device functions properly") {
