@@ -59,7 +59,7 @@ namespace nng {
         }
 
         void binary_message::allocate(size_type sz) {
-            if (has_message()) { return; }
+            if (has_message()) { free(); }
             ::nng_msg* msgp;
             const auto errnum = ::nng_msg_alloc(&msgp, sz);
             THROW_NNG_EXCEPTION_EC(errnum);
