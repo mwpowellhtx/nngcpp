@@ -4,10 +4,13 @@ namespace nng {
 
     namespace messaging {
 
-        message_base::message_base() : _msgp(nullptr) {
+        message_base_api::message_base_api() {
         }
 
-        message_base::message_base(::nng_msg* msgp) : _msgp(msgp) {
+        message_base::message_base() : message_base_api(), _msgp(nullptr) {
+        }
+
+        message_base::message_base(::nng_msg* msgp) : message_base_api(), _msgp(msgp) {
         }
 
         message_base::~message_base() {
