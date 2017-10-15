@@ -15,7 +15,6 @@
 #include "messaging_api_base.hpp"
 
 #include <cstdint>
-#include <vector>
 
 namespace nng {
 
@@ -26,11 +25,17 @@ namespace nng {
 #endif //NNGCPP_BINARY_MESSAGE_H
 
         // TODO: TBD: potentially handling these as a string-based as well...
-        class binary_message_header : public readonly_messaging_api<message_base::buffer_vector_type> {
+        class binary_message_header
+            : public message_base
+            , public supports_get_api<message_base::buffer_vector_type>
+            , public supports_append_api<message_base::buffer_vector_type, uint32_t>
+            , public supports_insert_api<message_base::buffer_vector_type, uint32_t>
+            , public supports_chop_api<message_base::size_type, uint32_t*>
+            , public supports_trim_api<message_base::size_type, uint32_t*> {
         public:
 
-            typedef readonly_messaging_api<message_base::buffer_vector_type>::size_type size_type;
-            typedef readonly_messaging_api<message_base::buffer_vector_type>::buffer_vector_type buffer_vector_type;
+            typedef message_base::size_type size_type;
+            typedef message_base::buffer_vector_type buffer_vector_type;
 
         protected:
 
@@ -53,18 +58,23 @@ namespace nng {
             // TODO: TBD: so if header is truly "read-only" then it is debatable whether "clear" should be exposed via header...
             virtual void clear() override;
 
-            virtual bool has_message() const override;
+            virtual void append(const uint32_t& val);
 
-        //    // TODO: TBD: technically we should not be doing anything with header, per se; however, that being said, future efforts may involve moving from msg/header/body to "scatter/gather" pattern.
-        //protected:
+            virtual void insert(const uint32_t& val);
 
-        //    virtual void append(const message_base::buffer_vector_type& buf) override;
+            virtual void trim(uint32_t* valp);
 
-        //    virtual void insert(const message_base::buffer_vector_type& buf) override;
+            virtual void chop(uint32_t* valp);
 
-        //    virtual void trim(size_type sz) override;
+        protected:
 
-        //    virtual void chop(size_type sz) override;
+            virtual void append(const buffer_vector_type& buf);
+
+            virtual void insert(const buffer_vector_type& buf);
+
+            virtual void trim(size_type sz);
+
+            virtual void chop(size_type sz);
         };
     }
 }

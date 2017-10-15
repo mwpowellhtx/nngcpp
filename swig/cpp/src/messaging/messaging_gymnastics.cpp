@@ -36,26 +36,26 @@ namespace nng {
             return lhs;
         }
 
-        messaging_api<buffer_vector_type>& operator<<(messaging_api<buffer_vector_type>& lhs, const buffer_vector_type& rhs) {
-            auto ops = message_conversion_appender_policy<buffer_vector_type, messaging_api<buffer_vector_type>>();
+        supports_append_api<buffer_vector_type>& operator<<(supports_append_api<buffer_vector_type>& lhs, const buffer_vector_type& rhs) {
+            auto ops = message_conversion_appender_policy<buffer_vector_type, supports_append_api<buffer_vector_type>>();
             ops.append(lhs, rhs);
             return lhs;
         }
 
-        const messaging_api<buffer_vector_type>& operator >> (const messaging_api<buffer_vector_type>& lhs, buffer_vector_type& rhs) {
-            auto ops = message_conversion_getter_policy<buffer_vector_type, messaging_api<buffer_vector_type>>();
+        const supports_get_api<buffer_vector_type>& operator >> (const supports_get_api<buffer_vector_type>& lhs, buffer_vector_type& rhs) {
+            auto ops = message_conversion_getter_policy<buffer_vector_type, supports_get_api<buffer_vector_type>>();
             rhs = ops.get(lhs);
             return lhs;
         }
 
-        messaging_api<buffer_vector_type>& operator<<(messaging_api<buffer_vector_type>& lhs, const std::string& rhs) {
-            auto ops = message_conversion_appender_policy<std::string, messaging_api<buffer_vector_type>>();
+        supports_append_api<buffer_vector_type>& operator<<(supports_append_api<buffer_vector_type>& lhs, const std::string& rhs) {
+            auto ops = message_conversion_appender_policy<std::string, supports_append_api<buffer_vector_type>>();
             ops.append(lhs, rhs);
             return lhs;
         }
 
-        const messaging_api<buffer_vector_type>& operator >> (const messaging_api<buffer_vector_type>& lhs, std::string& rhs) {
-            auto ops = message_conversion_getter_policy<std::string, messaging_api<buffer_vector_type>>();
+        const supports_get_api<buffer_vector_type>& operator >> (const supports_get_api<buffer_vector_type>& lhs, std::string& rhs) {
+            auto ops = message_conversion_getter_policy<std::string, supports_get_api<buffer_vector_type>>();
             rhs = ops.get(lhs);
             return lhs;
         }

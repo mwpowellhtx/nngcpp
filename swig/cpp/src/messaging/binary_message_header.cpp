@@ -8,6 +8,7 @@
 //
 
 #include "binary_message_header.h"
+#include "../core/exceptions.hpp"
 
 namespace nng {
 
@@ -17,10 +18,10 @@ namespace nng {
         using std::placeholders::_2;
         using std::placeholders::_3;
 
-        binary_message_header::binary_message_header() : readonly_messaging_api() {
+        binary_message_header::binary_message_header() : message_base() {
         }
 
-        binary_message_header::binary_message_header(::nng_msg* msgp) : readonly_messaging_api(msgp) {
+        binary_message_header::binary_message_header(::nng_msg* msgp) : message_base(msgp) {
         }
 
         binary_message_header::~binary_message_header() {
@@ -31,16 +32,30 @@ namespace nng {
         }
 
         message_base::size_type binary_message_header::get_size() const {
-            return _msgp == nullptr ? 0 : ::nng_msg_header_len(_msgp);
+            const auto op = std::bind(&::nng_msg_header_len, _1);
+            return _msgp == nullptr ? 0 : op(_msgp);
         }
 
+        // TODO: TBD: this is fairly redundant with body: there has got to be a better way to capture this as a cross cutting concern...
         bool binary_message_header::try_get(buffer_vector_type& value) const {
 
-            const auto sz = get_size();
+            if (_msgp == nullptr) { return false; }
 
-            const auto op = std::bind(&::nng_msg_header, _1);
+            typedef message_getter_try_get_policy<buffer_vector_type, void*> policy_type;
 
-            return messaging_api_type::try_get(value, op, sz);
+            const auto get_ = std::bind(&::nng_msg_header, _1);
+
+            const auto convert_ = [&](const void* x, buffer_vector_type& y) {
+                if (x == nullptr) { return false; }
+                const auto sz = get_size();
+                const auto* const src = (const buffer_vector_type::value_type* const)x;
+                for (size_type i = 0; i < sz; i++) {
+                    y.push_back((src + i)[0]);
+                }
+                return y.size() > 0;
+            };
+
+            return policy_type::try_get(value, _msgp, get_, convert_);
         }
 
         void binary_message_header::clear() {
@@ -48,12 +63,50 @@ namespace nng {
             do_clear_op(op, _msgp);
         }
 
-        bool binary_message_header::has_message() const {
-            // Which re-exposes has_message for public consumption.
-            return message_base::has_message();
+        void binary_message_header::append(const uint32_t& val) {
+            if (_msgp == nullptr) { return; }
+            const auto op = std::bind(&::nng_msg_header_append_u32, _1, _2);
+            const auto errnum = op(_msgp, val);
+            THROW_NNG_EXCEPTION_EC(errnum);
         }
 
-        //// TODO: TBD: for the moment, these are overridden at the read-only API level with empty implementations.
+        void binary_message_header::insert(const uint32_t& val) {
+            if (_msgp == nullptr) { return; }
+            const auto op = std::bind(&::nng_msg_header_insert_u32, _1, _2);
+            const auto errnum = op(_msgp, val);
+            THROW_NNG_EXCEPTION_EC(errnum);
+        }
+
+        void binary_message_header::trim(uint32_t* valp) {
+            if (_msgp == nullptr) { return; }
+            const auto op = std::bind(&::nng_msg_header_trim_u32, _1, _2);
+            const auto errnum = op(_msgp, valp);
+            THROW_NNG_EXCEPTION_EC(errnum);
+        }
+
+        void binary_message_header::chop(uint32_t* valp) {
+            if (_msgp == nullptr) { return; }
+            const auto op = std::bind(&::nng_msg_header_chop_u32, _1, _2);
+            const auto errnum = op(_msgp, valp);
+            THROW_NNG_EXCEPTION_EC(errnum);
+        }
+
+        void binary_message_header::append(const buffer_vector_type& buf) {
+            THROW_API_IS_READ_ONLY();
+        }
+
+        void binary_message_header::insert(const buffer_vector_type& buf) {
+            THROW_API_IS_READ_ONLY();
+        }
+
+        void binary_message_header::chop(size_type sz) {
+            THROW_API_IS_READ_ONLY();
+        }
+
+        void binary_message_header::trim(size_type sz) {
+            THROW_API_IS_READ_ONLY();
+        }
+
         //void binary_message_header::append(const message_base::buffer_vector_type& buf) {
         //    static const auto op = std::bind(&::nng_msg_header_append, _1, _2, _3);
         //    do_type_based_op(op, _msgp, buf);
@@ -64,13 +117,13 @@ namespace nng {
         //    do_type_based_op(op, _msgp, buf);
         //}
 
-        //void binary_message_header::trim(size_type sz) {
-        //    static const auto op = std::bind(&::nng_msg_header_trim, _1, _2);
+        //void binary_message_header::chop(size_type sz) {
+        //    static const auto op = std::bind(&::nng_msg_header_chop, _1, _2);
         //    do_size_based_op(op, _msgp, sz);
         //}
 
-        //void binary_message_header::chop(size_type sz) {
-        //    static const auto op = std::bind(&::nng_msg_header_chop, _1, _2);
+        //void binary_message_header::trim(size_type sz) {
+        //    static const auto op = std::bind(&::nng_msg_header_trim, _1, _2);
         //    do_size_based_op(op, _msgp, sz);
         //}
     }

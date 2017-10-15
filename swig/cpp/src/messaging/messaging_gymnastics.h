@@ -13,6 +13,8 @@
 // TODO: TBD: start here, but the intent is for this to support anything that looks or operates like the writable message api and/or readonly api
 #include "binary_message.h"
 
+#include "messaging_api_base.hpp"
+
 #include <string>
 #include <algorithm>
 
@@ -33,6 +35,7 @@ namespace nng {
             }
         };
 
+        // TODO: TBD: I wonder whether I can nix the policy template specializations altogether?
         template<class Target_, class Message_>
         struct message_conversion_appender_policy {
 
@@ -46,17 +49,17 @@ namespace nng {
         };
 
         template<>
-        struct message_conversion_getter_policy<buffer_vector_type, messaging_api<buffer_vector_type>> {
+        struct message_conversion_getter_policy<buffer_vector_type, supports_get_api<buffer_vector_type>> {
 
-            virtual buffer_vector_type get(const messaging_api<buffer_vector_type>& rhs) {
+            virtual buffer_vector_type get(const supports_get_api<buffer_vector_type>& rhs) {
                 return rhs.get();
             }
         };
 
         template<>
-        struct message_conversion_appender_policy<buffer_vector_type, messaging_api<buffer_vector_type>> {
+        struct message_conversion_appender_policy<buffer_vector_type, supports_append_api<buffer_vector_type>> {
 
-            virtual void append(messaging_api<buffer_vector_type>& lhs, const buffer_vector_type& rhs) {
+            virtual void append(supports_append_api<buffer_vector_type>& lhs, const buffer_vector_type& rhs) {
                 lhs.append(rhs);
             }
         };
@@ -73,18 +76,18 @@ namespace nng {
         }
 
         template<>
-        struct message_conversion_getter_policy<std::string, messaging_api<buffer_vector_type>> {
+        struct message_conversion_getter_policy<std::string, supports_get_api<buffer_vector_type>> {
 
-            virtual std::string get(const messaging_api<buffer_vector_type>& rhs) {
+            virtual std::string get(const supports_get_api<buffer_vector_type>& rhs) {
                 auto lhs_ = rhs.get();
                 return gymanstic_convert<buffer_vector_type, std::string, std::string::value_type>(lhs_);
             }
         };
 
         template<>
-        struct message_conversion_appender_policy<std::string, messaging_api<buffer_vector_type>> {
+        struct message_conversion_appender_policy<std::string, supports_append_api<buffer_vector_type>> {
 
-            virtual void append(messaging_api<buffer_vector_type>& lhs, const std::string& rhs) {
+            virtual void append(supports_append_api<buffer_vector_type>& lhs, const std::string& rhs) {
                 auto buf_ = gymanstic_convert<std::string, buffer_vector_type, buffer_vector_type::value_type>(rhs);
                 lhs.append(buf_);
             }
@@ -133,13 +136,13 @@ namespace nng {
 
         const binary_message& operator >> (const binary_message& lhs, std::string& rhs);
 
-        messaging_api<buffer_vector_type>& operator<<(messaging_api<buffer_vector_type>& lhs, const buffer_vector_type& rhs);
+        supports_append_api<buffer_vector_type>& operator<<(supports_append_api<buffer_vector_type>& lhs, const buffer_vector_type& rhs);
 
-        const messaging_api<buffer_vector_type>& operator >> (const messaging_api<buffer_vector_type>& lhs, buffer_vector_type& rhs);
+        const supports_get_api<buffer_vector_type>& operator >> (const supports_get_api<buffer_vector_type>& lhs, buffer_vector_type& rhs);
 
-        messaging_api<buffer_vector_type>& operator<<(messaging_api<buffer_vector_type>& lhs, const std::string& rhs);
+        supports_append_api<buffer_vector_type>& operator<<(supports_append_api<buffer_vector_type>& lhs, const std::string& rhs);
 
-        const messaging_api<buffer_vector_type>& operator>>(const messaging_api<buffer_vector_type>& lhs, std::string& rhs);
+        const supports_get_api<buffer_vector_type>& operator >> (const supports_get_api<buffer_vector_type>& lhs, std::string& rhs);
     }
 }
 

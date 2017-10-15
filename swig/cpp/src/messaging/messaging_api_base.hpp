@@ -2,7 +2,6 @@
 #define NNGCPP_MESSAGING_API_HPP
 
 #include "message_base.h"
-#include "../core/exceptions.hpp"
 
 #include <memory>
 #include <functional>
@@ -19,69 +18,18 @@ namespace nng {
         class message_body;
 
         template<typename Type_>
-        class messaging_api : public message_base {
+        class supports_get_api {
         protected:
 
-            typedef messaging_api<Type_> messaging_api_type;
+            typedef message_base::size_type size_type;
 
-            messaging_api() : message_base() {}
+            typedef Type_ getter_type;
 
-            messaging_api(::nng_msg* msgp) : message_base(msgp) {};
-
-        protected:
-
-            typedef std::function<void*(::nng_msg*)> get_buffer_op;
-
-        private:
-
-            static void* do_get_buffer_op(const get_buffer_op& op, ::nng_msg* msgp) {
-                return msgp == nullptr ? (void*) nullptr : op(msgp);
-            }
-
-        protected:
-
-            typedef std::function<int(::nng_msg*, const part_type, size_type)> type_based_op;
-
-            static void do_type_based_op(const type_based_op& op, ::nng_msg* msgp, const Type_& x) {
-                if (msgp == nullptr) { return; }
-                const auto* _x_data = x.data();
-                const auto _x_sz = x.size();
-                // Be careful of the operation. We want to expand errnum in the macro, NOT the operation itself.
-                const auto errnum = op(msgp, (const part_type)_x_data, _x_sz);
-                THROW_NNG_EXCEPTION_EC(errnum);
-            }
-
-            typedef std::function<int(::nng_msg*, size_type)> size_based_op;
-
-            static void do_size_based_op(const size_based_op& op, ::nng_msg* msgp, size_type sz) {
-                // Ditto above. Be careful of the macro expansion.
-                const auto errnum = op(msgp, sz);
-                THROW_NNG_EXCEPTION_EC(errnum);
-            }
-
-            bool try_get(buffer_vector_type& value, const get_buffer_op& op, size_type sz) const {
-
-                const auto* src = (buffer_vector_type::value_type*)do_get_buffer_op(op, _msgp);
-
-                if (src != nullptr) {
-                    for (size_type i = 0; i < sz; i++) {
-                        value.push_back((src + i)[0]);
-                    }
-                }
-
-                return (_msgp != nullptr) && (value.size() > 0);
-            }
-
-            typedef std::function<void(::nng_msg*)> clear_op;
-
-            static void do_clear_op(const clear_op& op, ::nng_msg* msgp) {
-                if (msgp == nullptr) { return; }
-                op(msgp);
-            }
+            typedef supports_get_api<Type_> getter_api_type;
 
         public:
 
-            virtual ~messaging_api() {}
+            virtual size_type get_size() const = 0;
 
             virtual bool try_get(Type_& value) const = 0;
 
@@ -89,43 +37,71 @@ namespace nng {
                 Type_ result;
                 return try_get(result) ? result : Type_();
             }
+        };
 
-            virtual void append(const Type_& x) = 0;
+        template<typename Result_, typename Intermediate_>
+        struct message_getter_try_get_policy {
 
-            virtual void insert(const Type_& x) = 0;
+            typedef Result_ result_type;
 
-            virtual void trim(size_type sz) = 0;
+            typedef Intermediate_ intermediate_type;
 
-            virtual void chop(size_type sz) = 0;
+            typedef std::function<intermediate_type(::nng_msg* const)> get_intermediate_func;
+
+            typedef std::function<bool(intermediate_type, result_type&)> convert_result_to_func;
+
+            // TODO: TBD: I'm not sure we really gain that much by this template specialization "policy" except perhaps a handshake with the API
+            static bool try_get(result_type& result, ::nng_msg* const msgp
+                , const get_intermediate_func& get
+                , const convert_result_to_func& convert_to) {
+
+                auto* x = get(msgp);
+                return convert_to(x, result);
+
+                //// TODO: TBD: exception may not be necessary here ...
+                //throw trx::not_implemented("the try get policy is not implemented");
+            }
+        };
+
+        template<typename... Args_> struct supports_append_api;
+
+        template<typename Type_, typename... Args_>
+        struct supports_append_api<Type_, Args_...> {
         };
 
         template<typename Type_>
-        class readonly_messaging_api : protected messaging_api<Type_> {
-        protected:
+        struct supports_append_api<Type_> {
+            virtual void append(const Type_& arg) = 0;
+        };
 
-            readonly_messaging_api() : messaging_api() {}
+        template<typename... Args_> struct supports_insert_api;
 
-            readonly_messaging_api(::nng_msg* msgp) : messaging_api(msgp) {}
+        template<typename Type_, typename... Args_>
+        struct supports_insert_api<Type_, Args_...> {};
 
-            virtual void append(const Type_& x) override {
-                THROW_API_IS_READ_ONLY();
-            }
+        template<typename Type_>
+        struct supports_insert_api<Type_> {
+            virtual void insert(const Type_& arg) = 0;
+        };
 
-            virtual void insert(const Type_& x) override {
-                THROW_API_IS_READ_ONLY();
-            }
+        template<typename... Type_> struct supports_chop_api;
 
-            virtual void trim(size_type sz) override {
-                THROW_API_IS_READ_ONLY();
-            }
+        template<typename Type_, typename... Args_>
+        struct supports_chop_api<Type_, Args_...> {};
 
-            virtual void chop(size_type sz) override {
-                THROW_API_IS_READ_ONLY();
-            }
+        template<typename Type_>
+        struct supports_chop_api<Type_> {
+            virtual void chop(Type_ arg) = 0;
+        };
 
-        public:
+        template<typename... Args_> struct supports_trim_api;
 
-            virtual ~readonly_messaging_api() {}
+        template<typename Type_, typename... Args_>
+        struct supports_trim_api<Type_, Args_...> {};
+
+        template<typename Type_>
+        struct supports_trim_api<Type_> {
+            virtual void trim(Type_ arg) = 0;
         };
     }
 }

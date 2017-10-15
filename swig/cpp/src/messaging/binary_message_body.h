@@ -15,7 +15,6 @@
 #include "messaging_api_base.hpp"
 
 #include <cstdint>
-#include <vector>
 
 namespace nng {
 
@@ -25,8 +24,18 @@ namespace nng {
         class binary_message;
 #endif //NNGCPP_STRING_BASED_MESSAGE_H
 
-        class binary_message_body : public messaging_api<message_base::buffer_vector_type> {
+        class binary_message_body
+            : public message_base
+            , public supports_get_api<message_base::buffer_vector_type>
+            , public supports_append_api<message_base::buffer_vector_type, uint32_t>
+            , public supports_insert_api<message_base::buffer_vector_type, uint32_t>
+            , public supports_chop_api<uint32_t, uint32_t*>
+            , public supports_trim_api<uint32_t, uint32_t*> {
         protected:
+
+            typedef message_base::buffer_vector_type buffer_vector_type;
+
+            typedef message_base::size_type size_type;
 
             friend class binary_message;
 
@@ -42,15 +51,25 @@ namespace nng {
 
             virtual size_type get_size() const override;
 
+        public:
+
             virtual void clear() override;
 
-            virtual void append(const buffer_vector_type& buf) override;
+            virtual void append(const buffer_vector_type& buf);
 
-            virtual void insert(const buffer_vector_type& buf) override;
+            virtual void insert(const buffer_vector_type& buf);
 
-            virtual void trim(size_type sz) override;
+            virtual void trim(size_type sz);
 
-            virtual void chop(size_type sz) override;
+            virtual void chop(size_type sz);
+
+            virtual void append(const uint32_t& val);
+
+            virtual void insert(const uint32_t& val);
+
+            virtual void trim(uint32_t* valp);
+
+            virtual void chop(uint32_t* valp);
         };
     }
 }
