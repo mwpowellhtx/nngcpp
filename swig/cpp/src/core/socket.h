@@ -89,6 +89,8 @@ namespace nng {
         void close();
         void shutdown();
 
+        bool is_open() const;
+
         // Convenience option wrappers.
         virtual void set_option(const std::string& name, const std::string& val, option_size_type sz) override;
         virtual void set_option(const std::string& name, const std::string& val) override;

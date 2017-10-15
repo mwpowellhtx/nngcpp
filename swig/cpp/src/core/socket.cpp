@@ -22,6 +22,31 @@ namespace nng {
         close();
     }
 
+    typedef std::function<int(::nng_socket)> close_or_shutdown_func;
+
+    void close_or_shutdown(const close_or_shutdown_func& op, ::nng_socket* const sp) {
+        if (!(*sp)) { return; }
+        const auto errnum = op(*sp);
+        THROW_NNG_EXCEPTION_IF_NOT_ONEOF(errnum, ec_eunknown, ec_enone, ec_enoent);
+        *sp = 0;
+    }
+
+    void socket::close() {
+        using std::placeholders::_1;
+        const auto op = std::bind(&::nng_close, _1);
+        close_or_shutdown(op, &sid);
+    }
+
+    void socket::shutdown() {
+        using std::placeholders::_1;
+        const auto op = std::bind(&::nng_shutdown, _1);
+        close_or_shutdown(op, &sid);
+    }
+
+    bool socket::is_open() const {
+        return sid != 0;
+    }
+
     // TODO: TBD: ditto ec handling...
     void socket::listen(const std::string& addr, flag_type flags) {
         const auto errnum = ::nng_listen(sid, addr.c_str(), nullptr, flags);
@@ -43,22 +68,6 @@ namespace nng {
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
-    void socket::close() {
-        if (sid) {
-            auto errnum = ::nng_close(sid);
-            THROW_NNG_EXCEPTION_EC(errnum);
-            sid = 0;
-        }
-    }
-
-    void socket::shutdown() {
-        if (sid) {
-            // TODO: TBD: I'm not sure "shutdown" is quite the same thing as "close". In other words, we may still operate on the ID.
-            auto errnum = ::nng_shutdown(sid);
-            THROW_NNG_EXCEPTION_EC(errnum);
-        }
-    }
-
     template<class Buffer_>
     int send(int id, const Buffer_& buf, std::size_t sz, flag_type flags) {
         const auto errnum = ::nng_send(id, (void*)&buf[0], sz, static_cast<int>(flags));
@@ -75,12 +84,17 @@ namespace nng {
     }
 
     void socket::send(binary_message_type* const bmp, flag_type flags) {
+        using std::placeholders::_1;
+        using std::placeholders::_2;
+        using std::placeholders::_3;
         auto* msgp = bmp->get_msgp();
-        const auto errnum = ::nng_sendmsg(sid, msgp, static_cast<int>(flags));
-        THROW_NNG_EXCEPTION_EC(errnum);
+        const auto op = std::bind(&::nng_sendmsg, _1, _2, _3);
+        const auto errnum = op(sid, msgp, static_cast<int>(flags));
         /* Yes, this is not a mistake. Message passing semantics means that NNG assumes
         ownership of the message after passing. Effectively, this nullifies the message. */
-        bmp->set_msgp(nullptr);
+        // TODO: TBD: at least for now this seems reasonable: depending on the error code, we may or may not want to do this...
+        if (!errnum) { bmp->set_msgp(nullptr); }
+        THROW_NNG_EXCEPTION_EC(errnum);
     }
 
     int socket::send(const buffer_vector_type* const bufp, flag_type flags) {
@@ -130,67 +144,121 @@ namespace nng {
 
     // Convenience option wrappers.
     void socket::set_option(const std::string& name, const std::string& val, option_size_type sz) {
+        using std::placeholders::_1;
+        using std::placeholders::_2;
+        using std::placeholders::_3;
+        using std::placeholders::_4;
+        const auto op = std::bind(&::nng_setopt, _1, _2, _3, _4);
         const auto errnum = ::nng_setopt(sid, name.c_str(), val.c_str(), sz);
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
     void socket::set_option(const std::string& name, const std::string& val) {
+        using std::placeholders::_1;
+        using std::placeholders::_2;
+        using std::placeholders::_3;
+        using std::placeholders::_4;
+        const auto op = std::bind(&::nng_setopt, _1, _2, _3, _4);
         const auto errnum = ::nng_setopt(sid, name.c_str(), val.c_str(), val.length());
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
     void socket::get_option(const std::string& name, std::string& val, option_size_type& sz) {
-        const auto errnum = ::nng_getopt(sid, name.c_str(), (void*)&val[0], &sz);
+        using std::placeholders::_1;
+        using std::placeholders::_2;
+        using std::placeholders::_3;
+        using std::placeholders::_4;
+        const auto op = std::bind(&::nng_getopt, _1, _2, _3, _4);
+        const auto errnum = op(sid, name.c_str(), (void*)&val[0], &sz);
         THROW_NNG_EXCEPTION_EC(errnum);
         // Do this because the C++ buffer does not appear to be honored quite right when working with the C buffers.
         val.resize(sz - 1);
     }
 
     void socket::get_option(const std::string& name, std::string& val) {
+        using std::placeholders::_1;
+        using std::placeholders::_2;
+        using std::placeholders::_3;
+        using std::placeholders::_4;
+        const auto op = std::bind(&::nng_getopt, _1, _2, _3, _4);
         option_size_type sz = val.size();
-        const auto errnum = ::nng_getopt(sid, name.c_str(), (void*)&val[0], &sz);
+        const auto errnum = op(sid, name.c_str(), (void*)&val[0], &sz);
         THROW_NNG_EXCEPTION_EC(errnum);
         // Do this because the C++ buffer does not appear to be honored quite right when working with the C buffers.
         val.resize(sz - 1);
     }
 
     void socket::set_option(const std::string& name, const void* valp, option_size_type sz) {
-        const auto errnum = ::nng_setopt(sid, name.c_str(), valp, sz);
+        using std::placeholders::_1;
+        using std::placeholders::_2;
+        using std::placeholders::_3;
+        using std::placeholders::_4;
+        const auto op = std::bind(&::nng_setopt, _1, _2, _3, _4);
+        const auto errnum = op(sid, name.c_str(), valp, sz);
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
     void socket::get_option(const std::string& name, void* val, option_size_type* szp) {
-        const auto errnum = ::nng_getopt(sid, name.c_str(), val, szp);
+        using std::placeholders::_1;
+        using std::placeholders::_2;
+        using std::placeholders::_3;
+        using std::placeholders::_4;
+        const auto op = std::bind(&::nng_getopt, _1, _2, _3, _4);
+        const auto errnum = op(sid, name.c_str(), val, szp);
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
     void socket::set_option_int(const std::string& name, int val) {
-        const auto errnum = ::nng_setopt_int(sid, name.c_str(), val);
+        using std::placeholders::_1;
+        using std::placeholders::_2;
+        using std::placeholders::_3;
+        const auto op = std::bind(&::nng_setopt_int, _1, _2, _3);
+        const auto errnum = op(sid, name.c_str(), val);
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
     void socket::set_option_size(const std::string& name, option_size_type val) {
-        const auto errnum = ::nng_setopt_size(sid, name.c_str(), val);
+        using std::placeholders::_1;
+        using std::placeholders::_2;
+        using std::placeholders::_3;
+        const auto op = std::bind(&::nng_setopt_size, _1, _2, _3);
+        const auto errnum = op(sid, name.c_str(), val);
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
     void socket::set_option_usec(const std::string& name, uint64_t val) {
-        const auto errnum = ::nng_setopt_usec(sid, name.c_str(), val);
+        using std::placeholders::_1;
+        using std::placeholders::_2;
+        using std::placeholders::_3;
+        const auto op = std::bind(&::nng_setopt_usec, _1, _2, _3);
+        const auto errnum = op(sid, name.c_str(), val);
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
     void socket::get_option_int(const std::string& name, int* valp) {
-        const auto errnum = ::nng_getopt_int(sid, name.c_str(), valp);
+        using std::placeholders::_1;
+        using std::placeholders::_2;
+        using std::placeholders::_3;
+        const auto op = std::bind(&::nng_getopt_int, _1, _2, _3);
+        const auto errnum = op(sid, name.c_str(), valp);
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
     void socket::get_option_size(const std::string& name, option_size_type* valp) {
-        const auto errnum = ::nng_getopt_size(sid, name.c_str(), valp);
+        using std::placeholders::_1;
+        using std::placeholders::_2;
+        using std::placeholders::_3;
+        const auto op = std::bind(&::nng_getopt_size, _1, _2, _3);
+        const auto errnum = op(sid, name.c_str(), valp);
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
     void socket::get_option_usec(const std::string& name, uint64_t* valp) {
-        const auto errnum = ::nng_getopt_usec(sid, name.c_str(), valp);
+        using std::placeholders::_1;
+        using std::placeholders::_2;
+        using std::placeholders::_3;
+        const auto op = std::bind(&::nng_getopt_usec, _1, _2, _3);
+        const auto errnum = op(sid, name.c_str(), valp);
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
