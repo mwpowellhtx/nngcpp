@@ -30,8 +30,8 @@ CATCH_TRANSLATE_EXCEPTION(std::exception& ex) {
 CATCH_TRANSLATE_EXCEPTION(nng::nng_exception& ex) {
     // TODO: TBD: consider making this a part of the nng::nng_exception::what method...
     std::ostringstream os;
-    const auto errnum = to_int(ex.error_code);
-    os << STRINGIFY(nng::nng_exception) << ": " << "error_code = " << errnum;
+    const auto errnum = static_cast<int>(ex.error_code);
+    os << STRINGIFY(nng::nng_exception) << ": " << ex.what() << " (error_code = " << errnum << ")";
     return os.str();
 }
 
