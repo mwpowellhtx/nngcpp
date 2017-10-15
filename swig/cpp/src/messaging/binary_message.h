@@ -30,9 +30,13 @@ namespace nng {
 
             binary_message(::nng_msg* msgp);
 
+            binary_message(::nng_msg* msgp, size_type sz);
+
         public:
 
             binary_message();
+
+            binary_message(size_type sz);
 
             virtual ~binary_message();
 

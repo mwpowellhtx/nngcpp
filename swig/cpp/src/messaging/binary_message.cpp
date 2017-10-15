@@ -20,12 +20,28 @@ namespace nng {
             allocate();
         }
 
+        binary_message::binary_message(size_type sz)
+            : message_base()
+            , _header()
+            , _body() {
+
+            allocate(sz);
+        }
+
         binary_message::binary_message(::nng_msg* msgp)
             : message_base(msgp)
             , _header(msgp)
             , _body(msgp) {
 
             allocate();
+        }
+
+        binary_message::binary_message(::nng_msg* msgp, size_type sz)
+            : message_base(msgp)
+            , _header(msgp)
+            , _body(msgp) {
+
+            allocate(sz);
         }
 
         binary_message::~binary_message() {
