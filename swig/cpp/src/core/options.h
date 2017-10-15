@@ -46,6 +46,8 @@ namespace nng {
         public:
 
             // TODO: TBD: provide time-units to make the times more obvious: i.e. Seconds? Milliseconds? Microseconds? Nanoseconds?
+            static const std::string socket_name;
+            static const std::string compat_domain;
             static const std::string raw;
             static const std::string linger_usec;
             static const std::string receive_buffer;
