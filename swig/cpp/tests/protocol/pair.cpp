@@ -22,6 +22,7 @@
 namespace nng {
     namespace transactions {
 
+        // TODO: TBD: this one potentially has broader test application, but we'll see...
         struct transaction {
         private:
 
