@@ -33,7 +33,7 @@ namespace constants {
     const nng::messaging::message_base::buffer_vector_type onthe_buf = { 'o','n','t','h','e' };
 }
 
-TEST_CASE("Bus pattern tests", "[protocol][bus]") {
+TEST_CASE("Bus pattern tests", "[bus][protocol][sockets][cxx]") {
 
     using namespace std;
     using namespace std::chrono;
