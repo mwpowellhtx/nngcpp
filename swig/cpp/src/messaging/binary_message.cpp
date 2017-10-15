@@ -1,4 +1,5 @@
 #include "binary_message.h"
+#include "message_pipe.h"
 
 #include "../core/exceptions.hpp"
 
@@ -8,16 +9,23 @@ namespace nng {
 
     namespace messaging {
 
+        using std::placeholders::_1;
+        using std::placeholders::_2;
+
         binary_message::binary_message()
             : message_base()
             , _header()
             , _body() {
+
+            allocate();
         }
 
         binary_message::binary_message(::nng_msg* msgp)
             : message_base(msgp)
             , _header(msgp)
             , _body(msgp) {
+
+            allocate();
         }
 
         binary_message::~binary_message() {
@@ -43,12 +51,14 @@ namespace nng {
             return &_body;
         }
 
-        message_base::size_type binary_message::get_size() const {
+        message_base::size_type binary_message::get_size() {
             // Should be both (Header.Size + Body.Size).
+            if (!has_message()) { allocate(); }
             return _header.get_size() + _body.get_size();
         }
 
         void binary_message::clear() {
+            if (!has_message()) { return; }
             _header.clear();
             _body.clear();
         }
@@ -61,17 +71,28 @@ namespace nng {
         }
 
         void binary_message::allocate(size_type sz) {
-            if (has_message()) { free(); }
+            if (has_message()) { return; }
+            const auto op = std::bind(::nng_msg_alloc, _1, _2);
             ::nng_msg* msgp;
-            const auto errnum = ::nng_msg_alloc(&msgp, sz);
+            const auto errnum = op(&msgp, sz);
             THROW_NNG_EXCEPTION_EC(errnum);
             binary_message::set_msgp(msgp);
         }
 
         void binary_message::free() {
             if (!has_message()) { return; }
-            ::nng_msg_free(get_msgp());
+            const auto op = std::bind(::nng_msg_free, _1);
+            op(_msgp);
             binary_message::set_msgp(nullptr);
+        }
+
+        void binary_message::set_pipe(const message_pipe* const mpp) {
+            if (mpp == nullptr) { return; }
+            if (!has_message()) { allocate(); }
+            // This is another convenience moment: allocate beforehand, if necessary.
+            // TODO: TBD: there is no return value here unfortunately... perhaps there should be?
+            const auto op = std::bind(&::nng_msg_set_pipe, _1, _2);
+            op(_msgp, mpp->pid);
         }
     }
 }

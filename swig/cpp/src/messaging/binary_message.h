@@ -10,6 +10,10 @@ namespace nng {
 
     namespace messaging {
 
+#ifndef NNGCPP_MESSAGE_PIPE_H
+        class message_pipe;
+#endif //NNGCPP_MESSAGE_PIPE_H
+
         // TODO: TBD: of course they are all "binary" messages close to the wire; however, we may shim a string-based API around this one...
         class binary_message : public message_base {
         private:
@@ -36,13 +40,15 @@ namespace nng {
 
             binary_message_body* const body();
 
-            virtual size_type get_size() const override;
+            virtual size_type get_size();
 
             virtual void clear() override;
 
             virtual void set_msgp(::nng_msg* msgp) override;
 
             virtual void allocate(size_type sz = 0);
+
+            virtual void set_pipe(const message_pipe* const mpp);
 
         protected:
 
