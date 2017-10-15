@@ -25,11 +25,6 @@ struct pipeline_fixture {
     }
 };
 
-//#define APPENDSTR(m, s) nng_msg_append(m, s, strlen(s))
-//#define CHECKSTR(m, s)                   \
-//	So(nng_msg_len(m) == strlen(s)); \
-//	So(memcmp(nng_msg_body(m), s, strlen(s)) == 0)
-
 namespace constants {
     const std::string test_addr = "inproc://test";
     const std::string hello = "hello";
@@ -130,7 +125,7 @@ TEST_CASE("Rule out the possibility of invalid operations", "[pipeline][push][pu
     }
 }
 
-TEST_CASE("Pipeline (push/pull) pattern", "[pipeline][push][pull][pattern]") {
+TEST_CASE("Pipeline (push/pull) pattern", "[pipeline][push][pull][pattern][protocol][sockets][cxx]") {
 
     using namespace std;
     using namespace std::chrono;
