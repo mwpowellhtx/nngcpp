@@ -40,7 +40,7 @@ namespace Catch {
 
                 virtual std::string describe() const override {
                     std::ostringstream os;
-                    const auto errnum = to_int(_actual_ec);
+                    const auto errnum = static_cast<int>(_actual_ec);
                     os << "exception error code was: (" << errnum << ")";
                     return os.str();
                 }
