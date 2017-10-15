@@ -7,6 +7,11 @@
 
 namespace nng {
 
+    using std::placeholders::_1;
+    using std::placeholders::_2;
+    using std::placeholders::_3;
+    using std::placeholders::_4;
+
     socket::socket(const nng_ctor_func& nng_ctor)
         : sid(0)
         , sender()
@@ -32,13 +37,11 @@ namespace nng {
     }
 
     void socket::close() {
-        using std::placeholders::_1;
         const auto op = std::bind(&::nng_close, _1);
         close_or_shutdown(op, &sid);
     }
 
     void socket::shutdown() {
-        using std::placeholders::_1;
         const auto op = std::bind(&::nng_shutdown, _1);
         close_or_shutdown(op, &sid);
     }
@@ -84,9 +87,6 @@ namespace nng {
     }
 
     void socket::send(binary_message_type* const bmp, flag_type flags) {
-        using std::placeholders::_1;
-        using std::placeholders::_2;
-        using std::placeholders::_3;
         auto* msgp = bmp->get_msgp();
         const auto op = std::bind(&::nng_sendmsg, _1, _2, _3);
         const auto errnum = op(sid, msgp, static_cast<int>(flags));
@@ -144,30 +144,18 @@ namespace nng {
 
     // Convenience option wrappers.
     void socket::set_option(const std::string& name, const std::string& val, option_size_type sz) {
-        using std::placeholders::_1;
-        using std::placeholders::_2;
-        using std::placeholders::_3;
-        using std::placeholders::_4;
         const auto op = std::bind(&::nng_setopt, _1, _2, _3, _4);
         const auto errnum = ::nng_setopt(sid, name.c_str(), val.c_str(), sz);
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
     void socket::set_option(const std::string& name, const std::string& val) {
-        using std::placeholders::_1;
-        using std::placeholders::_2;
-        using std::placeholders::_3;
-        using std::placeholders::_4;
         const auto op = std::bind(&::nng_setopt, _1, _2, _3, _4);
         const auto errnum = ::nng_setopt(sid, name.c_str(), val.c_str(), val.length());
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
     void socket::get_option(const std::string& name, std::string& val, option_size_type& sz) {
-        using std::placeholders::_1;
-        using std::placeholders::_2;
-        using std::placeholders::_3;
-        using std::placeholders::_4;
         const auto op = std::bind(&::nng_getopt, _1, _2, _3, _4);
         const auto errnum = op(sid, name.c_str(), (void*)&val[0], &sz);
         THROW_NNG_EXCEPTION_EC(errnum);
@@ -176,10 +164,6 @@ namespace nng {
     }
 
     void socket::get_option(const std::string& name, std::string& val) {
-        using std::placeholders::_1;
-        using std::placeholders::_2;
-        using std::placeholders::_3;
-        using std::placeholders::_4;
         const auto op = std::bind(&::nng_getopt, _1, _2, _3, _4);
         option_size_type sz = val.size();
         const auto errnum = op(sid, name.c_str(), (void*)&val[0], &sz);
@@ -189,74 +173,48 @@ namespace nng {
     }
 
     void socket::set_option(const std::string& name, const void* valp, option_size_type sz) {
-        using std::placeholders::_1;
-        using std::placeholders::_2;
-        using std::placeholders::_3;
-        using std::placeholders::_4;
         const auto op = std::bind(&::nng_setopt, _1, _2, _3, _4);
         const auto errnum = op(sid, name.c_str(), valp, sz);
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
     void socket::get_option(const std::string& name, void* val, option_size_type* szp) {
-        using std::placeholders::_1;
-        using std::placeholders::_2;
-        using std::placeholders::_3;
-        using std::placeholders::_4;
         const auto op = std::bind(&::nng_getopt, _1, _2, _3, _4);
         const auto errnum = op(sid, name.c_str(), val, szp);
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
     void socket::set_option_int(const std::string& name, int val) {
-        using std::placeholders::_1;
-        using std::placeholders::_2;
-        using std::placeholders::_3;
         const auto op = std::bind(&::nng_setopt_int, _1, _2, _3);
         const auto errnum = op(sid, name.c_str(), val);
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
     void socket::set_option_size(const std::string& name, option_size_type val) {
-        using std::placeholders::_1;
-        using std::placeholders::_2;
-        using std::placeholders::_3;
         const auto op = std::bind(&::nng_setopt_size, _1, _2, _3);
         const auto errnum = op(sid, name.c_str(), val);
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
     void socket::set_option_usec(const std::string& name, uint64_t val) {
-        using std::placeholders::_1;
-        using std::placeholders::_2;
-        using std::placeholders::_3;
         const auto op = std::bind(&::nng_setopt_usec, _1, _2, _3);
         const auto errnum = op(sid, name.c_str(), val);
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
     void socket::get_option_int(const std::string& name, int* valp) {
-        using std::placeholders::_1;
-        using std::placeholders::_2;
-        using std::placeholders::_3;
         const auto op = std::bind(&::nng_getopt_int, _1, _2, _3);
         const auto errnum = op(sid, name.c_str(), valp);
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
     void socket::get_option_size(const std::string& name, option_size_type* valp) {
-        using std::placeholders::_1;
-        using std::placeholders::_2;
-        using std::placeholders::_3;
         const auto op = std::bind(&::nng_getopt_size, _1, _2, _3);
         const auto errnum = op(sid, name.c_str(), valp);
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
     void socket::get_option_usec(const std::string& name, uint64_t* valp) {
-        using std::placeholders::_1;
-        using std::placeholders::_2;
-        using std::placeholders::_3;
         const auto op = std::bind(&::nng_getopt_usec, _1, _2, _3);
         const auto errnum = op(sid, name.c_str(), valp);
         THROW_NNG_EXCEPTION_EC(errnum);
