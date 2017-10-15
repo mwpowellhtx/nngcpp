@@ -19,13 +19,15 @@ namespace nng {
         }
 
         void message_pipe::close() {
-            if (!is_valid()) { return; }
-            const auto errnum = ::nng_pipe_close(pid);
-            THROW_NNG_EXCEPTION_EC(errnum);
+            if (!has_pipe()) { return; }
+            using std::placeholders::_1;
+            const auto op = std::bind(::nng_pipe_close, _1);
+            const auto errnum = op(pid);
+            THROW_NNG_EXCEPTION_IF_NOT_ONEOF(errnum, ec_eunknown, ec_enone, ec_enoent);
             pid = 0;
         }
 
-        bool message_pipe::is_valid() const {
+        bool message_pipe::has_pipe() const {
             return pid > 0;
         }
 
