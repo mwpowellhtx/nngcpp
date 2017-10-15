@@ -44,40 +44,55 @@ namespace nng {
     };
 
     class nng_exception : public std::exception {
-        public:
+    public:
 
-            error_code_type error_code;
+        error_code_type error_code;
 
-            std::string message;
+    public:
 
-        public:
+        nng_exception();
 
-            nng_exception();
+        nng_exception(int errnum);
 
-            nng_exception(int errnum);
+        nng_exception(error_code_type ec);
 
-            nng_exception(error_code_type ec);
+        virtual ~nng_exception();
 
-            virtual ~nng_exception();
+        static const std::string strerror(int errnum);
 
-            static const std::string strerror(int errnum);
+        static const std::string strerror(error_code_type ec);
 
-            static const std::string strerror(error_code_type ec);
+    private:
 
-            // TODO: TBD: this may not be what we're after here. or that we need another API to work with Catch...
-            virtual char const* what() const override;
+        template<typename ErrorCode_>
+        static bool __one_of(ErrorCode_ ec) {
+            // Not including itself.
+            return false;
+        }
+
+        template<typename ErrorCode_, typename Arg_, typename... Args_>
+        static bool __one_of(ErrorCode_ ec, const Arg_& arg, const Args_&... args) {
+            // The variadics surrounding this are fairly generic. But this is where rubber meets asphalt.
+            const auto actual_ec = static_cast<error_code_type>(ec);
+            const auto actual_arg = static_cast<error_code_type>(arg);
+            // True if ONE OF the args.
+            return actual_ec == actual_arg || __one_of(ec, args...);
+        }
+
+    public:
+
+        template<typename ErrorCode_, typename ...Args_>
+        static bool one_of(ErrorCode_ ec, const Args_&... args) {
+            return __one_of(ec, args...);
+        }
     };
 }
 
-int to_int(nng::error_code_type value);
+#define THROW_NNG_EXCEPTION_EC_IF_ONEOF(errnum, ...) if (nng::nng_exception::one_of(errnum, __VA_ARGS__)) throw nng::nng_exception(errnum)
 
-#define THROW_NNG_EXCEPTION() throw nng::nng_exception()
-
-#define SHOULD_THROW_NNG_EXCEPTION(condition) if (condition) THROW_NNG_EXCEPTION()
-
-#define SHOULD_THROW_NNG_EXCEPTION_EC(ec_or_errnum, condition) if (condition) throw nng::nng_exception(ec_or_errnum)
+#define THROW_NNG_EXCEPTION_IF_NOT_ONEOF(errnum, ...)  if (!nng::nng_exception::one_of(errnum, __VA_ARGS__)) throw nng::nng_exception(errnum)
 
 // TODO: TBD: I don't know if -1 (unknown) is a possibility, but we will include it there for now.
-#define THROW_NNG_EXCEPTION_EC(ec_or_errnum) SHOULD_THROW_NNG_EXCEPTION_EC(ec_or_errnum, !(ec_or_errnum == nng::ec_eunknown || ec_or_errnum == nng::ec_enone))
+#define THROW_NNG_EXCEPTION_EC(errnum) THROW_NNG_EXCEPTION_IF_NOT_ONEOF(errnum, nng::ec_enone)
 
 #endif // NNGCPP_NNG_EXCEPTION_H

@@ -1,23 +1,14 @@
 #include "nng_exception.h"
 
-int to_int(nng::error_code_type value) {
-    return static_cast<int>(value);
-}
-
 namespace nng {
 
-    nng_exception::nng_exception() : exception() {
-        error_code = ec_eunknown;
+    nng_exception::nng_exception() : exception(), error_code(ec_eunknown) {
     }
 
-    nng_exception::nng_exception(int errnum) : exception() {
-        error_code = static_cast<error_code_type>(errnum);
-        message = ::nng_strerror(errnum);
+    nng_exception::nng_exception(int errnum) : exception(::nng_strerror(errnum)), error_code(static_cast<error_code_type>(errnum)) {
     }
 
-    nng_exception::nng_exception(error_code_type ec) : exception() {
-        error_code = ec;
-        message = ::nng_strerror(static_cast<int>(ec));
+    nng_exception::nng_exception(error_code_type ec) : exception(::nng_strerror(static_cast<int>(ec))), error_code(ec) {
     }
 
     nng_exception::~nng_exception() {        
@@ -30,9 +21,5 @@ namespace nng {
 
     const std::string nng_exception::strerror(error_code_type ec) {
         return strerror(static_cast<int>(ec));
-    }
-
-    char const* nng_exception::what() const {
-        return "";
     }
 }
