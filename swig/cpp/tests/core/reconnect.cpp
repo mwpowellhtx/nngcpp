@@ -7,7 +7,8 @@
 // found online at https://opensource.org/licenses/MIT.
 //
 
-#include <catch.hpp>
+#include "../tests/catch/catch_macros.hpp"
+
 #include <nngcpp.h>
 
 #include <memory>
@@ -32,35 +33,26 @@ test with a returning error number. */
 #define NNG_TESTS_REQUIRE_ERR_EQ(code, expected) errnum = code; \
     REQUIRE(errnum == expected)
 
-/* While I despise macro code expansion, this is "better" for us because in the event
-of a legit failure, we see the actual line IN-SITU where the test case ACTUALLY IS. */
-#define NNG_TESTS_APPEND_STR(m, s) \
-    REQUIRE(::nng_msg_append(m, s, std::strlen(s)) == 0); \
-    REQUIRE(::nng_msg_len(m) == std::strlen(s)); \
-    REQUIRE(std::memcmp(::nng_msg_body(m), s, std::strlen(s)) == 0)
-
-#define NNG_TESTS_CHECK_STR(m, s) \
-    REQUIRE(m != nullptr); \
-    REQUIRE(::nng_msg_len(m) == std::strlen(s)); \
-    REQUIRE(std::memcmp(::nng_msg_body(m), s, std::strlen(s)) == 0)
-
-#define NNGCPP_TESTS_ALLOCATE_MSG_SZ(m, sz) \
-    REQUIRE((m).has_message() == false); \
-    REQUIRE((m).get_msgp() == nullptr); \
-    \
-    REQUIRE_NOTHROW((m).allocate(sz)); \
-    REQUIRE((m).has_message() == true); \
-    REQUIRE((m).get_msgp() != nullptr); \
-    \
-    REQUIRE((m).header() != nullptr); \
-    REQUIRE((m).header()->has_message()); \
-    REQUIRE((m).header()->get_msgp() == (m).get_msgp()); \
-    \
-    REQUIRE((m).body() != nullptr); \
-    REQUIRE((m).body()->has_message()); \
-    REQUIRE((m).body()->get_msgp() == (m).get_msgp());
-
-#define NNGCPP_TESTS_ALLOCATE_MSG(m) NNGCPP_TESTS_ALLOCATE_MSG_SZ(m, 0)
+//// TODO: TBD: these really deserve to be full on unit tests of the binary message, if not already done... not least of which half the assumptions made here are no longer correct...
+///* While I despise macro code expansion, this is "better" for us because in the event
+//of a legit failure, we see the actual line IN-SITU where the test case ACTUALLY IS. */
+//#define NNGCPP_TESTS_ALLOCATE_MSG_SZ(m, sz) \
+//    REQUIRE((m).has_message() == false); \
+//    REQUIRE((m).get_msgp() == nullptr); \
+//    \
+//    REQUIRE_NOTHROW((m).allocate(sz)); \
+//    REQUIRE((m).has_message() == true); \
+//    REQUIRE((m).get_msgp() != nullptr); \
+//    \
+//    REQUIRE((m).header() != nullptr); \
+//    REQUIRE((m).header()->has_message()); \
+//    REQUIRE((m).header()->get_msgp() == (m).get_msgp()); \
+//    \
+//    REQUIRE((m).body() != nullptr); \
+//    REQUIRE((m).body()->has_message()); \
+//    REQUIRE((m).body()->get_msgp() == (m).get_msgp());
+//
+//#define NNGCPP_TESTS_ALLOCATE_MSG(m) NNGCPP_TESTS_ALLOCATE_MSG_SZ(m, 0)
 
 struct c_style_fixture {
 
@@ -203,7 +195,7 @@ TEST_CASE("Catch translation of NNG C reconnect unit tests", "[nng][c][reconnect
     }
 }
 
-TEST_CASE("NNG C++ wrapper reconnect works", "[reconnect][cxx][wrapper]") {
+TEST_CASE("NNG C++ wrapper reconnect works", "[nng][reconnect][cxx]") {
 
     using namespace std;
     using namespace std::chrono;
@@ -243,9 +235,9 @@ TEST_CASE("NNG C++ wrapper reconnect works", "[reconnect][cxx][wrapper]") {
             per se. Rather, we should simply be able to "frame" buffers or strings, accordingly. */
             SECTION("We can send a frame") {
 
+                // TODO: TBD: put additional require/checks around these..
                 auto bmp = std::make_unique<binary_message>();
                 this_thread::sleep_for(100ms);
-                NNGCPP_TESTS_ALLOCATE_MSG(*bmp);
                 // And with a little C++ operator overloading help:
                 REQUIRE_NOTHROW(*bmp << hello);
                 REQUIRE_NOTHROW(push->send(bmp.get()));
@@ -282,7 +274,6 @@ TEST_CASE("NNG C++ wrapper reconnect works", "[reconnect][cxx][wrapper]") {
                 auto bmp = std::make_unique<binary_message>();
 
                 this_thread::sleep_for(100ms);
-                NNGCPP_TESTS_ALLOCATE_MSG(*bmp);
                 REQUIRE_NOTHROW(*bmp << hello);
                 REQUIRE_NOTHROW(push->send(bmp.get()));
                 REQUIRE(bmp->has_message() == false);
@@ -295,7 +286,7 @@ TEST_CASE("NNG C++ wrapper reconnect works", "[reconnect][cxx][wrapper]") {
 
                 // TODO: TBD: this one deserves its own unit test as well so that we are not cluttering the integration tests
                 message_pipe_fixture mp1(bmp.get());
-                REQUIRE(mp1.is_valid() == true);
+                REQUIRE(mp1.has_pipe() == true);
                 // TODO: TBD: deserves its own unit testing...
                 REQUIRE(mp1.get_pid() > 0);
                 /* Resetting the message pointer is effectively the same, if stronger, for purposes
@@ -308,11 +299,10 @@ TEST_CASE("NNG C++ wrapper reconnect works", "[reconnect][cxx][wrapper]") {
                     // Get the fixtured PID for test purposes prior to closing.
                     auto mp1_pid = mp1.get_pid();
                     REQUIRE_NOTHROW(mp1.close());
-                    REQUIRE(mp1.is_valid() == false);
+                    REQUIRE(mp1.has_pipe() == false);
 
                     this_thread::sleep_for(100ms);
                     auto bmp2 = std::make_unique<binary_message>();
-                    NNGCPP_TESTS_ALLOCATE_MSG(*bmp2);
                     REQUIRE_NOTHROW(*bmp2 << again);
                     // TODO: TBD: send/no-message -> receive/message is a pattern that deserves its own focused unit test...
                     REQUIRE_NOTHROW(push->send(bmp2.get()));
@@ -324,7 +314,7 @@ TEST_CASE("NNG C++ wrapper reconnect works", "[reconnect][cxx][wrapper]") {
                     REQUIRE_THAT(bmp2->body()->get(), Equals(again_buf));
 
                     message_pipe_fixture mp2(bmp2.get());
-                    REQUIRE(mp2.is_valid() == true);
+                    REQUIRE(mp2.has_pipe() == true);
                     // Ditto resetting the pointer versus exposing the free method.
                     REQUIRE_NOTHROW(bmp2.reset());
                     REQUIRE(bmp2.get() == nullptr);
