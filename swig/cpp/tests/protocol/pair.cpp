@@ -12,6 +12,8 @@
 #include "../catch/catch_nng_exception_matcher.hpp"
 #include "../catch/catch_exception_translations.hpp"
 #include "../catch/catch_macros.hpp"
+#include "../helpers/basic_fixture.h"
+#include "../helpers/constants.h"
 #include "../helpers/chrono.hpp"
 
 #include <nngcpp.h>
@@ -53,31 +55,28 @@ namespace nng {
     }
 }
 
-struct pair_fixture {
-    virtual ~pair_fixture() {
-        ::nng_fini();
-    }
-};
+namespace nng {
 
-struct c_style_pair_fixture : pair_fixture {
+    struct c_style_pair_fixture : nng::basic_fixture {
 
-    ::nng_socket s1;
-    ::nng_socket c1;
-    ::nng_socket c2;
+        ::nng_socket s1;
+        ::nng_socket c1;
+        ::nng_socket c2;
 
-    c_style_pair_fixture() : s1(0), c1(0), c2(0) {
-        REQUIRE(::nng_pair1_open(&s1) == 0);
-        REQUIRE(::nng_pair1_open(&c1) == 0);
-        REQUIRE(::nng_pair1_open(&c2) == 0);
-    }
+        c_style_pair_fixture() : s1(0), c1(0), c2(0) {
+            REQUIRE(::nng_pair1_open(&s1) == 0);
+            REQUIRE(::nng_pair1_open(&c1) == 0);
+            REQUIRE(::nng_pair1_open(&c2) == 0);
+        }
 
-    virtual ~c_style_pair_fixture() {
-        // The sockets can be closed here, but they may also have been closed beforehand.
-        if (s1) { CHECK_NOFAIL(::nng_close(s1) == 0); }
-        if (c1) { CHECK_NOFAIL(::nng_close(c1) == 0); }
-        if (c2) { CHECK_NOFAIL(::nng_close(c2) == 0); }
-    }
-};
+        virtual ~c_style_pair_fixture() {
+            // The sockets can be closed here, but they may also have been closed beforehand.
+            if (s1) { CHECK_NOFAIL(::nng_close(s1) == 0); }
+            if (c1) { CHECK_NOFAIL(::nng_close(c1) == 0); }
+            if (c2) { CHECK_NOFAIL(::nng_close(c2) == 0); }
+        }
+    };
+}
 
 namespace constants {
 
@@ -95,17 +94,17 @@ namespace constants {
     const std::string yes = "yes";
     const std::string again = "again";
 
-    const nng::messaging::message_base::buffer_vector_type alpha_buf = { 'a','l','p','h','a' };
-    const nng::messaging::message_base::buffer_vector_type beta_buf = { 'b','e','t','a' };
-    const nng::messaging::message_base::buffer_vector_type epsilon_buf = { 'e','p','s','i','l','o','n' };
-    const nng::messaging::message_base::buffer_vector_type gamma_buf = { 'g','a','m','m','a' };
-    const nng::messaging::message_base::buffer_vector_type one_buf = { 'o','n','e' };
-    const nng::messaging::message_base::buffer_vector_type two_buf = { 't','w','o' };
-    const nng::messaging::message_base::buffer_vector_type uno_buf = { 'u','n','o' };
-    const nng::messaging::message_base::buffer_vector_type dos_buf = { 'd','o','s' };
-    const nng::messaging::message_base::buffer_vector_type ein_buf = { 'e','i','n' };
-    const nng::messaging::message_base::buffer_vector_type yes_buf = { 'y','e','s' };
-    const nng::messaging::message_base::buffer_vector_type again_buf = { 'a','g','a','i','n' };
+    const auto alpha_buf = to_buffer(alpha);
+    const auto beta_buf = to_buffer(beta);
+    const auto epsilon_buf = to_buffer(epsilon);
+    const auto gamma_buf = to_buffer(gamma);
+    const auto one_buf = to_buffer(one);
+    const auto two_buf = to_buffer(two);
+    const auto uno_buf = to_buffer(uno);
+    const auto dos_buf = to_buffer(dos);
+    const auto ein_buf = to_buffer(ein);
+    const auto yes_buf = to_buffer(yes);
+    const auto again_buf = to_buffer(again);
 
     const uint32_t feedface = 0xfeedface;
     const uint32_t deadzeros = 0xdead0000;
@@ -276,14 +275,14 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
     using namespace nng::transactions;
     using namespace constants;
     using namespace Catch::Matchers;
-    using _opt_ = option_names;
+    using O = option_names;
 
     uint64_t timeout_usec;
     uint32_t actual_api;
     int32_t actual_opt;
     uint32_t hops;
 
-    pair_fixture fixture;
+    basic_fixture fixture;
 
     SECTION("Given a few sockets") {
 
@@ -301,11 +300,11 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
 
         const auto receive_timeout = 300ms;
 
-        REQUIRE_NOTHROW(serverp1->set_option_usec(_opt_::receive_timeout_usec, CAST_DURATION_TO_USEC(receive_timeout).count()));
-        REQUIRE_NOTHROW(clientp1->set_option_usec(_opt_::receive_timeout_usec, CAST_DURATION_TO_USEC(receive_timeout).count()));
-        REQUIRE_NOTHROW(clientp2->set_option_usec(_opt_::receive_timeout_usec, CAST_DURATION_TO_USEC(receive_timeout).count()));
+        REQUIRE_NOTHROW(serverp1->set_option_usec(O::receive_timeout_usec, CAST_DURATION_TO_USEC(receive_timeout).count()));
+        REQUIRE_NOTHROW(clientp1->set_option_usec(O::receive_timeout_usec, CAST_DURATION_TO_USEC(receive_timeout).count()));
+        REQUIRE_NOTHROW(clientp2->set_option_usec(O::receive_timeout_usec, CAST_DURATION_TO_USEC(receive_timeout).count()));
 
-        REQUIRE_NOTHROW(serverp1->get_option_usec(_opt_::receive_timeout_usec, &timeout_usec));
+        REQUIRE_NOTHROW(serverp1->get_option_usec(O::receive_timeout_usec, &timeout_usec));
         // TODO: TBD: looking forward to full Catch v2; including CHRONO comprehension.
         REQUIRE((timeout_usec * 1us).count() == CAST_DURATION_TO_USEC(300ms).count());
 
@@ -356,18 +355,18 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
             REQUIRE_NOTHROW(clientp1->dial(addr));
             SLEEP_FOR(100ms);
 
-            REQUIRE_THROWS_AS_MATCHING(serverp1->set_option_int(_opt_::raw, 1), nng_exception, ThrowsNngException(ec_estate));
-            REQUIRE_THROWS_AS_MATCHING(clientp1->set_option_int(_opt_::raw, 1), nng_exception, ThrowsNngException(ec_estate));
+            REQUIRE_THROWS_AS_MATCHING(serverp1->set_option_int(O::raw, 1), nng_exception, ThrowsNngException(ec_estate));
+            REQUIRE_THROWS_AS_MATCHING(clientp1->set_option_int(O::raw, 1), nng_exception, ThrowsNngException(ec_estate));
         }
 
         SECTION("Polyamorous mode is best effort") {
 
-            REQUIRE_NOTHROW(serverp1->set_option_int(_opt_::pair1_polyamorous, 1));
-            REQUIRE_NOTHROW(serverp1->set_option_int(_opt_::receive_buffer, 1));
-            REQUIRE_NOTHROW(serverp1->set_option_int(_opt_::send_buffer, 1));
-            REQUIRE_NOTHROW(clientp1->set_option_int(_opt_::receive_buffer, 1));
-            REQUIRE_NOTHROW(clientp1->set_option_int(_opt_::receive_buffer, 1));
-            REQUIRE_NOTHROW(serverp1->set_option_usec(_opt_::send_timeout_usec, CAST_DURATION_TO_USEC(100ms).count()));
+            REQUIRE_NOTHROW(serverp1->set_option_int(O::pair1_polyamorous, 1));
+            REQUIRE_NOTHROW(serverp1->set_option_int(O::receive_buffer, 1));
+            REQUIRE_NOTHROW(serverp1->set_option_int(O::send_buffer, 1));
+            REQUIRE_NOTHROW(clientp1->set_option_int(O::receive_buffer, 1));
+            REQUIRE_NOTHROW(clientp1->set_option_int(O::receive_buffer, 1));
+            REQUIRE_NOTHROW(serverp1->set_option_usec(O::send_timeout_usec, CAST_DURATION_TO_USEC(100ms).count()));
 
             REQUIRE_NOTHROW(serverp1->listen(addr));
             REQUIRE_NOTHROW(clientp1->dial(addr));
@@ -390,10 +389,10 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
 
         SECTION("Monogamous mode exerts backpressure") {
 
-            REQUIRE_NOTHROW(serverp1->set_option_int(_opt_::receive_buffer, 1));
-            REQUIRE_NOTHROW(serverp1->set_option_int(_opt_::send_buffer, 1));
-            REQUIRE_NOTHROW(clientp1->set_option_int(_opt_::receive_buffer, 1));
-            REQUIRE_NOTHROW(serverp1->set_option_usec(_opt_::send_timeout_usec, CAST_DURATION_TO_USEC(30ms).count()));
+            REQUIRE_NOTHROW(serverp1->set_option_int(O::receive_buffer, 1));
+            REQUIRE_NOTHROW(serverp1->set_option_int(O::send_buffer, 1));
+            REQUIRE_NOTHROW(clientp1->set_option_int(O::receive_buffer, 1));
+            REQUIRE_NOTHROW(serverp1->set_option_usec(O::send_timeout_usec, CAST_DURATION_TO_USEC(30ms).count()));
 
             REQUIRE_NOTHROW(serverp1->listen(addr));
             REQUIRE_NOTHROW(clientp1->dial(addr));
@@ -430,14 +429,14 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
             REQUIRE_NOTHROW(clientp1->dial(addr));
             SLEEP_FOR(100ms);
 
-            REQUIRE_THROWS_AS_MATCHING(serverp1->set_option_int(_opt_::pair1_polyamorous, 1), nng_exception, ThrowsNngException(ec_estate));
+            REQUIRE_THROWS_AS_MATCHING(serverp1->set_option_int(O::pair1_polyamorous, 1), nng_exception, ThrowsNngException(ec_estate));
         }
 
         SECTION("Monogamous raw mode works") {
 
-            REQUIRE_NOTHROW(serverp1->set_option_int(_opt_::raw, 1));
-            REQUIRE_NOTHROW(clientp1->set_option_int(_opt_::raw, 1));
-            REQUIRE_NOTHROW(clientp2->set_option_int(_opt_::raw, 1));
+            REQUIRE_NOTHROW(serverp1->set_option_int(O::raw, 1));
+            REQUIRE_NOTHROW(clientp1->set_option_int(O::raw, 1));
+            REQUIRE_NOTHROW(clientp2->set_option_int(O::raw, 1));
 
             REQUIRE_NOTHROW(serverp1->listen(addr));
             REQUIRE_NOTHROW(clientp1->dial(addr));
@@ -527,8 +526,8 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
                 ttl = 0;
 
                 // TODO: TBD: ditto options unit tests...
-                REQUIRE_NOTHROW(serverp1->set_option_int(_opt_::max_ttl, expected));
-                REQUIRE_NOTHROW(serverp1->get_option_int(_opt_::max_ttl, &ttl));
+                REQUIRE_NOTHROW(serverp1->set_option_int(O::max_ttl, expected));
+                REQUIRE_NOTHROW(serverp1->get_option_int(O::max_ttl, &ttl));
                 REQUIRE(ttl == expected);
 
                 SECTION("Bad TTL bounces") {
@@ -552,7 +551,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
                 }
 
                 SECTION("Large TTL passes") {
-                    REQUIRE_NOTHROW(serverp1->set_option_int(_opt_::max_ttl, ttl = max_ttl));
+                    REQUIRE_NOTHROW(serverp1->set_option_int(O::max_ttl, ttl = max_ttl));
                     REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
                     // TODO: TBD: ditto narrowly focused unit tests...
                     const int expected_api = 1234;
@@ -569,7 +568,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
                 }
 
                 SECTION("Max TTL fails") {
-                    REQUIRE_NOTHROW(serverp1->set_option_int(_opt_::max_ttl, ttl = max_ttl));
+                    REQUIRE_NOTHROW(serverp1->set_option_int(O::max_ttl, ttl = max_ttl));
                     REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
                     REQUIRE_NOTHROW(bmp->header()->append(ttl));
                     REQUIRE_NOTHROW(clientp1->send(bmp.get()));
@@ -580,21 +579,21 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
         SECTION("We cannot set insane TTLs") {
 
             // TODO: TBD: really should be part of an options-oriented unit test...
-            REQUIRE_THROWS_AS_MATCHING(serverp1->set_option_int(_opt_::max_ttl, ttl = 0), nng_exception, ThrowsNngException(ec_einval));
-            REQUIRE_THROWS_AS_MATCHING(serverp1->set_option_int(_opt_::max_ttl, ttl = 1000), nng_exception, ThrowsNngException(ec_einval));
+            REQUIRE_THROWS_AS_MATCHING(serverp1->set_option_int(O::max_ttl, ttl = 0), nng_exception, ThrowsNngException(ec_einval));
+            REQUIRE_THROWS_AS_MATCHING(serverp1->set_option_int(O::max_ttl, ttl = 1000), nng_exception, ThrowsNngException(ec_einval));
             // TODO: TBD: still a candidate for unit tests.
             // Note the subtle difference in set call.
-            REQUIRE_THROWS_AS_MATCHING(serverp1->set_option(_opt_::max_ttl, &(ttl = 8), 1), nng_exception, ThrowsNngException(ec_einval));
+            REQUIRE_THROWS_AS_MATCHING(serverp1->set_option(O::max_ttl, &(ttl = 8), 1), nng_exception, ThrowsNngException(ec_einval));
         }
 
         SECTION("Polyamorous cooked mode works") {
 
             // TODO: TBD: so all these hoops opening up this case need to be part of the narrower scope options unit test
-            REQUIRE_NOTHROW(serverp1->get_option_int(_opt_::pair1_polyamorous, &actual_opt));
+            REQUIRE_NOTHROW(serverp1->get_option_int(O::pair1_polyamorous, &actual_opt));
             REQUIRE(actual_opt == 0);
 
-            REQUIRE_NOTHROW(serverp1->set_option_int(_opt_::pair1_polyamorous, 1));
-            REQUIRE_NOTHROW(serverp1->get_option_int(_opt_::pair1_polyamorous, &actual_opt));
+            REQUIRE_NOTHROW(serverp1->set_option_int(O::pair1_polyamorous, 1));
+            REQUIRE_NOTHROW(serverp1->get_option_int(O::pair1_polyamorous, &actual_opt));
             REQUIRE(actual_opt == 1);
 
             REQUIRE_NOTHROW(serverp1->listen(addr));
@@ -649,7 +648,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
 
         SECTION("Polyamorous default works") {
 
-            REQUIRE_NOTHROW(serverp1->set_option_int(_opt_::pair1_polyamorous, 1));
+            REQUIRE_NOTHROW(serverp1->set_option_int(O::pair1_polyamorous, 1));
 
             REQUIRE_NOTHROW(serverp1->listen(addr));
             REQUIRE_NOTHROW(clientp1->dial(addr));
@@ -677,17 +676,17 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
         SECTION("Polyamorous raw mode works") {
 
             // TODO: TBD: here we go again, doing hoop jumping that really belongs in its own unit tests for options...
-            REQUIRE_NOTHROW(serverp1->get_option_int(_opt_::pair1_polyamorous, &actual_opt));
+            REQUIRE_NOTHROW(serverp1->get_option_int(O::pair1_polyamorous, &actual_opt));
             REQUIRE(actual_opt == 0);
 
-            REQUIRE_NOTHROW(serverp1->set_option_int(_opt_::pair1_polyamorous, 1));
-            REQUIRE_NOTHROW(serverp1->get_option_int(_opt_::pair1_polyamorous, &actual_opt));
+            REQUIRE_NOTHROW(serverp1->set_option_int(O::pair1_polyamorous, 1));
+            REQUIRE_NOTHROW(serverp1->get_option_int(O::pair1_polyamorous, &actual_opt));
             REQUIRE(actual_opt == 1);
 
             // TODO: It probably serves a purpose on one level; but if we test it in its own unit test, we can just set it and be done with it, with confidence.
             actual_opt = 0;
-            REQUIRE_NOTHROW(serverp1->set_option_int(_opt_::raw, 1));
-            REQUIRE_NOTHROW(serverp1->get_option_int(_opt_::raw, &actual_opt));
+            REQUIRE_NOTHROW(serverp1->set_option_int(O::raw, 1));
+            REQUIRE_NOTHROW(serverp1->get_option_int(O::raw, &actual_opt));
             REQUIRE(actual_opt == 1);
 
             REQUIRE_NOTHROW(serverp1->listen(addr));
