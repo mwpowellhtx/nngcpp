@@ -28,6 +28,7 @@ namespace nng {
     const std::string option_names::min_reconnect_time_usec = NNG_OPT_RECONNMINT;
     const std::string option_names::max_reconnect_time_usec = NNG_OPT_RECONNMAXT;
     const std::string option_names::pair1_polyamorous = NNG_OPT_PAIR1_POLY;
+    const std::string option_names::req_resend_time_usec = NNG_OPT_REQ_RESENDTIME;
     const std::string option_names::sub_subscribe = NNG_OPT_SUB_SUBSCRIBE;
     const std::string option_names::sub_unsubscribe = NNG_OPT_SUB_UNSUBSCRIBE;
     const std::string option_names::surveyor_survey_time_usec = NNG_OPT_SURVEYOR_SURVEYTIME;
