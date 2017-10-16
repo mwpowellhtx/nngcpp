@@ -138,6 +138,8 @@ TEST_CASE("Publisher/subscriber pattern using C++ wrapper", "[pubsub][v0][protoc
     using namespace Catch::Matchers;
     using O = option_names;
 
+    pubsub_fixture fixture;
+
     // Some of these need to be initialized to avoid garbage results, crash situations, etc.
     socket::size_type sz = 0;
     protocol_type actual_proto, actual_peer;
