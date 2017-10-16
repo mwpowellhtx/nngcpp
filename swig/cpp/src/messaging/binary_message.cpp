@@ -93,7 +93,11 @@ namespace nng {
             if (!has_message()) { return; }
             const auto op = std::bind(::nng_msg_free, _1);
             op(_msgp);
-            binary_message::set_msgp(nullptr);
+            // TODO: TBD: consider whether there is a better way to coordinate msgp between parent/child header, body and message.
+            // Be careful of cyclical calls, infinite recursion, etc.
+            message_base::set_msgp(nullptr);
+            _header.set_msgp(nullptr);
+            _body.set_msgp(nullptr);
         }
 
         void binary_message::set_pipe(const message_pipe* const mpp) {
