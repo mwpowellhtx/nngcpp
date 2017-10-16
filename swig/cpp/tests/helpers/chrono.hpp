@@ -13,7 +13,7 @@
 #include <chrono>
 
 #ifndef CAST_DURATION_TO_USEC
-#define CAST_DURATION_TO_USEC std::chrono::duration_cast<microseconds>
+#define CAST_DURATION_TO_USEC std::chrono::duration_cast<std::chrono::microseconds>
 #endif // CAST_DURATION_TO_USEC
 
 #endif // CHRONO_HELPERS_HPP
