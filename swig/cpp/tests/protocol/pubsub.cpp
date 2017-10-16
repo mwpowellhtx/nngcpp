@@ -100,7 +100,7 @@ namespace constants {
     }
 }
 
-TEST_CASE("Publisher/subscriber pattern using C++ wrapper", "[pubsub][v0][protocol][sockets][cxx]") {
+TEST_CASE("Publisher/subscriber pattern using C++ wrapper", "[pub][sub][v0][protocol][sockets][nng][cxx]") {
 
     using namespace std;
     using namespace constants;
