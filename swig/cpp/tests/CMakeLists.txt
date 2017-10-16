@@ -5,6 +5,7 @@
 #   Copyright 2016 Franklin "Snaipe" Mathieu <franklinmathieu@gmail.com>
 #   Copyright 2017 Garrett D'Amore <garrett@damore.org>
 #   Copyright 2017 Capitar IT Group BV <info@capitar.com>
+#   Copyright (c) 2017 Michael W Powell <mwpowellhtx@gmail.com>
 #
 #   Permission is hereby granted, free of charge, to any person obtaining a copy
 #   of this software and associated documentation files (the "Software"),
@@ -120,8 +121,9 @@ nngcpp_add_test (messaging/binary_message 0)
 nngcpp_add_test (messaging/messaging_gymnastics 0)
 
 nngcpp_add_test (protocol/bus 5)
-nngcpp_add_test (protocol/pipeline 5)
 nngcpp_add_test (protocol/pair 5)
+nngcpp_add_test (protocol/pipeline 5)
+nngcpp_add_test (protocol/pubsub 5)
 
 # nngcpp_add_test(event 5)
 # nngcpp_add_test(idhash 5)
@@ -130,7 +132,6 @@ nngcpp_add_test (protocol/pair 5)
 # nngcpp_add_test(list 5)
 # nngcpp_add_test(platform 5)
 # nngcpp_add_test(reqrep 5)
-# nngcpp_add_test(pubsub 5)
 # nngcpp_add_test(resolv 10)
 # nngcpp_add_test(survey 5)
 # nngcpp_add_test(synch 5)
