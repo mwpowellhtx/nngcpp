@@ -43,7 +43,19 @@ if (NNGCPP_ENABLE_TESTS)
         # list (APPEND all_tests ${NAME})
         set (TEST_PATH ${TEST_FILENAME}.cpp)
         get_filename_component (TEST_NAME ${TEST_FILENAME} NAME_WE)
-        add_executable (${TEST_NAME} main.cpp ${TEST_PATH})
+        add_executable (${TEST_NAME}
+            main.cpp
+
+            helpers/basic_fixture.cpp
+            helpers/basic_fixture.h
+
+            helpers/constants.cpp
+            helpers/constants.h
+
+            helpers/chrono.hpp
+
+            ${TEST_PATH}
+            )
         # Treat NNG and NNGCPP as DEPENDENCIES rather than link libraries.
         add_dependencies (${TEST_NAME} nng)
         add_dependencies (${TEST_NAME} ${NNGCPP_PROJECT_NAME_STATIC})
@@ -124,6 +136,7 @@ nngcpp_add_test (protocol/bus 5)
 nngcpp_add_test (protocol/pair 5)
 nngcpp_add_test (protocol/pipeline 5)
 nngcpp_add_test (protocol/pubsub 5)
+nngcpp_add_test (protocol/reqrep 5)
 
 # nngcpp_add_test(event 5)
 # nngcpp_add_test(idhash 5)
@@ -131,7 +144,6 @@ nngcpp_add_test (protocol/pubsub 5)
 # nngcpp_add_test(ipc 5)
 # nngcpp_add_test(list 5)
 # nngcpp_add_test(platform 5)
-# nngcpp_add_test(reqrep 5)
 # nngcpp_add_test(resolv 10)
 # nngcpp_add_test(survey 5)
 # nngcpp_add_test(synch 5)

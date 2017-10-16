@@ -12,24 +12,11 @@
 #include "../catch/catch_nng_exception_matcher.hpp"
 #include "../catch/catch_exception_translations.hpp"
 #include "../catch/catch_macros.hpp"
+#include "../helpers/basic_fixture.h"
+#include "../helpers/constants.h"
 #include "../helpers/chrono.hpp"
 
 #include <nngcpp.h>
-
-#include <algorithm>
-#include <type_traits>
-
-//#define APPENDSTR(m, s) nng_msg_append(m, s, strlen(s))
-//#define CHECKSTR(m, s)                   \-
-//	So(nng_msg_len(m) == strlen(s)); \
-//	So(memcmp(nng_msg_body(m), s, strlen(s)) == 0)
-
-// TODO: TBD: this pattern is prevalent enough that it deserves first class treatment throughout the unit test scaffold...
-struct pubsub_fixture {
-    virtual ~pubsub_fixture() {
-        CHECK_NOTHROW(::nng_fini());
-    }
-};
 
 namespace nng {
     namespace protocol {
@@ -85,21 +72,7 @@ namespace nng {
     }
 }
 
-// A little shorthand to save some calories.
-#define TO_BUFFER_RETVAL std::result_of<decltype(&to_buffer)(const std::string&)>::type
-
-#define DECL_STRING_BUFFER(s, buf) const TO_BUFFER_RETVAL buf = to_buffer(s)
-
 namespace constants {
-
-    // TODO: TBD: this really deserves first class support throughout test framework
-    nng::messaging::binary_message::buffer_vector_type to_buffer(const std::string& s) {
-        nng::messaging::binary_message::buffer_vector_type buf;
-        std::for_each(s.cbegin(), s.cend(), [&buf](const std::string::value_type& ch) {
-            buf.push_back(ch);
-        });
-        return buf;
-    }
 
     const std::string test_addr = "inproc://test";
 
@@ -138,7 +111,7 @@ TEST_CASE("Publisher/subscriber pattern using C++ wrapper", "[pubsub][v0][protoc
     using namespace Catch::Matchers;
     using O = option_names;
 
-    pubsub_fixture fixture;
+    basic_fixture fixture;
 
     // Some of these need to be initialized to avoid garbage results, crash situations, etc.
     socket::size_type sz = 0;
