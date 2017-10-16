@@ -4,7 +4,6 @@
 #include <nngcpp.h>
 
 #include <algorithm>
-#include <type_traits>
 
 namespace constants {
 
@@ -18,10 +17,5 @@ namespace constants {
     }
 
 }
-
-// Provide a little shorthand to save some calories.
-
-// Designed for use within the scope of the constants namespace.
-#define TO_BUFFER_RETVAL std::result_of<decltype(&to_buffer)(const std::string&)>::type
 
 #endif // NNGCPP_TESTS_CONSTANTS_HELPERS_H

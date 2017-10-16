@@ -76,9 +76,10 @@ namespace constants {
 
     const std::string test_addr = "inproc://test";
 
-    const std::string __empty = "";
     const std::string abc = "abc";
     const std::string hello = "hello";
+
+    const std::string __empty = "";
 
     namespace topics {
 
@@ -88,15 +89,15 @@ namespace constants {
         const std::string some_do_not_like_it = "some/do/not/like/it";
         const std::string some_like_it_raw = "/some/like/it/raw";
 
-        const TO_BUFFER_RETVAL some_buf = to_buffer(some);
-        const TO_BUFFER_RETVAL some_like_it_hot_buf = to_buffer(some_like_it_hot);
-        const TO_BUFFER_RETVAL some_day_some_how_buf = to_buffer(some_day_some_how);
-        const TO_BUFFER_RETVAL some_do_not_like_it_buf = to_buffer(some_do_not_like_it);
-        const TO_BUFFER_RETVAL some_like_it_raw_buf = to_buffer(some_like_it_raw);
+        const auto some_buf = to_buffer(some);
+        const auto some_like_it_hot_buf = to_buffer(some_like_it_hot);
+        const auto some_day_some_how_buf = to_buffer(some_day_some_how);
+        const auto some_do_not_like_it_buf = to_buffer(some_do_not_like_it);
+        const auto some_like_it_raw_buf = to_buffer(some_like_it_raw);
 
         // Yes, this is intentionally different from /some/path/to/topic...
         const std::string somewhere_over_the_rainbow = "/somewhere/over/the/rainbow";
-        const TO_BUFFER_RETVAL somewhere_over_the_rainbow_buf = to_buffer(somewhere_over_the_rainbow);
+        const auto somewhere_over_the_rainbow_buf = to_buffer(somewhere_over_the_rainbow);
     }
 }
 

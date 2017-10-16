@@ -30,11 +30,11 @@ namespace constants {
 
     const std::string __empty = "";
 
-    const TO_BUFFER_RETVAL ping_buf = to_buffer(ping);
-    const TO_BUFFER_RETVAL pong_buf = to_buffer(pong);
+    const auto ping_buf = to_buffer(ping);
+    const auto pong_buf = to_buffer(pong);
 
-    const TO_BUFFER_RETVAL abc_buf = to_buffer(abc);
-    const TO_BUFFER_RETVAL def_buf = to_buffer(def);
+    const auto abc_buf = to_buffer(abc);
+    const auto def_buf = to_buffer(def);
 }
 
 TEST_CASE("Request/reply pattern", "[req][rep][v0][protocol][sockets][nng][cxx]") {
