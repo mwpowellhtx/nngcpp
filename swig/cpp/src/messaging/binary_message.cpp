@@ -33,15 +33,7 @@ namespace nng {
             , _header(msgp)
             , _body(msgp) {
 
-            allocate();
-        }
-
-        binary_message::binary_message(::nng_msg* msgp, size_type sz)
-            : message_base(msgp)
-            , _header(msgp)
-            , _body(msgp) {
-
-            allocate(sz);
+            // Since the pointer is intentional, which may also be nullptr, do not allocate.
         }
 
         binary_message::~binary_message() {
@@ -80,7 +72,9 @@ namespace nng {
         }
 
         void binary_message::set_msgp(::nng_msg* msgp) {
-            // Frees any previously existing internal message beforehand.
+            // Yes, do free whatever message we previously had.
+            free();
+            // Then set the message, however was intended, which may also be nullptr.
             message_base::set_msgp(msgp);
             _header.set_msgp(msgp);
             _body.set_msgp(msgp);
