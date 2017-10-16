@@ -15,8 +15,13 @@
 #include "../catch/catch_nng_exception_matcher.hpp"
 #include "../catch/catch_macros.hpp"
 #include "../catch/timed_section_impl.hpp"
+#include "../helpers/constants.h"
+#include "../helpers/chrono.hpp"
 
 #include <nngcpp.h>
+
+// TODO: TBD: update this module: follow the C API grouping more or less closely, adapting for C+ wrapperisms
+// TODO: TBD: generally, update this taking into consideration updates; could "transaction" be useful now, in more broad sense? i.e. looking at constants::to_str for instance...
 
 #include <cctype>
 #include <string>
@@ -25,7 +30,6 @@
 #include <thread>
 #include <algorithm>
 #include <regex>
-#include <ostream>
 
 // TODO: TBD: these are a couple of interesting methods that might be interesting to include apart from the unit test itself.
 template<class It_ = std::string::const_iterator>
@@ -84,12 +88,6 @@ bool starts_with(At_ abegin, At_ aend, Bt_ bbegin, Bt_ bend) {
 // TODO: TBD: debatable how many of the constants should be included apart from the unit test itself...
 namespace constants {
 
-    std::string to_str(int value) {
-        std::ostringstream os;
-        os << value;
-        return os.str();
-    }
-
     const std::string url1_addr = "inproc://url1";
     const std::string url2_addr = "inproc://url2";
     const std::string bogus1_addr = "bogus://1";
@@ -105,10 +103,10 @@ namespace constants {
     const size_t max_addr_length = NNG_MAXADDRLEN;
 
     const nng::messaging::message_base::buffer_vector_type empty_buf;
-    const nng::messaging::message_base::buffer_vector_type data_buf = { (uint8_t)'a',(uint8_t)'b',(uint8_t)'c',(uint8_t)'\0' };
+    const auto data_buf = to_buffer("data");
 }
 
-TEST_CASE("Socket Operations", "[socket][operations]") {
+TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
 
     using namespace std;
     using namespace std::chrono;
@@ -205,36 +203,18 @@ TEST_CASE("Socket Operations", "[socket][operations]") {
 
         SECTION("Receive with no Pipes times out correctly") {
 
-#if 0 // The original
-            Convey("Recv with no pipes times out correctly", {
-                nng_msg *msg = NULL;
-            int64_t  to = 100000;
-            uint64_t now;
-
-            now = nng_clock();
-            So(now > 0);
-            So(nng_setopt_usec(s1, NNG_OPT_RECVTIMEO, to) == 0);
-            So(nng_recvmsg(s1, &msg, 0) == NNG_ETIMEDOUT);
-            So(msg == NULL);
-            So(nng_clock() >= (now + to));
-            So(nng_clock() < (now + (to * 2)));
-            });
-#endif //0
-
             const auto timeout = 100ms;
 
             RUN_TIMED_SECTION_MILLISECONDS(timeout, [&]() {
 
                 REQUIRE_NOTHROW(s1->set_option_usec(_opt_::receive_timeout_usec
-                    , duration_cast<microseconds>(timeout).count()));
+                    , CAST_DURATION_TO_USEC(timeout).count()));
 
-                size_type sz = 0;
-                buffer_vector_type buf;
-                s1->try_receive(&buf, sz);
-                // TODO: TBD: was working with
-                // TODO: TBD: this will work for now as a rough cut Exception match...
-                REQUIRE_THROWS_AS_MATCHING(s1->try_receive(&buf, sz), nng_exception, ThrowsNngException(ec_etimedout));
-                REQUIRE_THAT(buf, Equals(empty_buf));
+                unique_ptr<binary_message> bmp;
+
+                REQUIRE_NOTHROW(bmp = make_unique<binary_message>((::nng_msg*)nullptr));
+                REQUIRE_THROWS_AS_MATCHING(s1->try_receive(bmp.get()), nng_exception, ThrowsNngException(ec_etimedout));
+                REQUIRE(bmp->has_message() == false);
             });
         }
 
@@ -243,7 +223,7 @@ TEST_CASE("Socket Operations", "[socket][operations]") {
             buffer_vector_type buf;
             size_type sz = 0;
             // TODO: TBD: this will work for now as a rough cut Exception match...
-            REQUIRE_THROWS_AS_MATCHING(s1->try_receive(&buf, sz, to_int(flag_nonblock)), nng_exception, ThrowsNngException(ec_eagain));
+            REQUIRE_THROWS_AS_MATCHING(s1->try_receive(&buf, sz, flag_nonblock), nng_exception, ThrowsNngException(ec_eagain));
             REQUIRE_THAT(buf, Equals(empty_buf));
         }
 
@@ -331,7 +311,7 @@ TEST_CASE("Socket Operations", "[socket][operations]") {
 
             SECTION("Dialing async does not get refused") {
 
-                REQUIRE_NOTHROW(s1->dial(asy_addr, to_int(flag_nonblock)));
+                REQUIRE_NOTHROW(s1->dial(asy_addr, flag_nonblock));
 
                 SECTION("And connects late") {
 
