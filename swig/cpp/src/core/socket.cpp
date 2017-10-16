@@ -30,9 +30,13 @@ namespace nng {
     typedef std::function<int(::nng_socket)> close_or_shutdown_func;
 
     void close_or_shutdown(const close_or_shutdown_func& op, ::nng_socket* const sp) {
-        if (!(*sp)) { return; }
+        //// TODO: TBD: then whether we test for closure or not...
+        //if (!(*sp)) { return; }
         const auto errnum = op(*sp);
-        THROW_NNG_EXCEPTION_IF_NOT_ONEOF(errnum, ec_eunknown, ec_enone, ec_enoent);
+        // TODO: TBD: could also trap for ec_enoent; if there's no entry, then there's no entry, there is nothing to do, right?
+        //THROW_NNG_EXCEPTION_IF_NOT_ONEOF(errnum, ec_eunknown, ec_enone, ec_enoent);
+        THROW_NNG_EXCEPTION_IF_NOT_ONEOF(errnum, ec_eunknown, ec_enone);
+        // TODO: TBD: IMO, this really should be reset.
         *sp = 0;
     }
 
@@ -73,7 +77,8 @@ namespace nng {
 
     template<class Buffer_>
     int send(int id, const Buffer_& buf, std::size_t sz, flag_type flags) {
-        const auto errnum = ::nng_send(id, (void*)&buf[0], sz, static_cast<int>(flags));
+        // &buf[0] ????
+        const auto errnum = ::nng_send(id, (void*)buf.data(), sz, static_cast<int>(flags));
         THROW_NNG_EXCEPTION_EC(errnum);
         return errnum;
     }
@@ -81,7 +86,8 @@ namespace nng {
     template<class Buffer_>
     int try_receive(int id, Buffer_& buf, std::size_t& sz, flag_type flags) {
         buf.resize(sz);
-        const auto errnum = ::nng_recv(id, &buf[0], &sz, static_cast<int>(flags));
+        // &buf[0] ????
+        const auto errnum = ::nng_recv(id, (void*)buf.data(), &sz, static_cast<int>(flags));
         THROW_NNG_EXCEPTION_EC(errnum);
         return errnum;
     }
