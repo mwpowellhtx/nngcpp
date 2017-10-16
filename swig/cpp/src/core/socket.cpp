@@ -27,27 +27,21 @@ namespace nng {
         close();
     }
 
-    typedef std::function<int(::nng_socket)> close_or_shutdown_func;
-
-    void close_or_shutdown(const close_or_shutdown_func& op, ::nng_socket* const sp) {
-        //// TODO: TBD: then whether we test for closure or not...
-        //if (!(*sp)) { return; }
-        const auto errnum = op(*sp);
-        // TODO: TBD: could also trap for ec_enoent; if there's no entry, then there's no entry, there is nothing to do, right?
-        //THROW_NNG_EXCEPTION_IF_NOT_ONEOF(errnum, ec_eunknown, ec_enone, ec_enoent);
-        THROW_NNG_EXCEPTION_IF_NOT_ONEOF(errnum, ec_eunknown, ec_enone);
-        // TODO: TBD: IMO, this really should be reset.
-        *sp = 0;
-    }
-
     void socket::close() {
+        // Close is its own operation apart from Shutdown.
         const auto op = std::bind(&::nng_close, _1);
-        close_or_shutdown(op, &sid);
+        const auto errnum = op(sid);
+        THROW_NNG_EXCEPTION_IF_NOT_ONEOF(errnum, ec_eunknown, ec_enone);
+        // Closed is closed.
+        sid = 0;
     }
 
     void socket::shutdown() {
+        // Shutdown is its own operation apart from Closed.
         const auto op = std::bind(&::nng_shutdown, _1);
-        close_or_shutdown(op, &sid);
+        const auto errnum = op(sid);
+        THROW_NNG_EXCEPTION_IF_NOT_ONEOF(errnum, ec_eunknown, ec_enone);
+        // Which socket can still be in operation.
     }
 
     bool socket::is_open() const {
@@ -124,13 +118,12 @@ namespace nng {
         ::nng_msg* msgp = nullptr;
         const auto errnum = ::nng_recvmsg(sid, &msgp, static_cast<int>(flags));
         try {
+            // Which we actually do want to set this one.
             THROW_NNG_EXCEPTION_EC(errnum);
         }
         catch (...) {
             // TODO: TBD: this is probably (PROBABLY) about as good as we can expect here...
-            if (msgp != nullptr) {
-                ::nng_msg_free(msgp);
-            }
+            if (msgp) { ::nng_msg_free(msgp); }
             // Re-throw the exception after taking care of potential memory allocation.
             throw;
         }
