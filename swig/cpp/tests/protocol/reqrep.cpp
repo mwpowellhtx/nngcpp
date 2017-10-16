@@ -12,157 +12,182 @@
 #include "../catch/catch_nng_exception_matcher.hpp"
 #include "../catch/catch_exception_translations.hpp"
 #include "../catch/catch_macros.hpp"
+#include "../helpers/basic_fixture.h"
+#include "../helpers/constants.h"
 #include "../helpers/chrono.hpp"
 
 #include <nngcpp.h>
 
-#include "convey.h"
-#include "nng.h"
+namespace constants {
 
-#include <string.h>
+    const std::string test_addr = "inproc://test";
 
-TestMain("REQ/REP pattern", {
-	int         rv;
-	const char *addr = "inproc://test";
-	Convey("We can create a REQ socket", {
-		nng_socket req;
+    const std::string ping = "ping";
+    const std::string pong = "pong";
 
-		So(nng_req_open(&req) == 0);
+    const std::string abc = "abc";
+    const std::string def = "def";
 
-		Reset({ nng_close(req); });
+    const std::string __empty = "";
 
-		Convey("Protocols match", {
-			So(nng_protocol(req) == NNG_PROTO_REQ);
-			So(nng_peer(req) == NNG_PROTO_REP);
-		});
+    const TO_BUFFER_RETVAL ping_buf = to_buffer(ping);
+    const TO_BUFFER_RETVAL pong_buf = to_buffer(pong);
 
-		Convey("Resend time option id works", {
+    const TO_BUFFER_RETVAL abc_buf = to_buffer(abc);
+    const TO_BUFFER_RETVAL def_buf = to_buffer(def);
+}
 
-			// Set timeout.
-			So(nng_setopt_usec(
-			       req, NNG_OPT_REQ_RESENDTIME, 10000) == 0);
-			// Check invalid size
-			So(nng_setopt(req, NNG_OPT_REQ_RESENDTIME, "", 1) ==
-			    NNG_EINVAL);
-		});
+TEST_CASE("Request/reply pattern", "[req][rep][v0][protocol][sockets][nng][cxx]") {
 
-		Convey("Recv with no send fails", {
-			nng_msg *msg;
-			rv = nng_recvmsg(req, &msg, 0);
-			So(rv == NNG_ESTATE);
-		});
-	});
+    using namespace std;
+    using namespace nng;
+    using namespace nng::protocol;
+    using namespace nng::messaging;
+    using namespace constants;
+    using namespace Catch::Matchers;
+    using O = option_names;
 
-	Convey("We can create a REP socket", {
-		nng_socket rep;
-		So(nng_rep_open(&rep) == 0);
+    protocol_type actual_proto, actual_peer;
 
-		Reset({ nng_close(rep); });
+    unique_ptr<binary_message> bmp;
 
-		Convey("Protocols match", {
-			So(nng_protocol(rep) == NNG_PROTO_REP);
-			So(nng_peer(rep) == NNG_PROTO_REQ);
-		});
+    unique_ptr<latest_req_socket> reqp;
+    unique_ptr<latest_rep_socket> repp;
 
-		Convey("Send with no recv fails", {
-			nng_msg *msg;
-			rv = nng_msg_alloc(&msg, 0);
-			So(rv == 0);
-			rv = nng_sendmsg(rep, msg, 0);
-			So(rv == NNG_ESTATE);
-			nng_msg_free(msg);
-		});
+    SECTION("We can create a request socket") {
 
-		Convey("Cannot set resend time", {
-			So(nng_setopt_usec(rep, NNG_OPT_REQ_RESENDTIME, 100) ==
-			    NNG_ENOTSUP);
-		});
-	});
+        REQUIRE_NOTHROW(reqp = make_unique<latest_req_socket>());
 
-	Convey("We can create a linked REQ/REP pair", {
-		nng_socket req;
-		nng_socket rep;
+		SECTION("Protocols match") {
 
-		So(nng_rep_open(&rep) == 0);
+            REQUIRE_NOTHROW(actual_proto = reqp->get_protocol());
 
-		So(nng_req_open(&req) == 0);
+            REQUIRE(actual_proto == proto_requestor);
+            REQUIRE(actual_proto == proto_requestor_v0);
 
-		Reset({
-			nng_close(rep);
-			nng_close(req);
-		});
+            REQUIRE_NOTHROW(actual_peer = reqp->get_peer());
 
-		So(nng_listen(rep, addr, NULL, 0) == 0);
-		So(nng_dial(req, addr, NULL, 0) == 0);
+            REQUIRE(actual_peer == proto_replier);
+            REQUIRE(actual_peer == proto_replier_v0);
+		}
 
-		Convey("They can REQ/REP exchange", {
-			nng_msg *ping;
-			nng_msg *pong;
+		SECTION("Request resend time option works") {
 
-			So(nng_msg_alloc(&ping, 0) == 0);
-			So(nng_msg_append(ping, "ping", 5) == 0);
-			So(nng_msg_len(ping) == 5);
-			So(memcmp(nng_msg_body(ping), "ping", 5) == 0);
-			So(nng_sendmsg(req, ping, 0) == 0);
-			pong = NULL;
-			So(nng_recvmsg(rep, &pong, 0) == 0);
-			So(pong != NULL);
-			So(nng_msg_len(pong) == 5);
-			So(memcmp(nng_msg_body(pong), "ping", 5) == 0);
-			nng_msg_trim(pong, 5);
-			So(nng_msg_append(pong, "pong", 5) == 0);
-			So(nng_sendmsg(rep, pong, 0) == 0);
-			ping = 0;
-			So(nng_recvmsg(req, &ping, 0) == 0);
-			So(ping != NULL);
-			So(nng_msg_len(ping) == 5);
-			So(memcmp(nng_msg_body(ping), "pong", 5) == 0);
-			nng_msg_free(ping);
-		});
-	});
+            // Set the timeout.
+            REQUIRE_NOTHROW(reqp->set_option_usec(O::req_resend_time_usec, CAST_DURATION_TO_USEC(10ms).count()));
+            // TODO: TBD: it is unit tests like this that really deserve a more focused unit test on just options alone...
+            // Check invalid size.
+            REQUIRE_THROWS_AS_MATCHING(reqp->set_option(O::req_resend_time_usec, __empty, 1), nng_exception, ThrowsNngException(ec_einval));
+		}
 
-	Convey("Request cancellation works", {
-		nng_msg *abc;
-		nng_msg *def;
-		nng_msg *cmd;
-		uint64_t retry = 100000; // 100 ms
+		SECTION("Receive socket without send socket fails") {
 
-		nng_socket req;
-		nng_socket rep;
+            // TODO: TBD: really needs its own unit tests for the operation alone: verify in the binary message tests...
+            REQUIRE_NOTHROW(bmp = make_unique<binary_message>(static_cast<::nng_msg*>(nullptr)));
 
-		So(nng_rep_open(&rep) == 0);
+            REQUIRE_THROWS_AS_MATCHING(reqp->try_receive(bmp.get()), nng_exception, ThrowsNngException(ec_estate));
+		}
 
-		So(nng_req_open(&req) == 0);
+        SECTION("Socket can close") {
+            // Reset, not Close, as Closing without Reset can cause trouble on the unwind.
+            REQUIRE_NOTHROW(reqp.reset());
+        }
+    }
 
-		Reset({
-			nng_close(rep);
-			nng_close(req);
-		});
+	SECTION("We can create a reply socket") {
 
-		So(nng_setopt_usec(req, NNG_OPT_REQ_RESENDTIME, retry) == 0);
-		So(nng_setopt_int(req, NNG_OPT_SENDBUF, 16) == 0);
+        REQUIRE_NOTHROW(repp = make_unique<latest_rep_socket>());
 
-		So(nng_msg_alloc(&abc, 0) == 0);
-		So(nng_msg_append(abc, "abc", 4) == 0);
-		So(nng_msg_alloc(&def, 0) == 0);
-		So(nng_msg_append(def, "def", 4) == 0);
+		SECTION("Protocols match") {
 
-		So(nng_listen(rep, addr, NULL, 0) == 0);
-		So(nng_dial(req, addr, NULL, 0) == 0);
+            REQUIRE_NOTHROW(actual_proto = repp->get_protocol());
 
-		So(nng_sendmsg(req, abc, 0) == 0);
-		So(nng_sendmsg(req, def, 0) == 0);
-		So(nng_recvmsg(rep, &cmd, 0) == 0);
-		So(cmd != NULL);
+            REQUIRE(actual_proto == proto_replier);
+            REQUIRE(actual_proto == proto_replier_v0);
 
-		So(nng_sendmsg(rep, cmd, 0) == 0);
-		So(nng_recvmsg(rep, &cmd, 0) == 0);
-		So(nng_sendmsg(rep, cmd, 0) == 0);
-		So(nng_recvmsg(req, &cmd, 0) == 0);
+            REQUIRE_NOTHROW(actual_peer = repp->get_peer());
 
-		So(nng_msg_len(cmd) == 4);
-		So(memcmp(nng_msg_body(cmd), "def", 4) == 0);
-		nng_msg_free(cmd);
-	});
-	nng_fini();
-})
+            REQUIRE(actual_peer == proto_requestor);
+            REQUIRE(actual_peer == proto_requestor_v0);
+        }
+
+		SECTION("Send without receive fails") {
+            REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
+            REQUIRE_THROWS_AS_MATCHING(repp->send(bmp.get()), nng_exception, ThrowsNngException(ec_estate));
+		}
+
+		SECTION("Cannot set resend time option") {
+            REQUIRE_THROWS_AS_MATCHING(repp->set_option_usec(O::req_resend_time_usec, (100us).count()), nng_exception, ThrowsNngException(ec_enotsup));
+		}
+
+        SECTION("Socket can close") {
+            // Reset, not Close, as Closing without Reset can cause trouble on the unwind.
+            REQUIRE_NOTHROW(repp.reset());
+        }
+    }
+
+	SECTION("We can create a linked request/reply pair") {
+
+        unique_ptr<binary_message> pingp, pongp;
+
+        REQUIRE_NOTHROW(reqp = make_unique<latest_req_socket>());
+        REQUIRE_NOTHROW(repp = make_unique<latest_rep_socket>());
+
+        REQUIRE_NOTHROW(repp->listen(test_addr));
+        REQUIRE_NOTHROW(reqp->dial(test_addr));
+
+		SECTION("They can request/reply exchange") {
+
+            REQUIRE_NOTHROW(pingp = make_unique<binary_message>());
+            REQUIRE_NOTHROW(pongp = make_unique<binary_message>((::nng_msg*)nullptr));
+
+            REQUIRE_NOTHROW(*pingp << ping);
+            REQUIRE_NOTHROW(reqp->send(pingp.get()));
+            // We will use this state to our advantage later on.
+            REQUIRE(pingp->has_message() == false);
+            REQUIRE_NOTHROW(repp->try_receive(pongp.get()));
+            REQUIRE(pongp->has_message() == true);
+            REQUIRE_THAT(pongp->body()->get(), Equals(ping_buf));
+
+            // Interesting, now use the Trim API.
+            REQUIRE_NOTHROW(pongp->body()->trim(ping.length()));
+            REQUIRE_NOTHROW(*pongp << pong);
+            REQUIRE_NOTHROW(repp->send(pongp.get()));
+            // Here we are using the above assertion to our advantage.
+            REQUIRE_NOTHROW(reqp->try_receive(pingp.get()));
+            REQUIRE_THAT(pingp->body()->get(), Equals(pong_buf));
+		}
+	}
+
+	SECTION("Request cancellation works") {
+
+        unique_ptr<binary_message> abcp, defp, cmdp;
+
+        REQUIRE_NOTHROW(reqp = make_unique<latest_req_socket>());
+        REQUIRE_NOTHROW(repp = make_unique<latest_rep_socket>());
+
+        REQUIRE_NOTHROW(reqp->set_option_usec(O::req_resend_time_usec, CAST_DURATION_TO_USEC(100ms).count()));
+        REQUIRE_NOTHROW(reqp->set_option_int(O::send_buffer, 16));
+
+        REQUIRE_NOTHROW(repp->listen(test_addr));
+        REQUIRE_NOTHROW(reqp->dial(test_addr));
+
+        REQUIRE_NOTHROW(abcp = make_unique<binary_message>());
+        REQUIRE_NOTHROW(*abcp << abc);
+        REQUIRE_NOTHROW(defp = make_unique<binary_message>());
+        REQUIRE_NOTHROW(*defp << def);
+        REQUIRE_NOTHROW(cmdp = make_unique<binary_message>(nullptr));
+
+        REQUIRE_NOTHROW(reqp->send(abcp.get()));
+        REQUIRE_NOTHROW(reqp->send(defp.get()));
+        REQUIRE_NOTHROW(repp->try_receive(cmdp.get()));
+        REQUIRE_NOTHROW(cmdp->has_message() == true);
+
+        REQUIRE_NOTHROW(repp->send(cmdp.get()));
+        REQUIRE_NOTHROW(repp->try_receive(cmdp.get()));
+        REQUIRE_NOTHROW(repp->send(cmdp.get()));
+        REQUIRE_NOTHROW(reqp->try_receive(cmdp.get()));
+
+        REQUIRE_THAT(cmdp->body()->get(), Equals(def_buf));
+	}
+}
