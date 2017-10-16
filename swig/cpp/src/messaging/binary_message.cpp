@@ -14,24 +14,27 @@ namespace nng {
 
         binary_message::binary_message()
             : message_base()
-            , _header()
-            , _body() {
+            , _msgp(nullptr)
+            , _header(this)
+            , _body(this) {
 
             allocate();
         }
 
         binary_message::binary_message(size_type sz)
             : message_base()
-            , _header()
-            , _body() {
+            , _msgp(nullptr)
+            , _header(this)
+            , _body(this) {
 
             allocate(sz);
         }
 
         binary_message::binary_message(::nng_msg* msgp)
-            : message_base(msgp)
-            , _header(msgp)
-            , _body(msgp) {
+            : message_base()
+            , _msgp(msgp)
+            , _header(this)
+            , _body(this) {
 
             // Since the pointer is intentional, which may also be nullptr, do not allocate.
         }
@@ -71,33 +74,46 @@ namespace nng {
             _body.clear();
         }
 
+        ::nng_msg* binary_message::get_msgp() {
+            return _msgp;
+        }
+
         void binary_message::set_msgp(::nng_msg* msgp) {
             // Yes, do free whatever message we previously had.
             free();
             // Then set the message, however was intended, which may also be nullptr.
-            message_base::set_msgp(msgp);
-            _header.set_msgp(msgp);
-            _body.set_msgp(msgp);
+            _msgp = msgp;
+        }
+
+        void binary_message::on_sent() {
+            _msgp = nullptr;
         }
 
         void binary_message::allocate(size_type sz) {
             if (has_message()) { return; }
-            const auto op = std::bind(::nng_msg_alloc, _1, _2);
             ::nng_msg* msgp;
-            const auto errnum = op(&msgp, sz);
-            THROW_NNG_EXCEPTION_EC(errnum);
-            binary_message::set_msgp(msgp);
+            try {
+                const auto op = std::bind(::nng_msg_alloc, _1, _2);
+                const auto errnum = op(&msgp, sz);
+                THROW_NNG_EXCEPTION_EC(errnum);
+            }
+            catch (...) {
+                //// TODO: TBD: not sure this would be valid... or depending on the error...
+                //if (msgp) {
+                //    const auto __free = std::bind(::nng_msg_free, _1);
+                //    __free(msgp);
+                //}
+                throw;
+            }
+            set_msgp(msgp);
         }
 
         void binary_message::free() {
             if (!has_message()) { return; }
             const auto op = std::bind(::nng_msg_free, _1);
             op(_msgp);
-            // TODO: TBD: consider whether there is a better way to coordinate msgp between parent/child header, body and message.
-            // Be careful of cyclical calls, infinite recursion, etc.
-            message_base::set_msgp(nullptr);
-            _header.set_msgp(nullptr);
-            _body.set_msgp(nullptr);
+            // Just set the member directly since we own it.
+            _msgp = nullptr;
         }
 
         void binary_message::set_pipe(const message_pipe* const mpp) {

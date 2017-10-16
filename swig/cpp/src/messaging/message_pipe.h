@@ -29,7 +29,7 @@ namespace nng {
 
         public:
 
-            message_pipe(const message_base* const mbp);
+            message_pipe(message_base* const mbp);
 
             virtual ~message_pipe();
 

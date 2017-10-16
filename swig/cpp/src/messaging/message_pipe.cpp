@@ -6,9 +6,9 @@ namespace nng {
 
     namespace messaging {
 
-        message_pipe::message_pipe(const message_base* const mbp)
+        message_pipe::message_pipe(message_base* const mbp)
             : options()
-            , pid(::nng_msg_get_pipe(mbp->_msgp)) {
+            , pid(::nng_msg_get_pipe(mbp->get_msgp())) {
 
             // TODO: TBD: throw an exception upon irregular pipe value...
         }

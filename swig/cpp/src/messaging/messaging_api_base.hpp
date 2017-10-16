@@ -29,11 +29,11 @@ namespace nng {
 
         public:
 
-            virtual size_type get_size() const = 0;
+            virtual size_type get_size() = 0;
 
-            virtual bool try_get(Type_& value) const = 0;
+            virtual bool try_get(Type_& value) = 0;
 
-            virtual const Type_ get() const {
+            virtual const Type_ get() {
                 Type_ result;
                 return try_get(result) ? result : Type_();
             }

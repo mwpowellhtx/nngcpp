@@ -26,7 +26,7 @@ namespace nng {
 
         // TODO: TBD: potentially handling these as a string-based as well...
         class binary_message_header
-            : public message_base
+            : public message_part
             , public supports_get_api<message_base::buffer_vector_type>
             , public supports_append_api<message_base::buffer_vector_type, uint32_t>
             , public supports_insert_api<message_base::buffer_vector_type, uint32_t>
@@ -41,19 +41,15 @@ namespace nng {
 
             friend class binary_message;
 
-            binary_message_header();
-
-            binary_message_header(::nng_msg* msgp);
+            binary_message_header(message_base* const msgp);
 
         public:
 
             virtual ~binary_message_header();
 
-            virtual ::nng_msg* get_msgp() const override;
+            virtual bool try_get(buffer_vector_type& value) override;
 
-            virtual bool try_get(buffer_vector_type& value) const override;
-
-            virtual message_base::size_type get_size() const override;
+            virtual size_type get_size() override;
 
             // TODO: TBD: so if header is truly "read-only" then it is debatable whether "clear" should be exposed via header...
             virtual void clear() override;

@@ -25,7 +25,7 @@ namespace nng {
 #endif //NNGCPP_STRING_BASED_MESSAGE_H
 
         class binary_message_body
-            : public message_base
+            : public message_part
             , public supports_get_api<message_base::buffer_vector_type>
             , public supports_append_api<message_base::buffer_vector_type, uint32_t>
             , public supports_insert_api<message_base::buffer_vector_type, uint32_t>
@@ -39,17 +39,15 @@ namespace nng {
 
             friend class binary_message;
 
-            binary_message_body();
-
-            binary_message_body(::nng_msg* msgp);
+            binary_message_body(message_base* const basep);
 
         public:
 
             virtual ~binary_message_body();
 
-            virtual bool try_get(buffer_vector_type& value) const override;
+            virtual bool try_get(buffer_vector_type& value) override;
 
-            virtual size_type get_size() const override;
+            virtual size_type get_size() override;
 
         public:
 

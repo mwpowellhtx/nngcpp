@@ -30,7 +30,7 @@ namespace nng {
             typedef Message_ message_type;
             typedef message_conversion_getter_policy<Target_, Message_> base_type;
 
-            virtual target_type get(const message_type& rhs) {
+            virtual target_type get(message_type& rhs) {
                 return rhs.get();
             }
         };
@@ -51,7 +51,7 @@ namespace nng {
         template<>
         struct message_conversion_getter_policy<buffer_vector_type, supports_get_api<buffer_vector_type>> {
 
-            virtual buffer_vector_type get(const supports_get_api<buffer_vector_type>& rhs) {
+            virtual buffer_vector_type get(supports_get_api<buffer_vector_type>& rhs) {
                 return rhs.get();
             }
         };
@@ -78,7 +78,7 @@ namespace nng {
         template<>
         struct message_conversion_getter_policy<std::string, supports_get_api<buffer_vector_type>> {
 
-            virtual std::string get(const supports_get_api<buffer_vector_type>& rhs) {
+            virtual std::string get(supports_get_api<buffer_vector_type>& rhs) {
                 auto lhs_ = rhs.get();
                 return gymanstic_convert<buffer_vector_type, std::string, std::string::value_type>(lhs_);
             }
@@ -96,7 +96,7 @@ namespace nng {
         template<>
         struct message_conversion_getter_policy<std::string, binary_message> {
 
-            virtual std::string get(const binary_message& rhs) {
+            virtual std::string get(binary_message& rhs) {
                 const auto lhs_ = const_cast<binary_message&>(rhs).body()->get();
                 return gymanstic_convert<buffer_vector_type, std::string, std::string::value_type>(lhs_);
             }
@@ -114,7 +114,7 @@ namespace nng {
         template<>
         struct message_conversion_getter_policy<buffer_vector_type, binary_message> {
 
-            virtual buffer_vector_type get(const binary_message& rhs) {
+            virtual buffer_vector_type get(binary_message& rhs) {
                 return const_cast<binary_message&>(rhs).body()->get();
             }
         };
@@ -130,19 +130,19 @@ namespace nng {
 
         binary_message& operator<<(binary_message& lhs, const buffer_vector_type& rhs);
 
-        const binary_message& operator >> (const binary_message& lhs, buffer_vector_type& rhs);
+        binary_message& operator >> (binary_message& lhs, buffer_vector_type& rhs);
 
         binary_message& operator<<(binary_message& lhs, const std::string& rhs);
 
-        const binary_message& operator >> (const binary_message& lhs, std::string& rhs);
+        binary_message& operator >> (binary_message& lhs, std::string& rhs);
 
         supports_append_api<buffer_vector_type>& operator<<(supports_append_api<buffer_vector_type>& lhs, const buffer_vector_type& rhs);
 
-        const supports_get_api<buffer_vector_type>& operator >> (const supports_get_api<buffer_vector_type>& lhs, buffer_vector_type& rhs);
+        supports_get_api<buffer_vector_type>& operator >> (supports_get_api<buffer_vector_type>& lhs, buffer_vector_type& rhs);
 
         supports_append_api<buffer_vector_type>& operator<<(supports_append_api<buffer_vector_type>& lhs, const std::string& rhs);
 
-        const supports_get_api<buffer_vector_type>& operator >> (const supports_get_api<buffer_vector_type>& lhs, std::string& rhs);
+        supports_get_api<buffer_vector_type>& operator >> (supports_get_api<buffer_vector_type>& lhs, std::string& rhs);
     }
 }
 

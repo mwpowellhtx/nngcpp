@@ -16,28 +16,39 @@ namespace nng {
 
     namespace messaging {
 
-#ifndef NNGCPP_MESSAGE_PIPE_H
-        class message_pipe;
-#endif // NNGCPP_MESSAGE_PIPE_H
-
         // TODO: TBD: not the best placement for this one, but it will have to do.
         class message_base_api {
         protected:
 
+            friend class message_part;
+
             message_base_api();
+
+            virtual message_base_api& get_base() = 0;
+
+            virtual ::nng_msg* get_msgp() = 0;
 
             typedef std::function<void(::nng_msg*)> clear_op;
 
-            static void do_clear_op(const clear_op& op, ::nng_msg* msgp) {
-                if (msgp == nullptr) { return; }
-                op(msgp);
-            }
+            static void do_clear_op(const clear_op& op, ::nng_msg* msgp);
 
             virtual void clear() = 0;
+
+        public:
+
+            bool has_message();
         };
+
+#ifndef NNGCPP_MESSAGE_PIPE_H
+        class message_pipe;
+#endif // NNGCPP_MESSAGE_PIPE_H
 
         class message_base : public message_base_api {
         private:
+
+            friend class message_base_api;
+
+            friend class message_pipe;
 
             friend class socket;
 
@@ -49,25 +60,31 @@ namespace nng {
 
             typedef std::vector<uint8_t> buffer_vector_type;
 
-            friend class message_pipe;
-
         protected:
-
-            ::nng_msg* _msgp;
 
             message_base();
 
-            message_base(::nng_msg* msgp);
+            virtual message_base& get_base() override;
 
         public:
 
             virtual ~message_base();
+        };
 
-            virtual void set_msgp(::nng_msg* msgp);
+        class message_part : public message_base_api {
+        private:
 
-            virtual ::nng_msg* get_msgp() const;
+            message_base* _basep;
 
-            virtual bool has_message() const;
+            virtual message_base_api& get_base() override;
+
+        protected:
+
+            message_part(message_base* basep);
+
+            virtual ~message_part();
+
+            virtual ::nng_msg* get_msgp() override;
         };
     }
 }

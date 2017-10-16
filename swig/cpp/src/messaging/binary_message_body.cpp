@@ -18,23 +18,23 @@ namespace nng {
         using std::placeholders::_2;
         using std::placeholders::_3;
 
-        binary_message_body::binary_message_body() : message_base() {
-        }
-
-        binary_message_body::binary_message_body(::nng_msg* msgp) : message_base(msgp) {
+        binary_message_body::binary_message_body(message_base* basep) : message_part(basep) {
         }
 
         binary_message_body::~binary_message_body() {
         }
 
-        binary_message_body::size_type binary_message_body::get_size() const {
+        binary_message_body::size_type binary_message_body::get_size() {
+            const auto msgp = get_msgp();
             const auto op = std::bind(&::nng_msg_len, _1);
-            return _msgp == nullptr ? 0 : op(_msgp);
+            return msgp == nullptr ? 0 : op(msgp);
         }
 
-        bool binary_message_body::try_get(buffer_vector_type& value) const {
+        bool binary_message_body::try_get(buffer_vector_type& value) {
 
-            if (_msgp == nullptr) { return false; }
+            const auto msgp = get_msgp();
+
+            if (msgp == nullptr) { return false; }
 
             typedef message_getter_try_get_policy<buffer_vector_type, void*> policy_type;
 
@@ -51,68 +51,77 @@ namespace nng {
                 return y.size() > 0;
             };
 
-            return policy_type::try_get(value, _msgp, get_, convert_);
+            return policy_type::try_get(value, msgp, get_, convert_);
         }
 
         void binary_message_body::clear() {
-            if (_msgp == nullptr) { return; }
+            const auto msgp = get_msgp();
+            if (msgp == nullptr) { return; }
             const auto op = std::bind(&::nng_msg_clear, _1);
-            do_clear_op(op, _msgp);
+            do_clear_op(op, msgp);
         }
 
         void binary_message_body::append(const buffer_vector_type& buf) {
-            if (_msgp == nullptr) { return; }
+            const auto msgp = get_msgp();
+            if (msgp == nullptr) { return; }
             const auto op = std::bind(&::nng_msg_append, _1, _2, _3);
-            const auto errnum = op(_msgp, (const void*)&buf[0], buf.size());
+            const auto errnum = op(msgp, (const void*)&buf[0], buf.size());
             THROW_NNG_EXCEPTION_EC(errnum);
         }
 
         void binary_message_body::insert(const buffer_vector_type& buf) {
-            if (_msgp == nullptr) { return; }
+            const auto msgp = get_msgp();
+            if (msgp == nullptr) { return; }
             const auto op = std::bind(&::nng_msg_insert, _1, _2, _3);
-            const auto errnum = op(_msgp, (const void*)&buf[0], buf.size());
+            const auto errnum = op(msgp, (const void*)&buf[0], buf.size());
             THROW_NNG_EXCEPTION_EC(errnum);
         }
 
         void binary_message_body::trim(size_type sz) {
-            if (_msgp == nullptr) { return; }
+            const auto msgp = get_msgp();
+            if (msgp == nullptr) { return; }
             const auto op = std::bind(&::nng_msg_trim, _1, _2);
-            const auto errnum = op(_msgp, sz);
+            const auto errnum = op(msgp, sz);
             THROW_NNG_EXCEPTION_EC(errnum);
         }
 
         void binary_message_body::chop(size_type sz) {
-            if (_msgp == nullptr) { return; }
+            const auto msgp = get_msgp();
+            if (msgp == nullptr) { return; }
             const auto op = std::bind(&::nng_msg_chop, _1, _2);
-            const auto errnum = op(_msgp, sz);
+            const auto errnum = op(msgp, sz);
             THROW_NNG_EXCEPTION_EC(errnum);
         }
 
         void binary_message_body::append(const uint32_t& val) {
-            if (_msgp == nullptr) { return; }
+            const auto msgp = get_msgp();
+            if (msgp == nullptr) { return; }
             const auto op = std::bind(&::nng_msg_append_u32, _1, _2);
-            const auto errnum = op(_msgp, val);
+            const auto errnum = op(msgp, val);
             THROW_NNG_EXCEPTION_EC(errnum);
         }
 
         void binary_message_body::insert(const uint32_t& val) {
-            if (_msgp == nullptr) { return; }
+            const auto msgp = get_msgp();
+            if (msgp == nullptr) { return; }
             const auto op = std::bind(&::nng_msg_insert_u32, _1, _2);
-            const auto errnum = op(_msgp, val);
+            const auto errnum = op(msgp, val);
             THROW_NNG_EXCEPTION_EC(errnum);
         }
 
         void binary_message_body::trim(uint32_t* valp) {
-            if (_msgp == nullptr) { return; }
+            const auto msgp = get_msgp();
+            if (msgp == nullptr) { return; }
             const auto op = std::bind(&::nng_msg_trim_u32, _1, _2);
-            const auto errnum = op(_msgp, valp);
+            const auto errnum = op(msgp, valp);
             THROW_NNG_EXCEPTION_EC(errnum);
         }
 
         void binary_message_body::chop(uint32_t* valp) {
-            if (_msgp == nullptr) { return; }
+            const auto msgp = get_msgp();
+            if (msgp == nullptr) { return; }
             const auto op = std::bind(&::nng_msg_chop_u32, _1, _2);
-            const auto errnum = op(_msgp, valp);
+            const auto errnum = op(msgp, valp);
             THROW_NNG_EXCEPTION_EC(errnum);
         }
     }

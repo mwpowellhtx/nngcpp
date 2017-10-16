@@ -93,7 +93,7 @@ namespace nng {
         /* Yes, this is not a mistake. Message passing semantics means that NNG assumes
         ownership of the message after passing. Effectively, this nullifies the message. */
         // TODO: TBD: at least for now this seems reasonable: depending on the error code, we may or may not want to do this...
-        if (!errnum) { bmp->set_msgp(nullptr); }
+        if (!errnum) { bmp->on_sent(); }
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 

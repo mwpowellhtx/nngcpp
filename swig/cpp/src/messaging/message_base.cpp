@@ -4,13 +4,15 @@ namespace nng {
 
     namespace messaging {
 
+        void message_base_api::do_clear_op(const clear_op& op, ::nng_msg* msgp) {
+            if (msgp == nullptr) { return; }
+            op(msgp);
+        }
+
         message_base_api::message_base_api() {
         }
 
-        message_base::message_base() : message_base_api(), _msgp(nullptr) {
-        }
-
-        message_base::message_base(::nng_msg* msgp) : message_base_api(), _msgp(msgp) {
+        message_base::message_base() : message_base_api() {
         }
 
         message_base::~message_base() {
@@ -19,16 +21,28 @@ namespace nng {
             However, for Binary Message and sister classes it is entirely correct. */
         }
 
-        void message_base::set_msgp(::nng_msg* msgp) {
-            _msgp = msgp;
+        message_base& message_base::get_base() {
+            return *this;
         }
 
-        ::nng_msg* message_base::get_msgp() const {
-            return _msgp;
+        bool message_base_api::has_message() {
+            const auto msgp = get_base().get_msgp();
+            return msgp != nullptr;
         }
 
-        bool message_base::has_message() const {
-            return _msgp != nullptr;
+        message_part::message_part(message_base* basep) : message_base_api(), _basep(basep) {
+        }
+
+        message_part::~message_part() {
+            _basep = nullptr;
+        }
+
+        message_base_api& message_part::get_base() {
+            return *_basep;
+        }
+
+        ::nng_msg* message_part::get_msgp() {
+            return get_base().get_msgp();
         }
     }
 }
