@@ -23,7 +23,7 @@ namespace nng {
 
             using namespace messaging;
 
-            void test_properties(binary_message* bmp, listener* lp, dialer* dp) {
+            void property_tests(binary_message* bmp, listener* lp, dialer* dp) {
 
                 using namespace std;
                 using namespace protocol;
@@ -88,9 +88,9 @@ TEST_CASE("TCP transport", "[tcp][transport][nng][cxx]") {
     using namespace transport;
     using namespace constants;
 
-    const auto& test_properties = std::bind(&v4::test_properties, _1, _2, _3);
+    const auto& property_tests = std::bind(&v4::property_tests, _1, _2, _3);
 
-    extended_transport_fixture fixture(loopback_addr_base, test_properties);
+    extended_transport_fixture fixture(loopback_addr_base, property_tests);
 
     fixture.run_all();
 
