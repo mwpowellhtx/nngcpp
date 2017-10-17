@@ -39,23 +39,20 @@ if (NNGCPP_ENABLE_TESTS)
 
     set (TEST_PORT 12100)
 
-    macro (nngcpp_add_test TEST_FILENAME TIMEOUT)
+    set (DEFAULT_TEST_SRCS
+        main.cpp
+
+        helpers/basic_fixture.cpp
+        helpers/basic_fixture.h
+
+        helpers/constants.cpp
+        helpers/constants.h
+        
+        helpers/chrono.hpp
+        )
+
+    macro (nngcpp_finalize_test TEST_NAME TIMEOUT SRCS)
         # list (APPEND all_tests ${NAME})
-        set (TEST_PATH ${TEST_FILENAME}.cpp)
-        get_filename_component (TEST_NAME ${TEST_FILENAME} NAME_WE)
-        add_executable (${TEST_NAME}
-            main.cpp
-
-            helpers/basic_fixture.cpp
-            helpers/basic_fixture.h
-
-            helpers/constants.cpp
-            helpers/constants.h
-
-            helpers/chrono.hpp
-
-            ${TEST_PATH}
-            )
         # Treat NNG and NNGCPP as DEPENDENCIES rather than link libraries.
         add_dependencies (${TEST_NAME} nng)
         add_dependencies (${TEST_NAME} ${NNGCPP_PROJECT_NAME_STATIC})
@@ -75,6 +72,29 @@ if (NNGCPP_ENABLE_TESTS)
         add_test (NAME ${TEST_NAME} COMMAND ${TEST_NAME} -v -p)
         set_tests_properties (${TEST_NAME} PROPERTIES TIMEOUT ${TIMEOUT})
         math (EXPR TEST_PORT "${TEST_PORT}+20")
+    endmacro ()
+
+    macro (nngcpp_add_test TEST_FILENAME TIMEOUT)
+        set (TEST_PATH ${TEST_FILENAME}.cpp)
+        get_filename_component (TEST_NAME ${TEST_FILENAME} NAME_WE)
+        set (TEST_SRCS ${DEFAULT_TEST_SRCS})
+        list (APPEND TEST_SRCS ${TEST_PATH})
+        add_executable (${TEST_NAME} ${TEST_SRCS})
+        nngcpp_finalize_test (${TEST_NAME} ${TIMEOUT} ${TEST_SRCS})
+        message (STATUS "Unit test '${TEST_FILENAME}' configured.")
+    endmacro ()
+
+    macro (nngcpp_add_transport_test TEST_FILENAME TIMEOUT)
+        set (TEST_PATH ${TEST_FILENAME}.cpp)
+        get_filename_component (TEST_NAME ${TEST_FILENAME} NAME_WE)
+        set (TEST_SRCS ${DEFAULT_TEST_SRCS})
+        list (APPEND TEST_SRCS ${TEST_PATH})
+        list (APPEND TEST_SRCS
+            transport/transport.cpp
+            transport/transport.h
+        )
+        add_executable (${TEST_NAME} ${TEST_SRCS})
+        nngcpp_finalize_test (${TEST_NAME} ${TIMEOUT} ${TEST_SRCS})
         message (STATUS "Unit test '${TEST_FILENAME}' configured.")
     endmacro ()
 
@@ -139,9 +159,10 @@ nngcpp_add_test (protocol/pubsub 5)
 nngcpp_add_test (protocol/reqrep 5)
 nngcpp_add_test (protocol/survey 5)
 
+nngcpp_add_transport_test (transport/inproc 5)
+
 # nngcpp_add_test(event 5)
 # nngcpp_add_test(idhash 5)
-# nngcpp_add_test(inproc 5)
 # nngcpp_add_test(ipc 5)
 # nngcpp_add_test(list 5)
 # nngcpp_add_test(platform 5)
