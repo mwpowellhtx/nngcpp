@@ -10,9 +10,12 @@
 namespace nng {
 
     class options {
-        protected:
+    public:
 
-            typedef std::size_t size_type;
+        typedef std::size_t size_type;
+
+    protected:
+
             typedef uint64_t option_ulonglong_type;
 
             options();
