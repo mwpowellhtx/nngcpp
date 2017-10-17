@@ -77,7 +77,7 @@ TEST_CASE("Request/reply pattern", "[req][rep][v0][protocol][sockets][nng][cxx]"
             REQUIRE_NOTHROW(reqp->set_option_usec(O::req_resend_time_usec, CAST_DURATION_TO_USEC(10ms).count()));
             // TODO: TBD: it is unit tests like this that really deserve a more focused unit test on just options alone...
             // Check invalid size.
-            REQUIRE_THROWS_AS_MATCHING(reqp->set_option(O::req_resend_time_usec, __empty, 1), nng_exception, ThrowsNngException(ec_einval));
+            REQUIRE_THROWS_AS_MATCHING(reqp->set_option(O::req_resend_time_usec, __empty, 1), nng_exception, THROWS_NNG_EXCEPTION(ec_einval));
 		}
 
 		SECTION("Receive socket without send socket fails") {
@@ -85,7 +85,7 @@ TEST_CASE("Request/reply pattern", "[req][rep][v0][protocol][sockets][nng][cxx]"
             // TODO: TBD: really needs its own unit tests for the operation alone: verify in the binary message tests...
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>(static_cast<::nng_msg*>(nullptr)));
 
-            REQUIRE_THROWS_AS_MATCHING(reqp->try_receive(bmp.get()), nng_exception, ThrowsNngException(ec_estate));
+            REQUIRE_THROWS_AS_MATCHING(reqp->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_estate));
 		}
 
         SECTION("Socket can close") {
@@ -113,11 +113,11 @@ TEST_CASE("Request/reply pattern", "[req][rep][v0][protocol][sockets][nng][cxx]"
 
 		SECTION("Send without receive fails") {
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
-            REQUIRE_THROWS_AS_MATCHING(repp->send(bmp.get()), nng_exception, ThrowsNngException(ec_estate));
+            REQUIRE_THROWS_AS_MATCHING(repp->send(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_estate));
 		}
 
 		SECTION("Cannot set resend time option") {
-            REQUIRE_THROWS_AS_MATCHING(repp->set_option_usec(O::req_resend_time_usec, (100us).count()), nng_exception, ThrowsNngException(ec_enotsup));
+            REQUIRE_THROWS_AS_MATCHING(repp->set_option_usec(O::req_resend_time_usec, (100us).count()), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
 		}
 
         SECTION("Socket can close") {
@@ -144,9 +144,9 @@ TEST_CASE("Request/reply pattern", "[req][rep][v0][protocol][sockets][nng][cxx]"
             REQUIRE_NOTHROW(*pingp << ping);
             REQUIRE_NOTHROW(reqp->send(pingp.get()));
             // We will use this state to our advantage later on.
-            REQUIRE(pingp->has_message() == false);
+            REQUIRE(pingp->has_one() == false);
             REQUIRE_NOTHROW(repp->try_receive(pongp.get()));
-            REQUIRE(pongp->has_message() == true);
+            REQUIRE(pongp->has_one() == true);
             REQUIRE_THAT(pongp->body()->get(), Equals(ping_buf));
 
             // Interesting, now use the Trim API.
@@ -181,7 +181,7 @@ TEST_CASE("Request/reply pattern", "[req][rep][v0][protocol][sockets][nng][cxx]"
         REQUIRE_NOTHROW(reqp->send(abcp.get()));
         REQUIRE_NOTHROW(reqp->send(defp.get()));
         REQUIRE_NOTHROW(repp->try_receive(cmdp.get()));
-        REQUIRE_NOTHROW(cmdp->has_message() == true);
+        REQUIRE_NOTHROW(cmdp->has_one() == true);
 
         REQUIRE_NOTHROW(repp->send(cmdp.get()));
         REQUIRE_NOTHROW(repp->try_receive(cmdp.get()));

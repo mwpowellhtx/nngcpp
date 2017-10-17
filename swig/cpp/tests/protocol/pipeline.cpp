@@ -313,8 +313,8 @@ TEST_CASE("Load balancing works", "[pipeline][push][pull][load][balancing]") {
     REQUIRE_NOTHROW(abcsp = make_unique<binary_message>());
     REQUIRE_NOTHROW(defsp = make_unique<binary_message>());
 
-    REQUIRE_THROWS_AS_MATCHING(pullsp1->try_receive(abcsp.get()), nng_exception, ThrowsNngException(ec_etimedout));
-    REQUIRE_THROWS_AS_MATCHING(pullsp2->try_receive(defsp.get()), nng_exception, ThrowsNngException(ec_etimedout));
+    REQUIRE_THROWS_AS_MATCHING(pullsp1->try_receive(abcsp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
+    REQUIRE_THROWS_AS_MATCHING(pullsp2->try_receive(defsp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
 
     SECTION("Can close sockets") {
         REQUIRE_NOTHROW(pushsp.reset());

@@ -93,9 +93,9 @@ TEST_CASE("Bus pattern tests", "[bus][protocol][sockets][cxx]") {
             auto bmp = std::make_unique<binary_message>();
 
             // This is just a poor man's sleep.
-            REQUIRE_THROWS_AS_MATCHING(busp1->try_receive(bmp.get()), nng_exception, ThrowsNngException(ec_etimedout));
-            REQUIRE_THROWS_AS_MATCHING(busp2->try_receive(bmp.get()), nng_exception, ThrowsNngException(ec_etimedout));
-            REQUIRE_THROWS_AS_MATCHING(busp3->try_receive(bmp.get()), nng_exception, ThrowsNngException(ec_etimedout));
+            REQUIRE_THROWS_AS_MATCHING(busp1->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
+            REQUIRE_THROWS_AS_MATCHING(busp2->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
+            REQUIRE_THROWS_AS_MATCHING(busp3->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
 
             SECTION("Bus2 delivers message to Bus1, Bus3 times out") {
 
@@ -105,7 +105,7 @@ TEST_CASE("Bus pattern tests", "[bus][protocol][sockets][cxx]") {
                 REQUIRE_THAT(bmp->body()->get(), Equals(_99bits_buf));
 
                 REQUIRE_NOTHROW(bmp = std::make_unique<binary_message>());
-                REQUIRE_THROWS_AS_MATCHING(busp3->try_receive(bmp.get()), nng_exception, ThrowsNngException(ec_etimedout));
+                REQUIRE_THROWS_AS_MATCHING(busp3->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
             }
 
             SECTION ("Bus1 delivers message to both Bus2 and Bus3") {

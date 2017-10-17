@@ -346,7 +346,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
             REQUIRE_NOTHROW(*bmp << two);
             REQUIRE_NOTHROW(clientp2->send(bmp.get()));
-            REQUIRE_THROWS_AS_MATCHING(serverp1->try_receive(bmp.get()), nng_exception, ThrowsNngException(ec_etimedout));
+            REQUIRE_THROWS_AS_MATCHING(serverp1->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
         }
 
         SECTION("Cannot set raw mode after connected") {
@@ -355,8 +355,8 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
             REQUIRE_NOTHROW(clientp1->dial(addr));
             SLEEP_FOR(100ms);
 
-            REQUIRE_THROWS_AS_MATCHING(serverp1->set_option_int(O::raw, 1), nng_exception, ThrowsNngException(ec_estate));
-            REQUIRE_THROWS_AS_MATCHING(clientp1->set_option_int(O::raw, 1), nng_exception, ThrowsNngException(ec_estate));
+            REQUIRE_THROWS_AS_MATCHING(serverp1->set_option_int(O::raw, 1), nng_exception, THROWS_NNG_EXCEPTION(ec_estate));
+            REQUIRE_THROWS_AS_MATCHING(clientp1->set_option_int(O::raw, 1), nng_exception, THROWS_NNG_EXCEPTION(ec_estate));
         }
 
         SECTION("Polyamorous mode is best effort") {
@@ -429,7 +429,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
             REQUIRE_NOTHROW(clientp1->dial(addr));
             SLEEP_FOR(100ms);
 
-            REQUIRE_THROWS_AS_MATCHING(serverp1->set_option_int(O::pair1_polyamorous, 1), nng_exception, ThrowsNngException(ec_estate));
+            REQUIRE_THROWS_AS_MATCHING(serverp1->set_option_int(O::pair1_polyamorous, 1), nng_exception, THROWS_NNG_EXCEPTION(ec_estate));
         }
 
         SECTION("Monogamous raw mode works") {
@@ -483,7 +483,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
 
                 REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
                 REQUIRE_NOTHROW(clientp1->send(bmp.get()));
-                REQUIRE_THROWS_AS_MATCHING(serverp1->try_receive(bmp.get()), nng_exception, ThrowsNngException(ec_etimedout));
+                REQUIRE_THROWS_AS_MATCHING(serverp1->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
 
                 REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
                 REQUIRE_NOTHROW(bmp->body()->append(feedface));
@@ -502,7 +502,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
                     REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
                     REQUIRE_NOTHROW(bmp->header()->append(deadzeros));
                     REQUIRE_NOTHROW(clientp1->send(bmp.get()));
-                    REQUIRE_THROWS_AS_MATCHING(serverp1->try_receive(bmp.get()), nng_exception, ThrowsNngException(ec_etimedout));
+                    REQUIRE_THROWS_AS_MATCHING(serverp1->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
                 }
 
                 // TODO: TBD: zero bits? there are non zeros here...
@@ -534,7 +534,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
                     REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
                     REQUIRE_NOTHROW(bmp->header()->append(expected));
                     REQUIRE_NOTHROW(clientp1->send(bmp.get()));
-                    REQUIRE_THROWS_AS_MATCHING(serverp1->try_receive(bmp.get()), nng_exception, ThrowsNngException(ec_etimedout));
+                    REQUIRE_THROWS_AS_MATCHING(serverp1->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
                 }
 
                 SECTION("Good TTL passes") {
@@ -572,18 +572,18 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
                     REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
                     REQUIRE_NOTHROW(bmp->header()->append(ttl));
                     REQUIRE_NOTHROW(clientp1->send(bmp.get()));
-                    REQUIRE_THROWS_AS_MATCHING(serverp1->try_receive(bmp.get()), nng_exception, ThrowsNngException(ec_etimedout));
+                    REQUIRE_THROWS_AS_MATCHING(serverp1->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
                 }
             }
         }
         SECTION("We cannot set insane TTLs") {
 
             // TODO: TBD: really should be part of an options-oriented unit test...
-            REQUIRE_THROWS_AS_MATCHING(serverp1->set_option_int(O::max_ttl, ttl = 0), nng_exception, ThrowsNngException(ec_einval));
-            REQUIRE_THROWS_AS_MATCHING(serverp1->set_option_int(O::max_ttl, ttl = 1000), nng_exception, ThrowsNngException(ec_einval));
+            REQUIRE_THROWS_AS_MATCHING(serverp1->set_option_int(O::max_ttl, ttl = 0), nng_exception, THROWS_NNG_EXCEPTION(ec_einval));
+            REQUIRE_THROWS_AS_MATCHING(serverp1->set_option_int(O::max_ttl, ttl = 1000), nng_exception, THROWS_NNG_EXCEPTION(ec_einval));
             // TODO: TBD: still a candidate for unit tests.
             // Note the subtle difference in set call.
-            REQUIRE_THROWS_AS_MATCHING(serverp1->set_option(O::max_ttl, &(ttl = 8), 1), nng_exception, ThrowsNngException(ec_einval));
+            REQUIRE_THROWS_AS_MATCHING(serverp1->set_option(O::max_ttl, &(ttl = 8), 1), nng_exception, THROWS_NNG_EXCEPTION(ec_einval));
         }
 
         SECTION("Polyamorous cooked mode works") {
@@ -643,7 +643,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
             REQUIRE_NOTHROW(bmp->set_pipe(mpp1.get()));
             REQUIRE_NOTHROW(*bmp << ein);
             REQUIRE_NOTHROW(serverp1->send(bmp.get()));
-            REQUIRE_THROWS_AS_MATCHING(clientp2->try_receive(bmp.get()), nng_exception, ThrowsNngException(ec_etimedout));
+            REQUIRE_THROWS_AS_MATCHING(clientp2->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
         }
 
         SECTION("Polyamorous default works") {
@@ -753,7 +753,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
                 REQUIRE_NOTHROW(*bmp << ein);
                 REQUIRE_NOTHROW(bmp->header()->append(1));
                 REQUIRE_NOTHROW(serverp1->send(bmp.get()));
-                REQUIRE_THROWS_AS_MATCHING(clientp2->try_receive(bmp.get()), nng_exception, ThrowsNngException(ec_etimedout));
+                REQUIRE_THROWS_AS_MATCHING(clientp2->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
             }
         }
     }

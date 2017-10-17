@@ -66,7 +66,7 @@ TEST_CASE("Survey pattern", "[surveyor][respondent][v0][protocol][sockets][nng][
 		SECTION("Receive without survey fails") {
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>(nullptr));
-            REQUIRE_THROWS_AS_MATCHING(surp->try_receive(bmp.get()), nng_exception, ThrowsNngException(ec_estate));
+            REQUIRE_THROWS_AS_MATCHING(surp->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_estate));
 		}
 
 		SECTION("Survey without responder times out") {
@@ -75,7 +75,7 @@ TEST_CASE("Survey pattern", "[surveyor][respondent][v0][protocol][sockets][nng][
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
             REQUIRE_NOTHROW(surp->send(bmp.get()));
-            REQUIRE_THROWS_AS_MATCHING(surp->try_receive(bmp.get()), nng_exception, ThrowsNngException(ec_etimedout));
+            REQUIRE_THROWS_AS_MATCHING(surp->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
 		}
 
         SECTION("Socket can close") {
@@ -103,7 +103,7 @@ TEST_CASE("Survey pattern", "[surveyor][respondent][v0][protocol][sockets][nng][
         SECTION("Send fails with no suveyor") {
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
-            REQUIRE_THROWS_AS_MATCHING(resp->send(bmp.get()), nng_exception, ThrowsNngException(ec_estate));
+            REQUIRE_THROWS_AS_MATCHING(resp->send(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_estate));
         }
 
         SECTION("Socket can close") {
@@ -151,14 +151,14 @@ TEST_CASE("Survey pattern", "[surveyor][respondent][v0][protocol][sockets][nng][
             REQUIRE_THAT(bmp->body()->get(), Equals(def_buf));
 
             REQUIRE_NOTHROW(bmp->set_msgp(nullptr));
-            REQUIRE_THROWS_AS_MATCHING(surp->try_receive(bmp.get()), nng_exception, ThrowsNngException(ec_etimedout));
+            REQUIRE_THROWS_AS_MATCHING(surp->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
 
 			SECTION("And goes to non-survey state") {
 
                 REQUIRE_NOTHROW(surp->set_option_usec(O::receive_timeout_usec, CAST_DURATION_TO_USEC(200ms).count()));
 
                 // ...
-                REQUIRE_THROWS_AS_MATCHING(surp->try_receive(bmp.get()), nng_exception, ThrowsNngException(ec_estate));
+                REQUIRE_THROWS_AS_MATCHING(surp->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_estate));
 			}
 		}
 	}

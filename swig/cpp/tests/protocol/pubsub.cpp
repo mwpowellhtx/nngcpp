@@ -208,14 +208,14 @@ TEST_CASE("Publisher/subscriber pattern using C++ wrapper", "[pub][sub][v0][prot
                 REQUIRE_NOTHROW(subp->set_option(O::sub_unsubscribe, abc));
                 REQUIRE_NOTHROW(subp->set_option(O::sub_unsubscribe, __empty));
 
-                REQUIRE_THROWS_AS_MATCHING(subp->set_option(O::sub_unsubscribe, __empty), nng_exception, ThrowsNngException(ec_enoent));
-                REQUIRE_THROWS_AS_MATCHING(subp->set_option(O::sub_unsubscribe, hello), nng_exception, ThrowsNngException(ec_enoent));
+                REQUIRE_THROWS_AS_MATCHING(subp->set_option(O::sub_unsubscribe, __empty), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
+                REQUIRE_THROWS_AS_MATCHING(subp->set_option(O::sub_unsubscribe, hello), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
             }
         }
 
         SECTION("Publisher cannot subscribe") {
 
-            REQUIRE_THROWS_AS_MATCHING(pubp->set_option(O::sub_subscribe, __empty), nng_exception, ThrowsNngException(ec_enotsup));
+            REQUIRE_THROWS_AS_MATCHING(pubp->set_option(O::sub_subscribe, __empty), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
         }
 
         SECTION("Subscriber can receive from publisher") {
@@ -233,7 +233,7 @@ TEST_CASE("Publisher/subscriber pattern using C++ wrapper", "[pub][sub][v0][prot
             REQUIRE_NOTHROW(*bmp << topics::somewhere_over_the_rainbow);
             REQUIRE_THAT(bmp->body()->get(), Equals(topics::somewhere_over_the_rainbow_buf));
             REQUIRE_NOTHROW(pubp->send(bmp.get()));
-            REQUIRE_THROWS_AS_MATCHING(subp->try_receive(bmp.get()), nng_exception, ThrowsNngException(ec_etimedout));
+            REQUIRE_THROWS_AS_MATCHING(subp->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
             REQUIRE_NOTHROW(*bmp << topics::some_day_some_how);
@@ -249,7 +249,7 @@ TEST_CASE("Publisher/subscriber pattern using C++ wrapper", "[pub][sub][v0][prot
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
             REQUIRE_NOTHROW(*bmp << topics::some_do_not_like_it);
             REQUIRE_NOTHROW(pubp->send(bmp.get()));
-            REQUIRE_THROWS_AS_MATCHING(subp->try_receive(bmp.get()), nng_exception, ThrowsNngException(ec_etimedout));
+            REQUIRE_THROWS_AS_MATCHING(subp->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
         }
 
         SECTION("Subscribers in raw receive") {

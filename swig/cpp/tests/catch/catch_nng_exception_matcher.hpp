@@ -46,11 +46,9 @@ namespace Catch {
                 }
             };
         }
-
-        Exceptions::NngExceptionMatcher ThrowsNngException(const nng::error_code_type expected_ec) {
-            return Exceptions::NngExceptionMatcher(expected_ec);
-        }
     }
 }
+
+#define THROWS_NNG_EXCEPTION(expected_ec) Catch::Matchers::Exceptions::NngExceptionMatcher(expected_ec)
 
 #endif // CATCH_NNG_EXCEPTION_MATCHER_HPP

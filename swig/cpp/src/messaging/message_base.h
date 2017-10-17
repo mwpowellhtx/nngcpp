@@ -36,7 +36,7 @@ namespace nng {
 
         public:
 
-            bool has_message();
+            bool has_one();
         };
 
 #ifndef NNGCPP_MESSAGE_PIPE_H

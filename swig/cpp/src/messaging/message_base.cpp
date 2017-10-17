@@ -25,7 +25,7 @@ namespace nng {
             return *this;
         }
 
-        bool message_base_api::has_message() {
+        bool message_base_api::has_one() {
             const auto msgp = get_base().get_msgp();
             return msgp != nullptr;
         }

@@ -36,7 +36,7 @@
 #define NNGCPP_TESTS_REQUIRE_BINARY_MESSAGE(bm, msgp) \
     REQUIRE((bm).body() != nullptr); \
     REQUIRE((bm).header() != nullptr); \
-    REQUIRE((bm).has_message() == ((msgp) != nullptr)); \
+    REQUIRE((bm).has_one() == ((msgp) != nullptr)); \
     REQUIRE((bm).get_msgp() == (msgp)); \
     REQUIRE((bm).header()->get_msgp() == (msgp)); \
     REQUIRE((bm).body()->get_msgp() == (msgp))

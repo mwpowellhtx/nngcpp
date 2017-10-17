@@ -33,27 +33,6 @@ test with a returning error number. */
 #define NNG_TESTS_REQUIRE_ERR_EQ(code, expected) errnum = code; \
     REQUIRE(errnum == expected)
 
-//// TODO: TBD: these really deserve to be full on unit tests of the binary message, if not already done... not least of which half the assumptions made here are no longer correct...
-///* While I despise macro code expansion, this is "better" for us because in the event
-//of a legit failure, we see the actual line IN-SITU where the test case ACTUALLY IS. */
-//#define NNGCPP_TESTS_ALLOCATE_MSG_SZ(m, sz) \
-//    REQUIRE((m).has_message() == false); \
-//    REQUIRE((m).get_msgp() == nullptr); \
-//    \
-//    REQUIRE_NOTHROW((m).allocate(sz)); \
-//    REQUIRE((m).has_message() == true); \
-//    REQUIRE((m).get_msgp() != nullptr); \
-//    \
-//    REQUIRE((m).header() != nullptr); \
-//    REQUIRE((m).header()->has_message()); \
-//    REQUIRE((m).header()->get_msgp() == (m).get_msgp()); \
-//    \
-//    REQUIRE((m).body() != nullptr); \
-//    REQUIRE((m).body()->has_message()); \
-//    REQUIRE((m).body()->get_msgp() == (m).get_msgp());
-//
-//#define NNGCPP_TESTS_ALLOCATE_MSG(m) NNGCPP_TESTS_ALLOCATE_MSG_SZ(m, 0)
-
 struct c_style_fixture {
 
     ::nng_socket push;
@@ -243,10 +222,10 @@ TEST_CASE("NNG C++ wrapper reconnect works", "[nng][reconnect][cxx]") {
                 REQUIRE_NOTHROW(push->send(bmp.get()));
                 /* Ditto message passing semantics. The Send() operation effectively
                 nullifies the internal message. */
-                REQUIRE(bmp->has_message() == false);
+                REQUIRE(bmp->has_one() == false);
 
                 REQUIRE_NOTHROW(pull->try_receive(bmp.get()));
-                REQUIRE(bmp->has_message() == true);
+                REQUIRE(bmp->has_one() == true);
                 // Just verify that the message matches the buffer.
                 REQUIRE_THAT(bmp->body()->get(), Equals(hello_buf));
             }
@@ -276,11 +255,11 @@ TEST_CASE("NNG C++ wrapper reconnect works", "[nng][reconnect][cxx]") {
                 this_thread::sleep_for(100ms);
                 REQUIRE_NOTHROW(*bmp << hello);
                 REQUIRE_NOTHROW(push->send(bmp.get()));
-                REQUIRE(bmp->has_message() == false);
+                REQUIRE(bmp->has_one() == false);
 
                 // See notes above. Sending transfers ownership of the internal message to NNG.
                 REQUIRE_NOTHROW(pull->try_receive(bmp.get()));
-                REQUIRE(bmp->has_message() == true);
+                REQUIRE(bmp->has_one() == true);
                 // Just verify that the message matches the buffer.
                 REQUIRE_THAT(bmp->body()->get(), Equals(hello_buf));
 
@@ -306,10 +285,10 @@ TEST_CASE("NNG C++ wrapper reconnect works", "[nng][reconnect][cxx]") {
                     REQUIRE_NOTHROW(*bmp2 << again);
                     // TODO: TBD: send/no-message -> receive/message is a pattern that deserves its own focused unit test...
                     REQUIRE_NOTHROW(push->send(bmp2.get()));
-                    REQUIRE(bmp2->has_message() == false);
+                    REQUIRE(bmp2->has_one() == false);
 
                     REQUIRE_NOTHROW(pull->try_receive(bmp2.get()));
-                    REQUIRE(bmp2->has_message() == true);
+                    REQUIRE(bmp2->has_one() == true);
                     // Just verify that the message matches the buffer.
                     REQUIRE_THAT(bmp2->body()->get(), Equals(again_buf));
 

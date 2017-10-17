@@ -53,23 +53,23 @@ namespace nng {
         }
 
         binary_message_header* const binary_message::header() {
-            if (!has_message()) { allocate(); }
+            if (!has_one()) { allocate(); }
             return &_header;
         }
 
         binary_message_body* const binary_message::body() {
-            if (!has_message()) { allocate(); }
+            if (!has_one()) { allocate(); }
             return &_body;
         }
 
         message_base::size_type binary_message::get_size() {
             // Should be both (Header.Size + Body.Size).
-            if (!has_message()) { allocate(); }
+            if (!has_one()) { allocate(); }
             return _header.get_size() + _body.get_size();
         }
 
         void binary_message::clear() {
-            if (!has_message()) { return; }
+            if (!has_one()) { return; }
             _header.clear();
             _body.clear();
         }
@@ -90,7 +90,7 @@ namespace nng {
         }
 
         void binary_message::allocate(size_type sz) {
-            if (has_message()) { return; }
+            if (has_one()) { return; }
             ::nng_msg* msgp;
             try {
                 const auto op = std::bind(::nng_msg_alloc, _1, _2);
@@ -109,7 +109,7 @@ namespace nng {
         }
 
         void binary_message::free() {
-            if (!has_message()) { return; }
+            if (!has_one()) { return; }
             const auto op = std::bind(::nng_msg_free, _1);
             op(_msgp);
             // Just set the member directly since we own it.
@@ -118,7 +118,7 @@ namespace nng {
 
         void binary_message::set_pipe(const message_pipe* const mpp) {
             if (mpp == nullptr) { return; }
-            if (!has_message()) { allocate(); }
+            if (!has_one()) { allocate(); }
             // This is another convenience moment: allocate beforehand, if necessary.
             // TODO: TBD: there is no return value here unfortunately... perhaps there should be?
             const auto op = std::bind(&::nng_msg_set_pipe, _1, _2);
