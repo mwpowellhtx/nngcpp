@@ -44,6 +44,7 @@ namespace nng {
 
             virtual ~session();
 
+            // TODO: TBD: for now leave it as-is; eventually convert from (const socket&) to (const socket* const) ...
             std::shared_ptr<dialer> create_dialer_ep();
             std::shared_ptr<dialer> create_dialer_ep(const socket& s, const std::string& addr);
 

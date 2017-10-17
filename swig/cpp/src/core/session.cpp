@@ -56,7 +56,7 @@ namespace nng {
     }
 
     std::shared_ptr<dialer> session::create_dialer_ep(const socket& s, const std::string& addr) {
-        return __create(_dialer_eps, s, addr);
+        return __create(_dialer_eps, &s, addr);
     }
 
     std::shared_ptr<listener> session::create_listener_ep() {
@@ -64,7 +64,7 @@ namespace nng {
     }
 
     std::shared_ptr<listener> session::create_listener_ep(const socket& s, const std::string& addr) {
-        return __create(_listener_eps, s, addr);
+        return __create(_listener_eps, &s, addr);
     }
 
     void session::remove_dialer_ep(const dialer* const dp) {
