@@ -163,11 +163,11 @@ nngcpp_add_test (protocol/reqrep 5)
 nngcpp_add_test (protocol/survey 5)
 
 nngcpp_add_transport_test (transport/inproc 5)
+nngcpp_add_transport_test (transport/ipc 5)
 nngcpp_add_transport_test (transport/tcp 5)
 
 # nngcpp_add_test(event 5)
 # nngcpp_add_test(idhash 5)
-# nngcpp_add_test(ipc 5)
 # nngcpp_add_test(list 5)
 # nngcpp_add_test(platform 5)
 # nngcpp_add_test(resolv 10)

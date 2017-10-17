@@ -88,6 +88,31 @@ namespace nng {
         void run_send_and_receive(const std::string& addr);
         void run_send_and_receive_large_data(const std::string& addr);
     };
+
+    struct c_style_transport_fixture : public basic_fixture, public address_calculator {
+
+        c_style_transport_fixture(const std::string& base_addr);
+
+        virtual ~c_style_transport_fixture();
+
+        virtual void run_all();
+ 
+    protected:
+
+        std::string _base_addr;
+
+        ::nng_socket _rep, _req;
+
+        virtual void run_all(const std::string& addr);
+
+    private:
+
+        void run_connection_refused_works(const char* addr);
+        void run_dup_listeners_rejected(const char* addr);
+        void run_listener_and_dialer_accepted(const char* addr);
+        void run_send_and_receive(const char* addr);
+        void run_send_and_receive_large_data(const char* addr);
+    };
 }
 
 #endif // NNGCPP_TESTS_TRANSPORT_FIXTURE_H

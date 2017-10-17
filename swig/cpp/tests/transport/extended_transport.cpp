@@ -54,24 +54,20 @@ namespace nng {
 
         using namespace std;
         using namespace messaging;
-        using namespace protocol;
         using namespace constants;
         using namespace Catch::Matchers;
 
         SECTION("Run property tests") {
 
-            unique_ptr<listener> lp;
-            unique_ptr<dialer> dp;
+            listener l;
+            dialer d;
 
             unique_ptr<binary_message> sendp, recvp;
 
-            REQUIRE_NOTHROW(lp = make_unique<listener>());
-            REQUIRE_NOTHROW(dp = make_unique<dialer>());
-
-            REQUIRE_NOTHROW(_repp->listen(addr, lp.get()));
-            REQUIRE(lp->has_one() == true);
-            REQUIRE_NOTHROW(_reqp->dial(addr, dp.get()));
-            REQUIRE(dp->has_one() == true);
+            REQUIRE_NOTHROW(_repp->listen(addr, &l));
+            REQUIRE(l.has_one() == true);
+            REQUIRE_NOTHROW(_reqp->dial(addr, &d));
+            REQUIRE(d.has_one() == true);
 
             // Wait for listener to catch up since it may be slightly behind.
             SLEEP_FOR(20ms);
@@ -86,7 +82,7 @@ namespace nng {
             REQUIRE(recvp->has_one() == true);
             REQUIRE_THAT(recvp->body()->get(), Equals(props_buf));
 
-            _test_properties(recvp.get(), lp.get(), dp.get());
+            _test_properties(recvp.get(), &l, &d);
         }
     }
 }
