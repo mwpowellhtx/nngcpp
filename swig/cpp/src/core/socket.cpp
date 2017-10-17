@@ -50,12 +50,12 @@ namespace nng {
 
     // TODO: TBD: ditto ec handling...
     void socket::listen(const std::string& addr, flag_type flags) {
-        const auto errnum = ::nng_listen(sid, addr.c_str(), nullptr, flags);
+        const auto errnum = ::nng_listen(sid, addr.c_str(), nullptr, static_cast<int>(flags));
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
     void socket::listen(const std::string& addr, listener* const lp, flag_type flags) {
-        const auto errnum = ::nng_listen(sid, addr.c_str(), lp ? &(lp->lid) : nullptr, flags);
+        const auto errnum = ::nng_listen(sid, addr.c_str(), lp ? &(lp->lid) : nullptr, static_cast<int>(flags));
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
@@ -65,7 +65,7 @@ namespace nng {
     }
 
     void socket::dial(const std::string& addr, dialer* const dp, flag_type flags) {
-        const auto errnum = ::nng_dial(sid, addr.c_str(), dp ? &(dp->did) : nullptr, flags);
+        const auto errnum = ::nng_dial(sid, addr.c_str(), dp ? &(dp->did) : nullptr, static_cast<int>(flags));
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
