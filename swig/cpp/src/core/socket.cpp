@@ -50,22 +50,26 @@ namespace nng {
 
     // TODO: TBD: ditto ec handling...
     void socket::listen(const std::string& addr, flag_type flags) {
-        const auto errnum = ::nng_listen(sid, addr.c_str(), nullptr, static_cast<int>(flags));
+        const auto& op = std::bind(&::nng_listen, _1, _2, _3, _4);
+        const auto errnum = op(sid, addr.c_str(), nullptr, static_cast<int>(flags));
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
     void socket::listen(const std::string& addr, listener* const lp, flag_type flags) {
-        const auto errnum = ::nng_listen(sid, addr.c_str(), lp ? &(lp->lid) : nullptr, static_cast<int>(flags));
+        const auto& op = std::bind(&::nng_listen, _1, _2, _3, _4);
+        const auto errnum = op(sid, addr.c_str(), lp ? &(lp->lid) : nullptr, static_cast<int>(flags));
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
     void socket::dial(const std::string& addr, flag_type flags) {
-        const auto errnum = ::nng_dial(sid, addr.c_str(), nullptr, flags);
+        const auto& op = std::bind(&::nng_dial, _1, _2, _3, _4);
+        const auto errnum = op(sid, addr.c_str(), nullptr, flags);
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
     void socket::dial(const std::string& addr, dialer* const dp, flag_type flags) {
-        const auto errnum = ::nng_dial(sid, addr.c_str(), dp ? &(dp->did) : nullptr, static_cast<int>(flags));
+        const auto& op = std::bind(&::nng_dial, _1, _2, _3, _4);
+        const auto errnum = op(sid, addr.c_str(), dp ? &(dp->did) : nullptr, static_cast<int>(flags));
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
