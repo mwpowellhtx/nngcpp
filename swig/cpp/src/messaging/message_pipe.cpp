@@ -83,6 +83,7 @@ namespace nng {
 
         void message_pipe::get_option_usec(const std::string& name, option_ulonglong_type* valp) {
             throw trx::not_implemented("::nng_pipe_getopt_usec missing from the nng source");
+            //// TODO: TBD: see repo issue: http://github.com/nanomsg/nng/issues/116
             //const auto& op = std::bind(::nng_pipe_getopt_usec, _1, _2, _3);
             //const auto errnum = op(pid, name.c_str(), valp);
             //THROW_NNG_EXCEPTION_EC(errnum);
