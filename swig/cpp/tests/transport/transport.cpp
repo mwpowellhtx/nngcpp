@@ -9,9 +9,6 @@
 // found online at https://opensource.org/licenses/MIT.
 //
 
-#include "../catch/catch_nng_exception_matcher.hpp"
-#include "../catch/catch_exception_translations.hpp"
-#include "../catch/catch_macros.hpp"
 #include "../helpers/constants.h"
 
 #include "transport.h"
@@ -31,6 +28,30 @@ namespace constants {
 
 namespace nng {
 
+    address_calculator::address_calculator() : _port(TEST_PORT) {
+    }
+
+    address_calculator::~address_calculator() {
+    }
+
+    int address_calculator::get_port(int delta) {
+        return _port += delta;
+    }
+
+    std::string address_calculator::get_addr(const std::string& base_addr, int delta) {
+        std::ostringstream os;
+        os << base_addr << ":" << get_port(delta);
+        return os.str();
+    }
+
+    std::string address_calculator::get_next_addr(const std::string& base_addr, int delta) {
+        return get_addr(base_addr, std::abs(delta));
+    }
+
+    std::string address_calculator::get_prev_addr(const std::string& base_addr, int delta) {
+        return get_addr(base_addr, -std::abs(delta));
+    }
+
     // TODO: TBD: could expose this, but random generators are a dime a dozen...
     void seed_random_generator(std::time_t seed) {
         // Initialize the random generator.
@@ -39,7 +60,7 @@ namespace nng {
 
     // TODO: TBD: we could potentially accept command line arguments for the PORT, but I really fail to see the need
     transport_fixture::transport_fixture(const std::string& base_addr)
-        : _port(TEST_PORT)
+        : address_calculator()
         , _base_addr(base_addr)
         , _reqp()
         , _repp() {
@@ -53,38 +74,28 @@ namespace nng {
     transport_fixture::~transport_fixture() {
     }
 
-    int transport_fixture::get_port(int delta) {
-        auto port = _port;
-        _port += delta;
-        return port;
-    }
-
-    std::string transport_fixture::get_addr(int delta) {
-        std::ostringstream os;
-        os << _base_addr << ":" << get_port(delta);
-        return os.str();
-    }
-
-    std::string transport_fixture::get_next_addr(int delta) {
-        return get_addr(std::abs(delta));
-    }
-
-    std::string transport_fixture::get_prev_addr(int delta) {
-        return get_addr(-std::abs(delta));
-    }
-
     void transport_fixture::run_all() {
 
-        const auto addr = get_next_addr();
+        const auto addr = get_next_addr(_base_addr);
 
         //("Given transport for address " + _current_addr).c_str()
         SECTION("Given transport for address '" + addr + "'") {
-            run_connection_refused_works(addr);
-            run_dup_listeners_rejected(addr);
-            run_listener_and_dialer_accepted(addr);
-            run_send_and_receive(addr);
-            run_send_and_receive_large_data(addr);
+            run_all(addr);
         }
+    }
+
+    void transport_fixture::run_one(const run_one_func& func) {
+        address_calculator& self = *this;
+        func(self);
+    }
+
+    void transport_fixture::run_all(const std::string& addr) {
+
+        run_connection_refused_works(addr);
+        run_dup_listeners_rejected(addr);
+        run_listener_and_dialer_accepted(addr);
+        run_send_and_receive(addr);
+        run_send_and_receive_large_data(addr);
     }
 
     void transport_fixture::run_connection_refused_works(const std::string& addr) {
@@ -98,10 +109,10 @@ namespace nng {
             unique_ptr<dialer> dp;
 
             REQUIRE_NOTHROW(dp = make_unique<dialer>());
-            REQUIRE_THROWS_AS_MATCHING(_reqp->dial(addr, dp.get()), nng_exception, ThrowsNngException(ec_econnrefused));
+            REQUIRE_THROWS_AS_MATCHING(_reqp->dial(addr, dp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_econnrefused));
 
             REQUIRE_NOTHROW(dp = make_unique<dialer>());
-            REQUIRE_THROWS_AS_MATCHING(_repp->dial(addr, dp.get()), nng_exception, ThrowsNngException(ec_econnrefused));
+            REQUIRE_THROWS_AS_MATCHING(_repp->dial(addr, dp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_econnrefused));
         }
     }
 
@@ -121,7 +132,7 @@ namespace nng {
 
             // Leaving the first Listener open and available.
             REQUIRE_NOTHROW(lp2 = make_unique<listener>());
-            REQUIRE_THROWS_AS_MATCHING(_reqp->listen(addr, lp2.get()), nng_exception, ThrowsNngException(ec_eaddrinuse));
+            REQUIRE_THROWS_AS_MATCHING(_reqp->listen(addr, lp2.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_eaddrinuse));
             REQUIRE(lp2->has_one() == false);
         }
     }

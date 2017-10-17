@@ -9,8 +9,6 @@
 // found online at https://opensource.org/licenses/MIT.
 //
 
-#include <catch.hpp>
-
 #include "transport.h"
 
 namespace constants {

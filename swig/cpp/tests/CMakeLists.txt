@@ -90,6 +90,9 @@ if (NNGCPP_ENABLE_TESTS)
         set (TEST_SRCS ${DEFAULT_TEST_SRCS})
         list (APPEND TEST_SRCS ${TEST_PATH})
         list (APPEND TEST_SRCS
+            transport/extended_transport.cpp
+            transport/extended_transport.h
+
             transport/transport.cpp
             transport/transport.h
         )
@@ -160,6 +163,7 @@ nngcpp_add_test (protocol/reqrep 5)
 nngcpp_add_test (protocol/survey 5)
 
 nngcpp_add_transport_test (transport/inproc 5)
+nngcpp_add_transport_test (transport/tcp 5)
 
 # nngcpp_add_test(event 5)
 # nngcpp_add_test(idhash 5)
@@ -169,7 +173,6 @@ nngcpp_add_transport_test (transport/inproc 5)
 # nngcpp_add_test(resolv 10)
 # nngcpp_add_test(synch 5)
 # nngcpp_add_test(transport 5)
-# nngcpp_add_test(tcp 5)
 # nngcpp_add_test(tcp6 5)
 # nngcpp_add_test(message 5)
 # nngcpp_add_test(udp 5)
