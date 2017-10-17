@@ -35,6 +35,8 @@ set (NNGCPP_CPP_SRCS
     core/enums.h
     core/enums.cpp
     core/core.h
+    core/address.cpp
+    core/address.h
     core/device.cpp
     core/device.h
     core/dialer.cpp
