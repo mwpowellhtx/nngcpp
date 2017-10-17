@@ -2,9 +2,16 @@
 #include "message_base.h"
 #include "../core/exceptions.hpp"
 
+#define THROW_MSG_PIPE_SETOPT_INV_OP() throw trx::invalid_operation("message pipes cannot set options")
+
 namespace nng {
 
     namespace messaging {
+
+        using std::placeholders::_1;
+        using std::placeholders::_2;
+        using std::placeholders::_3;
+        using std::placeholders::_4;
 
         message_pipe::message_pipe(message_base* const mbp)
             : options()
@@ -19,7 +26,7 @@ namespace nng {
         }
 
         void message_pipe::close() {
-            if (!has_pipe()) { return; }
+            if (!has_one()) { return; }
             using std::placeholders::_1;
             const auto op = std::bind(::nng_pipe_close, _1);
             const auto errnum = op(pid);
@@ -27,7 +34,7 @@ namespace nng {
             pid = 0;
         }
 
-        bool message_pipe::has_pipe() const {
+        bool message_pipe::has_one() const {
             return pid > 0;
         }
 
@@ -39,69 +46,72 @@ namespace nng {
             return pid != rhs.pid;
         }
 
-        void message_pipe::set_option(const std::string& name, const std::string& val, option_size_type sz) {
-            const auto errnum = ::nng_setopt(pid, name.c_str(), val.c_str(), sz);
-            THROW_NNG_EXCEPTION_EC(errnum);
-        }
-
-        void message_pipe::set_option(const std::string& name, const std::string& val) {
-            const auto errnum = ::nng_setopt(pid, name.c_str(), val.c_str(), val.length());
-            THROW_NNG_EXCEPTION_EC(errnum);
-        }
-
         void message_pipe::get_option(const std::string& name, std::string& val) {
-            option_size_type sz = val.size();
-            const auto errnum = ::nng_getopt(pid, name.c_str(), (void*)&val[0], &sz);
+            size_type sz = val.size();
+            const auto& op = std::bind(::nng_pipe_getopt, _1, _2, _3, _4);
+            const auto errnum = op(pid, name.c_str(), (void*)val.data(), &sz);
             THROW_NNG_EXCEPTION_EC(errnum);
-            // Do this because the C++ buffer does not appear to be honored quite right when working with the C buffers.
-            val.resize(sz - 1);
+            //// Do this because the C++ buffer does not appear to be honored quite right when working with the C buffers.
+            //val.resize(sz - 1);
         }
 
-        void message_pipe::get_option(const std::string& name, std::string& val, option_size_type& sz) {
-            const auto errnum = ::nng_getopt(pid, name.c_str(), (void*)&val[0], &sz);
+        void message_pipe::get_option(const std::string& name, std::string& val, size_type& sz) {
+            const auto& op =  std::bind(::nng_pipe_getopt, _1, _2, _3, _4);
+            const auto errnum = op(pid, name.c_str(), (void*)&val[0], &sz);
             THROW_NNG_EXCEPTION_EC(errnum);
-            // Do this because the C++ buffer does not appear to be honored quite right when working with the C buffers.
-            val.resize(sz - 1);
+            //// Do this because the C++ buffer does not appear to be honored quite right when working with the C buffers.
+            //val.resize(sz - 1);
         }
 
-        void message_pipe::set_option(const std::string& name, const void* valp, option_size_type sz) {
-            const auto errnum = ::nng_setopt(pid, name.c_str(), valp, sz);
-            THROW_NNG_EXCEPTION_EC(errnum);
-        }
-
-        void message_pipe::get_option(const std::string& name, void* val, option_size_type* szp) {
-            const auto errnum = ::nng_getopt(pid, name.c_str(), val, szp);
-            THROW_NNG_EXCEPTION_EC(errnum);
-        }
-
-        void message_pipe::set_option_int(const std::string& name, int val) {
-            const auto errnum = ::nng_setopt_int(pid, name.c_str(), val);
-            THROW_NNG_EXCEPTION_EC(errnum);
-        }
-
-        void message_pipe::set_option_size(const std::string& name, option_size_type val) {
-            const auto errnum = ::nng_setopt_size(pid, name.c_str(), val);
-            THROW_NNG_EXCEPTION_EC(errnum);
-        }
-
-        void message_pipe::set_option_usec(const std::string& name, option_ulonglong_type val) {
-            const auto errnum = ::nng_setopt_usec(pid, name.c_str(), val);
+        void message_pipe::get_option(const std::string& name, void* val, size_type* szp) {
+            const auto& op = std::bind(::nng_pipe_getopt, _1, _2, _3, _4);
+            const auto errnum = op(pid, name.c_str(), val, szp);
             THROW_NNG_EXCEPTION_EC(errnum);
         }
 
         void message_pipe::get_option_int(const std::string& name, int* valp) {
-            const auto errnum = ::nng_getopt_int(pid, name.c_str(), valp);
+            const auto& op = std::bind(::nng_pipe_getopt_int, _1, _2, _3);
+            const auto errnum = op(pid, name.c_str(), valp);
             THROW_NNG_EXCEPTION_EC(errnum);
         }
 
-        void message_pipe::get_option_size(const std::string& name, option_size_type* valp) {
+        void message_pipe::get_option_size(const std::string& name, size_type* valp) {
+            const auto& op = std::bind(::nng_pipe_getopt_size, _1, _2, _3);
             const auto errnum = ::nng_getopt_size(pid, name.c_str(), valp);
             THROW_NNG_EXCEPTION_EC(errnum);
         }
 
         void message_pipe::get_option_usec(const std::string& name, option_ulonglong_type* valp) {
-            const auto errnum = ::nng_getopt_usec(pid, name.c_str(), valp);
-            THROW_NNG_EXCEPTION_EC(errnum);
+            throw trx::not_implemented("::nng_pipe_getopt_usec missing from the nng source");
+            //const auto& op = std::bind(::nng_pipe_getopt_usec, _1, _2, _3);
+            //const auto errnum = op(pid, name.c_str(), valp);
+            //THROW_NNG_EXCEPTION_EC(errnum);
+        }
+
+        // TODO: TBD: here are some additional eligible candidates for unit testing of message pipe alone...
+        void message_pipe::set_option(const std::string& name, const std::string& val, size_type sz) {
+            THROW_MSG_PIPE_SETOPT_INV_OP();
+        }
+
+        void message_pipe::set_option(const std::string& name, const std::string& val) {
+            THROW_MSG_PIPE_SETOPT_INV_OP();
+        }
+
+        void message_pipe::set_option(const std::string& name, const void* valp, size_type sz) {
+            THROW_MSG_PIPE_SETOPT_INV_OP();
+        }
+
+
+        void message_pipe::set_option_int(const std::string& name, int val) {
+            THROW_MSG_PIPE_SETOPT_INV_OP();
+        }
+
+        void message_pipe::set_option_size(const std::string& name, size_type val) {
+            THROW_MSG_PIPE_SETOPT_INV_OP();
+        }
+
+        void message_pipe::set_option_usec(const std::string& name, option_ulonglong_type val) {
+            THROW_MSG_PIPE_SETOPT_INV_OP();
         }
     }
 }

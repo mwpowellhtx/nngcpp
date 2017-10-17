@@ -142,7 +142,7 @@ namespace nng {
     }
 
     // Convenience option wrappers.
-    void socket::set_option(const std::string& name, const std::string& val, option_size_type sz) {
+    void socket::set_option(const std::string& name, const std::string& val, size_type sz) {
         const auto op = std::bind(&::nng_setopt, _1, _2, _3, _4);
         const auto errnum = ::nng_setopt(sid, name.c_str(), val.c_str(), sz);
         THROW_NNG_EXCEPTION_EC(errnum);
@@ -154,7 +154,7 @@ namespace nng {
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
-    void socket::get_option(const std::string& name, std::string& val, option_size_type& sz) {
+    void socket::get_option(const std::string& name, std::string& val, size_type& sz) {
         const auto op = std::bind(&::nng_getopt, _1, _2, _3, _4);
         const auto errnum = op(sid, name.c_str(), (void*)&val[0], &sz);
         THROW_NNG_EXCEPTION_EC(errnum);
@@ -164,20 +164,20 @@ namespace nng {
 
     void socket::get_option(const std::string& name, std::string& val) {
         const auto op = std::bind(&::nng_getopt, _1, _2, _3, _4);
-        option_size_type sz = val.size();
+        size_type sz = val.size();
         const auto errnum = op(sid, name.c_str(), (void*)&val[0], &sz);
         THROW_NNG_EXCEPTION_EC(errnum);
         // Do this because the C++ buffer does not appear to be honored quite right when working with the C buffers.
         val.resize(sz - 1);
     }
 
-    void socket::set_option(const std::string& name, const void* valp, option_size_type sz) {
+    void socket::set_option(const std::string& name, const void* valp, size_type sz) {
         const auto op = std::bind(&::nng_setopt, _1, _2, _3, _4);
         const auto errnum = op(sid, name.c_str(), valp, sz);
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
-    void socket::get_option(const std::string& name, void* val, option_size_type* szp) {
+    void socket::get_option(const std::string& name, void* val, size_type* szp) {
         const auto op = std::bind(&::nng_getopt, _1, _2, _3, _4);
         const auto errnum = op(sid, name.c_str(), val, szp);
         THROW_NNG_EXCEPTION_EC(errnum);
@@ -189,7 +189,7 @@ namespace nng {
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
-    void socket::set_option_size(const std::string& name, option_size_type val) {
+    void socket::set_option_size(const std::string& name, size_type val) {
         const auto op = std::bind(&::nng_setopt_size, _1, _2, _3);
         const auto errnum = op(sid, name.c_str(), val);
         THROW_NNG_EXCEPTION_EC(errnum);
@@ -207,7 +207,7 @@ namespace nng {
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
-    void socket::get_option_size(const std::string& name, option_size_type* valp) {
+    void socket::get_option_size(const std::string& name, size_type* valp) {
         const auto op = std::bind(&::nng_getopt_size, _1, _2, _3);
         const auto errnum = op(sid, name.c_str(), valp);
         THROW_NNG_EXCEPTION_EC(errnum);

@@ -92,21 +92,21 @@ namespace nng {
         bool is_open() const;
 
         // Convenience option wrappers.
-        virtual void set_option(const std::string& name, const std::string& val, option_size_type sz) override;
+        virtual void set_option(const std::string& name, const std::string& val, size_type sz) override;
         virtual void set_option(const std::string& name, const std::string& val) override;
 
         virtual void get_option(const std::string& name, std::string& val) override;
-        virtual void get_option(const std::string& name, std::string& val, option_size_type& sz) override;
+        virtual void get_option(const std::string& name, std::string& val, size_type& sz) override;
 
-        virtual void set_option(const std::string& name, const void* valp, option_size_type sz) override;
-        virtual void get_option(const std::string& name, void* valp, option_size_type* szp) override;
+        virtual void set_option(const std::string& name, const void* valp, size_type sz) override;
+        virtual void get_option(const std::string& name, void* valp, size_type* szp) override;
 
         void set_option_int(const std::string& name, int val);
-        void set_option_size(const std::string& name, option_size_type val);
+        void set_option_size(const std::string& name, size_type val);
         void set_option_usec(const std::string& name, uint64_t val);
 
         void get_option_int(const std::string& name, int* valp);
-        void get_option_size(const std::string& name, option_size_type* valp);
+        void get_option_size(const std::string& name, size_type* valp);
         void get_option_usec(const std::string& name, uint64_t* valp);
 
         virtual void send(binary_message_type* const bmp, flag_type flags = flag_none) override;

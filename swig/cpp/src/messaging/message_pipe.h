@@ -35,28 +35,30 @@ namespace nng {
 
             virtual void close();
 
-            virtual bool has_pipe() const;
+            virtual bool has_one() const;
 
             bool operator==(const message_pipe& rhs);
             // TODO: TBD: so, apparently there is no std::not_equal_to available from the Microsoft implementation, however, we should still be able to override the operator
             bool operator!=(const message_pipe& rhs);
 
-            virtual void set_option(const std::string& name, const std::string& val, option_size_type sz) override;
-            virtual void set_option(const std::string& name, const std::string& val) override;
-
             virtual void get_option(const std::string& name, std::string& val) override;
-            virtual void get_option(const std::string& name, std::string& val, option_size_type& sz) override;
+            virtual void get_option(const std::string& name, std::string& val, size_type& sz) override;
 
-            virtual void set_option(const std::string& name, const void* valp, option_size_type sz) override;
-            virtual void get_option(const std::string& name, void* val, option_size_type* szp) override;
-
-            virtual void set_option_int(const std::string& name, int val) override;
-            virtual void set_option_size(const std::string& name, option_size_type val) override;
-            virtual void set_option_usec(const std::string& name, option_ulonglong_type val) override;
+            virtual void set_option(const std::string& name, const void* valp, size_type sz) override;
+            virtual void get_option(const std::string& name, void* val, size_type* szp) override;
 
             virtual void get_option_int(const std::string& name, int* valp) override;
-            virtual void get_option_size(const std::string& name, option_size_type* valp) override;
+            virtual void get_option_size(const std::string& name, size_type* valp) override;
             virtual void get_option_usec(const std::string& name, option_ulonglong_type* valp) override;
+
+        protected:
+
+            virtual void set_option(const std::string& name, const std::string& val, size_type sz) override;
+            virtual void set_option(const std::string& name, const std::string& val) override;
+
+            virtual void set_option_int(const std::string& name, int val) override;
+            virtual void set_option_size(const std::string& name, size_type val) override;
+            virtual void set_option_usec(const std::string& name, option_ulonglong_type val) override;
         };
     }
 }

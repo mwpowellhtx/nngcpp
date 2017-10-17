@@ -608,7 +608,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
             REQUIRE_THAT(bmp->body()->get(), Equals(one_buf));
             // TODO: TBD: ditto focused unit tests...
             REQUIRE_NOTHROW(mpp1 = make_unique<message_pipe>(bmp.get()));
-            REQUIRE(mpp1->has_pipe() == true);
+            REQUIRE(mpp1->has_one() == true);
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
             REQUIRE_NOTHROW(*bmp << two);
@@ -616,7 +616,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
             REQUIRE_NOTHROW(serverp1->try_receive(bmp.get()));
             REQUIRE_THAT(bmp->body()->get(), Equals(two_buf));
             REQUIRE_NOTHROW(mpp2 = make_unique<message_pipe>(bmp.get()));
-            REQUIRE(mpp2->has_pipe() == true);
+            REQUIRE(mpp2->has_one() == true);
             REQUIRE(*mpp1 != *mpp2);
 
             // Slightly different from the C-based unit tests. We will need it for the next lines.
@@ -701,7 +701,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
                 REQUIRE_NOTHROW(serverp1->try_receive(bmp.get()));
                 REQUIRE_THAT(bmp->body()->get(), Equals(one_buf));
                 REQUIRE_NOTHROW(mpp1 = make_unique<message_pipe>(bmp.get()));
-                REQUIRE(mpp1->has_pipe() == true);
+                REQUIRE(mpp1->has_one() == true);
                 REQUIRE_NOTHROW(bmp->header()->trim(&hops));
                 REQUIRE(hops == 1);
 
@@ -711,7 +711,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
                 REQUIRE_NOTHROW(serverp1->try_receive(bmp.get()));
                 REQUIRE_THAT(bmp->body()->get(), Equals(two_buf));
                 REQUIRE_NOTHROW(mpp2 = make_unique<message_pipe>(bmp.get()));
-                REQUIRE(mpp2->has_pipe() == true);
+                REQUIRE(mpp2->has_one() == true);
                 REQUIRE_NOTHROW(bmp->header()->trim(&hops));
                 REQUIRE(hops == 1);
                 REQUIRE_NOTHROW(bmp.reset());
@@ -743,7 +743,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
                 REQUIRE_NOTHROW(serverp1->try_receive(bmp.get()));
                 REQUIRE_THAT(bmp->body()->get(), Equals(one_buf));
                 REQUIRE_NOTHROW(mpp1 = make_unique<message_pipe>(bmp.get()));
-                REQUIRE(mpp1->has_pipe() == true);
+                REQUIRE(mpp1->has_one() == true);
 
                 // More hoop jumping.
                 REQUIRE_NOTHROW(clientp1->close());

@@ -12,7 +12,7 @@ namespace nng {
     class options {
         protected:
 
-            typedef std::size_t option_size_type;
+            typedef std::size_t size_type;
             typedef uint64_t option_ulonglong_type;
 
             options();
@@ -20,22 +20,26 @@ namespace nng {
         public:
 
             //// TODO: TBD: I do not thinkg there is ever a good reason to expose these to the externally facing consumer... I could be wrong about that, but for now will leave them unspecified.
-            virtual void set_option(const std::string& name, const std::string& val, option_size_type sz) = 0;
+            virtual void set_option(const std::string& name, const std::string& val, size_type sz) = 0;
             virtual void set_option(const std::string& name, const std::string& val) = 0;
 
             virtual void get_option(const std::string& name, std::string& val) = 0;
-            virtual void get_option(const std::string& name, std::string& val, option_size_type& sz) = 0;
+            virtual void get_option(const std::string& name, std::string& val, size_type& sz) = 0;
 
-            virtual void set_option(const std::string& name, const void* valp, option_size_type sz) = 0;
-            virtual void get_option(const std::string& name, void* val, option_size_type* szp) = 0;
+            virtual void set_option(const std::string& name, const void* valp, size_type sz) = 0;
+            virtual void get_option(const std::string& name, void* val, size_type* szp) = 0;
 
             virtual void set_option_int(const std::string& name, int val) = 0;
-            virtual void set_option_size(const std::string& name, option_size_type val) = 0;
+            virtual void set_option_size(const std::string& name, size_type val) = 0;
             virtual void set_option_usec(const std::string& name, option_ulonglong_type val) = 0;
 
             virtual void get_option_int(const std::string& name, int* valp) = 0;
-            virtual void get_option_size(const std::string& name, option_size_type* valp) = 0;
+            virtual void get_option_size(const std::string& name, size_type* valp) = 0;
             virtual void get_option_usec(const std::string& name, option_ulonglong_type* valp) = 0;
+
+            // TODO: TBD: add API for get/set uint64 support
+            // TODO: TBD: also consider separating get from set slices...
+            // TODO: TBD: look into how possibly to "disable" functionality, perhaps via template?
     };
 
     struct option_names {
