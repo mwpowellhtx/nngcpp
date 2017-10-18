@@ -1,7 +1,8 @@
 #ifndef NNGCPP_NNG_EXCEPTION_H
 #define NNGCPP_NNG_EXCEPTION_H
 
-#include "../../nngcpp_integration.h"
+#define NNG_ONLY
+#include <nngcpp.h>
 
 // nng should be in the include path.
 #include <exception>

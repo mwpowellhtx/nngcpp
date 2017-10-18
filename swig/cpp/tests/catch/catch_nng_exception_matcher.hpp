@@ -1,11 +1,11 @@
 #ifndef CATCH_NNG_EXCEPTION_MATCHER_HPP
 #define CATCH_NNG_EXCEPTION_MATCHER_HPP
 
-#include <catch.hpp>
+#include <core/exceptions.hpp>
 
 #include <ostream>
 
-#include <core/exceptions.hpp>
+#include <catch.hpp>
 
 namespace Catch {
     namespace Matchers {

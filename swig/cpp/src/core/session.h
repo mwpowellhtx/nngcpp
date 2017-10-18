@@ -1,16 +1,14 @@
 #ifndef NNGCPP_SESSION_H
 #define NNGCPP_SESSION_H
 
-#include "../nngcpp_integration.h"
-
-#include "../nngcpp_messaging.hpp"
+#include "../messaging/messaging.h"
+#include "../protocol/protocol.h"
 
 #include "address.h"
 #include "options.h"
 #include "listener.h"
 #include "dialer.h"
 #include "device.h"
-#include "../protocol/protocol.h"
 
 #include <memory>
 #include <vector>

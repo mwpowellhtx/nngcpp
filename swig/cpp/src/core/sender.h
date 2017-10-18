@@ -1,9 +1,9 @@
 #ifndef NNGCPP_SENDER_H
 #define NNGCPP_SENDER_H
 
-#include "../nngcpp_integration.h"
+#include "../messaging/messaging.h"
 
-#include "nngcpp_messaging.hpp"
+#include "enums.h"
 
 #include <cstddef>
 #include <cstdint>

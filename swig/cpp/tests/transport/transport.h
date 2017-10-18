@@ -12,14 +12,15 @@
 #ifndef NNGCPP_TESTS_TRANSPORT_FIXTURE_H
 #define NNGCPP_TESTS_TRANSPORT_FIXTURE_H
 
+#include <protocol/protocol.h>
+
 #include "../catch/catch_nng_exception_matcher.hpp"
 #include "../catch/catch_exception_translations.hpp"
 #include "../catch/catch_macros.hpp"
 #include "../helpers/basic_fixture.h"
 
-#include <nngcpp.h>
-
 #include <string>
+#include <memory>
 #include <functional>
 
 namespace nng {

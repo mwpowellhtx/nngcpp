@@ -10,10 +10,9 @@
 #ifndef NNGCPP_TESTS_MESSAGING_BINARY_MESSAGE_PART_FIXTURES_HPP
 #define NNGCPP_TESTS_MESSAGING_BINARY_MESSAGE_PART_FIXTURES_HPP
 
-#include <catch.hpp>
-#include <nng/nng.h>
-
 #include "messaging/message_base.h"
+
+#include <catch.hpp>
 
 namespace nng {
     namespace messaging {

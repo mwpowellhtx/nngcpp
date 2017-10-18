@@ -1,5 +1,8 @@
 #include "options.h"
 
+#define NNG_ONLY
+#include <nngcpp.h>
+
 namespace nng {
 
     options::options() {

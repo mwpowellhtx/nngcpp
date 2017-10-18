@@ -9,37 +9,28 @@
 // found online at https://opensource.org/licenses/MIT.
 //
 
+#include <nngcpp.h>
+
 #include "../catch/catch_exception_matcher_base.hpp"
 #include "../catch/catch_exception_translations.hpp"
 #include "../catch/catch_nng_exception_matcher.hpp"
 #include "../catch/catch_macros.hpp"
 
-#include <nngcpp.h>
-
-#include <string>
 #include <memory>
-#include <thread>
 
 #ifndef _WIN32
-
-    #include <poll.h>
-    #include <unistd.h>
-    #define INVALID_SOCKET -1
-
+#   include <poll.h>
+#   include <unistd.h>
+#   define INVALID_SOCKET -1
 #else // _WIN32
-
-    #define poll WSAPoll
-
-    #ifndef WIN32_LEAN_AND_MEAN
-        #define WIN32_LEAN_AND_MEAN
-    #endif // WIN32_LEAN_AND_MEAN
-
-    #include <Windows.h>
-    #include <WinSock2.h>
-
-    #include <MSWSock.h>
-    #include <WS2tcpip.h>
-
+#   define poll WSAPoll
+#   ifndef WIN32_LEAN_AND_MEAN
+#       define WIN32_LEAN_AND_MEAN
+#   endif // WIN32_LEAN_AND_MEAN
+#   include <Windows.h>
+#   include <WinSock2.h>
+#   include <MSWSock.h>
+#   include <WS2tcpip.h>
 #endif // _WIN32
 
 namespace constants {

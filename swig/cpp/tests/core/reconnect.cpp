@@ -7,12 +7,11 @@
 // found online at https://opensource.org/licenses/MIT.
 //
 
-#include "../tests/catch/catch_macros.hpp"
-
 #include <nngcpp.h>
 
+#include "../tests/catch/catch_macros.hpp"
+
 #include <memory>
-#include <thread>
 
 namespace constants {
 
@@ -59,7 +58,7 @@ namespace nng {
 
         struct message_pipe_fixture : public message_pipe {
 
-            message_pipe_fixture(const message_base* const mbp) : message_pipe(mbp) {
+            message_pipe_fixture(message_base* const mbp) : message_pipe(mbp) {
             }
 
             ::nng_pipe get_pid() const {
@@ -265,7 +264,7 @@ TEST_CASE("NNG C++ wrapper reconnect works", "[nng][reconnect][cxx]") {
 
                 // TODO: TBD: this one deserves its own unit test as well so that we are not cluttering the integration tests
                 message_pipe_fixture mp1(bmp.get());
-                REQUIRE(mp1.has_pipe() == true);
+                REQUIRE(mp1.has_one() == true);
                 // TODO: TBD: deserves its own unit testing...
                 REQUIRE(mp1.get_pid() > 0);
                 /* Resetting the message pointer is effectively the same, if stronger, for purposes
@@ -278,7 +277,7 @@ TEST_CASE("NNG C++ wrapper reconnect works", "[nng][reconnect][cxx]") {
                     // Get the fixtured PID for test purposes prior to closing.
                     auto mp1_pid = mp1.get_pid();
                     REQUIRE_NOTHROW(mp1.close());
-                    REQUIRE(mp1.has_pipe() == false);
+                    REQUIRE(mp1.has_one() == false);
 
                     this_thread::sleep_for(100ms);
                     auto bmp2 = std::make_unique<binary_message>();
@@ -293,7 +292,7 @@ TEST_CASE("NNG C++ wrapper reconnect works", "[nng][reconnect][cxx]") {
                     REQUIRE_THAT(bmp2->body()->get(), Equals(again_buf));
 
                     message_pipe_fixture mp2(bmp2.get());
-                    REQUIRE(mp2.has_pipe() == true);
+                    REQUIRE(mp2.has_one() == true);
                     // Ditto resetting the pointer versus exposing the free method.
                     REQUIRE_NOTHROW(bmp2.reset());
                     REQUIRE(bmp2.get() == nullptr);

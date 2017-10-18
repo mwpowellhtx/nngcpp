@@ -7,13 +7,15 @@
 // found online at https://opensource.org/licenses/MIT.
 //
 
+#include <nngcpp.h>
+
 #include <catch.hpp>
 
-#include "../src/nngcpp_messaging.hpp"
+#include "../helpers/constants.h"
 
 namespace constants {
     const std::string hello = "hello";
-    const nng::messaging::buffer_vector_type hello_buf = { 'h','e','l','l','o' };
+    const nng::messaging::buffer_vector_type hello_buf = to_buffer(hello);
 }
 
 TEST_CASE("Run some gymnastic conversion scenarios", "[convert][messaging][gymnastics][cxx]") {
@@ -99,7 +101,7 @@ TEST_CASE("Can write (append) to and read (get) from binary message using string
 
 // I dislike declarations via MACRO, but in this case I will make an exception.
 #define NNGCPP_TESTS_EXPOSE_BINARY_MESSAGE_BODY(bm, bmb) \
-    auto * const bmb = bm.body(); \
+    auto* bmb = bm.body(); \
     REQUIRE(bmb != nullptr)
 
 TEST_CASE("Can write (append) to and read (get) from binary message body using byte vector"
@@ -110,6 +112,7 @@ TEST_CASE("Can write (append) to and read (get) from binary message body using b
     using namespace Catch::Matchers;
     using namespace constants;
 
+    // TODO: TBD: should revisit the utility of these macros; with the messaging work I've done, their value has decreased I think...
     NNGCPP_TESTS_INITIALIZE_BINARY_MESSAGE(bm);
 
     // map - Message API pointer.
@@ -117,7 +120,7 @@ TEST_CASE("Can write (append) to and read (get) from binary message body using b
 
     SECTION("Can write (append) to") {
 
-        REQUIRE_NOTHROW(*mapip << hello_buf);
+        REQUIRE_NOTHROW(bm << hello_buf);
 
         // Do a quick smoke test.
         REQUIRE(mapip->get_size() == hello_buf.size());
@@ -147,7 +150,7 @@ TEST_CASE("Can write (append) to and read (get) from binary message body using s
 
     SECTION("Can write (append) to") {
 
-        REQUIRE_NOTHROW(*mapip << hello);
+        REQUIRE_NOTHROW(bm << hello);
 
         // Do a quick smoke test.
         REQUIRE(mapip->get_size() == hello.length());

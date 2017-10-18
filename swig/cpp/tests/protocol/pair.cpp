@@ -9,6 +9,8 @@
 // found online at https://opensource.org/licenses/MIT.
 //
 
+#include <nngcpp.h>
+
 #include "../catch/catch_nng_exception_matcher.hpp"
 #include "../catch/catch_exception_translations.hpp"
 #include "../catch/catch_macros.hpp"
@@ -16,11 +18,9 @@
 #include "../helpers/constants.h"
 #include "../helpers/chrono.hpp"
 
-#include <nngcpp.h>
-
-#include <string>
 #include <sstream>
 
+// TODO: TBD: now this one is crashing; revisit this one later after sorting out the include situation
 namespace nng {
     namespace transactions {
 

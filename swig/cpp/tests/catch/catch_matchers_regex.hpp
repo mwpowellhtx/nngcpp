@@ -1,10 +1,10 @@
 #ifndef CATCH_MATCHERS_REGEX_HPP
 #define CATCH_MATCHERS_REGEX_HPP
 
-#include <catch.hpp>
-
 #include <string>
 #include <regex>
+
+#include <catch.hpp>
 
 namespace Catch {
     namespace Matchers {

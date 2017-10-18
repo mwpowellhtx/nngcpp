@@ -24,17 +24,15 @@
 #   IN THE SOFTWARE.
 #
 
-include_directories (AFTER SYSTEM "${NNG_INSTALL_PREFIX}/include")
-
 # It is recommended to list ALL of the source files like so; as compared/contrasted with, say,
 # file (GLOB) or even file (GLOB_RECURSE). This is because CMake fails to see new or updates
 # files that are GLOB'ed unless detectable changes also occur to the CMake files themselves.
 set (NNGCPP_CPP_SRCS
     nngcpp.h
     nngcpp_integration.h
+    core/core.h
     core/enums.h
     core/enums.cpp
-    core/core.h
     core/address.cpp
     core/address.h
     core/device.cpp
@@ -64,6 +62,7 @@ set (NNGCPP_CPP_SRCS
     core/exceptions/not_implemented.h
     core/exceptions/invalid_operation.cpp
     core/exceptions/invalid_operation.h
+    messaging/messaging.h
     messaging/binary_message.cpp
     messaging/binary_message.h
     messaging/binary_message_body.cpp
@@ -79,6 +78,7 @@ set (NNGCPP_CPP_SRCS
     messaging/messaging_api_base.hpp
     messaging/messaging_gymnastics.cpp
     messaging/messaging_gymnastics.h
+    protocol/protocol.h
     protocol/bus/bus.cpp
     protocol/bus/bus.h
     protocol/pair/pair_v0.cpp
@@ -145,15 +145,18 @@ set (NNGCPP_INSTALL_STATIC_BINDIR ${CMAKE_INSTALL_BINDIR}/static)
 set (NNGCPP_INSTALL_SHARED_LIBDIR ${CMAKE_INSTALL_LIBDIR}/shared)
 set (NNGCPP_INSTALL_SHARED_BINDIR ${CMAKE_INSTALL_BINDIR}/shared)
 
+include_directories (AFTER SYSTEM "${NNG_INSTALL_PREFIX}/include")
 
 # Configure the STATIC and then the SHARED libraries.
 add_library (${NNGCPP_PROJECT_NAME_STATIC} STATIC ${NNGCPP_CPP_SRCS})
 # TODO: TBD: /Zc:wchar_t- is for Visual Studio CL.EXE, I think.
+target_include_directories (${NNGCPP_PROJECT_NAME_STATIC} PUBLIC $<BUILD_INTERFACE:${NNG_GIT_REPO_SRC_DIR}>)
 target_compile_definitions (${NNGCPP_PROJECT_NAME_STATIC} PUBLIC -D NNG_STATIC_LIB -D NNGCPP_STATIC_LIB)
 
 add_library (${NNGCPP_PROJECT_NAME_SHARED} SHARED ${NNGCPP_CPP_SRCS})
 # This is where we experience a bit of demarcation from the underlying NNG. We want to
 # be consumers of the NNG static library in this instance, and not the shared library.
+target_include_directories (${NNGCPP_PROJECT_NAME_SHARED} PUBLIC $<BUILD_INTERFACE:${NNG_GIT_REPO_SRC_DIR}>)
 target_compile_definitions (${NNGCPP_PROJECT_NAME_SHARED} PRIVATE -D NNG_STATIC_LIB -D NNGCPP_SHARED_LIB)
 
 

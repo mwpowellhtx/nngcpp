@@ -1,6 +1,8 @@
 #include "socket.h"
-#include "dialer.h"
+#include "messenger.h"
 #include "listener.h"
+#include "dialer.h"
+#include "options.h"
 #include "exceptions.hpp"
 
 #include <vector>

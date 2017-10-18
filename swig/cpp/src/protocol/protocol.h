@@ -1,8 +1,5 @@
-
 #ifndef CPPNNG_PROT_H
 #define CPPNNG_PROT_H
-
-#include "../core/core.h"
 
 #define CPPNNG_PROT_NAMESPACE nng::protocol
 

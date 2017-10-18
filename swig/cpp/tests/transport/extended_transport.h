@@ -14,6 +14,13 @@
 
 #include "transport.h"
 
+#include <core/listener.h>
+#include <core/dialer.h>
+#include <messaging/binary_message.h>
+
+#include <string>
+#include <functional>
+
 namespace nng {
 
     struct extended_transport_fixture : public transport_fixture {

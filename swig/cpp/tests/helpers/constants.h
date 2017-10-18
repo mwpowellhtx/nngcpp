@@ -1,8 +1,9 @@
 #ifndef NNGCPP_TESTS_CONSTANTS_HELPERS_H
 #define NNGCPP_TESTS_CONSTANTS_HELPERS_H
 
-#include <nngcpp.h>
+#include <messaging/binary_message.h>
 
+#include <string>
 #include <ostream>
 
 namespace constants {

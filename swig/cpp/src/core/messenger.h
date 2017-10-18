@@ -1,7 +1,8 @@
 #ifndef NNGCPP_MESSENGER_H
 #define NNGCPP_MESSENGER_H
 
-#include <nng/nng.h>
+#define NNG_ONLY
+#include <nngcpp.h>
 
 #include <cstddef>
 

@@ -1,8 +1,6 @@
 #ifndef NNGCPP_OPTIONS_H
 #define NNGCPP_OPTIONS_H
 
-#include "../nngcpp_integration.h"
-
 #include <cstddef>
 #include <cstdint>
 #include <string>

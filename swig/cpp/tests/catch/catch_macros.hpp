@@ -3,6 +3,13 @@
 
 #include <catch.hpp>
 
+// Be careful of this include.
+#define NNG_ONLY
+#include <nngcpp.h>
+
+#include <chrono>
+#include <thread>
+
 #ifndef INTERNAL_CATCH_THROWS_AS_MATCHING
 ///////////////////////////////////////////////////////////////////////////////
 #define INTERNAL_CATCH_THROWS_AS_MATCHING( macroName, exceptionType, exceptionMatcher, resultDisposition, expr ) \
@@ -39,8 +46,6 @@
 #define REQUIRE_THROWS_AS_MATCHING( expr, exceptionType, exceptionMatcher ) INTERNAL_CATCH_THROWS_AS_MATCHING( "REQUIRE_THROWS_AS_MATCHING", exceptionType, exceptionMatcher, Catch::ResultDisposition::Normal, expr )
 #endif // REQUIRE_THROWS_AS_MATCHING
 
-#include <nng/nng.h>
-
 /* While I despise macro code expansion, this is "better" for us because in the event
 of a legit failure, we see the actual line IN-SITU where the test case ACTUALLY IS. */
 #define NNG_TESTS_APPEND_STR(m, s) \
@@ -53,8 +58,6 @@ of a legit failure, we see the actual line IN-SITU where the test case ACTUALLY 
     REQUIRE(m != nullptr); \
     REQUIRE(::nng_msg_len(m) == std::strlen(s)); \
     REQUIRE(std::memcmp(::nng_msg_body(m), s, std::strlen(s)) == 0)
-
-#include <chrono>
 
 #ifndef SLEEP_FOR
 #define SLEEP_FOR(rt) std::this_thread::sleep_for(rt)

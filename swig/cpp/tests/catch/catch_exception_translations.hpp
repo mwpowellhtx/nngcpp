@@ -10,9 +10,9 @@
 #ifndef NNGCPP_CATCH_EXCEPTION_TRANSLATIONS_HPP
 #define NNGCPP_CATCH_EXCEPTION_TRANSLATIONS_HPP
 
-#include <catch.hpp>
-
 #include <core/exceptions.hpp>
+
+#include <catch.hpp>
 
 #ifndef STRINGIFY
 #define STRINGIFY(x)    #x

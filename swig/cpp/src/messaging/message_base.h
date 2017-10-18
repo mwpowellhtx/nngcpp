@@ -1,7 +1,8 @@
 #ifndef NNGCPP_MESSAGE_BASE_H
 #define NNGCPP_MESSAGE_BASE_H
 
-#include <nng/nng.h>
+#define NNG_ONLY
+#include <nngcpp.h>
 
 #include <cstddef>
 #include <cstdint>

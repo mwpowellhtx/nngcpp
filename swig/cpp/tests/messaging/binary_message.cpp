@@ -85,6 +85,7 @@ TEST_CASE("Binary messages work", "[binary_message][messaging][cxx]") {
     using namespace Catch::Matchers;
     using buffer_vector_type = message_base::buffer_vector_type;
 
+    // TODO: TBD: revisit the utility of the Binary Message macros in general with this one; and reconsider the kinds of unit/integration testing with header and body
     SECTION("Constructors and destructors work") {
 
         SECTION("Constructors work") {

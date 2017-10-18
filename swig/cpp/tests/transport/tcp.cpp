@@ -11,10 +11,12 @@
 
 #include "extended_transport.h"
 
-#ifndef _WIN32
-#   include <arpa/inet.h>
-#else
+#include <core/core.h>
+
+#ifdef _WIN32
 #   include <WinSock2.h>
+#else
+#   include <arpa/inet.h>
 #endif
 
 namespace nng {
@@ -48,18 +50,20 @@ namespace nng {
                     // TODO: TBD: this is really more of an unit test thing...
                     REQUIRE_NOTHROW(pp->get_option(O::local_address, ap->get(), &actual_sz));
                     REQUIRE(actual_sz == ap->get_size());
-                    REQUIRE(ap->get_s_family() == expected_family);
-                    REQUIRE(ap->get_addr() == loopback_addr);
-                    REQUIRE(ap->get_port() > 0);
+                    REQUIRE(ap->get_family() == expected_family);
+                    REQUIRE(ap->view() != nullptr);
+                    REQUIRE(ap->view()->get_addr() == loopback_addr);
+                    REQUIRE(ap->view()->get_port() > 0);
                 }
 
                 SECTION("Remote address property works") {
 
                     REQUIRE_NOTHROW(pp->get_option(O::remote_address, ap->get(), &actual_sz));
                     REQUIRE(actual_sz == ap->get_size());
-                    REQUIRE(ap->get_s_family() == expected_family);
-                    REQUIRE(ap->get_addr() == loopback_addr);
-                    REQUIRE(ap->get_port() > 0);
+                    REQUIRE(ap->get_family() == expected_family);
+                    REQUIRE(ap->view() != nullptr);
+                    REQUIRE(ap->view()->get_addr() == loopback_addr);
+                    REQUIRE(ap->view()->get_port() > 0);
 
                     REQUIRE(dp);
                     REQUIRE_THROWS_AS_MATCHING(dp->get_option(O::remote_address, ap->get(), &actual_sz), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));

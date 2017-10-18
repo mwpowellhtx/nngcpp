@@ -1,9 +1,9 @@
 #ifndef NNGCPP_RECEIVER_H
 #define NNGCPP_RECEIVER_H
 
-#include "../nngcpp_integration.h"
+#include "../messaging/messaging.h"
 
-#include "nngcpp_messaging.hpp"
+#include "enums.h"
 
 #include <cstddef>
 #include <cstdint>

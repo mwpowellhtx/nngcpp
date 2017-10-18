@@ -3,17 +3,20 @@
 
 #include "../nngcpp_integration.h"
 
-// nng should be in the include path.
-#include <functional>
-#include <string>
-
 #include "enums.h"
 #include "sender.h"
 #include "receiver.h"
 #include "messenger.h"
-#include "options.h"
+
+// nng should be in the include path.
+#include <functional>
+#include <string>
 
 namespace nng {
+
+#ifndef NNGCPP_OPTIONS_H
+    class options;
+#endif // NNGCPP_OPTIONS_H
 
     enum protocol_type {
         protocol_none = ::NNG_PROTO_NONE,

@@ -9,6 +9,8 @@
 // found online at https://opensource.org/licenses/MIT.
 //
 
+#include <nngcpp.h>
+
 // Which also includes Catch, as well as Chrono and Functional.
 #include "../catch/catch_matchers_regex.hpp"
 #include "../catch/catch_exception_translations.hpp"
@@ -18,18 +20,12 @@
 #include "../helpers/constants.h"
 #include "../helpers/chrono.hpp"
 
-#include <nngcpp.h>
-
 // TODO: TBD: update this module: follow the C API grouping more or less closely, adapting for C+ wrapperisms
 // TODO: TBD: generally, update this taking into consideration updates; could "transaction" be useful now, in more broad sense? i.e. looking at constants::to_str for instance...
 
 #include <cctype>
-#include <string>
 #include <memory>
-#include <chrono>
-#include <thread>
 #include <algorithm>
-#include <regex>
 
 // TODO: TBD: these are a couple of interesting methods that might be interesting to include apart from the unit test itself.
 template<class It_ = std::string::const_iterator>

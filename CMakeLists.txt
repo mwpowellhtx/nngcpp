@@ -65,6 +65,7 @@ verify_git_exists()
 set (NNGCPP_SWIG_DIR ${NngCppAndSwig_SOURCE_DIR}/swig)
 set (NNG_INSTALL_PREFIX ${CMAKE_CURRENT_SOURCE_DIR}/nngbuild)
 set (NNG_GIT_REPO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/repos/nng)
+set (NNG_GIT_REPO_SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/repos/nng/src)
 set (CATCH_GIT_REPO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/repos/catch)
 # TODO: TBD: for now adding a second CATCH2_GIT_REPO_DIR definition.
 set (CATCH2_GIT_REPO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/repos/catch2)

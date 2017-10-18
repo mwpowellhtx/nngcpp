@@ -2,7 +2,7 @@
 
 #include <catch.hpp>
 
-#include <nng/nng.h>
+#include <nng.h>
 
 namespace nng {
 

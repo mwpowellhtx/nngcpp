@@ -57,12 +57,15 @@ if (NNGCPP_ENABLE_TESTS)
         add_dependencies (${TEST_NAME} nng)
         add_dependencies (${TEST_NAME} ${NNGCPP_PROJECT_NAME_STATIC})
         target_include_directories (${TEST_NAME} PUBLIC $<BUILD_INTERFACE:${CATCH_GIT_REPO_DIR}/single_include>)
-        # TODO: TBD: this one we may want to just include, always, as a default solution-wide include directory
-        target_include_directories (${TEST_NAME} PUBLIC $<BUILD_INTERFACE:${NNG_INSTALL_PREFIX}/include>)
+        # # TODO: TBD: this one we may want to just include, always, as a default solution-wide include directory
+        # target_include_directories (${TEST_NAME} PUBLIC $<BUILD_INTERFACE:${NNG_INSTALL_PREFIX}/include>)
+        # TODO: TBD: doing it this way because we need to connect with the source in potentially invasive ways
+        # TODO: TBD: at least for the time being absent publicly facing API
+        target_include_directories (${TEST_NAME} PUBLIC $<BUILD_INTERFACE:${NNG_GIT_REPO_SRC_DIR}>)
         # So it does not appear to be enough to Add the Dependency; we must ALSO configure Target Link Libraries.
         target_link_libraries (${TEST_NAME} ${NNGCPP_REQUIRED_LIBS} nng_static ${NNGCPP_PROJECT_NAME_STATIC})
         # TODO: TBD: c++14? or c++11?
-        target_compile_definitions (${TEST_NAME} PUBLIC -D NNG_STATIC_LIB -D NNGCPP_STATIC_LIB -D CATCH_CONFIG_ENABLE_CHRONO_STRINGMAKER -D TEST_PORT=${TEST_PORT})
+        target_compile_definitions (${TEST_NAME} PUBLIC -D UNIT_TESTING -D NNG_STATIC_LIB -D NNGCPP_STATIC_LIB -D CATCH_CONFIG_ENABLE_CHRONO_STRINGMAKER -D TEST_PORT=${TEST_PORT})
         if (CMAKE_THREAD_LIBS_INIT)
             target_link_libraries (${TEST_NAME} "${CMAKE_THREAD_LIBS_INIT}")
         endif ()
@@ -165,6 +168,7 @@ nngcpp_add_test (protocol/survey 5)
 nngcpp_add_transport_test (transport/inproc 5)
 nngcpp_add_transport_test (transport/ipc 5)
 nngcpp_add_transport_test (transport/tcp 5)
+nngcpp_add_transport_test (transport/tcp6 5)
 
 # nngcpp_add_test(event 5)
 # nngcpp_add_test(idhash 5)
@@ -173,7 +177,6 @@ nngcpp_add_transport_test (transport/tcp 5)
 # nngcpp_add_test(resolv 10)
 # nngcpp_add_test(synch 5)
 # nngcpp_add_test(transport 5)
-# nngcpp_add_test(tcp6 5)
 # nngcpp_add_test(message 5)
 # nngcpp_add_test(udp 5)
 

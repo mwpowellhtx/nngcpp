@@ -1,7 +1,8 @@
 #ifndef NNGCPP_MESSAGE_PIPE_H
 #define NNGCPP_MESSAGE_PIPE_H
 
-#include <nng/nng.h>
+#define NNG_ONLY
+#include <nngcpp.h>
 
 #include "../core/options.h"
 

@@ -9,14 +9,14 @@
 // found online at https://opensource.org/licenses/MIT.
 //
 
+#include <nngcpp.h>
+
 #include "../catch/catch_nng_exception_matcher.hpp"
 #include "../catch/catch_exception_translations.hpp"
 #include "../catch/catch_macros.hpp"
 #include "../helpers/basic_fixture.h"
 #include "../helpers/constants.h"
 #include "../helpers/chrono.hpp"
-
-#include <nngcpp.h>
 
 namespace constants {
 

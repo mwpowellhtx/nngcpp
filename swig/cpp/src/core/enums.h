@@ -1,7 +1,8 @@
 #ifndef NNGCPP_ENUMS_H
 #define NNGCPP_ENUMS_H
 
-#include <nng/nng.h>
+#define NNG_ONLY
+#include <nngcpp.h>
 
 namespace nng {
 

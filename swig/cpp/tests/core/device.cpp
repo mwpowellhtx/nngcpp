@@ -9,13 +9,11 @@
 // found online at https://opensource.org/licenses/MIT.
 //
 
+#include <nngcpp.h>
+
 #include "../catch/catch_exception_translations.hpp"
 #include "../helpers/chrono.hpp"
 
-#include <nngcpp.h>
-
-#include <string>
-#include <chrono>
 #include <ostream>
 
 struct device_fixture {

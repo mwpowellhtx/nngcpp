@@ -9,9 +9,12 @@
 // found online at https://opensource.org/licenses/MIT.
 //
 
-#include "../helpers/constants.h"
-
 #include "transport.h"
+
+#include <core/listener.h>
+#include <core/dialer.h>
+
+#include "../helpers/constants.h"
 
 #include <cstdlib>
 #include <sstream>

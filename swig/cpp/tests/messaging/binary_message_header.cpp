@@ -7,13 +7,13 @@
 // found online at https://opensource.org/licenses/MIT.
 //
 
-#include "binary_message_part_fixtures.hpp"
+// TODO: TBD: unit testing is the right idea, however, these no longer exist apart from binary message
 
 #include <nngcpp.h>
 
-#include "../src/messaging/binary_message_header.h"
-
 #include "../catch/catch_exception_translations.hpp"
+
+#include "binary_message_part_fixtures.hpp"
 
 namespace constants {
     const nng::messaging::message_base::buffer_vector_type data = { 1,2,3 };

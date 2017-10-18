@@ -9,14 +9,13 @@
 // found online at https://opensource.org/licenses/MIT.
 //
 
+#include <nngcpp.h>
+
 #include "../catch/catch_nng_exception_matcher.hpp"
 #include "../catch/catch_exception_translations.hpp"
 #include "../catch/catch_macros.hpp"
+#include "../helpers/constants.h"
 #include "../helpers/chrono.hpp"
-
-#include <nngcpp.h>
-
-#include <string>
 
 struct bus_fixture {
 
@@ -29,8 +28,8 @@ namespace constants {
     const std::string test_addr = "inproc://test";
     const std::string _99bits = "99bits";
     const std::string onthe = "onthe";
-    const nng::messaging::message_base::buffer_vector_type _99bits_buf = { '9','9','b','i','t','s' };
-    const nng::messaging::message_base::buffer_vector_type onthe_buf = { 'o','n','t','h','e' };
+    const nng::messaging::message_base::buffer_vector_type _99bits_buf = to_buffer(_99bits);
+    const nng::messaging::message_base::buffer_vector_type onthe_buf = to_buffer(onthe);
 }
 
 TEST_CASE("Bus pattern tests", "[bus][protocol][sockets][cxx]") {
@@ -42,14 +41,14 @@ TEST_CASE("Bus pattern tests", "[bus][protocol][sockets][cxx]") {
     using namespace nng::messaging;
     using namespace constants;
     using namespace Catch::Matchers;
-    using _opt_ = option_names;
+    using O = option_names;
 
     bus_fixture fixture;
 
 
 	SECTION("We can create a Bus socket") {
 
-        auto busp = std::make_unique<latest_bus_socket>();
+        auto busp = make_unique<latest_bus_socket>();
 
         REQUIRE(busp != nullptr);
 
@@ -69,9 +68,9 @@ TEST_CASE("Bus pattern tests", "[bus][protocol][sockets][cxx]") {
 
     SECTION("We can create a linked Bus topology") {
 
-        auto busp1 = std::make_unique<latest_bus_socket>()
-            , busp2 = std::make_unique<latest_bus_socket>()
-            , busp3 = std::make_unique<latest_bus_socket>()
+        auto busp1 = make_unique<latest_bus_socket>()
+            , busp2 = make_unique<latest_bus_socket>()
+            , busp3 = make_unique<latest_bus_socket>()
             ;
 
         REQUIRE(busp1 != nullptr);
@@ -84,13 +83,13 @@ TEST_CASE("Bus pattern tests", "[bus][protocol][sockets][cxx]") {
 
         const auto receive_timeout = 50ms;
 
-        REQUIRE_NOTHROW(busp1->set_option_usec(_opt_::receive_timeout_usec, CAST_DURATION_TO_USEC(receive_timeout).count()));
-        REQUIRE_NOTHROW(busp2->set_option_usec(_opt_::receive_timeout_usec, CAST_DURATION_TO_USEC(receive_timeout).count()));
-        REQUIRE_NOTHROW(busp3->set_option_usec(_opt_::receive_timeout_usec, CAST_DURATION_TO_USEC(receive_timeout).count()));
+        REQUIRE_NOTHROW(busp1->set_option_usec(O::receive_timeout_usec, CAST_DURATION_TO_USEC(receive_timeout).count()));
+        REQUIRE_NOTHROW(busp2->set_option_usec(O::receive_timeout_usec, CAST_DURATION_TO_USEC(receive_timeout).count()));
+        REQUIRE_NOTHROW(busp3->set_option_usec(O::receive_timeout_usec, CAST_DURATION_TO_USEC(receive_timeout).count()));
 
         SECTION("Messages delivered") {
 
-            auto bmp = std::make_unique<binary_message>();
+            auto bmp = make_unique<binary_message>();
 
             // This is just a poor man's sleep.
             REQUIRE_THROWS_AS_MATCHING(busp1->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
@@ -104,7 +103,7 @@ TEST_CASE("Bus pattern tests", "[bus][protocol][sockets][cxx]") {
                 REQUIRE_NOTHROW(busp1->try_receive(bmp.get()));
                 REQUIRE_THAT(bmp->body()->get(), Equals(_99bits_buf));
 
-                REQUIRE_NOTHROW(bmp = std::make_unique<binary_message>());
+                REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
                 REQUIRE_THROWS_AS_MATCHING(busp3->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
             }
 
@@ -118,7 +117,7 @@ TEST_CASE("Bus pattern tests", "[bus][protocol][sockets][cxx]") {
                const auto* const msgp1 = bmp->get_msgp();
                 REQUIRE_THAT(bmp->body()->get(), Equals(onthe_buf));
 
-                REQUIRE_NOTHROW(bmp = std::make_unique<binary_message>());
+                REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
                 REQUIRE_NOTHROW(busp3->try_receive(bmp.get()));
                 // To demonstrate this is an entirely new message received.
                 const auto* const msgp2 = bmp->get_msgp();
