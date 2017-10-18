@@ -1,8 +1,6 @@
 #ifndef NNGCPP_DIALER_H
 #define NNGCPP_DIALER_H
 
-#include "../nngcpp_integration.h"
-
 #include "enums.h"
 #include "endpoint.h"
 #include "options.h"

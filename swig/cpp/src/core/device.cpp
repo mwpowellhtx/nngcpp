@@ -1,5 +1,5 @@
-#include "socket.h"
 #include "device.h"
+#include "socket.h"
 
 namespace nng {
 

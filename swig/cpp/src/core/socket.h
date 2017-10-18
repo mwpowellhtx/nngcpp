@@ -1,7 +1,8 @@
 #ifndef NNGCPP_SOCKET_H
 #define NNGCPP_SOCKET_H
 
-#include "../nngcpp_integration.h"
+#define NNG_ONLY
+#include <nngcpp.h>
 
 #include "enums.h"
 #include "sender.h"

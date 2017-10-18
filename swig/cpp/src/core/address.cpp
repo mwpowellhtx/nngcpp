@@ -145,9 +145,6 @@ namespace nng {
 
         // Trusting that Jewel is not somehow otherwise accidentally correct!
         switch (actual_jewel) {
-        case af_unspec:
-            _view.reset(new unspec_family_view(sap));
-            break;
         case af_inproc:
             _view.reset(new inproc_family_view(sap));
             break;
@@ -162,6 +159,10 @@ namespace nng {
             break;
         case af_zt:
             _view.reset(new zt_family_view(sap));
+            break;
+        case af_unspec:
+        default:
+            _view.reset(new unspec_family_view(sap));
             break;
         }
     }

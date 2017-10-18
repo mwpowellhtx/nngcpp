@@ -1,5 +1,5 @@
-#include "socket.h"
 #include "dialer.h"
+#include "socket.h"
 #include "exceptions.hpp"
 
 namespace nng {

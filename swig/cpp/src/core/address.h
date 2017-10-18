@@ -4,8 +4,6 @@
 #define NNG_ONLY
 #include <nngcpp.h>
 
-#include "../nngcpp_integration.h"
-
 #include <cstddef>
 #include <vector>
 #include <memory>

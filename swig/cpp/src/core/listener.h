@@ -1,8 +1,6 @@
 #ifndef NNGCPP_LISTENER_H
 #define NNGCPP_LISTENER_H
 
-#include "../nngcpp_integration.h"
-
 #include "enums.h"
 #include "endpoint.h"
 #include "options.h"

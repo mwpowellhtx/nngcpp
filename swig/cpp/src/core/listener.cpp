@@ -1,5 +1,5 @@
-#include "socket.h"
 #include "listener.h"
+#include "socket.h"
 #include "exceptions.hpp"
 
 namespace nng {

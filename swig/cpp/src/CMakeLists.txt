@@ -29,7 +29,6 @@
 # files that are GLOB'ed unless detectable changes also occur to the CMake files themselves.
 set (NNGCPP_CPP_SRCS
     nngcpp.h
-    nngcpp_integration.h
     core/core.h
     core/enums.h
     core/enums.cpp

@@ -1,8 +1,6 @@
 #ifndef NNGCPP_ENDPOINT_H
 #define NNGCPP_ENDPOINT_H
 
-#include "../nngcpp_integration.h"
-
 #include "enums.h"
 
 namespace nng {

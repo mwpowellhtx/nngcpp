@@ -1,14 +1,12 @@
 #ifndef NNGCPP_DEVICE_H
 #define NNGCPP_DEVICE_H
 
-#include "../nngcpp_integration.h"
+#include "socket.h"
 
 #include <memory>
 #include <thread>
 
 namespace nng {
-
-    class socket;
 
     // TODO: TBD: should perhaps not expose device_path as an external resource, much less to SWIG
     struct device_path {
