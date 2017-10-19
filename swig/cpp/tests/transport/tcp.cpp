@@ -78,12 +78,6 @@ namespace constants {
     const std::string wildcard_addr_base = "tcp://*";
 }
 
-namespace nng {
-    using std::placeholders::_1;
-    using std::placeholders::_2;
-    using std::placeholders::_3;
-}
-
 TEST_CASE("TCP transport", "[tcp][transport][nng][cxx]") {
 
     using namespace std;
@@ -91,6 +85,10 @@ TEST_CASE("TCP transport", "[tcp][transport][nng][cxx]") {
     using namespace messaging;
     using namespace transport;
     using namespace constants;
+
+    using std::placeholders::_1;
+    using std::placeholders::_2;
+    using std::placeholders::_3;
 
     const auto& property_tests = std::bind(&v4::property_tests, _1, _2, _3);
 
