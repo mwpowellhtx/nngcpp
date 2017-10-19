@@ -64,8 +64,12 @@ if (NNGCPP_ENABLE_TESTS)
         target_include_directories (${TEST_NAME} PUBLIC $<BUILD_INTERFACE:${NNG_GIT_REPO_SRC_DIR}>)
         # So it does not appear to be enough to Add the Dependency; we must ALSO configure Target Link Libraries.
         target_link_libraries (${TEST_NAME} ${NNGCPP_REQUIRED_LIBS} nng_static ${NNGCPP_PROJECT_NAME_STATIC})
+        # TODO: TBD: supporting NNG_PLATFORM_WINDOWS for now; will want to be platform sensitive here and define NNG_PLATFORM_POSIX if necessary
+        set (NNG_PLATFORM NNG_PLATFORM_WINDOWS)
         # TODO: TBD: c++14? or c++11?
-        target_compile_definitions (${TEST_NAME} PUBLIC -D UNIT_TESTING -D NNG_STATIC_LIB -D NNGCPP_STATIC_LIB -D CATCH_CONFIG_ENABLE_CHRONO_STRINGMAKER -D TEST_PORT=${TEST_PORT})
+        # Definitions defined in more or less ordered manner.
+        # Define NOMINMAX for purpose of Windows collision with min/max macros and things like numeric_limits. Who DID that?!?!
+        target_compile_definitions (${TEST_NAME} PUBLIC -D UNIT_TESTING -D TEST_PORT=${TEST_PORT} -D CATCH_CONFIG_ENABLE_CHRONO_STRINGMAKER -D ${NNG_PLATFORM} -D NNG_STATIC_LIB -D NNGCPP_STATIC_LIB -D NOMINMAX)
         if (CMAKE_THREAD_LIBS_INIT)
             target_link_libraries (${TEST_NAME} "${CMAKE_THREAD_LIBS_INIT}")
         endif ()
@@ -147,6 +151,7 @@ else ()
 endif ()
 
 nngcpp_add_test (core/errors 2)
+nngcpp_add_test (core/address 2)
 nngcpp_add_test (core/pollfd 5)
 nngcpp_add_test (core/reconnect 5)
 nngcpp_add_test (core/sock 5)
