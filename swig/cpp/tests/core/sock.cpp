@@ -18,7 +18,6 @@
 #include "../catch/catch_macros.hpp"
 #include "../catch/timed_section_impl.hpp"
 #include "../helpers/constants.h"
-#include "../helpers/chrono.hpp"
 
 // TODO: TBD: update this module: follow the C API grouping more or less closely, adapting for C+ wrapperisms
 // TODO: TBD: generally, update this taking into consideration updates; could "transaction" be useful now, in more broad sense? i.e. looking at constants::to_str for instance...

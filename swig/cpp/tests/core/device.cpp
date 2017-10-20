@@ -13,7 +13,6 @@
 
 #include "../catch/catch_exception_translations.hpp"
 #include "../catch/catch_macros.hpp"
-#include "../helpers/chrono.hpp"
 
 #include <ostream>
 

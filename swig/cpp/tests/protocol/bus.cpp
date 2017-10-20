@@ -15,7 +15,6 @@
 #include "../catch/catch_exception_translations.hpp"
 #include "../catch/catch_macros.hpp"
 #include "../helpers/constants.h"
-#include "../helpers/chrono.hpp"
 
 struct bus_fixture {
 
