@@ -132,14 +132,15 @@ TEST_CASE("Pair v1 protocol works using C code", "[pair][v1][protocol][sockets][
     SECTION("Given a few sockets") {
         const auto addr = transaction::get_xact().next_addr(pairv1_addr_base);
 
-        auto receive_timeout = static_cast<uint64_t>(300000);
+        const auto receive_timeout = 300ms;
+        duration_type timeout;
 
-        REQUIRE(::nng_setopt_usec(s1, NNG_OPT_RECVTIMEO, receive_timeout) == 0);
-        REQUIRE(::nng_setopt_usec(c1, NNG_OPT_RECVTIMEO, receive_timeout) == 0);
-        REQUIRE(::nng_setopt_usec(c2, NNG_OPT_RECVTIMEO, receive_timeout) == 0);
-        receive_timeout = 0;
-        REQUIRE(::nng_getopt_usec(s1, NNG_OPT_RECVTIMEO, &receive_timeout) == 0);
-        REQUIRE(receive_timeout == 300000);
+        REQUIRE(::nng_setopt_ms(s1, NNG_OPT_RECVTIMEO, CAST_DURATION_TO_MS(receive_timeout).count()) == 0);
+        REQUIRE(::nng_setopt_ms(c1, NNG_OPT_RECVTIMEO, CAST_DURATION_TO_MS(receive_timeout).count()) == 0);
+        REQUIRE(::nng_setopt_ms(c2, NNG_OPT_RECVTIMEO, CAST_DURATION_TO_MS(receive_timeout).count()) == 0);
+
+        REQUIRE(::nng_getopt_ms(s1, NNG_OPT_RECVTIMEO, &timeout) == 0);
+        REQUIRE((timeout*1ms) == receive_timeout);
 
         // ...
 
@@ -148,7 +149,7 @@ TEST_CASE("Pair v1 protocol works using C code", "[pair][v1][protocol][sockets][
             REQUIRE(::nng_setopt_int(s1, NNG_OPT_RECVBUF, 1) == 0);
             REQUIRE(::nng_setopt_int(s1, NNG_OPT_SENDBUF, 1) == 0);
             REQUIRE(::nng_setopt_int(c1, NNG_OPT_RECVBUF, 1) == 0);
-            REQUIRE(::nng_setopt_usec(s1, NNG_OPT_SENDTIMEO, 30000) == 0);
+            REQUIRE(::nng_setopt_ms(s1, NNG_OPT_SENDTIMEO, (30ms).count()) == 0);
 
             REQUIRE(::nng_listen(s1, addr.c_str(), NULL, 0) == 0);
             REQUIRE(::nng_dial(c1, addr.c_str(), NULL, 0) == 0);
@@ -277,10 +278,10 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
     using namespace Catch::Matchers;
     using O = option_names;
 
-    uint64_t timeout_usec;
+    uint32_t hops;
     uint32_t actual_api;
     int32_t actual_opt;
-    uint32_t hops;
+    duration_type timeout_duration;
 
     basic_fixture fixture;
 
@@ -300,13 +301,13 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
 
         const auto receive_timeout = 300ms;
 
-        REQUIRE_NOTHROW(serverp1->set_option_usec(O::receive_timeout_usec, CAST_DURATION_TO_USEC(receive_timeout).count()));
-        REQUIRE_NOTHROW(clientp1->set_option_usec(O::receive_timeout_usec, CAST_DURATION_TO_USEC(receive_timeout).count()));
-        REQUIRE_NOTHROW(clientp2->set_option_usec(O::receive_timeout_usec, CAST_DURATION_TO_USEC(receive_timeout).count()));
+        REQUIRE_NOTHROW(serverp1->set_option_ms(O::receive_timeout_duration, CAST_DURATION_TO_MS(receive_timeout).count()));
+        REQUIRE_NOTHROW(clientp1->set_option_ms(O::receive_timeout_duration, CAST_DURATION_TO_MS(receive_timeout).count()));
+        REQUIRE_NOTHROW(clientp2->set_option_ms(O::receive_timeout_duration, CAST_DURATION_TO_MS(receive_timeout).count()));
 
-        REQUIRE_NOTHROW(serverp1->get_option_usec(O::receive_timeout_usec, &timeout_usec));
+        REQUIRE_NOTHROW(serverp1->get_option_ms(O::receive_timeout_duration, &timeout_duration));
         // TODO: TBD: looking forward to full Catch v2; including CHRONO comprehension.
-        REQUIRE((timeout_usec * 1us).count() == CAST_DURATION_TO_USEC(300ms).count());
+        REQUIRE((timeout_duration * 1ms).count() == (300ms).count());
 
         unique_ptr<binary_message> bmp;
         unique_ptr<message_pipe> mpp1, mpp2;
@@ -366,7 +367,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
             REQUIRE_NOTHROW(serverp1->set_option_int(O::send_buffer, 1));
             REQUIRE_NOTHROW(clientp1->set_option_int(O::receive_buffer, 1));
             REQUIRE_NOTHROW(clientp1->set_option_int(O::receive_buffer, 1));
-            REQUIRE_NOTHROW(serverp1->set_option_usec(O::send_timeout_usec, CAST_DURATION_TO_USEC(100ms).count()));
+            REQUIRE_NOTHROW(serverp1->set_option_ms(O::send_timeout_duration, (100ms).count()));
 
             REQUIRE_NOTHROW(serverp1->listen(addr));
             REQUIRE_NOTHROW(clientp1->dial(addr));
@@ -392,7 +393,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
             REQUIRE_NOTHROW(serverp1->set_option_int(O::receive_buffer, 1));
             REQUIRE_NOTHROW(serverp1->set_option_int(O::send_buffer, 1));
             REQUIRE_NOTHROW(clientp1->set_option_int(O::receive_buffer, 1));
-            REQUIRE_NOTHROW(serverp1->set_option_usec(O::send_timeout_usec, CAST_DURATION_TO_USEC(30ms).count()));
+            REQUIRE_NOTHROW(serverp1->set_option_ms(O::send_timeout_duration, (30ms).count()));
 
             REQUIRE_NOTHROW(serverp1->listen(addr));
             REQUIRE_NOTHROW(clientp1->dial(addr));

@@ -4,7 +4,6 @@
 #include "message_base.h"
 
 #include <cstddef>
-#include <cstdint>
 #include <vector>
 #include <string>
 
@@ -14,9 +13,6 @@ namespace nng {
 
         struct messaging_utils {
         public:
-
-            typedef message_base::size_type size_type;
-            typedef message_base::buffer_vector_type buffer_vector_type;
 
         private:
 

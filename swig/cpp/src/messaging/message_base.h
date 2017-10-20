@@ -1,8 +1,7 @@
 #ifndef NNGCPP_MESSAGE_BASE_H
 #define NNGCPP_MESSAGE_BASE_H
 
-#define NNG_ONLY
-#include <nngcpp.h>
+#include "../core/types.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -16,6 +15,8 @@ namespace nng {
 #endif // NNGCPP_SOCKET_H
 
     namespace messaging {
+
+        typedef std::vector<uint8_t> buffer_vector_type;
 
         // TODO: TBD: not the best placement for this one, but it will have to do.
         class message_base_api {
@@ -56,10 +57,6 @@ namespace nng {
         public:
 
             typedef void* part_type;
-
-            typedef std::size_t size_type;
-
-            typedef std::vector<uint8_t> buffer_vector_type;
 
         protected:
 

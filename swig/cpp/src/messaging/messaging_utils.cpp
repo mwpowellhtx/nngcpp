@@ -11,10 +11,9 @@ namespace nng {
         }
 
         template<class Src_, class Dest_>
-        Dest_ __to_dest(const Src_* const sp, messaging_utils::size_type sz) {
+        Dest_ __to_dest(const Src_* const sp, size_type sz) {
             Dest_ d;
             typedef Dest_::value_type dest_value_type;
-            typedef messaging_utils::size_type size_type;
             // TODO: TBD: may need/want to account for unicode wide-characters.
             for (auto it = sp->cbegin(); ((size_type)(it - sp->cbegin())) < sz
                 && it != sp->cend(); it++) {
@@ -31,21 +30,21 @@ namespace nng {
             return __to_dest<buffer_vector_type, std::string>(bufp, sz);
         }
 
-        messaging_utils::buffer_vector_type messaging_utils::to_buffer(const std::string::value_type* cp) {
+        buffer_vector_type messaging_utils::to_buffer(const std::string::value_type* cp) {
             const std::string s(cp);
             return to_buffer(&s, s.length());
         }
 
-        messaging_utils::buffer_vector_type messaging_utils::to_buffer(const std::string::value_type* cp, size_type sz) {
+        buffer_vector_type messaging_utils::to_buffer(const std::string::value_type* cp, size_type sz) {
             const std::string s(cp);
             return to_buffer(&s, sz);
         }
 
-        messaging_utils::buffer_vector_type messaging_utils::to_buffer(const std::string* const sp) {
+        buffer_vector_type messaging_utils::to_buffer(const std::string* const sp) {
             return sp == nullptr ? buffer_vector_type() : to_buffer(sp, sp->length());
         }
 
-        messaging_utils::buffer_vector_type messaging_utils::to_buffer(const std::string* const sp, size_type sz) {
+        buffer_vector_type messaging_utils::to_buffer(const std::string* const sp, size_type sz) {
             return __to_dest<std::string, buffer_vector_type>(sp, sz);
         }
     }

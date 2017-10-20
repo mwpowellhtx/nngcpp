@@ -1,8 +1,7 @@
 #ifndef NNGCPP_ADDRESS_H
 #define NNGCPP_ADDRESS_H
 
-#define NNG_ONLY
-#include <nngcpp.h>
+#include "types.h"
 
 #include <cstddef>
 #include <memory>
@@ -339,8 +338,6 @@ namespace nng {
 
         //typedef ::nng_sockaddr sockaddr_type;
         typedef sockaddr_t sockaddr_type;
-
-        typedef  std::size_t size_type;
 
     private:
 

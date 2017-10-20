@@ -1,6 +1,8 @@
 #ifndef NNGCPP_BINARY_MESSAGE_H
 #define NNGCPP_BINARY_MESSAGE_H
 
+#include "../core/types.h"
+
 #include "binary_message_header.h"
 #include "binary_message_body.h"
 
@@ -19,8 +21,6 @@ namespace nng {
         private:
 
             friend class socket;
-
-            typedef message_base::size_type size_type;
 
             ::nng_msg* _msgp;
 

@@ -115,11 +115,11 @@ TEST_CASE("Publisher/subscriber pattern using C++ wrapper", "[pub][sub][v0][prot
     basic_fixture fixture;
 
     // Some of these need to be initialized to avoid garbage results, crash situations, etc.
-    socket::size_type sz = 0;
+    size_type sz = 0;
     protocol_type actual_proto, actual_peer;
 
     unique_ptr<binary_message> bmp;
-    binary_message::buffer_vector_type buf;
+    buffer_vector_type buf;
 
     unique_ptr<latest_pub_socket_fixture> pubp;
     unique_ptr<latest_sub_socket_fixture> subp;
@@ -221,7 +221,7 @@ TEST_CASE("Publisher/subscriber pattern using C++ wrapper", "[pub][sub][v0][prot
         SECTION("Subscriber can receive from publisher") {
 
             REQUIRE_NOTHROW(subp->set_option(O::sub_subscribe, topics::some));
-            REQUIRE_NOTHROW(subp->set_option_usec(O::receive_timeout_usec, CAST_DURATION_TO_USEC(90ms).count()));
+            REQUIRE_NOTHROW(subp->set_option_ms(O::receive_timeout_duration, (90ms).count()));
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
             REQUIRE_NOTHROW(*bmp << topics::some_like_it_hot);
@@ -244,7 +244,7 @@ TEST_CASE("Publisher/subscriber pattern using C++ wrapper", "[pub][sub][v0][prot
 
         SECTION("Subscribers without subsciptions do not receive") {
 
-            REQUIRE_NOTHROW(subp->set_option_usec(O::receive_timeout_usec, CAST_DURATION_TO_USEC(90ms).count()));
+            REQUIRE_NOTHROW(subp->set_option_ms(O::receive_timeout_duration, (90ms).count()));
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
             REQUIRE_NOTHROW(*bmp << topics::some_do_not_like_it);
@@ -254,7 +254,7 @@ TEST_CASE("Publisher/subscriber pattern using C++ wrapper", "[pub][sub][v0][prot
 
         SECTION("Subscribers in raw receive") {
 
-            REQUIRE_NOTHROW(subp->set_option_usec(O::receive_timeout_usec, CAST_DURATION_TO_USEC(90ms).count()));
+            REQUIRE_NOTHROW(subp->set_option_ms(O::receive_timeout_duration, (90ms).count()));
             REQUIRE_NOTHROW(subp->set_option_int(O::raw, 1));
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());

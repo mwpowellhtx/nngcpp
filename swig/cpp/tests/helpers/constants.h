@@ -9,7 +9,7 @@
 namespace constants {
 
     // TODO: TBD: this really deserves first class support throughout test framework
-    nng::messaging::binary_message::buffer_vector_type to_buffer(const std::string& s);
+    nng::messaging::buffer_vector_type to_buffer(const std::string& s);
 
     template<typename Type_>
     std::string to_str(Type_ value) {

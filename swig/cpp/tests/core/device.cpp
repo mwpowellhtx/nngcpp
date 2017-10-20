@@ -12,6 +12,7 @@
 #include <nngcpp.h>
 
 #include "../catch/catch_exception_translations.hpp"
+#include "../catch/catch_macros.hpp"
 #include "../helpers/chrono.hpp"
 
 #include <ostream>
@@ -59,8 +60,8 @@ namespace constants {
     const std::string dev2_addr = "inproc://dev2";
     const std::string alpha = "alpha";
     const std::string omega = "omega";
-    const nng::messaging::message_base::buffer_vector_type alpha_buf = { 'a','l','p','h','a' };
-    const nng::messaging::message_base::buffer_vector_type omega_buf = { 'o','m','e','g','a' };
+    const nng::messaging::buffer_vector_type alpha_buf = { 'a','l','p','h','a' };
+    const nng::messaging::buffer_vector_type omega_buf = { 'o','m','e','g','a' };
 }
 
 TEST_CASE("Test that device functions properly", "[device]") {
@@ -73,7 +74,7 @@ TEST_CASE("Test that device functions properly", "[device]") {
     using namespace nng::protocol;
     using namespace nng::messaging;
     using namespace constants;
-    using _opt_ = option_names;
+    using O = option_names;
 
     /* No need to involve any "sessions" at this level. In fact, I think that having
     a device "fixture" better focuses the unit test on just what should be vetted. */
@@ -87,8 +88,8 @@ TEST_CASE("Test that device functions properly", "[device]") {
             latest_pair_socket p1, p2;
 
             // TODO: TBD: in the grand scheme of things, I'm not really sure what purpose these two assertions are serving...
-            REQUIRE_NOTHROW(p1.set_option_int(_opt_::raw, 1));
-            REQUIRE_NOTHROW(p2.set_option_int(_opt_::raw, 1));
+            REQUIRE_NOTHROW(p1.set_option_int(O::raw, 1));
+            REQUIRE_NOTHROW(p2.set_option_int(O::raw, 1));
 
             REQUIRE_NOTHROW(fixture.install(&p1, &p2, true));
             REQUIRE(fixture.is_installed() == true);
@@ -103,10 +104,10 @@ TEST_CASE("Test that device functions properly", "[device]") {
 
             const auto timeout = 1000ms;
 
-            REQUIRE_NOTHROW(e1.set_option_usec(_opt_::receive_timeout_usec, CAST_DURATION_TO_USEC(timeout).count()));
-            REQUIRE_NOTHROW(e2.set_option_usec(_opt_::receive_timeout_usec, CAST_DURATION_TO_USEC(timeout).count()));
+            REQUIRE_NOTHROW(e1.set_option_ms(O::receive_timeout_duration, CAST_DURATION_TO_MS(timeout).count()));
+            REQUIRE_NOTHROW(e2.set_option_ms(O::receive_timeout_duration, CAST_DURATION_TO_MS(timeout).count()));
 
-            this_thread::sleep_for(100ms);
+            SLEEP_FOR(100ms);
 
             SECTION("Device can send and receive") {
 

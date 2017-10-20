@@ -1,8 +1,7 @@
 #ifndef NNGCPP_SOCKET_H
 #define NNGCPP_SOCKET_H
 
-#define NNG_ONLY
-#include <nngcpp.h>
+#include "types.h"
 
 #include "enums.h"
 #include "sender.h"
@@ -56,11 +55,10 @@ namespace nng {
     class dialer;
     struct device_path;
 
-    class socket : public sender, public receiver, public messenger, public options {
+    class socket : public sender, public receiver, public messenger, public options_reader, public options_writer {
     public:
 
-        typedef messaging::message_base::size_type size_type;
-        typedef messaging::message_base::buffer_vector_type buffer_vector_type;
+        typedef messaging::buffer_vector_type buffer_vector_type;
         typedef messaging::binary_message binary_message_type;
 
     private:
@@ -96,33 +94,34 @@ namespace nng {
         bool is_open() const;
 
         // Convenience option wrappers.
-        virtual void set_option(const std::string& name, const std::string& val, size_type sz) override;
-        virtual void set_option(const std::string& name, const std::string& val) override;
+        virtual void get_option(const std::string& name, void* valp, nng::size_type* szp) override;
 
         virtual void get_option(const std::string& name, std::string& val) override;
-        virtual void get_option(const std::string& name, std::string& val, size_type& sz) override;
-
-        virtual void set_option(const std::string& name, const void* valp, size_type sz) override;
-        virtual void get_option(const std::string& name, void* valp, size_type* szp) override;
-
-        void set_option_int(const std::string& name, int val);
-        void set_option_size(const std::string& name, size_type val);
-        void set_option_usec(const std::string& name, uint64_t val);
+        virtual void get_option(const std::string& name, std::string& val, nng::size_type& sz) override;
 
         void get_option_int(const std::string& name, int* valp);
-        void get_option_size(const std::string& name, size_type* valp);
-        void get_option_usec(const std::string& name, uint64_t* valp);
+        void get_option_size(const std::string& name, nng::size_type* valp);
+        void get_option_ms(const std::string& name, duration_type* valp);
+
+        virtual void set_option(const std::string& name, const void* valp, nng::size_type sz) override;
+
+        virtual void set_option(const std::string& name, const std::string& val, nng::size_type sz) override;
+        virtual void set_option(const std::string& name, const std::string& val) override;
+
+        virtual void set_option_int(const std::string& name, int val) override;
+        virtual void set_option_size(const std::string& name, nng::size_type val) override;
+        virtual void set_option_ms(const std::string& name, duration_type val) override;
 
         virtual void send(binary_message_type* const bmp, flag_type flags = flag_none) override;
 
         virtual int send(const buffer_vector_type* const bufp, flag_type flags = flag_none) override;
-        virtual int send(const buffer_vector_type* const bufp, size_type sz, flag_type flags = flag_none) override;
+        virtual int send(const buffer_vector_type* const bufp, nng::size_type sz, flag_type flags = flag_none) override;
 
         virtual std::unique_ptr<binary_message_type> receive(flag_type flags = flag_none) override;
         virtual int try_receive(binary_message_type* const bmp, flag_type flags = flag_none) override;
 
-        virtual buffer_vector_type receive(size_type& sz, flag_type flags = flag_none) override;
-        virtual int try_receive(buffer_vector_type* const bufp, size_type& sz, flag_type flags = flag_none) override;
+        virtual buffer_vector_type receive(nng::size_type& sz, flag_type flags = flag_none) override;
+        virtual int try_receive(buffer_vector_type* const bufp, nng::size_type& sz, flag_type flags = flag_none) override;
 
         protocol_type get_protocol() const;
         protocol_type get_peer() const;

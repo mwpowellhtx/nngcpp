@@ -30,9 +30,9 @@ namespace constants {
     const std::string hello = "hello";
     const std::string abc = "abc";
     const std::string def = "def";
-    const nng::messaging::message_base::buffer_vector_type hello_buf = { 'h','e','l','l','o' };
-    const nng::messaging::message_base::buffer_vector_type abc_buf = { 'a','b','c' };
-    const nng::messaging::message_base::buffer_vector_type def_buf = { 'd','e','f' };
+    const nng::messaging::buffer_vector_type hello_buf = { 'h','e','l','l','o' };
+    const nng::messaging::buffer_vector_type abc_buf = { 'a','b','c' };
+    const nng::messaging::buffer_vector_type def_buf = { 'd','e','f' };
 }
 
 namespace nng {
@@ -101,9 +101,9 @@ TEST_CASE("Rule out the possibility of invalid operations", "[pipeline][push][pu
     using namespace trx;
 
     // Even though we are technically doing nothing with these, we MUST initialize them anyhow.
-    socket::size_type sz = 0;
+    size_type sz = 0;
     binary_message* bmp = nullptr;
-    message_base::buffer_vector_type* bufp = nullptr;
+    buffer_vector_type* bufp = nullptr;
 
     SECTION("Push sockets cannot receive messages") {
 
@@ -136,7 +136,7 @@ TEST_CASE("Pipeline (push/pull) pattern", "[pipeline][push][pull][pattern][proto
     using namespace Catch;
     using namespace Catch::Matchers;
     using namespace constants;
-    using _opt_ = option_names;
+    using O = option_names;
 
     SECTION("We can create a Push socket") {
 
@@ -248,7 +248,7 @@ TEST_CASE("Load balancing works", "[pipeline][push][pull][load][balancing]") {
     using namespace nng::messaging;
     using namespace constants;
     using namespace Catch::Matchers;
-    using _opt_ = option_names;
+    using O = option_names;
 
     unique_ptr<latest_push_socket> pushsp;
     unique_ptr<latest_pull_socket> pullsp1, pullsp2, pullsp3;
@@ -265,15 +265,15 @@ TEST_CASE("Load balancing works", "[pipeline][push][pull][load][balancing]") {
 
     const int default_buffer_size = 4;
 
-    REQUIRE_NOTHROW(pushsp->set_option_int(_opt_::receive_buffer, default_buffer_size));
-    REQUIRE_NOTHROW(pullsp1->set_option_int(_opt_::receive_buffer, default_buffer_size));
-    REQUIRE_NOTHROW(pullsp2->set_option_int(_opt_::receive_buffer, default_buffer_size));
-    REQUIRE_NOTHROW(pullsp3->set_option_int(_opt_::receive_buffer, default_buffer_size));
+    REQUIRE_NOTHROW(pushsp->set_option_int(O::receive_buffer, default_buffer_size));
+    REQUIRE_NOTHROW(pullsp1->set_option_int(O::receive_buffer, default_buffer_size));
+    REQUIRE_NOTHROW(pullsp2->set_option_int(O::receive_buffer, default_buffer_size));
+    REQUIRE_NOTHROW(pullsp3->set_option_int(O::receive_buffer, default_buffer_size));
 
-    REQUIRE_NOTHROW(pushsp->set_option_int(_opt_::send_buffer, default_buffer_size));
-    REQUIRE_NOTHROW(pullsp1->set_option_int(_opt_::send_buffer, default_buffer_size));
-    REQUIRE_NOTHROW(pullsp2->set_option_int(_opt_::send_buffer, default_buffer_size));
-    REQUIRE_NOTHROW(pullsp3->set_option_int(_opt_::send_buffer, default_buffer_size));
+    REQUIRE_NOTHROW(pushsp->set_option_int(O::send_buffer, default_buffer_size));
+    REQUIRE_NOTHROW(pullsp1->set_option_int(O::send_buffer, default_buffer_size));
+    REQUIRE_NOTHROW(pullsp2->set_option_int(O::send_buffer, default_buffer_size));
+    REQUIRE_NOTHROW(pullsp3->set_option_int(O::send_buffer, default_buffer_size));
 
     unique_ptr<binary_message> abcsp, defsp;
 
@@ -285,9 +285,9 @@ TEST_CASE("Load balancing works", "[pipeline][push][pull][load][balancing]") {
 
     const auto receive_timeout = 100ms;
 
-    REQUIRE_NOTHROW(pullsp1->set_option_usec(_opt_::receive_timeout_usec, CAST_DURATION_TO_USEC(receive_timeout).count()));
-    REQUIRE_NOTHROW(pullsp2->set_option_usec(_opt_::receive_timeout_usec, CAST_DURATION_TO_USEC(receive_timeout).count()));
-    REQUIRE_NOTHROW(pullsp3->set_option_usec(_opt_::receive_timeout_usec, CAST_DURATION_TO_USEC(receive_timeout).count()));
+    REQUIRE_NOTHROW(pullsp1->set_option_ms(O::receive_timeout_duration, CAST_DURATION_TO_MS(receive_timeout).count()));
+    REQUIRE_NOTHROW(pullsp2->set_option_ms(O::receive_timeout_duration, CAST_DURATION_TO_MS(receive_timeout).count()));
+    REQUIRE_NOTHROW(pullsp3->set_option_ms(O::receive_timeout_duration, CAST_DURATION_TO_MS(receive_timeout).count()));
 
     REQUIRE_NOTHROW(pushsp->listen(test_addr));
     REQUIRE_NOTHROW(pullsp1->dial(test_addr));

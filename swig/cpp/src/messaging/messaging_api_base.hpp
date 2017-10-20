@@ -21,8 +21,6 @@ namespace nng {
         class supports_get_api {
         protected:
 
-            typedef message_base::size_type size_type;
-
             typedef Type_ getter_type;
 
             typedef supports_get_api<Type_> getter_api_type;

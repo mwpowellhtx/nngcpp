@@ -202,21 +202,20 @@ namespace nng {
     namespace messaging {
 
         // TODO: TBD: this is a likely candidate for everything besides just transport.
-        void init_random_buffer(message_base::buffer_vector_type& buffer
-            ,  const message_base::size_type sz) {
+        void init_random_buffer(buffer_vector_type& buf,  const size_type sz) {
 
-            buffer.resize(sz);
+            buf.resize(sz);
 
-            for (message_base::size_type i = 0; i < sz; i++) {
-                buffer[i] = std::rand() & 0xff;
+            for (size_type i = 0; i < sz; i++) {
+                buf[i] = std::rand() & 0xff;
             }
         }
 
-        void twos_compliment_buffer(message_base::buffer_vector_type& buffer) {
-            const auto &twos_compliment = [](message_base::buffer_vector_type::value_type& x) {
+        void twos_compliment_buffer(buffer_vector_type& buf) {
+            const auto &twos_compliment = [](buffer_vector_type::value_type& x) {
                 x = ~x;
             };
-            std::for_each(buffer.begin(), buffer.end(), twos_compliment);
+            std::for_each(buf.begin(), buf.end(), twos_compliment);
         }
     }
 
@@ -234,8 +233,8 @@ namespace nng {
             unique_ptr<binary_message> sendp, recvp;
 
             // What's a buffer without some HEX involvement...
-            const message_base::size_type sz = 0x400 * 0x80; // Much larger than any transport segment.
-            message_base::buffer_vector_type data;
+            const size_type sz = 0x400 * 0x80; // Much larger than any transport segment.
+            buffer_vector_type data;
 
             REQUIRE_NOTHROW(init_random_buffer(data, sz));
 

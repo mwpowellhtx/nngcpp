@@ -21,7 +21,7 @@ namespace nng {
 #endif // NNGCPP_BINARY_MESSAGE_H
 
         // TODO: so, equal_to is available, but not_equal_to is not?
-        class message_pipe : public options, public std::equal_to<message_pipe> {
+        class message_pipe : public options_reader, public std::equal_to<message_pipe> {
         protected:
 
             friend class binary_message;
@@ -42,24 +42,14 @@ namespace nng {
             // TODO: TBD: so, apparently there is no std::not_equal_to available from the Microsoft implementation, however, we should still be able to override the operator
             bool operator!=(const message_pipe& rhs);
 
+            virtual void get_option(const std::string& name, void* val, size_type* szp) override;
+
             virtual void get_option(const std::string& name, std::string& val) override;
             virtual void get_option(const std::string& name, std::string& val, size_type& sz) override;
 
-            virtual void set_option(const std::string& name, const void* valp, size_type sz) override;
-            virtual void get_option(const std::string& name, void* val, size_type* szp) override;
-
             virtual void get_option_int(const std::string& name, int* valp) override;
             virtual void get_option_size(const std::string& name, size_type* valp) override;
-            virtual void get_option_usec(const std::string& name, option_ulonglong_type* valp) override;
-
-        protected:
-
-            virtual void set_option(const std::string& name, const std::string& val, size_type sz) override;
-            virtual void set_option(const std::string& name, const std::string& val) override;
-
-            virtual void set_option_int(const std::string& name, int val) override;
-            virtual void set_option_size(const std::string& name, size_type val) override;
-            virtual void set_option_usec(const std::string& name, option_ulonglong_type val) override;
+            virtual void get_option_ms(const std::string& name, duration_type* valp) override;
         };
     }
 }

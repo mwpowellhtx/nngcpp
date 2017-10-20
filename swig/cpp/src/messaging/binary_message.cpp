@@ -62,7 +62,7 @@ namespace nng {
             return &_body;
         }
 
-        message_base::size_type binary_message::get_size() {
+        size_type binary_message::get_size() {
             // Should be both (Header.Size + Body.Size).
             if (!has_one()) { allocate(); }
             return _header.get_size() + _body.get_size();

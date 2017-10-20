@@ -30,6 +30,7 @@
 set (NNGCPP_CPP_SRCS
     nngcpp.h
     core/core.h
+    core/types.h
     core/enums.h
     core/enums.cpp
     core/address.cpp

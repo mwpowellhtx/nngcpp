@@ -21,8 +21,8 @@ namespace constants {
     const std::string hello = "hello";
     const std::string again = "again";
 
-    const nng::messaging::message_base::buffer_vector_type hello_buf = { 'h','e','l','l','o' };
-    const nng::messaging::message_base::buffer_vector_type again_buf = { 'a','g','a','i','n' };
+    const nng::messaging::buffer_vector_type hello_buf = { 'h','e','l','l','o' };
+    const nng::messaging::buffer_vector_type again_buf = { 'a','g','a','i','n' };
 }
 
 /* This is interesting in the event we actually need/want to separate the code under
@@ -93,8 +93,10 @@ TEST_CASE("Catch translation of NNG C reconnect unit tests", "[nng][c][reconnect
         auto& pull = $.pull;
         auto& push = $.push;
 
-        REQUIRE(::nng_setopt_usec(pull, NNG_OPT_RECONNMINT, 10000) == 0);
-        REQUIRE(::nng_setopt_usec(pull, NNG_OPT_RECONNMAXT, 10000) == 0);
+        const auto timeout = 10ms;
+
+        REQUIRE(::nng_setopt_ms(pull, NNG_OPT_RECONNMINT, timeout.count()) == 0);
+        REQUIRE(::nng_setopt_ms(pull, NNG_OPT_RECONNMAXT, timeout.count()) == 0);
 
         SECTION("Dialing before listening works") {
 
@@ -196,12 +198,12 @@ TEST_CASE("NNG C++ wrapper reconnect works", "[nng][reconnect][cxx]") {
         REQUIRE_NOTHROW(push = _session_.create_push_socket());
         REQUIRE_NOTHROW(pull = _session_.create_pull_socket());
 
-        const duration<uint64_t, milli> reconnect_time = 10ms;
+        const auto reconnect_time = 10ms;
 
         // TODO: TBD: count() might be the way to go here, but I cannot say for sure.
         // http://en.cppreference.com/w/cpp/chrono/duration
-        REQUIRE_NOTHROW(pull->set_option_usec(_opt_::min_reconnect_time_usec, reconnect_time.count()));
-        REQUIRE_NOTHROW(pull->set_option_usec(_opt_::max_reconnect_time_usec, reconnect_time.count()));
+        REQUIRE_NOTHROW(pull->set_option_ms(_opt_::min_reconnect_time_duration, reconnect_time.count()));
+        REQUIRE_NOTHROW(pull->set_option_ms(_opt_::max_reconnect_time_duration, reconnect_time.count()));
 
         SECTION("Dialing before listening works") {
 

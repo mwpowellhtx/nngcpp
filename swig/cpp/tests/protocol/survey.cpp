@@ -71,7 +71,7 @@ TEST_CASE("Survey pattern", "[surveyor][respondent][v0][protocol][sockets][nng][
 
 		SECTION("Survey without responder times out") {
 
-            REQUIRE_NOTHROW(surp->set_option_usec(O::surveyor_survey_time_usec, CAST_DURATION_TO_USEC(50ms).count()));
+            REQUIRE_NOTHROW(surp->set_option_ms(O::surveyor_survey_time_duration, (50ms).count()));
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
             REQUIRE_NOTHROW(surp->send(bmp.get()));
@@ -121,7 +121,7 @@ TEST_CASE("Survey pattern", "[surveyor][respondent][v0][protocol][sockets][nng][
 
         //	nng_socket sock;
 
-        REQUIRE_NOTHROW(surp->set_option_usec(O::surveyor_survey_time_usec, CAST_DURATION_TO_USEC(50ms).count()));
+        REQUIRE_NOTHROW(surp->set_option_ms(O::surveyor_survey_time_duration, (50ms).count()));
 
         REQUIRE_NOTHROW(surp->listen(test_addr));
         REQUIRE_NOTHROW(resp->dial(test_addr));
@@ -155,7 +155,7 @@ TEST_CASE("Survey pattern", "[surveyor][respondent][v0][protocol][sockets][nng][
 
 			SECTION("And goes to non-survey state") {
 
-                REQUIRE_NOTHROW(surp->set_option_usec(O::receive_timeout_usec, CAST_DURATION_TO_USEC(200ms).count()));
+                REQUIRE_NOTHROW(surp->set_option_ms(O::receive_timeout_duration, (200ms).count()));
 
                 // ...
                 REQUIRE_THROWS_AS_MATCHING(surp->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_estate));

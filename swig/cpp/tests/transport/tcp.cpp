@@ -31,9 +31,6 @@ namespace nng {
                 using namespace protocol;
                 using O = option_names;
 
-                const auto expected_family = af_inet;
-                const auto loopback_addr = ::htonl(0x7f000001);
-
                 unique_ptr<message_pipe> pp;
                 unique_ptr<address> ap;
 
@@ -43,27 +40,27 @@ namespace nng {
                 REQUIRE_NOTHROW(ap = make_unique<address>());
                 REQUIRE(ap->has_one() == true);
 
-                address::size_type actual_sz = ap->get_size();
+                auto actual_sz = ap->get_size();
 
                 SECTION("Local address property works") {
 
                     // TODO: TBD: this is really more of an unit test thing...
                     REQUIRE_NOTHROW(pp->get_option(O::local_address, ap->get(), &actual_sz));
                     REQUIRE(actual_sz == ap->get_size());
-                    REQUIRE(ap->get_family() == expected_family);
+                    REQUIRE(ap->get_family() == af_inet);
                     REQUIRE(ap->view() != nullptr);
-                    REQUIRE(ap->view()->get_addr() == loopback_addr);
-                    REQUIRE(ap->view()->get_port() > 0);
+                    REQUIRE(ap->view()->get_addr() == INADDR_LOOPBACK);
+                    REQUIRE(ap->view()->get_port() != 0);
                 }
 
                 SECTION("Remote address property works") {
 
                     REQUIRE_NOTHROW(pp->get_option(O::remote_address, ap->get(), &actual_sz));
                     REQUIRE(actual_sz == ap->get_size());
-                    REQUIRE(ap->get_family() == expected_family);
+                    REQUIRE(ap->get_family() == af_inet);
                     REQUIRE(ap->view() != nullptr);
-                    REQUIRE(ap->view()->get_addr() == loopback_addr);
-                    REQUIRE(ap->view()->get_port() > 0);
+                    REQUIRE(ap->view()->get_addr() == INADDR_LOOPBACK);
+                    REQUIRE(ap->view()->get_port() != 0);
 
                     REQUIRE(dp);
                     REQUIRE_THROWS_AS_MATCHING(dp->get_option(O::remote_address, ap->get(), &actual_sz), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));

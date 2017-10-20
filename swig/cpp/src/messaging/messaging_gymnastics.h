@@ -21,8 +21,6 @@
 namespace nng {
     namespace messaging {
 
-        typedef message_base::buffer_vector_type buffer_vector_type;
-
         template<class Target_, class Message_>
         struct message_conversion_getter_policy {
 

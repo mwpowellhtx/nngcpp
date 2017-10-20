@@ -4,19 +4,27 @@
 
 namespace nng {
 
+    using std::placeholders::_1;
+    using std::placeholders::_2;
+    using std::placeholders::_3;
+    using std::placeholders::_4;
+
     // TODO: TBD: is "listener" its own thing? or simply another kind of "socket"? i.e. perhaps a receive-only socket, as the name would suggest
     listener::listener()
         : lid(0)
         , endpoint()
-        , options() {
+        , options_reader()
+        , options_writer() {
     }
 
     listener::listener(const socket* const sp, const std::string& addr)
         : lid(0)
         , endpoint()
-        , options() {
+        , options_reader()
+        , options_writer() {
 
-        const auto errnum = ::nng_listener_create(&lid, sp->sid, addr.c_str());
+        const auto op = std::bind(&::nng_listener_create, _1, _2, _3);
+        const auto errnum = op(&lid, sp->sid, addr.c_str());
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
@@ -25,13 +33,15 @@ namespace nng {
     }
 
     void listener::start(flag_type flags) {
-        const auto errnum = ::nng_listener_start(lid, static_cast<int>(flags));
+        const auto op = std::bind(&::nng_listener_start, _1, _2);
+        const auto errnum = op(lid, static_cast<int>(flags));
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
     void listener::close() {
         if (lid) {
-            const auto errnum = ::nng_listener_close(lid);
+            const auto op = std::bind(&::nng_listener_close, _1);
+            const auto errnum = op(lid);
             THROW_NNG_EXCEPTION_EC(errnum);
             lid = 0;
         }
@@ -41,68 +51,80 @@ namespace nng {
         return lid != 0;
     }
 
-    void listener::set_option(const std::string& name, const std::string& val, size_type sz) {
-        const auto errnum = ::nng_listener_setopt(lid, name.c_str(), val.c_str(), sz);
-        THROW_NNG_EXCEPTION_EC(errnum);
-    }
-
-    void listener::set_option(const std::string& name, const std::string& val) {
-        const auto errnum = ::nng_listener_setopt(lid, name.c_str(), val.c_str(), val.length());
-        THROW_NNG_EXCEPTION_EC(errnum);
-    }
-
     void listener::get_option(const std::string& name, std::string& val, size_type& sz) {
-        const auto errnum = ::nng_listener_getopt(lid, name.c_str(), (void*)&val[0], &sz);
+        const auto op = std::bind(&::nng_listener_getopt, _1, _2, _3, _4);
+        const auto errnum = op(lid, name.c_str(), (void*)&val[0], &sz);
         THROW_NNG_EXCEPTION_EC(errnum);
         // Do this because the C++ buffer does not appear to be honored quite right when working with the C buffers.
         val.resize(sz - 1);
     }
 
     void listener::get_option(const std::string& name, std::string& val) {
-        size_type sz = val.size();
-        const auto errnum = ::nng_listener_getopt(lid, name.c_str(), (void*)&val[0], &sz);
+        auto sz = val.size();
+        const auto op = std::bind(&::nng_listener_getopt, _1, _2, _3, _4);
+        const auto errnum = op(lid, name.c_str(), (void*)&val[0], &sz);
         THROW_NNG_EXCEPTION_EC(errnum);
         // Do this because the C++ buffer does not appear to be honored quite right when working with the C buffers.
         val.resize(sz - 1);
     }
 
-    void listener::set_option(const std::string& name, const void* bp, size_type sz) {
-        const auto errnum = ::nng_listener_setopt(lid, name.c_str(), bp, sz);
-        THROW_NNG_EXCEPTION_EC(errnum);
-    }
-
     void listener::get_option(const std::string& name, void* val, size_type* szp) {
-        const auto errnum = ::nng_listener_getopt(lid, name.c_str(), val, szp);
-        THROW_NNG_EXCEPTION_EC(errnum);
-    }
-
-    void listener::set_option_int(const std::string& name, int val) {
-        const auto errnum = ::nng_listener_setopt_int(lid, name.c_str(), val);
-        THROW_NNG_EXCEPTION_EC(errnum);
-    }
-
-    void listener::set_option_size(const std::string& name, size_type val) {
-        const auto errnum = ::nng_listener_setopt_size(lid, name.c_str(), val);
-        THROW_NNG_EXCEPTION_EC(errnum);
-    }
-
-    void listener::set_option_usec(const std::string& name, option_ulonglong_type val) {
-        const auto errnum = ::nng_listener_setopt_usec(lid, name.c_str(), val);
+        const auto op = std::bind(&::nng_listener_getopt, _1, _2, _3, _4);
+        const auto errnum = op(lid, name.c_str(), val, szp);
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
     void listener::get_option_int(const std::string& name, int* valp) {
-        const auto errnum = ::nng_listener_getopt_int(lid, name.c_str(), valp);
+        const auto op = std::bind(&::nng_listener_getopt_int, _1, _2, _3);
+        const auto errnum = op(lid, name.c_str(), valp);
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
     void listener::get_option_size(const std::string& name, size_type* valp) {
-        const auto errnum = ::nng_listener_getopt_size(lid, name.c_str(), valp);
+        const auto op = std::bind(&::nng_listener_getopt_size, _1, _2, _3);
+        const auto errnum = op(lid, name.c_str(), valp);
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
-    void listener::get_option_usec(const std::string& name, option_ulonglong_type* valp) {
-        const auto errnum = ::nng_listener_getopt_usec(lid, name.c_str(), valp);
+    void listener::get_option_ms(const std::string& name, duration_type* valp) {
+        const auto op = std::bind(&::nng_listener_getopt_ms, _1, _2, _3);
+        const auto errnum = op(lid, name.c_str(), valp);
+        THROW_NNG_EXCEPTION_EC(errnum);
+    }
+
+    void listener::set_option(const std::string& name, const std::string& val, size_type sz) {
+        const auto op = std::bind(&::nng_listener_setopt, _1, _2, _3, _4);
+        const auto errnum = op(lid, name.c_str(), val.c_str(), sz);
+        THROW_NNG_EXCEPTION_EC(errnum);
+    }
+
+    void listener::set_option(const std::string& name, const std::string& val) {
+        const auto op = std::bind(&::nng_listener_setopt, _1, _2, _3, _4);
+        const auto errnum = op(lid, name.c_str(), val.c_str(), val.length());
+        THROW_NNG_EXCEPTION_EC(errnum);
+    }
+
+    void listener::set_option(const std::string& name, const void* bp, size_type sz) {
+        const auto op = std::bind(&::nng_listener_setopt, _1, _2, _3, _4);
+        const auto errnum = op(lid, name.c_str(), bp, sz);
+        THROW_NNG_EXCEPTION_EC(errnum);
+    }
+
+    void listener::set_option_int(const std::string& name, int val) {
+        const auto op = std::bind(&::nng_listener_setopt_int, _1, _2, _3);
+        const auto errnum = op(lid, name.c_str(), val);
+        THROW_NNG_EXCEPTION_EC(errnum);
+    }
+
+    void listener::set_option_size(const std::string& name, size_type val) {
+        const auto op = std::bind(&::nng_listener_setopt_size, _1, _2, _3);
+        const auto errnum = op(lid, name.c_str(), val);
+        THROW_NNG_EXCEPTION_EC(errnum);
+    }
+
+    void listener::set_option_ms(const std::string& name, duration_type val) {
+        const auto op = std::bind(&::nng_listener_setopt_ms, _1, _2, _3);
+        const auto errnum = op(lid, name.c_str(), val);
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 }

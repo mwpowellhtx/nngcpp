@@ -74,10 +74,10 @@ TEST_CASE("Request/reply pattern", "[req][rep][v0][protocol][sockets][nng][cxx]"
 		SECTION("Request resend time option works") {
 
             // Set the timeout.
-            REQUIRE_NOTHROW(reqp->set_option_usec(O::req_resend_time_usec, CAST_DURATION_TO_USEC(10ms).count()));
+            REQUIRE_NOTHROW(reqp->set_option_ms(O::req_resend_time_duration, (10ms).count()));
             // TODO: TBD: it is unit tests like this that really deserve a more focused unit test on just options alone...
             // Check invalid size.
-            REQUIRE_THROWS_AS_MATCHING(reqp->set_option(O::req_resend_time_usec, __empty, 1), nng_exception, THROWS_NNG_EXCEPTION(ec_einval));
+            REQUIRE_THROWS_AS_MATCHING(reqp->set_option(O::req_resend_time_duration, __empty, 1), nng_exception, THROWS_NNG_EXCEPTION(ec_einval));
 		}
 
 		SECTION("Receive socket without send socket fails") {
@@ -117,7 +117,7 @@ TEST_CASE("Request/reply pattern", "[req][rep][v0][protocol][sockets][nng][cxx]"
 		}
 
 		SECTION("Cannot set resend time option") {
-            REQUIRE_THROWS_AS_MATCHING(repp->set_option_usec(O::req_resend_time_usec, (100us).count()), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
+            REQUIRE_THROWS_AS_MATCHING(repp->set_option_ms(O::req_resend_time_duration, (100us).count()), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
 		}
 
         SECTION("Socket can close") {
@@ -166,7 +166,7 @@ TEST_CASE("Request/reply pattern", "[req][rep][v0][protocol][sockets][nng][cxx]"
         REQUIRE_NOTHROW(reqp = make_unique<latest_req_socket>());
         REQUIRE_NOTHROW(repp = make_unique<latest_rep_socket>());
 
-        REQUIRE_NOTHROW(reqp->set_option_usec(O::req_resend_time_usec, CAST_DURATION_TO_USEC(100ms).count()));
+        REQUIRE_NOTHROW(reqp->set_option_ms(O::req_resend_time_duration, (100ms).count()));
         REQUIRE_NOTHROW(reqp->set_option_int(O::send_buffer, 16));
 
         REQUIRE_NOTHROW(repp->listen(test_addr));

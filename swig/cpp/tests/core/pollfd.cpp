@@ -91,7 +91,7 @@ TEST_CASE("Poll FDs", "[pollfd]") {
 
             SECTION("But if we write they are pollable") {
                 pollfd pfd{ (SOCKET)fd , POLLIN, 0 };
-                const messaging_utils::buffer_vector_type _kick_buf = { 'k','i','c','k','\0' };
+                const buffer_vector_type _kick_buf = { 'k','i','c','k','\0' };
                 REQUIRE_NOTHROW(s2->send(&_kick_buf, _kick_buf.size())); // TODO: TBD: was blocking prior to this...
                 REQUIRE(::poll(&pfd, 1, 1000) == 1);
                 REQUIRE((pfd.revents&POLLIN));

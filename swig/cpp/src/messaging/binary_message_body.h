@@ -10,6 +10,8 @@
 #ifndef NNGCPP_BINARY_MESSAGE_BODY_H
 #define NNGCPP_BINARY_MESSAGE_BODY_H
 
+#include "../core/types.h"
+
 #include "message_base.h"
 
 #include "messaging_api_base.hpp"
@@ -26,16 +28,12 @@ namespace nng {
 
         class binary_message_body
             : public message_part
-            , public supports_get_api<message_base::buffer_vector_type>
-            , public supports_append_api<message_base::buffer_vector_type, uint32_t>
-            , public supports_insert_api<message_base::buffer_vector_type, uint32_t>
+            , public supports_get_api<buffer_vector_type>
+            , public supports_append_api<buffer_vector_type, uint32_t>
+            , public supports_insert_api<buffer_vector_type, uint32_t>
             , public supports_chop_api<uint32_t, uint32_t*>
             , public supports_trim_api<uint32_t, uint32_t*> {
         protected:
-
-            typedef message_base::buffer_vector_type buffer_vector_type;
-
-            typedef message_base::size_type size_type;
 
             friend class binary_message;
 

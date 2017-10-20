@@ -17,4 +17,6 @@
 #include "session.h"
 #include "socket.h"
 
+#include "exceptions.hpp"
+
 #endif // NNGCPP_CORE_H

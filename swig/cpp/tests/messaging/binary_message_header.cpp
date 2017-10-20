@@ -16,7 +16,7 @@
 #include "binary_message_part_fixtures.hpp"
 
 namespace constants {
-    const nng::messaging::message_base::buffer_vector_type data = { 1,2,3 };
+    const nng::messaging::buffer_vector_type data = { 1,2,3 };
 }
 
 TEST_CASE("Test that the data is as expected", "[messaging][data]") {
@@ -24,7 +24,6 @@ TEST_CASE("Test that the data is as expected", "[messaging][data]") {
     using namespace nng::messaging;
     using namespace constants;
     using namespace Catch::Matchers;
-    using buffer_vector_type = message_base::buffer_vector_type;
 
     buffer_vector_type expected = { 1,2,3 };
     REQUIRE(data.size() == expected.size());
@@ -37,8 +36,6 @@ TEST_CASE("Test that C style NNG message appends", "[messaging][header][nng][app
     using namespace constants;
 
     ::nng_msg* msgp;
-
-    typedef message_base::buffer_vector_type buffer_vector_type;
 
     REQUIRE(::nng_msg_alloc(&msgp, 0) == 0);
 
@@ -69,7 +66,6 @@ TEST_CASE("Test that the default message works", "[messaging][binary][header][de
     using namespace nng::messaging;
     using namespace constants;
     using namespace Catch::Matchers;
-    using buffer_vector_type = message_base::buffer_vector_type;
 
     auto part = binary_message_part_fixture<binary_message_header>();
 
@@ -82,7 +78,6 @@ TEST_CASE("::nng_msg* based ctor works", "[messaging][binary][header][alloc]") {
     using namespace nng::messaging;
     using namespace constants;
     using namespace Catch::Matchers;
-    using buffer_vector_type = message_base::buffer_vector_type;
 
     ::nng_msg* msgp = nullptr;
 

@@ -28,8 +28,8 @@ namespace constants {
     const std::string test_addr = "inproc://test";
     const std::string _99bits = "99bits";
     const std::string onthe = "onthe";
-    const nng::messaging::message_base::buffer_vector_type _99bits_buf = to_buffer(_99bits);
-    const nng::messaging::message_base::buffer_vector_type onthe_buf = to_buffer(onthe);
+    const nng::messaging::buffer_vector_type _99bits_buf = to_buffer(_99bits);
+    const nng::messaging::buffer_vector_type onthe_buf = to_buffer(onthe);
 }
 
 TEST_CASE("Bus pattern tests", "[bus][protocol][sockets][cxx]") {
@@ -83,9 +83,9 @@ TEST_CASE("Bus pattern tests", "[bus][protocol][sockets][cxx]") {
 
         const auto receive_timeout = 50ms;
 
-        REQUIRE_NOTHROW(busp1->set_option_usec(O::receive_timeout_usec, CAST_DURATION_TO_USEC(receive_timeout).count()));
-        REQUIRE_NOTHROW(busp2->set_option_usec(O::receive_timeout_usec, CAST_DURATION_TO_USEC(receive_timeout).count()));
-        REQUIRE_NOTHROW(busp3->set_option_usec(O::receive_timeout_usec, CAST_DURATION_TO_USEC(receive_timeout).count()));
+        REQUIRE_NOTHROW(busp1->set_option_ms(O::receive_timeout_duration, CAST_DURATION_TO_MS(receive_timeout).count()));
+        REQUIRE_NOTHROW(busp2->set_option_ms(O::receive_timeout_duration, CAST_DURATION_TO_MS(receive_timeout).count()));
+        REQUIRE_NOTHROW(busp3->set_option_ms(O::receive_timeout_duration, CAST_DURATION_TO_MS(receive_timeout).count()));
 
         SECTION("Messages delivered") {
 

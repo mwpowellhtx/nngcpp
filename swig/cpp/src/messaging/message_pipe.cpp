@@ -2,8 +2,6 @@
 #include "message_base.h"
 #include "../core/exceptions.hpp"
 
-#define THROW_MSG_PIPE_SETOPT_INV_OP() throw trx::invalid_operation("message pipes cannot set options")
-
 namespace nng {
 
     namespace messaging {
@@ -14,10 +12,12 @@ namespace nng {
         using std::placeholders::_4;
 
         message_pipe::message_pipe(message_base* const mbp)
-            : options()
-            , pid(::nng_msg_get_pipe(mbp->get_msgp())) {
+            : options_reader()
+            , pid(0) {
 
             // TODO: TBD: throw an exception upon irregular pipe value...
+            const auto& op = std::bind(&::nng_msg_get_pipe, _1);
+            pid = op(mbp->get_msgp());
         }
 
         // TODO: TBD: this is looking very similar to socket. perhaps it is...
@@ -46,6 +46,12 @@ namespace nng {
             return pid != rhs.pid;
         }
 
+        void message_pipe::get_option(const std::string& name, void* val, size_type* szp) {
+            const auto& op = std::bind(::nng_pipe_getopt, _1, _2, _3, _4);
+            const auto errnum = op(pid, name.c_str(), val, szp);
+            THROW_NNG_EXCEPTION_EC(errnum);
+        }
+
         void message_pipe::get_option(const std::string& name, std::string& val) {
             size_type sz = val.size();
             const auto& op = std::bind(::nng_pipe_getopt, _1, _2, _3, _4);
@@ -63,12 +69,6 @@ namespace nng {
             //val.resize(sz - 1);
         }
 
-        void message_pipe::get_option(const std::string& name, void* val, size_type* szp) {
-            const auto& op = std::bind(::nng_pipe_getopt, _1, _2, _3, _4);
-            const auto errnum = op(pid, name.c_str(), val, szp);
-            THROW_NNG_EXCEPTION_EC(errnum);
-        }
-
         void message_pipe::get_option_int(const std::string& name, int* valp) {
             const auto& op = std::bind(::nng_pipe_getopt_int, _1, _2, _3);
             const auto errnum = op(pid, name.c_str(), valp);
@@ -81,38 +81,12 @@ namespace nng {
             THROW_NNG_EXCEPTION_EC(errnum);
         }
 
-        void message_pipe::get_option_usec(const std::string& name, option_ulonglong_type* valp) {
-            throw trx::not_implemented("::nng_pipe_getopt_usec missing from the nng source");
-            //// TODO: TBD: see repo issue: http://github.com/nanomsg/nng/issues/116
-            //const auto& op = std::bind(::nng_pipe_getopt_usec, _1, _2, _3);
-            //const auto errnum = op(pid, name.c_str(), valp);
-            //THROW_NNG_EXCEPTION_EC(errnum);
-        }
-
-        // TODO: TBD: here are some additional eligible candidates for unit testing of message pipe alone...
-        void message_pipe::set_option(const std::string& name, const std::string& val, size_type sz) {
-            THROW_MSG_PIPE_SETOPT_INV_OP();
-        }
-
-        void message_pipe::set_option(const std::string& name, const std::string& val) {
-            THROW_MSG_PIPE_SETOPT_INV_OP();
-        }
-
-        void message_pipe::set_option(const std::string& name, const void* valp, size_type sz) {
-            THROW_MSG_PIPE_SETOPT_INV_OP();
-        }
-
-
-        void message_pipe::set_option_int(const std::string& name, int val) {
-            THROW_MSG_PIPE_SETOPT_INV_OP();
-        }
-
-        void message_pipe::set_option_size(const std::string& name, size_type val) {
-            THROW_MSG_PIPE_SETOPT_INV_OP();
-        }
-
-        void message_pipe::set_option_usec(const std::string& name, option_ulonglong_type val) {
-            THROW_MSG_PIPE_SETOPT_INV_OP();
+        void message_pipe::get_option_ms(const std::string& name, duration_type* valp) {
+            //throw trx::not_implemented("::nng_pipe_getopt_usec missing from the nng source");
+            // TODO: TBD: see repo issue: http://github.com/nanomsg/nng/issues/116
+            const auto& op = std::bind(::nng_pipe_getopt_ms, _1, _2, _3);
+            const auto errnum = op(pid, name.c_str(), valp);
+            THROW_NNG_EXCEPTION_EC(errnum);
         }
     }
 }

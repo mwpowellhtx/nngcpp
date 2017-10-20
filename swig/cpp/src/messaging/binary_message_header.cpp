@@ -24,7 +24,7 @@ namespace nng {
         binary_message_header::~binary_message_header() {
         }
 
-        message_base::size_type binary_message_header::get_size() {
+        size_type binary_message_header::get_size() {
             const auto msgp = get_msgp();
             const auto op = std::bind(&::nng_msg_header_len, _1);
             return msgp == nullptr ? 0 : op(msgp);
