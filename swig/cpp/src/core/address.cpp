@@ -244,11 +244,11 @@ namespace nng {
     }
 
     uint16_t inet_family_view::get_port() const {
-        return get_detail()->sa_port;
+        return ::ntohs(get_detail()->sa_port);
     }
 
     void inet_family_view::set_port(const uint16_t value) {
-        get_detail()->sa_port = value;
+        get_detail()->sa_port = ::htons(value);
     }
 
     inet6_family_view::inet6_family_view(sockaddr_type* const sap)
