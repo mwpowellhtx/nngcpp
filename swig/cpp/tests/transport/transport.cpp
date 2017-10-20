@@ -20,6 +20,8 @@
 #include <sstream>
 #include <algorithm>
 
+#include <iostream>
+
 namespace constants {
 
     const std::string ping = "ping";
@@ -31,19 +33,24 @@ namespace constants {
 
 namespace nng {
 
-    address_calculator::address_calculator() : _port(TEST_PORT) {
+    int address_calculator::port = TEST_PORT;
+
+    address_calculator::address_calculator(char port_delim) : _port_delim() {
+        if (port_delim) {
+            _port_delim.push_back(port_delim);
+        }
     }
 
     address_calculator::~address_calculator() {
     }
 
     int address_calculator::get_port(int delta) {
-        return _port += delta;
+        return port += delta;
     }
 
     std::string address_calculator::get_addr(const std::string& base_addr, int delta) {
         std::ostringstream os;
-        os << base_addr << ":" << get_port(delta);
+        os << base_addr << _port_delim << get_port(delta);
         return os.str();
     }
 
@@ -62,8 +69,8 @@ namespace nng {
     }
 
     // TODO: TBD: we could potentially accept command line arguments for the PORT, but I really fail to see the need
-    transport_fixture::transport_fixture(const std::string& base_addr)
-        : address_calculator()
+    transport_fixture::transport_fixture(const std::string& base_addr, char port_delim)
+        : address_calculator(port_delim)
         , _base_addr(base_addr)
         , _reqp()
         , _repp() {
@@ -85,6 +92,8 @@ namespace nng {
     void transport_fixture::run_all() {
 
         const auto addr = get_next_addr(_base_addr);
+
+        std::cout << "Given transport for address: addr = '" << addr << "'" << std::endl;
 
         //("Given transport for address " + _current_addr).c_str()
         SECTION("Given transport for address '" + addr + "'") {
@@ -110,6 +119,9 @@ namespace nng {
 
         SECTION("Connection refused works") {
 
+            INFO("addr: " + addr);
+            FAIL();
+
             dialer d;
 
             REQUIRE_THROWS_AS_MATCHING(_reqp->dial(addr, &d), nng_exception, THROWS_NNG_EXCEPTION(ec_econnrefused));
@@ -120,6 +132,9 @@ namespace nng {
     void transport_fixture::run_dup_listeners_rejected(const std::string& addr) {
 
         SECTION("Duplicate listeners rejected") {
+
+            INFO("addr: " + addr);
+            FAIL();
 
             // Smart pointers is overkill for these sections.
             listener l1, l2;
@@ -137,6 +152,9 @@ namespace nng {
 
         SECTION("Listener and dialer accepted") {
 
+            INFO("addr: " + addr);
+            FAIL();
+
             // Smart pointers is overkill for these sections.
             listener l;
             dialer d;
@@ -144,7 +162,8 @@ namespace nng {
             REQUIRE_NOTHROW(_repp->listen(addr, &l));
             REQUIRE(l.has_one() == true);
 
-            REQUIRE_NOTHROW(_reqp->dial(addr, &d));
+            REQUIRE_NOTHROW(_reqp->dial(addr, &d, flag_none));
+            //REQUIRE_NOTHROW(_reqp->dial(addr, &d));
             REQUIRE(d.has_one() == true);
         }
     }
@@ -158,6 +177,9 @@ namespace nng {
         using O = option_names;
  
         SECTION("Send and receive") {
+
+            INFO("addr: " + addr);
+            FAIL();
 
             listener l;
             dialer d;
@@ -266,9 +288,9 @@ namespace nng {
         }
     }
 
-    c_style_transport_fixture::c_style_transport_fixture(const std::string& base_addr)
+    c_style_transport_fixture::c_style_transport_fixture(const std::string& base_addr, char port_delim)
         : basic_fixture()
-        , address_calculator()
+        , address_calculator(port_delim)
         , _base_addr(base_addr)
         , _rep(0)
         , _req(0) {
@@ -300,7 +322,7 @@ namespace nng {
 
         run_connection_refused_works(addr_c_str);
         run_dup_listeners_rejected(addr_c_str);
-        //run_listener_and_dialer_accepted(addr_c_str);
+        run_listener_and_dialer_accepted(addr_c_str);
         run_send_and_receive(addr_c_str);
         run_send_and_receive_large_data(addr_c_str);
     }

@@ -89,7 +89,7 @@ TEST_CASE("TCP transport", "[tcp][transport][nng][cxx]") {
 
     const auto& property_tests = std::bind(&v4::property_tests, _1, _2, _3);
 
-    extended_transport_fixture fixture(loopback_addr_base, property_tests);
+    extended_transport_fixture fixture(loopback_addr_base, ':', property_tests);
 
     fixture.run_all();
 

@@ -35,11 +35,13 @@ namespace nng {
 
     protected:
 
-        address_calculator();
+        address_calculator(char port_delim = '\0');
 
     private:
 
-        int _port;
+        static int port;
+
+        std::string _port_delim;
 
         int get_port(int delta);
     };
@@ -48,7 +50,7 @@ namespace nng {
 
         typedef std::function<void(address_calculator&)> run_one_func;
 
-        transport_fixture(const std::string& base_addr);
+        transport_fixture(const std::string& base_addr, char port_delim = '\0');
 
         virtual ~transport_fixture();
 
@@ -92,17 +94,17 @@ namespace nng {
 
     struct c_style_transport_fixture : public basic_fixture, public address_calculator {
 
-        c_style_transport_fixture(const std::string& base_addr);
+        c_style_transport_fixture(const std::string& base_addr, char port_delim = '\0');
 
         virtual ~c_style_transport_fixture();
 
         virtual void run_all();
  
+        ::nng_socket _rep, _req;
+
     protected:
 
         std::string _base_addr;
-
-        ::nng_socket _rep, _req;
 
         virtual void run_all(const std::string& addr);
 

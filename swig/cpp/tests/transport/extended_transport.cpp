@@ -36,6 +36,13 @@ namespace nng {
         , _test_properties(property_tests) {
     }
 
+    extended_transport_fixture::extended_transport_fixture(const std::string& base_addr
+        , const char port_delim
+        , const run_property_tests_func& property_tests)
+        : transport_fixture(base_addr, port_delim)
+        , _test_properties(property_tests) {
+    }
+
     extended_transport_fixture::~extended_transport_fixture() {
     }
 

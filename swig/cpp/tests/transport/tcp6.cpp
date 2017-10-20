@@ -121,7 +121,7 @@ TEST_CASE("TCP (IPv6) transport tests", "[tcp][ipv6][transport][nng][cxx]") {
 
     if (has_v6()) {
         const auto& property_tests = std::bind(&v6::property_tests, _1, _2, _3);
-        extended_transport_fixture fixture(loopback_addr_base, property_tests);
+        extended_transport_fixture fixture(loopback_addr_base, ':', property_tests);
         fixture.run_all();
     } else {
         INFO("IPv6 not available for testing.");

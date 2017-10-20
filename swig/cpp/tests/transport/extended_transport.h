@@ -31,6 +31,10 @@ namespace nng {
         extended_transport_fixture(const std::string& base_addr
             , const run_property_tests_func& property_tests);
 
+        extended_transport_fixture(const std::string& base_addr
+            , const char port_delim
+            , const run_property_tests_func& property_tests);
+
         virtual ~extended_transport_fixture();
 
         virtual void run_all() override;
