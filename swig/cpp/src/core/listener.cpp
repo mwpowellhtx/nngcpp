@@ -86,7 +86,13 @@ namespace nng {
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
-    void listener::get_option_ms(const std::string& name, duration_type* valp) {
+    void listener::get_option(const std::string& name, duration_type* valp) {
+        duration_type::rep val;
+        get_option_ms(name, &val);
+        *valp = duration_type(val);
+    }
+
+    void listener::get_option_ms(const std::string& name, duration_rep_type* valp) {
         const auto op = std::bind(&::nng_listener_getopt_ms, _1, _2, _3);
         const auto errnum = op(lid, name.c_str(), valp);
         THROW_NNG_EXCEPTION_EC(errnum);
@@ -122,7 +128,11 @@ namespace nng {
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
-    void listener::set_option_ms(const std::string& name, duration_type val) {
+    void listener::set_option(const std::string& name, duration_type val) {
+        set_option_ms(name, val.count());
+    }
+
+    void listener::set_option_ms(const std::string& name, duration_rep_type val) {
         const auto op = std::bind(&::nng_listener_setopt_ms, _1, _2, _3);
         const auto errnum = op(lid, name.c_str(), val);
         THROW_NNG_EXCEPTION_EC(errnum);

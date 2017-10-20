@@ -99,9 +99,11 @@ namespace nng {
         virtual void get_option(const std::string& name, std::string& val) override;
         virtual void get_option(const std::string& name, std::string& val, nng::size_type& sz) override;
 
-        void get_option_int(const std::string& name, int* valp);
-        void get_option_size(const std::string& name, nng::size_type* valp);
-        void get_option_ms(const std::string& name, duration_type* valp);
+        virtual void get_option_int(const std::string& name, int* valp) override;
+        virtual void get_option_size(const std::string& name, nng::size_type* valp) override;
+
+        virtual void get_option(const std::string& name, duration_type* valp) override;
+        virtual void get_option_ms(const std::string& name, duration_rep_type* valp) override;
 
         virtual void set_option(const std::string& name, const void* valp, nng::size_type sz) override;
 
@@ -110,7 +112,9 @@ namespace nng {
 
         virtual void set_option_int(const std::string& name, int val) override;
         virtual void set_option_size(const std::string& name, nng::size_type val) override;
-        virtual void set_option_ms(const std::string& name, duration_type val) override;
+
+        virtual void set_option(const std::string& name, duration_type val) override;
+        virtual void set_option_ms(const std::string& name, duration_rep_type val) override;
 
         virtual void send(binary_message_type* const bmp, flag_type flags = flag_none) override;
 

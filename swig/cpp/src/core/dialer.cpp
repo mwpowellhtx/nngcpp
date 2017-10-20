@@ -83,7 +83,13 @@ namespace nng {
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
-    void dialer::get_option_ms(const std::string& name, duration_type* valp) {
+    void dialer::get_option(const std::string& name, duration_type* valp) {
+        duration_rep_type val;
+        get_option_ms(name, &val);
+        *valp = duration_type(val);
+    }
+
+    void dialer::get_option_ms(const std::string& name, duration_rep_type* valp) {
         const auto& op = std::bind(&::nng_dialer_getopt_ms, _1, _2, _3);
         const auto errnum = op(did, name.c_str(), valp);
         THROW_NNG_EXCEPTION_EC(errnum);
@@ -119,7 +125,11 @@ namespace nng {
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
-    void dialer::set_option_ms(const std::string& name, duration_type val) {
+    void dialer::set_option(const std::string& name, duration_type val) {
+        set_option_ms(name, val.count());
+    }
+
+    void dialer::set_option_ms(const std::string& name, duration_rep_type val) {
         const auto& op = std::bind(&::nng_dialer_setopt_ms, _1, _2, _3);
         const auto errnum = op(did, name.c_str(), val);
         THROW_NNG_EXCEPTION_EC(errnum);

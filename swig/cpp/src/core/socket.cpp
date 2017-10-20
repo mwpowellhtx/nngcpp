@@ -186,7 +186,13 @@ namespace nng {
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
-    void socket::get_option_ms(const std::string& name, duration_type* valp) {
+    void socket::get_option(const std::string& name, duration_type* valp) {
+        duration_type::rep val;
+        get_option_ms(name, &val);
+        *valp = duration_type(val);
+    }
+
+    void socket::get_option_ms(const std::string& name, duration_rep_type* valp) {
         const auto op = std::bind(&::nng_getopt_ms, _1, _2, _3);
         const auto errnum = op(sid, name.c_str(), valp);
         THROW_NNG_EXCEPTION_EC(errnum);
@@ -222,7 +228,11 @@ namespace nng {
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
-    void socket::set_option_ms(const std::string& name, duration_type val) {
+    void socket::set_option(const std::string& name, duration_type val) {
+        set_option_ms(name, val.count());
+    }
+
+    void socket::set_option_ms(const std::string& name, duration_rep_type val) {
         const auto op = std::bind(&::nng_setopt_ms, _1, _2, _3);
         const auto errnum = op(sid, name.c_str(), val);
         THROW_NNG_EXCEPTION_EC(errnum);

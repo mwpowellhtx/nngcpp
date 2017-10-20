@@ -49,7 +49,9 @@ namespace nng {
 
             virtual void get_option_int(const std::string& name, int* valp) override;
             virtual void get_option_size(const std::string& name, size_type* valp) override;
-            virtual void get_option_ms(const std::string& name, duration_type* valp) override;
+
+            virtual void get_option(const std::string& name, duration_type* valp) override;
+            virtual void get_option_ms(const std::string& name, duration_rep_type* valp) override;
         };
     }
 }

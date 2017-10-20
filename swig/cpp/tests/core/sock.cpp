@@ -200,7 +200,7 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
 
             RUN_TIMED_SECTION_MILLISECONDS(timeout, [&]() {
 
-                REQUIRE_NOTHROW(s1->set_option_ms(O::receive_timeout_duration, timeout.count()));
+                REQUIRE_NOTHROW(s1->set_option(O::receive_timeout_duration, timeout));
 
                 unique_ptr<binary_message> bmp;
 
@@ -226,7 +226,7 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
 
             RUN_TIMED_SECTION_MILLISECONDS(timeout, [&]() {
 
-                REQUIRE_NOTHROW(s1->set_option_ms(O::send_timeout_duration, timeout.count()));
+                REQUIRE_NOTHROW(s1->set_option(O::send_timeout_duration, timeout));
                 // TODO: TBD: this will work for now as a rough cut Exception match...
                 REQUIRE_THROWS_AS_MATCHING(s1->send(&empty_buf), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
 
@@ -235,11 +235,11 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
 
         SECTION("We can set and get options") {
 
-            const auto timeout = 1234us;
+            const auto timeout = 123ms;
             const auto v = static_cast<int64_t>(0);
             size_type  sz;
 
-            REQUIRE_NOTHROW(s1->set_option_ms(O::send_timeout_duration, timeout.count()));
+            REQUIRE_NOTHROW(s1->set_option(O::send_timeout_duration, timeout));
 
             SECTION("Read-only options handled properly") {
 
@@ -452,7 +452,7 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
 
                     duration_type timeout;
 
-                    REQUIRE_THROWS_AS_MATCHING(l.get_option_ms(O::linger_duration, &timeout), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
+                    REQUIRE_THROWS_AS_MATCHING(l.get_option(O::linger_duration, &timeout), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
                 }
 
                 SECTION("Cannot access absent Dialer Endpoint options") {
@@ -473,7 +473,7 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
 
                     duration_type timeout;
 
-                    REQUIRE_THROWS_AS_MATCHING(d.get_option_ms(O::linger_duration, &timeout), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
+                    REQUIRE_THROWS_AS_MATCHING(d.get_option(O::linger_duration, &timeout), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
                 }
 
                 SECTION("We can send and receive messages") {
@@ -492,10 +492,10 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
                     REQUIRE_NOTHROW(s1->set_option_int(O::send_buffer, 1));
                     REQUIRE_NOTHROW(s2->set_option_int(O::send_buffer, 1));
 
-                    REQUIRE_NOTHROW(s1->set_option_ms(O::send_timeout_duration, timeout.count()));
-                    REQUIRE_NOTHROW(s1->set_option_ms(O::receive_timeout_duration, timeout.count()));
-                    REQUIRE_NOTHROW(s2->set_option_ms(O::send_timeout_duration, timeout.count()));
-                    REQUIRE_NOTHROW(s2->set_option_ms(O::receive_timeout_duration, timeout.count()));
+                    REQUIRE_NOTHROW(s1->set_option(O::send_timeout_duration, timeout));
+                    REQUIRE_NOTHROW(s1->set_option(O::receive_timeout_duration, timeout));
+                    REQUIRE_NOTHROW(s2->set_option(O::send_timeout_duration, timeout));
+                    REQUIRE_NOTHROW(s2->set_option(O::receive_timeout_duration, timeout));
 
                     REQUIRE_NOTHROW(s1->listen(t1_addr));
                     REQUIRE_NOTHROW(s2->dial(t1_addr));

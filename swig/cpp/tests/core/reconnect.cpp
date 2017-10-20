@@ -78,6 +78,7 @@ TEST_CASE("Catch translation of NNG C reconnect unit tests", "[nng][c][reconnect
 
     using namespace std;
     using namespace std::chrono;
+    using namespace nng;
     using namespace constants;
 
     SECTION("Verify that we have the required data") {
@@ -93,7 +94,7 @@ TEST_CASE("Catch translation of NNG C reconnect unit tests", "[nng][c][reconnect
         auto& pull = $.pull;
         auto& push = $.push;
 
-        const auto timeout = 10ms;
+        duration_type const timeout = 10ms;
 
         REQUIRE(::nng_setopt_ms(pull, NNG_OPT_RECONNMINT, timeout.count()) == 0);
         REQUIRE(::nng_setopt_ms(pull, NNG_OPT_RECONNMAXT, timeout.count()) == 0);
@@ -200,10 +201,8 @@ TEST_CASE("NNG C++ wrapper reconnect works", "[nng][reconnect][cxx]") {
 
         const auto reconnect_time = 10ms;
 
-        // TODO: TBD: count() might be the way to go here, but I cannot say for sure.
-        // http://en.cppreference.com/w/cpp/chrono/duration
-        REQUIRE_NOTHROW(pull->set_option_ms(_opt_::min_reconnect_time_duration, reconnect_time.count()));
-        REQUIRE_NOTHROW(pull->set_option_ms(_opt_::max_reconnect_time_duration, reconnect_time.count()));
+        REQUIRE_NOTHROW(pull->set_option(_opt_::min_reconnect_time_duration, reconnect_time));
+        REQUIRE_NOTHROW(pull->set_option(_opt_::max_reconnect_time_duration, reconnect_time));
 
         SECTION("Dialing before listening works") {
 

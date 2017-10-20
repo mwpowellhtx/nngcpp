@@ -285,9 +285,9 @@ TEST_CASE("Load balancing works", "[pipeline][push][pull][load][balancing]") {
 
     const auto receive_timeout = 100ms;
 
-    REQUIRE_NOTHROW(pullsp1->set_option_ms(O::receive_timeout_duration, CAST_DURATION_TO_MS(receive_timeout).count()));
-    REQUIRE_NOTHROW(pullsp2->set_option_ms(O::receive_timeout_duration, CAST_DURATION_TO_MS(receive_timeout).count()));
-    REQUIRE_NOTHROW(pullsp3->set_option_ms(O::receive_timeout_duration, CAST_DURATION_TO_MS(receive_timeout).count()));
+    REQUIRE_NOTHROW(pullsp1->set_option(O::receive_timeout_duration, receive_timeout));
+    REQUIRE_NOTHROW(pullsp2->set_option(O::receive_timeout_duration, receive_timeout));
+    REQUIRE_NOTHROW(pullsp3->set_option(O::receive_timeout_duration, receive_timeout));
 
     REQUIRE_NOTHROW(pushsp->listen(test_addr));
     REQUIRE_NOTHROW(pullsp1->dial(test_addr));

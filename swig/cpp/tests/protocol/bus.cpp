@@ -83,9 +83,9 @@ TEST_CASE("Bus pattern tests", "[bus][protocol][sockets][cxx]") {
 
         const auto receive_timeout = 50ms;
 
-        REQUIRE_NOTHROW(busp1->set_option_ms(O::receive_timeout_duration, CAST_DURATION_TO_MS(receive_timeout).count()));
-        REQUIRE_NOTHROW(busp2->set_option_ms(O::receive_timeout_duration, CAST_DURATION_TO_MS(receive_timeout).count()));
-        REQUIRE_NOTHROW(busp3->set_option_ms(O::receive_timeout_duration, CAST_DURATION_TO_MS(receive_timeout).count()));
+        REQUIRE_NOTHROW(busp1->set_option(O::receive_timeout_duration, receive_timeout));
+        REQUIRE_NOTHROW(busp2->set_option(O::receive_timeout_duration, receive_timeout));
+        REQUIRE_NOTHROW(busp3->set_option(O::receive_timeout_duration, receive_timeout));
 
         SECTION("Messages delivered") {
 

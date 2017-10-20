@@ -81,7 +81,13 @@ namespace nng {
             THROW_NNG_EXCEPTION_EC(errnum);
         }
 
-        void message_pipe::get_option_ms(const std::string& name, duration_type* valp) {
+        void message_pipe::get_option(const std::string& name, duration_type* valp) {
+            duration_type::rep val;
+            get_option_ms(name, &val);
+            *valp = duration_type(val);
+        }
+
+        void message_pipe::get_option_ms(const std::string& name, duration_rep_type* valp) {
             //throw trx::not_implemented("::nng_pipe_getopt_usec missing from the nng source");
             // TODO: TBD: see repo issue: http://github.com/nanomsg/nng/issues/116
             const auto& op = std::bind(::nng_pipe_getopt_ms, _1, _2, _3);
