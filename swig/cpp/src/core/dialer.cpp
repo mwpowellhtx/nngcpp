@@ -38,7 +38,8 @@ namespace nng {
 
     void dialer::close() {
         if (did) {
-            const auto errnum = ::nng_dialer_close(did);
+            const auto op = std::bind(&::nng_dialer_close, _1);
+            const auto errnum = op(did);
             THROW_NNG_EXCEPTION_EC(errnum);
             did = 0;
         }
