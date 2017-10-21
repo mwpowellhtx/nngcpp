@@ -297,8 +297,8 @@ namespace nng {
     inet6_family_view::in6_addr_vector_type inet6_family_view::get_in6_addr() const {
         const auto sz = sizeof(::nng_sockaddr_in6::sa_addr);
         auto raw = get_detail()->sa_addr;
-        const auto raw_end = raw + sz - 1;
-        while (!*raw && raw != raw_end) { ++raw; }
+        const auto raw_end = raw + sz;
+        while (!*raw && raw < raw_end) { ++raw; }
         return in6_addr_vector_type(raw, raw_end);
     }
 
