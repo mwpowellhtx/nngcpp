@@ -89,18 +89,21 @@ if (NNGCPP_ENABLE_TESTS)
         message (STATUS "Unit test '${TEST_FILENAME}' configured.")
     endmacro ()
 
-    macro (nngcpp_add_transport_test TEST_FILENAME TIMEOUT)
+    macro (nngcpp_add_transport_test TEST_FILENAME RUN_EXTENDED_TESTS TIMEOUT)
         set (TEST_PATH ${TEST_FILENAME}.cpp)
         get_filename_component (TEST_NAME ${TEST_FILENAME} NAME_WE)
         set (TEST_SRCS ${DEFAULT_TEST_SRCS})
         list (APPEND TEST_SRCS ${TEST_PATH})
         list (APPEND TEST_SRCS
-            transport/extended_transport.cpp
-            transport/extended_transport.h
-
             transport/transport.cpp
             transport/transport.h
         )
+        if (${RUN_EXTENDED_TESTS})
+            list (APPEND TEST_SRCS
+                transport/extended_transport.cpp
+                transport/extended_transport.h
+            )
+        endif ()
         add_executable (${TEST_NAME} ${TEST_SRCS})
         nngcpp_finalize_test (${TEST_NAME} ${TIMEOUT} ${TEST_SRCS})
         message (STATUS "Unit test '${TEST_FILENAME}' configured.")
@@ -168,11 +171,11 @@ nngcpp_add_test (protocol/pubsub 5)
 nngcpp_add_test (protocol/reqrep 5)
 nngcpp_add_test (protocol/survey 5)
 
-nngcpp_add_transport_test (transport/inproc 5)
-nngcpp_add_transport_test (transport/ipc 5)
-nngcpp_add_transport_test (transport/tcp 5)
-nngcpp_add_transport_test (transport/tcp6 5)
-nngcpp_add_transport_test (transport/udp 5)
+nngcpp_add_transport_test (transport/inproc OFF 5)
+nngcpp_add_transport_test (transport/ipc OFF 5)
+nngcpp_add_transport_test (transport/tcp ON 5)
+nngcpp_add_transport_test (transport/tcp6 ON 5)
+nngcpp_add_transport_test (transport/udp OFF 5)
 
 # nngcpp_add_test(event 5)
 # nngcpp_add_test(idhash 5)
