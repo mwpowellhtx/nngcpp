@@ -19,6 +19,8 @@ extern "C" {
 }
 #endif // __cplusplus
 
+#include <catch.hpp>
+
 namespace constants {
 
     const std::vector<std::string> prefix_tags = { "tcp6" };
@@ -43,19 +45,19 @@ namespace nng {
             // TODO: TBD: so the only reason why we do this is to back-support the NNG structure.
             ::nng_sockaddr sa;
             std::memcpy(&sa, loopback.get(), sizeof(sa));
-            int rv;
+            auto rv = ::nni_plat_udp_open(&udpp, &sa);
             // A call like this works because the nng_sockaddr is type-defined as nni_sockaddr.
-            CHECK_NOFAIL((rv = ::nni_plat_udp_open(&udpp, &sa)) == 0);
-            if (rv == 0) {
+            CHECK_NOFAIL(rv == 0);
+            if (udpp != nullptr && !rv) {
                 ::nni_plat_udp_close(udpp);
             }
-            return !rv;
+            return rv == 0;
         }
     }
 }
 
 void init(const std::string& addr) {
-    // TODO: TBD: what kind of initialization do we need here?
+    REQUIRE(nng::transport::has_v6() == true);
 }
 
 namespace nng {
