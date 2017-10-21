@@ -16,6 +16,11 @@
 
 #include <nngcpp.h>
 
+namespace constants {
+    extern const std::string props;
+    extern const nng::messaging::buffer_vector_type props_buf;
+}
+
 namespace nng {
 
     namespace messaging {

@@ -33,9 +33,6 @@ void init(const std::string& addr) {
 
 namespace constants {
 
-    const std::string props = "props";
-    const auto props_buf = to_buffer(props);
-
     const std::string loopback_addr_base = "tcp://127.0.0.1";
     const std::string wildcard_addr_base = "tcp://*";
 

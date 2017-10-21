@@ -17,7 +17,7 @@
 
 namespace constants {
     const std::string props = "props";
-    const auto props_buf = to_buffer(props);
+    const nng::messaging::buffer_vector_type props_buf = to_buffer(props);
 }
 
 TEST_CASE("Check some properties", "[check][properties][nng][cxx][bonus]") {
