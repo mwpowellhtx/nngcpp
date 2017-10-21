@@ -162,16 +162,13 @@ namespace nng {
         size_type sz = val.size();
         const auto errnum = op(sid, name.c_str(), (void*)&val[0], &sz);
         THROW_NNG_EXCEPTION_EC(errnum);
-        // Do this because the C++ buffer does not appear to be honored quite right when working with the C buffers.
-        val.resize(sz - 1);
+        // Accounting for C style strings during transmission.
+        if (sz > 0) { val.resize(sz - 1); }
     }
 
-    void socket::get_option(const std::string& name, std::string& val, nng::size_type& sz) {
-        const auto op = std::bind(&::nng_getopt, _1, _2, _3, _4);
-        const auto errnum = op(sid, name.c_str(), (void*)&val[0], &sz);
-        THROW_NNG_EXCEPTION_EC(errnum);
-        // Do this because the C++ buffer does not appear to be honored quite right when working with the C buffers.
-        val.resize(sz - 1);
+    void socket::get_option(const std::string& name, std::string& val, size_type& sz) {
+        val.resize(sz);
+        get_option(name, val);
     }
 
     void socket::get_option_int(const std::string& name, int* valp) {
