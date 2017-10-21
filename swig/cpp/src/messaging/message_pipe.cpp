@@ -1,5 +1,6 @@
 #include "message_pipe.h"
 #include "message_base.h"
+#include "../core/address.h"
 #include "../core/exceptions.hpp"
 
 namespace nng {
@@ -62,7 +63,7 @@ namespace nng {
         }
 
         void message_pipe::get_option(const std::string& name, std::string& val, size_type& sz) {
-            const auto& op =  std::bind(::nng_pipe_getopt, _1, _2, _3, _4);
+            const auto& op = std::bind(::nng_pipe_getopt, _1, _2, _3, _4);
             const auto errnum = op(pid, name.c_str(), (void*)&val[0], &sz);
             THROW_NNG_EXCEPTION_EC(errnum);
             //// Do this because the C++ buffer does not appear to be honored quite right when working with the C buffers.
@@ -93,6 +94,12 @@ namespace nng {
             const auto& op = std::bind(::nng_pipe_getopt_ms, _1, _2, _3);
             const auto errnum = op(pid, name.c_str(), valp);
             THROW_NNG_EXCEPTION_EC(errnum);
+        }
+
+        void message_pipe::get_option(const std::string& name, address* const valp) {
+            auto sz = valp->get_size();
+            get_option(name, (void*)valp->get(), &sz);
+            // TODO: TBD: may throw an exception of the size did not align for whatever reason...
         }
     }
 }

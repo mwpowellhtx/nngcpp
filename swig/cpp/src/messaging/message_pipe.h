@@ -10,6 +10,10 @@
 
 namespace nng {
 
+#ifndef NNGCPP_ADDRESS_H
+    class address;
+#endif //NNGCPP_ADDRESS_H
+
     namespace messaging {
 
 #ifndef NNGCPP_MESSAGE_BASE_H
@@ -52,6 +56,9 @@ namespace nng {
 
             virtual void get_option(const std::string& name, duration_type* valp) override;
             virtual void get_option_ms(const std::string& name, duration_rep_type* valp) override;
+
+            // TODO: TBD: does this belong in the options_reader? and implemented on any of the other readers?
+            virtual void get_option(const std::string& name, address* const valp);
         };
     }
 }
