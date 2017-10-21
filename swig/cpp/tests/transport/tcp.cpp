@@ -49,8 +49,6 @@ namespace nng {
         void test_local_addr_properties<::nng_pipe, ::nng_listener, ::nng_dialer>(::nng_pipe* const pp
             , ::nng_listener* const lp, ::nng_dialer* const dp, uint16_t expected_port) {
 
-            using O = option_names;
-
             ::nng_sockaddr a;
             size_type sz = sizeof(a);
 
@@ -64,8 +62,6 @@ namespace nng {
         template<>
         void test_remote_addr_properties<::nng_pipe, ::nng_listener, ::nng_dialer>(::nng_pipe* const pp
             , ::nng_listener* const lp, ::nng_dialer* const dp, uint16_t expected_port) {
-
-            using O = option_names;
 
             ::nng_sockaddr a;
             size_type sz = sizeof(a);
@@ -81,8 +77,6 @@ namespace nng {
         void test_local_addr_properties<message_pipe, listener, dialer>(message_pipe* const pp
             , listener* const lp, dialer* const dp, uint16_t expected_port) {
 
-            using O = option_names;
-
             // TODO: TBD: call address socket_address instead... would be more specific.
             address a;
 
@@ -97,8 +91,6 @@ namespace nng {
         template<>
         void test_remote_addr_properties<message_pipe, listener, dialer>(message_pipe* const pp
             , listener* const lp, dialer* const dp, uint16_t expected_port) {
-
-            using O = option_names;
 
             // TODO: TBD: call address socket_address instead... would be more specific.
             address a;

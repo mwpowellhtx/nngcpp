@@ -19,6 +19,13 @@ extern "C" {
 }
 #endif // __cplusplus
 
+namespace constants {
+    // The IPv6 loopback is represented by "::1" and the [] brackets represents the ability to append a ":<port>".
+    const std::string loopback_addr_base = "tcp://[::1]";
+    const std::string test_addr_base = loopback_addr_base;
+    const char port_delim = ':';
+}
+
 namespace nng {
 
     namespace transport {
@@ -40,92 +47,87 @@ namespace nng {
             }
             return !rv;
         }
-
-        namespace v6 {
-
-            using namespace std;
-            using namespace messaging;
-            using namespace Catch::Matchers;
-
-            // was: static int check_props_v6(nng_msg *msg, nng_listener l, nng_dialer d)
-
-            void property_tests(binary_message *bmp, listener* lp, dialer* dp) {
-
-                using O = option_names;
-
-                unique_ptr<address> ap;
-                unique_ptr<message_pipe> pp;
-
-                family_view_base* actual_vp;
-
-                REQUIRE_NOTHROW(ap = make_unique<address>());
-                REQUIRE_NOTHROW(pp = make_unique<message_pipe>(bmp));
-                REQUIRE(pp->has_one() == true);
-
-                const auto in6_loopback = address::in6_loopback();
-                const auto expected_vp = const_cast<address&>(in6_loopback).view();
-                REQUIRE(expected_vp);
-
-                auto actual_sz = ap->get_size();
-                auto _ap_getp = ap->get();
-                REQUIRE(_ap_getp);
-
-                // TODO: TBD: it would be better to have visibility into the Fixture, the current Address, Port, etc...
-                SECTION("IPv6 Local address option works") {
-
-                    REQUIRE_NOTHROW(pp->get_option(O::local_address, _ap_getp, &actual_sz));
-                    REQUIRE_NOTHROW(actual_vp = ap->view());
-                    REQUIRE(actual_vp);
-                    // The very fact that this step PASSES means that we had an IPv6 (inet6) View.
-                    REQUIRE_THAT(actual_vp->get_in6_addr(), Equals(expected_vp->get_in6_addr()));
-                    // In this case all we can know is that the Port should be set.
-                    REQUIRE(actual_vp->get_port());
-                }
-
-                SECTION("IPv6 Remote address option works") {
-
-                    REQUIRE_NOTHROW(pp->get_option(O::remote_address, _ap_getp, &actual_sz));
-                    REQUIRE_NOTHROW(actual_vp = ap->view());
-                    REQUIRE(actual_vp);
-                    // The very fact that this step PASSES means that we had an IPv6 (inet6) View.
-                    REQUIRE_THAT(actual_vp->get_in6_addr(), Equals(expected_vp->get_in6_addr()));
-                    // In this case all we can know is that the Port should be set.
-                    REQUIRE(actual_vp->get_port());
-
-                    REQUIRE_NOTHROW(actual_sz = ap->get_size());
-                    REQUIRE(dp);
-                    REQUIRE_THROWS_AS_MATCHING(dp->get_option(O::remote_address, _ap_getp, &actual_sz), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
-                }
-            }
-        }
     }
 }
 
-namespace constants {
-    // The IPv6 loopback is represented by "::1" and the [] brackets represents the ability to append a ":<port>".
-    const std::string loopback_addr_base = "tcp://[::1]";
+void init(const std::string& addr) {
+    // TODO: TBD: what kind of initialization do we need here?
 }
 
-TEST_CASE("TCP (IPv6) transport tests", "[tcp][ipv6][transport][nng][cxx]") {
+namespace nng {
+    namespace messaging {
 
-    using namespace nng;
-    using namespace nng::transport;
-    using namespace constants;
+        const family_view_base::in6_addr_vector_type expected_loopback_long_addr
+            = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1 };
 
-    // TODO: TBD: do we really need to invoke ::nni_init? and for what reason? for has_v6 to work properly?
-    REQUIRE(::nni_init() == 0);
+        const family_view_base::in6_addr_vector_type expected_loopback_short_addr = { 1 };
 
-    using std::placeholders::_1;
-    using std::placeholders::_2;
-    using std::placeholders::_3;
+        using O = option_names;
 
-    if (has_v6()) {
-        const auto& property_tests = std::bind(&v6::property_tests, _1, _2, _3);
-        extended_transport_fixture fixture(loopback_addr_base, ':', property_tests);
-        fixture.run_all();
-    } else {
-        INFO("IPv6 not available for testing.");
-	}
+        template<>
+        void test_local_addr_properties<::nng_pipe, ::nng_listener, ::nng_dialer>(::nng_pipe* const pp
+            , ::nng_listener* const lp, ::nng_dialer* const dp, uint16_t expected_port) {
 
-	//::nng_fini();
+            using namespace std;
+
+            ::nng_sockaddr a;
+            size_type sz = sizeof(a);
+
+            REQUIRE(::nng_pipe_getopt(*pp, O::local_address.c_str(), (void*)&a, &sz) == 0);
+            REQUIRE(sz == sizeof(a));
+            REQUIRE(a.s_un.s_family == ::NNG_AF_INET6);
+            REQUIRE(memcmp(&(a.s_un.s_in6.sa_addr), &expected_loopback_long_addr[0], 16) == 0);
+            REQUIRE(a.s_un.s_in6.sa_port == ::htons(expected_port));
+        }
+
+        template<>
+        void test_remote_addr_properties<::nng_pipe, ::nng_listener, ::nng_dialer>(::nng_pipe* const pp
+            , ::nng_listener* const lp, ::nng_dialer* const dp, uint16_t expected_port) {
+
+            using namespace std;
+
+            ::nng_sockaddr a;
+            size_type sz = sizeof(a);
+
+            REQUIRE(::nng_pipe_getopt(*pp, O::remote_address.c_str(), (void*)&a, &sz) == 0);
+            REQUIRE(sz == sizeof(a));
+            REQUIRE(a.s_un.s_family == ::NNG_AF_INET6);
+            REQUIRE(memcmp(&(a.s_un.s_in6.sa_addr), &expected_loopback_long_addr[0], 16) == 0);
+            REQUIRE(a.s_un.s_in.sa_port != 0);
+        }
+
+        template<>
+        void test_local_addr_properties<message_pipe, listener, dialer>(message_pipe* const pp
+            , listener* const lp, dialer* const dp, uint16_t expected_port) {
+
+            using namespace Catch::Matchers;
+
+            // TODO: TBD: call address socket_address instead... would be more specific.
+            address a;
+
+            REQUIRE_NOTHROW(pp->get_option(O::local_address, &a));
+            REQUIRE(a.get_family() == af_inet6);
+            auto vp = a.view();
+            REQUIRE(vp->get_family() == a.get_family());
+            REQUIRE_THAT(vp->get_in6_addr(), Equals(expected_loopback_short_addr));
+            REQUIRE(vp->get_port() == expected_port);
+        }
+
+        template<>
+        void test_remote_addr_properties<message_pipe, listener, dialer>(message_pipe* const pp
+            , listener* const lp, dialer* const dp, uint16_t expected_port) {
+
+            using namespace Catch::Matchers;
+
+            // TODO: TBD: call address socket_address instead... would be more specific.
+            address a;
+
+            REQUIRE_NOTHROW(pp->get_option(O::remote_address, &a));
+            REQUIRE(a.get_family() == af_inet6);
+            auto vp = a.view();
+            REQUIRE(vp->get_family() == a.get_family());
+            REQUIRE_THAT(vp->get_in6_addr(), Equals(expected_loopback_short_addr));
+            REQUIRE(vp->get_port() != 0);
+        }
+    }
 }
