@@ -22,8 +22,8 @@
 extern "C" {
 #endif // __cplusplus
 
-#include <./core/aio.h>
-#include <./core/transport.h>
+#include <core/aio.h>
+#include <core/transport.h>
 
     extern ::nni_tran* nni_tran_find(const char *);
 

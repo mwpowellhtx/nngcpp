@@ -15,7 +15,11 @@
 
 #ifdef __cplusplus
 extern "C" {
-#   include <core/nng_impl.h>
+#endif // __cplusplus
+
+#include <core/nng_impl.h>
+
+#ifdef __cplusplus
 }
 #endif // __cplusplus
 
