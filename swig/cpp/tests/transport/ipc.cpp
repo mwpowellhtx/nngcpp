@@ -9,13 +9,14 @@
 // found online at https://opensource.org/licenses/MIT.
 //
 
+#include <nngcpp.h>
+
 #include "transport.h"
 
 #include "../catch/catch_exception_matcher_base.hpp"
 #include "../catch/catch_exception_translations.hpp"
+#include "../catch/catch_tags.h"
 #include "../helpers/constants.h"
-
-#include <nngcpp.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,6 +37,8 @@ void init(const std::string& addr) {
 }
 
 namespace constants {
+
+    const std::vector<std::string> prefix_tags = { "ipc" };
 
     // TODO: TBD: I wonder if this ultimately refers to actually /tmp/nng_ipc_test_ in the file path?
     // TODO: TBD: that would be on Linux, I'm assuming; what about on Windows? is the implementation "there" yet?

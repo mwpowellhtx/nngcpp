@@ -9,12 +9,14 @@
 // found online at https://opensource.org/licenses/MIT.
 //
 
+#include "../catch/catch_tags.h"
 #include "../helpers/constants.h"
 
 #include "transport.h"
 
 #include <core/listener.h>
 #include <core/dialer.h>
+#include <algorithms/string_algo.hpp>
 
 #include <cstdlib>
 #include <sstream>
@@ -119,7 +121,8 @@ namespace constants {
 }
 
 
-TEST_CASE("IPC transport tests using C++ wrapper", "[ipc][transport][nng][cxx][sample2]") {
+TEST_CASE("Test the transport using C++ wrappers", Catch::Tags(constants::prefix_tags
+    , "rep", "req", "transport", "nng", "cxx", "sample").c_str()) {
 
     using namespace std;
     using namespace nng;
@@ -219,7 +222,7 @@ TEST_CASE("IPC transport tests using C++ wrapper", "[ipc][transport][nng][cxx][s
         REQUIRE(pp->has_one() == true);
 
         // TODO: TBD: this bit is borderline message pipe unit testing and that's about it...
-        REQUIRE_NOTHROW(actual_addr.resize(addr.length()));
+        REQUIRE_NOTHROW(actual_addr.resize(NNG_MAXADDRLEN));
         REQUIRE_NOTHROW(pp->get_option(O::url, actual_addr));
         REQUIRE(actual_addr == addr);
     }
@@ -269,9 +272,11 @@ TEST_CASE("IPC transport tests using C++ wrapper", "[ipc][transport][nng][cxx][s
     }
 }
 
-TEST_CASE("IPC transport tests using C style approach", "[ipc][rep][req][transport][nng][c][sample]") {
+TEST_CASE("Test the transport in C style", Catch::Tags(constants::prefix_tags
+    , "rep", "req", "transport", "nng", "c", "sample").c_str()) {
 
     using namespace std;
+    using namespace trx;
     using namespace nng;
     using namespace nng::protocol;
     using namespace nng::messaging;
@@ -283,12 +288,12 @@ TEST_CASE("IPC transport tests using C style approach", "[ipc][rep][req][transpo
 
     const auto addr = calc.get_next_addr(test_addr_base);
 
+    init(addr);
+
     c_style_transport_fixture_redeux redeux;
 
-    auto& req = redeux._req;
-    auto& rep = redeux._rep;
-
-    init(addr);
+    const auto& req = redeux._req;
+    const auto& rep = redeux._rep;
 
     SECTION("Connection refused works") {
 
@@ -372,27 +377,30 @@ TEST_CASE("IPC transport tests using C style approach", "[ipc][rep][req][transpo
 
         REQUIRE_NOTHROW(*sendp << ping);
         REQUIRE(::nng_sendmsg(req, sendp->get_msgp(), 0) == 0);
+        REQUIRE_NOTHROW(sendp->on_sent());
         msgp = nullptr;
         REQUIRE(::nng_recvmsg(rep, &msgp, 0) == 0);
         REQUIRE(msgp);
         REQUIRE_NOTHROW(recvp->set_msgp(msgp));
         REQUIRE_THAT(recvp->body()->get(), Equals(ping_buf));
 
-        REQUIRE_NOTHROW(sendp->set_msgp(nullptr));
-        REQUIRE_NOTHROW(*sendp << acknowledge);
-        REQUIRE(::nng_sendmsg(rep, sendp->get_msgp(), 0) == 0);
-        REQUIRE_NOTHROW(sendp->on_sent());
+        REQUIRE_NOTHROW(recvp->body()->chop(ping.size()));
+        REQUIRE_NOTHROW(*recvp << acknowledge);
+        REQUIRE(::nng_sendmsg(rep, recvp->get_msgp(), 0) == 0);
+        REQUIRE_NOTHROW(recvp->on_sent());
         msgp = nullptr;
         REQUIRE(::nng_recvmsg(req, &msgp, 0) == 0);
         REQUIRE(msgp);
-        REQUIRE_NOTHROW(recvp->set_msgp(msgp));
-        REQUIRE_THAT(recvp->body()->get(), Equals(acknowledge_buf));
+        REQUIRE_NOTHROW(sendp->set_msgp(msgp));
+        REQUIRE_THAT(sendp->body()->get(), Equals(acknowledge_buf));
 
-        REQUIRE_NOTHROW(p = ::nng_msg_get_pipe(recvp->get_msgp()));
+        REQUIRE_NOTHROW(p = ::nng_msg_get_pipe(sendp->get_msgp()));
         REQUIRE(p);
 
-        url.resize(NNG_MAXADDRLEN);
+        REQUIRE_NOTHROW(url.resize(NNG_MAXADDRLEN));
         REQUIRE(::nng_pipe_getopt(p, O::url.c_str(), &url[0], &(sz = NNG_MAXADDRLEN)) == 0);
+        REQUIRE(sz < NNG_MAXADDRLEN);
+        REQUIRE_NOTHROW(url.resize(sz - 1));
         REQUIRE_THAT(url, Equals(string(addr)));
     }
 }

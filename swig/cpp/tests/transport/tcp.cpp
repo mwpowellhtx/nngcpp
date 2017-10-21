@@ -13,12 +13,8 @@
 
 #include "../catch/catch_exception_matcher_base.hpp"
 #include "../catch/catch_exception_translations.hpp"
+#include "../catch/catch_tags.h"
 #include "../helpers/constants.h"
-
-#define NNG_ONLY
-#include <nngcpp.h>
-
-#include <core/core.h>
 
 #ifdef _WIN32
 #   include <WinSock2.h>
@@ -32,6 +28,8 @@ void init(const std::string& addr) {
 }
 
 namespace constants {
+
+    const std::vector<std::string> prefix_tags = { "tcp" };
 
     const std::string loopback_addr_base = "tcp://127.0.0.1";
     const std::string wildcard_addr_base = "tcp://*";
@@ -105,7 +103,8 @@ namespace nng {
     }
 }
 
-TEST_CASE("We cannot connect to wildcards", "[tcp][pair][connect][wildcards][transport][nng][cxx]") {
+TEST_CASE("We cannot connect to wildcards", Catch::Tags(constants::prefix_tags
+    , "pair", "connect", "wildcards", "transport", "nng", "cxx").c_str()) {
 
     using namespace std;
     using namespace nng;
@@ -125,7 +124,8 @@ TEST_CASE("We cannot connect to wildcards", "[tcp][pair][connect][wildcards][tra
     REQUIRE_THROWS_AS_MATCHING(sp->dial(addr), nng_exception, THROWS_NNG_EXCEPTION(ec_eaddrinval));
 }
 
-TEST_CASE("We can bind to wildcards", "[tcp][pair][connect][wildcards][transport][nng][cxx]") {
+TEST_CASE("We can bind to wildcards", Catch::Tags(constants::prefix_tags
+    , "tcp", "pair", "connect", "wildcards", "transport", "nng", "cxx").c_str()) {
 
     using namespace std;
     using namespace nng;

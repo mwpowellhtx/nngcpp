@@ -9,9 +9,9 @@
 // found online at https://opensource.org/licenses/MIT.
 //
 
-#include <nngcpp.h>
-
 #include "extended_transport.h"
+
+#include "../catch/catch_tags.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -20,9 +20,13 @@ extern "C" {
 #endif // __cplusplus
 
 namespace constants {
+
+    const std::vector<std::string> prefix_tags = { "tcp6" };
+
     // The IPv6 loopback is represented by "::1" and the [] brackets represents the ability to append a ":<port>".
     const std::string loopback_addr_base = "tcp://[::1]";
     const std::string test_addr_base = loopback_addr_base;
+
     const char port_delim = ':';
 }
 

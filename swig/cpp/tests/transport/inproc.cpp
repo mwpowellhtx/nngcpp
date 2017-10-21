@@ -11,17 +11,15 @@
 
 #include "transport.h"
 
+#include "../catch/catch_tags.h"
+
 namespace constants {
+
+    const std::vector<std::string> prefix_tags = { "inproc" };
+
     const std::string test_addr_base = "inproc://test_";
+
+    const char port_delim = '\0';
 }
 
-TEST_CASE("Inproc transport tests", "[inproc][transport][nng][cxx]") {
-
-    using namespace nng;
-    using namespace constants;
-
-    // Everything is tucked away in the "fixture" in this instance.
-    transport_fixture fixture(test_addr_base);
-
-    fixture.run_all();
-}
+void init(const std::string& addr) {}

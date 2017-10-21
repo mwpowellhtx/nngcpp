@@ -12,9 +12,9 @@
 #ifndef NNGCPP_TESTS_EXTENDED_TRANSPORT_TESTS_H
 #define NNGCPP_TESTS_EXTENDED_TRANSPORT_TESTS_H
 
-#include "transport.h"
-
 #include <nngcpp.h>
+
+#include "transport.h"
 
 namespace constants {
     extern const std::string props;

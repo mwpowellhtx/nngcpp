@@ -19,6 +19,7 @@
 #include "../catch/catch_macros.hpp"
 #include "../helpers/basic_fixture.h"
 
+#include <vector>
 #include <string>
 #include <memory>
 #include <functional>
@@ -26,6 +27,7 @@
 namespace constants {
     extern const std::string test_addr_base;
     extern const char port_delim;
+    extern const std::vector<std::string> prefix_tags;
 }
 
 extern void init(const std::string& addr);
