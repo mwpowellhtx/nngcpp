@@ -136,13 +136,13 @@ TEST_CASE("Test the transport using C++ wrappers", Catch::Tags(constants::prefix
 
     const auto addr = calc.get_next_addr(test_addr_base);
 
+    init(addr);
+
     std::unique_ptr<latest_rep_socket> repp;
     std::unique_ptr<latest_req_socket> reqp;
 
     REQUIRE_NOTHROW(repp = make_unique<latest_rep_socket>());
     REQUIRE_NOTHROW(reqp = make_unique<latest_req_socket>());
-
-    init(addr);
 
     SECTION("Connection refused works") {
 
