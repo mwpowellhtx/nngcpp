@@ -6,6 +6,9 @@
 
 namespace nng {
 
+    basic_fixture::basic_fixture() {
+    }
+
     basic_fixture::~basic_fixture() {
         CHECK_NOTHROW(::nng_fini());
     }

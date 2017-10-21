@@ -11,6 +11,13 @@
 
 #include "extended_transport.h"
 
+#include "../catch/catch_exception_matcher_base.hpp"
+#include "../catch/catch_exception_translations.hpp"
+#include "../helpers/constants.h"
+
+#define NNG_ONLY
+#include <nngcpp.h>
+
 #include <core/core.h>
 
 #ifdef _WIN32
@@ -19,121 +26,136 @@
 #   include <arpa/inet.h>
 #endif
 
+#include <functional>
+
+void init(const std::string& addr) {
+}
+
+namespace constants {
+
+    const std::string props = "props";
+    const auto props_buf = to_buffer(props);
+
+    const std::string loopback_addr_base = "tcp://127.0.0.1";
+    const std::string wildcard_addr_base = "tcp://*";
+
+    const std::string test_addr_base = loopback_addr_base;
+    const char port_delim = ':';
+}
+
 namespace nng {
-    namespace transport {
-        namespace v4 {
+    namespace messaging {
 
-            using namespace messaging;
+        using O = option_names;
 
-            void property_tests(binary_message* bmp, listener* lp, dialer* dp) {
+        template<>
+        void test_local_addr_properties<::nng_pipe, ::nng_listener, ::nng_dialer>(::nng_pipe* const pp
+            , ::nng_listener* const lp, ::nng_dialer* const dp, uint16_t expected_port) {
 
-                using namespace std;
-                using namespace protocol;
-                using O = option_names;
+            using O = option_names;
 
-                unique_ptr<message_pipe> pp;
-                unique_ptr<address> ap;
+            ::nng_sockaddr a;
+            size_type sz = sizeof(a);
 
-                REQUIRE_NOTHROW(pp = make_unique<message_pipe>(bmp));
-                REQUIRE(pp->has_one() == true);
+            REQUIRE(::nng_pipe_getopt(*pp, O::local_address.c_str(), (void*)&a, &sz) == 0);
+            REQUIRE(sz == sizeof(a));
+            REQUIRE(a.s_un.s_family == ::NNG_AF_INET);
+            REQUIRE(a.s_un.s_in.sa_addr == ::htonl(INADDR_LOOPBACK));
+            REQUIRE(a.s_un.s_in.sa_port == ::htons(expected_port));
+        }
 
-                REQUIRE_NOTHROW(ap = make_unique<address>());
-                REQUIRE(ap->has_one() == true);
+        template<>
+        void test_remote_addr_properties<::nng_pipe, ::nng_listener, ::nng_dialer>(::nng_pipe* const pp
+            , ::nng_listener* const lp, ::nng_dialer* const dp, uint16_t expected_port) {
 
-                auto actual_sz = ap->get_size();
+            using O = option_names;
 
-                SECTION("Local address property works") {
+            ::nng_sockaddr a;
+            size_type sz = sizeof(a);
 
-                    // TODO: TBD: this is really more of an unit test thing...
-                    REQUIRE_NOTHROW(pp->get_option(O::local_address, ap->get(), &actual_sz));
-                    REQUIRE(actual_sz == ap->get_size());
-                    REQUIRE(ap->get_family() == af_inet);
-                    REQUIRE(ap->view() != nullptr);
-                    REQUIRE(ap->view()->get_addr() == INADDR_LOOPBACK);
-                    REQUIRE(ap->view()->get_port() != 0);
-                }
+            REQUIRE(::nng_pipe_getopt(*pp, O::remote_address.c_str(), (void*)&a, &sz) == 0);
+            REQUIRE(sz == sizeof(a));
+            REQUIRE(a.s_un.s_family == ::NNG_AF_INET);
+            REQUIRE(a.s_un.s_in.sa_addr == ::htonl(INADDR_LOOPBACK));
+            REQUIRE(a.s_un.s_in.sa_port != 0);
+        }
 
-                SECTION("Remote address property works") {
+        template<>
+        void test_local_addr_properties<message_pipe, listener, dialer>(message_pipe* const pp
+            , listener* const lp, dialer* const dp, uint16_t expected_port) {
 
-                    REQUIRE_NOTHROW(pp->get_option(O::remote_address, ap->get(), &actual_sz));
-                    REQUIRE(actual_sz == ap->get_size());
-                    REQUIRE(ap->get_family() == af_inet);
-                    REQUIRE(ap->view() != nullptr);
-                    REQUIRE(ap->view()->get_addr() == INADDR_LOOPBACK);
-                    REQUIRE(ap->view()->get_port() != 0);
+            using O = option_names;
 
-                    REQUIRE(dp);
-                    REQUIRE_THROWS_AS_MATCHING(dp->get_option(O::remote_address, ap->get(), &actual_sz), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
-                }
-            }
+            // TODO: TBD: call address socket_address instead... would be more specific.
+            address a;
+
+            REQUIRE_NOTHROW(pp->get_option(O::local_address, &a));
+            REQUIRE(a.get_family() == af_inet);
+            auto vp = a.view();
+            REQUIRE(vp->get_family() == a.get_family());
+            REQUIRE(vp->get_addr() == INADDR_LOOPBACK);
+            REQUIRE(vp->get_port() == expected_port);
+        }
+
+        template<>
+        void test_remote_addr_properties<message_pipe, listener, dialer>(message_pipe* const pp
+            , listener* const lp, dialer* const dp, uint16_t expected_port) {
+
+            using O = option_names;
+
+            // TODO: TBD: call address socket_address instead... would be more specific.
+            address a;
+
+            REQUIRE_NOTHROW(pp->get_option(O::remote_address, &a));
+            REQUIRE(a.get_family() == af_inet);
+            auto vp = a.view();
+            REQUIRE(vp->get_family() == a.get_family());
+            REQUIRE(vp->get_addr() == INADDR_LOOPBACK);
+            REQUIRE(vp->get_port() != 0);
         }
     }
 }
 
-namespace constants {
-    const std::string loopback_addr_base = "tcp://127.0.0.1";
-    const std::string wildcard_addr_base = "tcp://*";
-}
-
-TEST_CASE("TCP transport", "[tcp][transport][nng][cxx]") {
+TEST_CASE("We cannot connect to wildcards", "[tcp][pair][connect][wildcards][transport][nng][cxx]") {
 
     using namespace std;
     using namespace nng;
-    using namespace messaging;
-    using namespace transport;
+    using namespace nng::protocol;
     using namespace constants;
+    using namespace Catch::Matchers;
 
-    using std::placeholders::_1;
-    using std::placeholders::_2;
-    using std::placeholders::_3;
+    std::string addr;
+    address_calculator calc(port_delim);
+    unique_ptr<latest_pair_socket> sp;
 
-    const auto& property_tests = std::bind(&v4::property_tests, _1, _2, _3);
+    REQUIRE_NOTHROW(sp = make_unique<latest_pair_socket>());
 
-    extended_transport_fixture fixture(loopback_addr_base, ':', property_tests);
+    REQUIRE_NOTHROW(addr = calc.get_next_addr(wildcard_addr_base));
 
-    fixture.run_all();
+    WARN("Dialing address: '" + addr + "'");
+    REQUIRE_THROWS_AS_MATCHING(sp->dial(addr), nng_exception, THROWS_NNG_EXCEPTION(ec_eaddrinval));
+}
 
-    const auto cannot_connect_to_wildcards = [](address_calculator& calc) {
+TEST_CASE("We can bind to wildcards", "[tcp][pair][connect][wildcards][transport][nng][cxx]") {
 
-        using namespace protocol;
-        using namespace Catch::Matchers;
+    using namespace std;
+    using namespace nng;
+    using namespace nng::protocol;
+    using namespace constants;
+    using namespace Catch::Matchers;
 
-        SECTION("We cannot connect to wildcards") {
+    std::string addr;
+    address_calculator calc(port_delim);
+    unique_ptr<latest_pair_socket> sp1, sp2;
 
-            string addr;
-            unique_ptr<latest_pair_socket> sp;
+    REQUIRE_NOTHROW(sp1 = make_unique<latest_pair_socket>());
+    REQUIRE_NOTHROW(sp2 = make_unique<latest_pair_socket>());
 
-            REQUIRE_NOTHROW(sp = make_unique<latest_pair_socket>());
+    REQUIRE_NOTHROW(addr = calc.get_next_addr(wildcard_addr_base));
+    WARN("Listening to address: '" + addr + "'");
+    REQUIRE_NOTHROW(sp1->listen(addr));
 
-            REQUIRE_NOTHROW(addr = calc.get_next_addr(wildcard_addr_base));
-
-            INFO("Attempting to dial address: '" + addr + "'");
-            REQUIRE_THROWS_AS_MATCHING(sp->dial(addr), nng_exception, THROWS_NNG_EXCEPTION(ec_eaddrinval));
-        }
-    };
-
-    const auto can_bind_to_wildcard = [](address_calculator& calc) {
-
-        using namespace protocol;
-        using namespace Catch::Matchers;
-
-        SECTION("We can bind to wildcards") {
-
-            string addr;
-            unique_ptr<latest_pair_socket> sp1, sp2;
-
-            REQUIRE_NOTHROW(sp1 = make_unique<latest_pair_socket>());
-            REQUIRE_NOTHROW(sp2 = make_unique<latest_pair_socket>());
-
-            REQUIRE_NOTHROW(addr = calc.get_next_addr(wildcard_addr_base));
-            INFO("Listening to address: '" + addr + "'");
-            REQUIRE_NOTHROW(sp1->listen(addr));
-
-            REQUIRE_NOTHROW(addr = calc.get_addr(loopback_addr_base));
-            INFO("Dialing address: '" + addr + "'");
-            REQUIRE_NOTHROW(sp2->dial(addr));
-        }
-    };
-
-    fixture.run_many(cannot_connect_to_wildcards, can_bind_to_wildcard);
+    REQUIRE_NOTHROW(addr = calc.get_addr(loopback_addr_base));
+    WARN("Dialing address: '" + addr + "'");
+    REQUIRE_NOTHROW(sp2->dial(addr));
 }

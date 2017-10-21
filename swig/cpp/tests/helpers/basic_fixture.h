@@ -6,6 +6,7 @@
 namespace nng {
 
     struct basic_fixture {
+        basic_fixture();
         virtual ~basic_fixture();
     };
 }

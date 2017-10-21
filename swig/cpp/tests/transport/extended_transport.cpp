@@ -11,85 +11,148 @@
 
 #include "extended_transport.h"
 
-#include "../catch/catch_nng_exception_matcher.hpp"
-#include "../catch/catch_exception_translations.hpp"
-#include "../catch/catch_macros.hpp"
+#include "core/core.h"
+
 #include "../helpers/constants.h"
 
-#include <cstdlib>
-#include <sstream>
-#include <algorithm>
-
 namespace constants {
-
     const std::string props = "props";
-
     const auto props_buf = to_buffer(props);
 }
 
-namespace nng {
+TEST_CASE("Check some properties", "[check][properties][nng][cxx][bonus]") {
 
-    // TODO: TBD: we could potentially accept command line arguments for the PORT, but I really fail to see the need
-    extended_transport_fixture::extended_transport_fixture(const std::string& base_addr
-        , const run_property_tests_func& property_tests)
-        : transport_fixture(base_addr)
-        , _test_properties(property_tests) {
+    using namespace std;
+    using namespace nng;
+    using namespace nng::protocol;
+    using namespace nng::messaging;
+    using namespace constants;
+    using namespace Catch::Matchers;
+    using O = option_names;
+
+    address_calculator calc(port_delim);
+    const auto get_current_port = std::bind(&address_calculator::get_current_port);
+
+    unique_ptr<binary_message> sendp, recvp;
+    transport_fixture_redeux redeux;
+
+    const auto addr = calc.get_next_addr(test_addr_base);
+
+    const auto& rep = redeux._rep;
+    const auto& req = redeux._req;
+
+    SECTION("Properties tests") {
+
+        WARN("Running properties test on address: '" + addr + "'");
+
+        listener l;
+        dialer d;
+
+        unique_ptr<binary_message> sendp, recvp;
+
+        REQUIRE_NOTHROW(sendp = make_unique<binary_message>());
+        REQUIRE_NOTHROW(recvp = make_unique<binary_message>(nullptr));
+
+        REQUIRE_NOTHROW(rep->listen(addr, &l));
+        REQUIRE(l.has_one() == true);
+        REQUIRE_NOTHROW(req->dial(addr, &d));
+        REQUIRE(d.has_one() == true);
+        SLEEP_FOR(20ms); // Allow listener to catch up from being slightly behind.
+
+        REQUIRE_NOTHROW(*sendp << props);
+        REQUIRE_NOTHROW(req->send(sendp.get()));
+        REQUIRE(sendp->has_one() == false);
+
+        REQUIRE_NOTHROW(rep->try_receive(recvp.get()));
+        REQUIRE(recvp->has_one() == true);
+        REQUIRE_THAT(recvp->body()->get(), Equals(props_buf));
+
+        SECTION("Now test the properties") {
+
+            unique_ptr<message_pipe> pp;
+
+            // Vet the Pipe and the Port ahead of time.
+            REQUIRE_NOTHROW(pp = make_unique<message_pipe>(recvp.get()));
+            REQUIRE(pp->has_one() == true);
+
+            auto current_port = get_current_port();
+            REQUIRE(current_port != 0);
+
+            SECTION("Local address property works") {
+                test_local_addr_properties(pp.get(), &l, &d, current_port);
+            }
+
+            SECTION("Remote address property works") {
+                test_remote_addr_properties(pp.get(), &l, &d, current_port);
+            }
+        }
     }
+}
 
-    extended_transport_fixture::extended_transport_fixture(const std::string& base_addr
-        , const char port_delim
-        , const run_property_tests_func& property_tests)
-        : transport_fixture(base_addr, port_delim)
-        , _test_properties(property_tests) {
-    }
+TEST_CASE("Check some properties in C style", "[check][properties][nng][c][bonus]") {
 
-    extended_transport_fixture::~extended_transport_fixture() {
-    }
+    using namespace std;
+    using namespace nng;
+    using namespace nng::messaging;
+    using namespace constants;
+    using namespace Catch::Matchers;
 
-    void extended_transport_fixture::run_all() {
-        transport_fixture::run_all();
-    }
+    address_calculator calc(port_delim);
+    const auto get_current_port = std::bind(&address_calculator::get_current_port);
 
-    void extended_transport_fixture::run_all(const std::string& addr) {
+    unique_ptr<binary_message> sendp, recvp;
+    c_style_transport_fixture_redeux redeux;
 
-        transport_fixture::run_all(addr);
+    const auto addr = calc.get_next_addr(test_addr_base);
 
-        run_property_tests(addr);
-    }
+    const auto& rep = redeux._rep;
+    const auto& req = redeux._req;
 
-    void extended_transport_fixture::run_property_tests(const std::string& addr) {
+    SECTION("Properties tests") {
 
-        using namespace std;
-        using namespace messaging;
-        using namespace constants;
-        using namespace Catch::Matchers;
+        WARN("Running properties test on address: '" + addr + "'");
 
-        SECTION("Run property tests") {
+        ::nng_listener l;
+        ::nng_dialer d;
 
-            listener l;
-            dialer d;
+        ::nng_msg* msgp;
+        unique_ptr<binary_message> sendp, recvp;
 
-            unique_ptr<binary_message> sendp, recvp;
+        REQUIRE_NOTHROW(sendp = make_unique<binary_message>());
+        REQUIRE_NOTHROW(recvp = make_unique<binary_message>(nullptr));
 
-            REQUIRE_NOTHROW(_repp->listen(addr, &l));
-            REQUIRE(l.has_one() == true);
-            REQUIRE_NOTHROW(_reqp->dial(addr, &d));
-            REQUIRE(d.has_one() == true);
+        REQUIRE(::nng_listen(rep, addr.c_str(), &l, 0) == 0);
+        REQUIRE(l);
+        REQUIRE(::nng_dial(req, addr.c_str(), &d, 0) == 0);
+        REQUIRE(d);
+        SLEEP_FOR(20ms); // Allow listener to catch up from being slightly behind.
 
-            // Wait for listener to catch up since it may be slightly behind.
-            SLEEP_FOR(20ms);
+        REQUIRE_NOTHROW(*sendp << props);
+        REQUIRE(::nng_sendmsg(req, sendp->get_msgp(), 0) == 0);
+        REQUIRE_NOTHROW(sendp->on_sent());
+        REQUIRE(sendp->has_one() == false);
 
-            REQUIRE_NOTHROW(sendp = make_unique<binary_message>());
-            REQUIRE_NOTHROW(recvp = make_unique<binary_message>(nullptr));
-            REQUIRE(recvp->has_one() == false);
-            REQUIRE_NOTHROW(*sendp << props);
+        REQUIRE(::nng_recvmsg(rep, &msgp, 0) == 0);
+        REQUIRE_NOTHROW(recvp->set_msgp(msgp));
+        REQUIRE(recvp->has_one() == true);
+        REQUIRE_THAT(recvp->body()->get(), Equals(props_buf));
 
-            REQUIRE_NOTHROW(_reqp->send(sendp.get()));
-            REQUIRE_NOTHROW(_repp->try_receive(recvp.get()));
-            REQUIRE(recvp->has_one() == true);
-            REQUIRE_THAT(recvp->body()->get(), Equals(props_buf));
+        SECTION("Now test the properties") {
 
-            _test_properties(recvp.get(), &l, &d);
+            // Vet the Pipe and the Port ahead of time.
+            ::nng_pipe p = ::nng_msg_get_pipe(recvp->get_msgp());
+            REQUIRE(p);
+
+            auto current_port = get_current_port();
+            REQUIRE(current_port != 0);
+
+            SECTION("Local address property works") {
+                test_local_addr_properties(&p, &l, &d, current_port);
+            }
+
+            SECTION("Remote address property works") {
+                test_remote_addr_properties(&p, &l, &d, current_port);
+            }
         }
     }
 }

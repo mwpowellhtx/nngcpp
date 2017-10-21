@@ -9,46 +9,42 @@
 // found online at https://opensource.org/licenses/MIT.
 //
 
-#ifndef NNGCPP_TESTS_EXTENDED_TRANSPORT_FIXTURE_H
-#define NNGCPP_TESTS_EXTENDED_TRANSPORT_FIXTURE_H
+#ifndef NNGCPP_TESTS_EXTENDED_TRANSPORT_TESTS_H
+#define NNGCPP_TESTS_EXTENDED_TRANSPORT_TESTS_H
 
 #include "transport.h"
 
-#include <core/listener.h>
-#include <core/dialer.h>
-#include <messaging/binary_message.h>
-
-#include <string>
-#include <functional>
+#include <nngcpp.h>
 
 namespace nng {
 
-    struct extended_transport_fixture : public transport_fixture {
+    namespace messaging {
 
-        typedef std::function<void(messaging::binary_message* bmp
-            , listener* lp, dialer* dp)> run_property_tests_func;
+        // Parameters should be as fully vetted as possible prior to presentation to the extended tests function.
+        template<typename Pipe_, typename Listener_, typename Dialer_>
+        void test_local_addr_properties(Pipe_* const pp, Listener_* const lp
+            , Dialer_* const dp, uint16_t expected_port) {}
 
-        extended_transport_fixture(const std::string& base_addr
-            , const run_property_tests_func& property_tests);
+        template<typename Pipe_, typename Listener_, typename Dialer_>
+        void test_remote_addr_properties(Pipe_* const pp, Listener_* const lp
+            , Dialer_* const dp, uint16_t expected_port) {}
 
-        extended_transport_fixture(const std::string& base_addr
-            , const char port_delim
-            , const run_property_tests_func& property_tests);
+        template<>
+        extern void test_local_addr_properties<::nng_pipe, ::nng_listener, ::nng_dialer>(::nng_pipe* const pp
+            , ::nng_listener* const lp, ::nng_dialer* const dp, uint16_t expected_port);
 
-        virtual ~extended_transport_fixture();
+        template<>
+        extern void test_remote_addr_properties<::nng_pipe, ::nng_listener, ::nng_dialer>(::nng_pipe* const pp
+            , ::nng_listener* const lp, ::nng_dialer* const dp, uint16_t expected_port);
 
-        virtual void run_all() override;
+        template<>
+        extern void test_local_addr_properties<message_pipe, listener, dialer>(message_pipe* const pp
+            , listener* const lp, dialer* const dp, uint16_t expected_port);
 
-    protected:
-
-        virtual void run_all(const std::string& addr) override;
-
-    private:
-
-        const run_property_tests_func _test_properties;
-
-        void run_property_tests(const std::string& addr);
-    };
+        template<>
+        extern void test_remote_addr_properties<message_pipe, listener, dialer>(message_pipe* const pp
+            , listener* const lp, dialer* const dp, uint16_t expected_port);
+    }
 }
 
-#endif // NNGCPP_TESTS_EXTENDED_TRANSPORT_FIXTURE_H
+#endif // NNGCPP_TESTS_EXTENDED_TRANSPORT_TESTS_H

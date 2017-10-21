@@ -9,8 +9,8 @@
 // found online at https://opensource.org/licenses/MIT.
 //
 
-#ifndef NNGCPP_TESTS_TRANSPORT_FIXTURE_H
-#define NNGCPP_TESTS_TRANSPORT_FIXTURE_H
+#ifndef NNGCPP_TESTS_TRANSPORT_TESTS_H
+#define NNGCPP_TESTS_TRANSPORT_TESTS_H
 
 #include <protocol/protocol.h>
 
@@ -23,9 +23,18 @@
 #include <memory>
 #include <functional>
 
+namespace constants {
+    extern const std::string test_addr_base;
+    extern const char port_delim;
+}
+
+extern void init(const std::string& addr);
+
 namespace nng {
 
     struct address_calculator {
+
+        address_calculator(char port_delim = '\0');
 
         virtual ~address_calculator();
 
@@ -33,89 +42,53 @@ namespace nng {
         std::string get_next_addr(const std::string& base_addr, int delta = 1);
         std::string get_prev_addr(const std::string& base_addr, int delta = -1);
 
-    protected:
-
-        address_calculator(char port_delim = '\0');
-
     private:
 
         static int port;
 
         std::string _port_delim;
 
-        int get_port(int delta);
+        uint16_t get_port(int delta);
+
+    public:
+
+        static uint16_t get_current_port();
     };
 
-    struct transport_fixture : public basic_fixture, public address_calculator {
+    template<typename Req_, typename Rep_>
+    struct transport_fixture_redeux_base : public basic_fixture {
 
-        typedef std::function<void(address_calculator&)> run_one_func;
+        typedef Req_ req_type;
+        typedef Rep_ rep_type;
 
-        transport_fixture(const std::string& base_addr, char port_delim = '\0');
-
-        virtual ~transport_fixture();
-
-        void run_one(const run_one_func& func);
-
-        template<class Func>
-        void run_many(const Func& func) {
-            address_calculator& self = *this;
-            func(self);
-        }
-
-        template<class Func, class ...Funcs_>
-        void run_many(const Func& func, const Funcs_&... funcs) {
-            run_many(func);
-            run_many(funcs...);
-        }
-
-        template<class ...Funcs_>
-        void run_many(const Funcs_&... funcs) {
-            run_many(funcs);
-        }
-
-        virtual void run_all();
+        req_type _req;
+        rep_type _rep;
 
     protected:
 
-        std::string _base_addr;
-        std::unique_ptr<protocol::latest_rep_socket> _repp;
-        std::unique_ptr<protocol::latest_req_socket> _reqp;
+        transport_fixture_redeux_base() : _req(), _rep() {
+        }
 
-        virtual void run_all(const std::string& addr);
-
-    private:
-
-        void run_connection_refused_works(const std::string& addr);
-        void run_dup_listeners_rejected(const std::string& addr);
-        void run_listener_and_dialer_accepted(const std::string& addr);
-        void run_send_and_receive(const std::string& addr);
-        void run_send_and_receive_large_data(const std::string& addr);
+        transport_fixture_redeux_base(req_type req, rep_type rep) : _req(req), _rep(rep) {
+        }
     };
 
-    struct c_style_transport_fixture : public basic_fixture, public address_calculator {
+    struct c_style_transport_fixture_redeux
+        : public transport_fixture_redeux_base<::nng_socket, ::nng_socket> {
 
-        c_style_transport_fixture(const std::string& base_addr, char port_delim = '\0');
+        c_style_transport_fixture_redeux();
 
-        virtual ~c_style_transport_fixture();
+        virtual ~c_style_transport_fixture_redeux();
+    };
 
-        virtual void run_all();
- 
-        ::nng_socket _rep, _req;
+    struct transport_fixture_redeux : public transport_fixture_redeux_base<
+        std::unique_ptr<protocol::latest_req_socket>
+        , std::unique_ptr<protocol::latest_rep_socket>> {
 
-    protected:
+        transport_fixture_redeux();
 
-        std::string _base_addr;
-
-        virtual void run_all(const std::string& addr);
-
-    private:
-
-        void run_connection_refused_works(const char* addr);
-        void run_dup_listeners_rejected(const char* addr);
-        void run_listener_and_dialer_accepted(const char* addr);
-        void run_send_and_receive(const char* addr);
-        void run_send_and_receive_large_data(const char* addr);
+        virtual ~transport_fixture_redeux();
     };
 }
 
-#endif // NNGCPP_TESTS_TRANSPORT_FIXTURE_H
+#endif // NNGCPP_TESTS_TRANSPORT_TESTS_H
