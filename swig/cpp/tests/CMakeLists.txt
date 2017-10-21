@@ -42,6 +42,9 @@ if (NNGCPP_ENABLE_TESTS)
     set (DEFAULT_TEST_SRCS
         main.cpp
 
+        catch/catch_tags.cpp
+        catch/catch_tags.h
+
         helpers/basic_fixture.cpp
         helpers/basic_fixture.h
 
