@@ -7,7 +7,6 @@ namespace nng {
     using std::placeholders::_1;
     using std::placeholders::_2;
     using std::placeholders::_3;
-    using std::placeholders::_4;
 
     // TODO: TBD: ditto "listener" ...
     dialer::dialer()
@@ -49,78 +48,60 @@ namespace nng {
         return did != 0;
     }
 
-    void dialer::get_option(const std::string& name, std::string& val) {
-        auto sz = val.size();
-        const auto& op = std::bind(&::nng_dialer_getopt, _1, _2, _3, _4);
-        const auto errnum = op(did, name.c_str(), (void*)&val[0], &sz);
-        THROW_NNG_EXCEPTION_EC(errnum);
-        // Accounting for C style strings during transmission.
-        if (sz > 0) { val.resize(sz - 1); }
-    }
-
     void dialer::get_option(const std::string& name, std::string& val, size_type& sz) {
         val.resize(sz);
         get_option(name, val);
     }
 
-    void dialer::get_option(const std::string& name, void* val, size_type* szp) {
-        const auto& op = std::bind(&::nng_dialer_getopt, _1, _2, _3, _4);
-        const auto errnum = op(did, name.c_str(), val, szp);
-        THROW_NNG_EXCEPTION_EC(errnum);
+    void dialer::get_option(const std::string& name, void* valp, size_type& sz) {
+        const auto& op = std::bind(&::nng_dialer_getopt, did, _1, _2, _3);
+        options_reader::get_option(op, name, valp, sz);
     }
 
-    void dialer::get_option_int(const std::string& name, int* valp) {
-        const auto& op = std::bind(&::nng_dialer_getopt_int, _1, _2, _3);
-        const auto errnum = op(did, name.c_str(), valp);
-        THROW_NNG_EXCEPTION_EC(errnum);
+    void dialer::get_option(const std::string& name, std::string& val) {
+        const auto& op = std::bind(::nng_dialer_getopt, did, _1, _2, _3);
+        options_reader::get_option(op, name, val);
     }
 
-    void dialer::get_option_size(const std::string& name, size_type* valp) {
-        const auto& op = std::bind(&::nng_dialer_getopt_size, _1, _2, _3);
-        const auto errnum = op(did, name.c_str(), valp);
-        THROW_NNG_EXCEPTION_EC(errnum);
+    void dialer::get_option_int(const std::string& name, int& val) {
+        const auto& op = std::bind(::nng_dialer_getopt_int, did, _1, _2);
+        options_reader::get_option_int(op, name, val);
     }
 
-    void dialer::get_option(const std::string& name, duration_type* valp) {
-        duration_rep_type val;
-        get_option_ms(name, &val);
-        *valp = duration_type(val);
+    void dialer::get_option_sz(const std::string& name, size_type& val) {
+        const auto& op = std::bind(::nng_dialer_getopt_size, did, _1, _2);
+        options_reader::get_option_sz(op, name, val);
     }
 
-    void dialer::get_option_ms(const std::string& name, duration_rep_type* valp) {
-        const auto& op = std::bind(&::nng_dialer_getopt_ms, _1, _2, _3);
-        const auto errnum = op(did, name.c_str(), valp);
-        THROW_NNG_EXCEPTION_EC(errnum);
+    void dialer::get_option(const std::string& name, duration_type& val) {
+        duration_rep_type x;
+        get_option_ms(name, x);
+        val = duration_type(x);
     }
 
-    void dialer::set_option(const std::string& name, const std::string& val, size_type sz) {
-        const auto& op = std::bind(&::nng_dialer_setopt, _1, _2, _3, _4);
-        const auto errnum = op(did, name.c_str(), val.c_str(), sz);
-        THROW_NNG_EXCEPTION_EC(errnum);
+    void dialer::get_option_ms(const std::string& name, duration_rep_type& val) {
+        const auto& op = std::bind(&::nng_dialer_getopt_ms, did, _1, _2);
+        options_reader::get_option_ms(op, name.c_str(), val);
+    }
+
+    void dialer::set_option(const std::string& name, const void* valp, size_type sz) {
+        const auto& op = std::bind(&::nng_dialer_setopt, did, _1, _2, _3);
+        options_writer::set_option(op, name, valp, sz);
     }
 
     void dialer::set_option(const std::string& name, const std::string& val) {
-        const auto& op = std::bind(&::nng_dialer_setopt, _1, _2, _3, _4);
-        const auto errnum = op(did, name.c_str(), val.c_str(), val.length());
-        THROW_NNG_EXCEPTION_EC(errnum);
-    }
-
-    void dialer::set_option(const std::string& name, const void* bp, size_type sz) {
-        const auto& op = std::bind(&::nng_dialer_setopt, _1, _2, _3, _4);
-        const auto errnum = op(did, name.c_str(), bp, sz);
-        THROW_NNG_EXCEPTION_EC(errnum);
+        const auto& op = std::bind(&::nng_dialer_setopt, did, _1, _2, _3);
+        options_writer::set_option(op, name, val);
     }
 
     void dialer::set_option_int(const std::string& name, int val) {
-        const auto& op = std::bind(&::nng_dialer_setopt_int, _1, _2, _3);
-        const auto errnum = op(did, name.c_str(), val);
-        THROW_NNG_EXCEPTION_EC(errnum);
+        const auto& op = std::bind(&::nng_dialer_setopt_int, did, _1, _2);
+        options_writer::set_option_int(op, name, val);
     }
 
-    void dialer::set_option_size(const std::string& name, size_type val) {
-        const auto& op = std::bind(&::nng_dialer_setopt_size, _1, _2, _3);
-        const auto errnum = op(did, name.c_str(), val);
-        THROW_NNG_EXCEPTION_EC(errnum);
+    void dialer::set_option_sz(const std::string& name, size_type val) {
+        const auto& op = std::bind(&::nng_dialer_setopt_size, did, _1, _2);
+        options_writer::set_option_sz(op, name, val);
     }
 
     void dialer::set_option(const std::string& name, duration_type val) {
@@ -128,8 +109,7 @@ namespace nng {
     }
 
     void dialer::set_option_ms(const std::string& name, duration_rep_type val) {
-        const auto& op = std::bind(&::nng_dialer_setopt_ms, _1, _2, _3);
-        const auto errnum = op(did, name.c_str(), val);
-        THROW_NNG_EXCEPTION_EC(errnum);
+        const auto& op = std::bind(&::nng_dialer_setopt_ms, did, _1, _2);
+        options_writer::set_option_ms(op, name, val);
     }
 }

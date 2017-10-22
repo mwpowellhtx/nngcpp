@@ -74,7 +74,7 @@ namespace nng {
 
             _stop_server = false;
 
-            using _opt_ = option_names;
+            using _opt_ = nng::option_names;
 
             //INFO("Setting up server reply socket.");
 
@@ -82,7 +82,7 @@ namespace nng {
 
             CHECK(_repsp.get() != nullptr);
 
-            REQUIRE_NOTHROW(_repsp->set_option_int(_opt_::receive_buffer, 256));
+            REQUIRE_NOTHROW(_repsp->set_option_int(_opt_::recv_buf, 256));
             REQUIRE_NOTHROW(_repsp->set_option_int(_opt_::send_buffer, 256));
 
             using namespace std::placeholders;

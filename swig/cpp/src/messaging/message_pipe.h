@@ -46,19 +46,18 @@ namespace nng {
             // TODO: TBD: so, apparently there is no std::not_equal_to available from the Microsoft implementation, however, we should still be able to override the operator
             bool operator!=(const message_pipe& rhs);
 
-            virtual void get_option(const std::string& name, void* val, size_type* szp) override;
+            virtual void get_option(const std::string& name, void* valp, size_type& sz) override;
 
             virtual void get_option(const std::string& name, std::string& val) override;
             virtual void get_option(const std::string& name, std::string& val, size_type& sz) override;
 
-            virtual void get_option_int(const std::string& name, int* valp) override;
-            virtual void get_option_size(const std::string& name, size_type* valp) override;
+            virtual void get_option(const std::string& name, address& val);
 
-            virtual void get_option(const std::string& name, duration_type* valp) override;
-            virtual void get_option_ms(const std::string& name, duration_rep_type* valp) override;
+            virtual void get_option_int(const std::string& name, int& val) override;
+            virtual void get_option_sz(const std::string& name, size_type& val) override;
 
-            // TODO: TBD: does this belong in the options_reader? and implemented on any of the other readers?
-            virtual void get_option(const std::string& name, address* const valp);
+            virtual void get_option(const std::string& name, duration_type& val) override;
+            virtual void get_option_ms(const std::string& name, duration_rep_type& val) override;
         };
     }
 }

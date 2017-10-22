@@ -9,7 +9,7 @@
 // // found online at https://opensource.org/licenses/MIT.
 // //
 
-#include <catch.hpp>
+#include "transport.h"
 
 // #include "convey.h"
 // #include "trantest.h"
@@ -20,6 +20,14 @@
 
 // // Basic UDP tests.
 // #include "core/nng_impl.h"
+
+namespace constants {
+    const std::vector<std::string> prefix_tags = { "udp" };
+    const char port_delim = ':';
+    const std::string test_addr_base = "";
+}
+
+void init(const std::string& addr) {}
 
 // TestMain("UDP support", {
 

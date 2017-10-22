@@ -264,15 +264,15 @@ TEST_CASE("Load balancing works", "[pipeline][push][pull][load][balancing]") {
 
     const int default_buffer_size = 4;
 
-    REQUIRE_NOTHROW(pushsp->set_option_int(O::receive_buffer, default_buffer_size));
-    REQUIRE_NOTHROW(pullsp1->set_option_int(O::receive_buffer, default_buffer_size));
-    REQUIRE_NOTHROW(pullsp2->set_option_int(O::receive_buffer, default_buffer_size));
-    REQUIRE_NOTHROW(pullsp3->set_option_int(O::receive_buffer, default_buffer_size));
+    REQUIRE_NOTHROW(pushsp->set_option_int(O::recv_buf, default_buffer_size));
+    REQUIRE_NOTHROW(pullsp1->set_option_int(O::recv_buf, default_buffer_size));
+    REQUIRE_NOTHROW(pullsp2->set_option_int(O::recv_buf, default_buffer_size));
+    REQUIRE_NOTHROW(pullsp3->set_option_int(O::recv_buf, default_buffer_size));
 
-    REQUIRE_NOTHROW(pushsp->set_option_int(O::send_buffer, default_buffer_size));
-    REQUIRE_NOTHROW(pullsp1->set_option_int(O::send_buffer, default_buffer_size));
-    REQUIRE_NOTHROW(pullsp2->set_option_int(O::send_buffer, default_buffer_size));
-    REQUIRE_NOTHROW(pullsp3->set_option_int(O::send_buffer, default_buffer_size));
+    REQUIRE_NOTHROW(pushsp->set_option_int(O::send_buf, default_buffer_size));
+    REQUIRE_NOTHROW(pullsp1->set_option_int(O::send_buf, default_buffer_size));
+    REQUIRE_NOTHROW(pullsp2->set_option_int(O::send_buf, default_buffer_size));
+    REQUIRE_NOTHROW(pullsp3->set_option_int(O::send_buf, default_buffer_size));
 
     unique_ptr<binary_message> abcsp, defsp;
 
@@ -284,9 +284,9 @@ TEST_CASE("Load balancing works", "[pipeline][push][pull][load][balancing]") {
 
     const auto receive_timeout = 100ms;
 
-    REQUIRE_NOTHROW(pullsp1->set_option(O::receive_timeout_duration, receive_timeout));
-    REQUIRE_NOTHROW(pullsp2->set_option(O::receive_timeout_duration, receive_timeout));
-    REQUIRE_NOTHROW(pullsp3->set_option(O::receive_timeout_duration, receive_timeout));
+    REQUIRE_NOTHROW(pullsp1->set_option(O::recv_timeout_duration, receive_timeout));
+    REQUIRE_NOTHROW(pullsp2->set_option(O::recv_timeout_duration, receive_timeout));
+    REQUIRE_NOTHROW(pullsp3->set_option(O::recv_timeout_duration, receive_timeout));
 
     REQUIRE_NOTHROW(pushsp->listen(test_addr));
     REQUIRE_NOTHROW(pullsp1->dial(test_addr));

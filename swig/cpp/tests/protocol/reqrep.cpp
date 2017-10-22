@@ -76,7 +76,7 @@ TEST_CASE("Request/reply pattern", "[req][rep][v0][protocol][sockets][nng][cxx]"
             REQUIRE_NOTHROW(reqp->set_option(O::req_resend_time_duration, 10ms));
             // TODO: TBD: it is unit tests like this that really deserve a more focused unit test on just options alone...
             // Check invalid size.
-            REQUIRE_THROWS_AS_MATCHING(reqp->set_option(O::req_resend_time_duration, __empty, 1), nng_exception, THROWS_NNG_EXCEPTION(ec_einval));
+            REQUIRE_THROWS_AS_MATCHING(reqp->set_option(O::req_resend_time_duration, __empty), nng_exception, THROWS_NNG_EXCEPTION(ec_einval));
 		}
 
 		SECTION("Receive socket without send socket fails") {

@@ -302,11 +302,11 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
 
         const auto receive_timeout = 300ms;
 
-        REQUIRE_NOTHROW(serverp1->set_option(O::receive_timeout_duration, receive_timeout));
-        REQUIRE_NOTHROW(clientp1->set_option(O::receive_timeout_duration, receive_timeout));
-        REQUIRE_NOTHROW(clientp2->set_option(O::receive_timeout_duration, receive_timeout));
+        REQUIRE_NOTHROW(serverp1->set_option(O::recv_timeout_duration, receive_timeout));
+        REQUIRE_NOTHROW(clientp1->set_option(O::recv_timeout_duration, receive_timeout));
+        REQUIRE_NOTHROW(clientp2->set_option(O::recv_timeout_duration, receive_timeout));
 
-        REQUIRE_NOTHROW(serverp1->get_option(O::receive_timeout_duration, &timeout_duration));
+        REQUIRE_NOTHROW(serverp1->get_option(O::recv_timeout_duration, timeout_duration));
         // TODO: TBD: looking forward to full Catch v2; including CHRONO comprehension.
         REQUIRE(timeout_duration == 300ms);
 
@@ -364,10 +364,10 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
         SECTION("Polyamorous mode is best effort") {
 
             REQUIRE_NOTHROW(serverp1->set_option_int(O::pair1_polyamorous, 1));
-            REQUIRE_NOTHROW(serverp1->set_option_int(O::receive_buffer, 1));
-            REQUIRE_NOTHROW(serverp1->set_option_int(O::send_buffer, 1));
-            REQUIRE_NOTHROW(clientp1->set_option_int(O::receive_buffer, 1));
-            REQUIRE_NOTHROW(clientp1->set_option_int(O::receive_buffer, 1));
+            REQUIRE_NOTHROW(serverp1->set_option_int(O::recv_buf, 1));
+            REQUIRE_NOTHROW(serverp1->set_option_int(O::send_buf, 1));
+            REQUIRE_NOTHROW(clientp1->set_option_int(O::recv_buf, 1));
+            REQUIRE_NOTHROW(clientp1->set_option_int(O::recv_buf, 1));
             REQUIRE_NOTHROW(serverp1->set_option(O::send_timeout_duration, 100ms));
 
             REQUIRE_NOTHROW(serverp1->listen(addr));
@@ -391,9 +391,9 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
 
         SECTION("Monogamous mode exerts backpressure") {
 
-            REQUIRE_NOTHROW(serverp1->set_option_int(O::receive_buffer, 1));
-            REQUIRE_NOTHROW(serverp1->set_option_int(O::send_buffer, 1));
-            REQUIRE_NOTHROW(clientp1->set_option_int(O::receive_buffer, 1));
+            REQUIRE_NOTHROW(serverp1->set_option_int(O::recv_buf, 1));
+            REQUIRE_NOTHROW(serverp1->set_option_int(O::send_buf, 1));
+            REQUIRE_NOTHROW(clientp1->set_option_int(O::recv_buf, 1));
             REQUIRE_NOTHROW(serverp1->set_option(O::send_timeout_duration, 30ms));
 
             REQUIRE_NOTHROW(serverp1->listen(addr));
@@ -529,7 +529,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
 
                 // TODO: TBD: ditto options unit tests...
                 REQUIRE_NOTHROW(serverp1->set_option_int(O::max_ttl, expected));
-                REQUIRE_NOTHROW(serverp1->get_option_int(O::max_ttl, &ttl));
+                REQUIRE_NOTHROW(serverp1->get_option_int(O::max_ttl, ttl));
                 REQUIRE(ttl == expected);
 
                 SECTION("Bad TTL bounces") {
@@ -591,11 +591,11 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
         SECTION("Polyamorous cooked mode works") {
 
             // TODO: TBD: so all these hoops opening up this case need to be part of the narrower scope options unit test
-            REQUIRE_NOTHROW(serverp1->get_option_int(O::pair1_polyamorous, &actual_opt));
+            REQUIRE_NOTHROW(serverp1->get_option_int(O::pair1_polyamorous, actual_opt));
             REQUIRE(actual_opt == 0);
 
             REQUIRE_NOTHROW(serverp1->set_option_int(O::pair1_polyamorous, 1));
-            REQUIRE_NOTHROW(serverp1->get_option_int(O::pair1_polyamorous, &actual_opt));
+            REQUIRE_NOTHROW(serverp1->get_option_int(O::pair1_polyamorous, actual_opt));
             REQUIRE(actual_opt == 1);
 
             REQUIRE_NOTHROW(serverp1->listen(addr));
@@ -678,17 +678,17 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
         SECTION("Polyamorous raw mode works") {
 
             // TODO: TBD: here we go again, doing hoop jumping that really belongs in its own unit tests for options...
-            REQUIRE_NOTHROW(serverp1->get_option_int(O::pair1_polyamorous, &actual_opt));
+            REQUIRE_NOTHROW(serverp1->get_option_int(O::pair1_polyamorous, actual_opt));
             REQUIRE(actual_opt == 0);
 
             REQUIRE_NOTHROW(serverp1->set_option_int(O::pair1_polyamorous, 1));
-            REQUIRE_NOTHROW(serverp1->get_option_int(O::pair1_polyamorous, &actual_opt));
+            REQUIRE_NOTHROW(serverp1->get_option_int(O::pair1_polyamorous, actual_opt));
             REQUIRE(actual_opt == 1);
 
             // TODO: It probably serves a purpose on one level; but if we test it in its own unit test, we can just set it and be done with it, with confidence.
             actual_opt = 0;
             REQUIRE_NOTHROW(serverp1->set_option_int(O::raw, 1));
-            REQUIRE_NOTHROW(serverp1->get_option_int(O::raw, &actual_opt));
+            REQUIRE_NOTHROW(serverp1->get_option_int(O::raw, actual_opt));
             REQUIRE(actual_opt == 1);
 
             REQUIRE_NOTHROW(serverp1->listen(addr));

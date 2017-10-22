@@ -83,7 +83,7 @@ namespace nng {
             ::nng_sockaddr a;
             size_type sz = sizeof(a);
 
-            REQUIRE(::nng_pipe_getopt(*pp, O::local_address.c_str(), (void*)&a, &sz) == 0);
+            REQUIRE(::nng_pipe_getopt(*pp, O::local_addr.c_str(), (void*)&a, &sz) == 0);
             REQUIRE(sz == sizeof(a));
             REQUIRE(a.s_un.s_family == ::NNG_AF_INET6);
             REQUIRE(memcmp(&(a.s_un.s_in6.sa_addr), &expected_loopback_long_addr[0], 16) == 0);
@@ -99,7 +99,7 @@ namespace nng {
             ::nng_sockaddr a;
             size_type sz = sizeof(a);
 
-            REQUIRE(::nng_pipe_getopt(*pp, O::remote_address.c_str(), (void*)&a, &sz) == 0);
+            REQUIRE(::nng_pipe_getopt(*pp, O::remote_addr.c_str(), (void*)&a, &sz) == 0);
             REQUIRE(sz == sizeof(a));
             REQUIRE(a.s_un.s_family == ::NNG_AF_INET6);
             REQUIRE(memcmp(&(a.s_un.s_in6.sa_addr), &expected_loopback_long_addr[0], 16) == 0);
@@ -115,7 +115,7 @@ namespace nng {
             // TODO: TBD: call address socket_address instead... would be more specific.
             address a;
 
-            REQUIRE_NOTHROW(pp->get_option(O::local_address, &a));
+            REQUIRE_NOTHROW(pp->get_option(O::local_addr, a));
             REQUIRE(a.get_family() == af_inet6);
             auto vp = a.view();
             REQUIRE(vp->get_family() == a.get_family());
@@ -132,7 +132,7 @@ namespace nng {
             // TODO: TBD: call address socket_address instead... would be more specific.
             address a;
 
-            REQUIRE_NOTHROW(pp->get_option(O::remote_address, &a));
+            REQUIRE_NOTHROW(pp->get_option(O::remote_addr, a));
             REQUIRE(a.get_family() == af_inet6);
             auto vp = a.view();
             REQUIRE(vp->get_family() == a.get_family());
