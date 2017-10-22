@@ -23,7 +23,7 @@ namespace trx {
     // trim from start (in place)
     static inline void ltrim(std::string& s) {
         auto found_= std::find_if(s.begin(), s.end(), [](std::string::value_type ch) {
-            return !std::isspace(ch);
+            return ch && !std::isspace(ch);
         });
         s.erase(s.begin(), found_);
     }
@@ -31,7 +31,7 @@ namespace trx {
     // trim from end (in place)
     static inline void rtrim(std::string& s) {
         auto found_ = std::find_if(s.rbegin(), s.rend(), [](std::string::value_type ch) {
-            return !std::isspace(ch);
+            return ch && !std::isspace(ch);
         });
         s.erase(found_.base(), s.end());
     }
@@ -44,21 +44,21 @@ namespace trx {
 
     // trim from start (copying)
     static inline std::string ltrimcp(const std::string& s) {
-        auto x = s;
+        std::string x(s.begin(), s.end());
         ltrim(x);
         return x;
     }
 
     // trim from end (copying)
     static inline std::string rtrimcp(const std::string& s) {
-        auto x = s;
+        std::string x(s.begin(), s.end());
         rtrim(x);
         return x;
     }
 
     // trim from both ends (copying)
     static inline std::string trimcp(const std::string& s) {
-        auto x = s;
+        std::string x(s.begin(), s.end());
         trim(x);
         return x;
     }
