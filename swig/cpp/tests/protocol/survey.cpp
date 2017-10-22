@@ -88,12 +88,12 @@ TEST_CASE("Survey pattern", "[surveyor][respondent][v0][protocol][sockets][nng][
 
         SECTION("Protocols match") {
 
-            actual_proto = resp->get_protocol();
+            REQUIRE_NOTHROW(actual_proto = resp->get_protocol());
 
             REQUIRE(actual_proto == proto_respondent);
             REQUIRE(actual_proto == proto_respondent_v0);
 
-            actual_peer = resp->get_peer();
+            REQUIRE_NOTHROW(actual_peer = resp->get_peer());
 
             REQUIRE(actual_peer == proto_surveyor);
             REQUIRE(actual_peer == proto_surveyor_v0);

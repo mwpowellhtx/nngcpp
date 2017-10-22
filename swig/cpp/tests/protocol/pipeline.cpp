@@ -144,16 +144,19 @@ TEST_CASE("Pipeline (push/pull) pattern", "[pipeline][push][pull][pattern][proto
         REQUIRE_NOTHROW(pushsp = make_unique<latest_push_socket>());
         REQUIRE(pushsp != nullptr);
 
+        protocol_type actual_proto, actual_peer;
+
         SECTION("Protocols match") {
 
-            const auto actual_proto = pushsp->get_protocol();
+            REQUIRE_NOTHROW(actual_proto = pushsp->get_protocol());
 
-            REQUIRE(actual_proto == nng::proto_pusher);
-            REQUIRE(actual_proto == nng::proto_pusher_v0);
+            REQUIRE(actual_proto == proto_pusher);
+            REQUIRE(actual_proto == proto_pusher_v0);
 
-            const auto actual_peer = pushsp->get_peer();
-            REQUIRE(actual_peer == nng::proto_puller);
-            REQUIRE(actual_peer == nng::proto_puller_v0);
+            REQUIRE_NOTHROW(actual_peer = pushsp->get_peer());
+
+            REQUIRE(actual_peer == proto_puller);
+            REQUIRE(actual_peer == proto_puller_v0);
         }
 
         SECTION("Can close socket") {
