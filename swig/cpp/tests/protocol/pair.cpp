@@ -461,7 +461,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
                 REQUIRE_THAT(bmp->body()->get(), Equals(gamma_buf));
                 REQUIRE(bmp->header()->get_size() == expected_header_sz);
                 // TODO: TBD: ditto header unit tests...
-                REQUIRE_NOTHROW(bmp->header()->trim(&hops));
+                REQUIRE_NOTHROW(bmp->header()->ltrim(hops));
                 REQUIRE(hops == 2);
 
                 REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
@@ -473,7 +473,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
                 REQUIRE_THAT(bmp->body()->get(), Equals(epsilon_buf));
                 // TODO: TBD: ditto header unit tests...
                 REQUIRE(bmp->header()->get_size() == expected_header_sz);
-                REQUIRE_NOTHROW(bmp->header()->trim(&hops));
+                REQUIRE_NOTHROW(bmp->header()->ltrim(hops));
                 REQUIRE_NOTHROW(mpp2 = make_unique<message_pipe>(bmp.get()));
                 REQUIRE(hops == 2);
 
@@ -493,7 +493,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
                 REQUIRE_NOTHROW(bmp->header()->append(1));
                 REQUIRE_NOTHROW(clientp1->send(bmp.get()));
                 REQUIRE_NOTHROW(serverp1->try_receive(bmp.get()));
-                REQUIRE_NOTHROW(bmp->body()->trim(&actual_api));
+                REQUIRE_NOTHROW(bmp->body()->ltrim(actual_api));
                 REQUIRE(actual_api == feedface);
             }
 
@@ -514,7 +514,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
                     REQUIRE_NOTHROW(bmp->header()->append(1));
                     REQUIRE_NOTHROW(clientp1->send(bmp.get()));
                     REQUIRE_NOTHROW(serverp1->try_receive(bmp.get()));
-                    REQUIRE_NOTHROW(bmp->body()->trim(&actual_api));
+                    REQUIRE_NOTHROW(bmp->body()->ltrim(actual_api));
                     REQUIRE(actual_api == feedface);
                 }
             }
@@ -545,9 +545,9 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
                     REQUIRE_NOTHROW(bmp->header()->append(initial_ttl));
                     REQUIRE_NOTHROW(clientp1->send(bmp.get()));
                     REQUIRE_NOTHROW(serverp1->try_receive(bmp.get()));
-                    REQUIRE_NOTHROW(bmp->body()->trim(&actual_api));
+                    REQUIRE_NOTHROW(bmp->body()->ltrim(actual_api));
                     REQUIRE(actual_api == feedface);
-                    REQUIRE_NOTHROW(bmp->header()->trim(&actual_api));
+                    REQUIRE_NOTHROW(bmp->header()->ltrim(actual_api));
                     // TODO: TBD: ditto header tests; this is looking like a counter?
                     REQUIRE(actual_api == initial_ttl + 1);
                 }
@@ -562,9 +562,9 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
                     REQUIRE_NOTHROW(bmp->header()->append(initial_ttl = ttl - 1));
                     REQUIRE_NOTHROW(clientp1->send(bmp.get()));
                     REQUIRE_NOTHROW(serverp1->try_receive(bmp.get()));
-                    REQUIRE_NOTHROW(bmp->body()->trim(&actual_api));
+                    REQUIRE_NOTHROW(bmp->body()->ltrim(actual_api));
                     REQUIRE(actual_api == expected_api);
-                    REQUIRE_NOTHROW(bmp->header()->trim(&actual_api));
+                    REQUIRE_NOTHROW(bmp->header()->ltrim(actual_api));
                     // TODO: TBD: was this the intention? (cryptic though it may have been...)
                     REQUIRE(actual_api == initial_ttl + 1);
                 }
@@ -704,7 +704,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
                 REQUIRE_THAT(bmp->body()->get(), Equals(one_buf));
                 REQUIRE_NOTHROW(mpp1 = make_unique<message_pipe>(bmp.get()));
                 REQUIRE(mpp1->has_one() == true);
-                REQUIRE_NOTHROW(bmp->header()->trim(&hops));
+                REQUIRE_NOTHROW(bmp->header()->ltrim(hops));
                 REQUIRE(hops == 1);
 
                 REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
@@ -714,7 +714,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sock
                 REQUIRE_THAT(bmp->body()->get(), Equals(two_buf));
                 REQUIRE_NOTHROW(mpp2 = make_unique<message_pipe>(bmp.get()));
                 REQUIRE(mpp2->has_one() == true);
-                REQUIRE_NOTHROW(bmp->header()->trim(&hops));
+                REQUIRE_NOTHROW(bmp->header()->ltrim(hops));
                 REQUIRE(hops == 1);
                 REQUIRE_NOTHROW(bmp.reset());
 

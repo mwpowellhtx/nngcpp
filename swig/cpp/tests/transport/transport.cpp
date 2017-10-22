@@ -384,7 +384,7 @@ TEST_CASE("Test the transport in C style", Catch::Tags(constants::prefix_tags
         REQUIRE_NOTHROW(recvp->set_msgp(msgp));
         REQUIRE_THAT(recvp->body()->get(), Equals(ping_buf));
 
-        REQUIRE_NOTHROW(recvp->body()->chop(ping.size()));
+        REQUIRE_NOTHROW(recvp->body()->rtrim(ping.size()));
         REQUIRE_NOTHROW(*recvp << acknowledge);
         REQUIRE(::nng_sendmsg(rep, recvp->get_msgp(), 0) == 0);
         REQUIRE_NOTHROW(recvp->on_sent());

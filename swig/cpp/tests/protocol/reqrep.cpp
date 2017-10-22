@@ -149,7 +149,7 @@ TEST_CASE("Request/reply pattern", "[req][rep][v0][protocol][sockets][nng][cxx]"
             REQUIRE_THAT(pongp->body()->get(), Equals(ping_buf));
 
             // Interesting, now use the Trim API.
-            REQUIRE_NOTHROW(pongp->body()->trim(ping.length()));
+            REQUIRE_NOTHROW(pongp->body()->ltrim(ping.length()));
             REQUIRE_NOTHROW(*pongp << pong);
             REQUIRE_NOTHROW(repp->send(pongp.get()));
             // Here we are using the above assertion to our advantage.
@@ -166,7 +166,7 @@ TEST_CASE("Request/reply pattern", "[req][rep][v0][protocol][sockets][nng][cxx]"
         REQUIRE_NOTHROW(repp = make_unique<latest_rep_socket>());
 
         REQUIRE_NOTHROW(reqp->set_option(O::req_resend_time_duration, 100ms));
-        REQUIRE_NOTHROW(reqp->set_option_int(O::send_buffer, 16));
+        REQUIRE_NOTHROW(reqp->set_option_int(O::send_buf, 16));
 
         REQUIRE_NOTHROW(repp->listen(test_addr));
         REQUIRE_NOTHROW(reqp->dial(test_addr));

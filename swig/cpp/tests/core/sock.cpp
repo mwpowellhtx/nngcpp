@@ -245,7 +245,7 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
                 // TODO: TBD: this will work for now as a rough cut Exception match...
                 REQUIRE_THROWS_AS_MATCHING(s1->set_option_int(O::recv_fd, 0), nng_exception, THROWS_NNG_EXCEPTION(ec_ereadonly));
                 REQUIRE_THROWS_AS_MATCHING(s1->set_option_int(O::send_fd, 0), nng_exception, THROWS_NNG_EXCEPTION(ec_ereadonly));
-                REQUIRE_THROWS_AS_MATCHING(s1->set_option(O::local_address, "a"), nng_exception, THROWS_NNG_EXCEPTION(ec_ereadonly));
+                REQUIRE_THROWS_AS_MATCHING(s1->set_option(O::local_addr, "a"), nng_exception, THROWS_NNG_EXCEPTION(ec_ereadonly));
             }
 
             SECTION("Url option works") {

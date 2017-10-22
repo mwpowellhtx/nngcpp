@@ -143,7 +143,7 @@ TEST_CASE("Survey pattern", "[surveyor][respondent][v0][protocol][sockets][nng][
             REQUIRE_NOTHROW(resp->try_receive(bmp.get()));
             REQUIRE_THAT(bmp->body()->get(), Equals(abc_buf));
 
-            REQUIRE_NOTHROW(bmp->body()->trim(abc.length()));
+            REQUIRE_NOTHROW(bmp->body()->ltrim(abc.length()));
             REQUIRE_NOTHROW(*bmp << def);
             REQUIRE_NOTHROW(resp->send(bmp.get()));
             REQUIRE_NOTHROW(surp->try_receive(bmp.get()));
@@ -154,7 +154,7 @@ TEST_CASE("Survey pattern", "[surveyor][respondent][v0][protocol][sockets][nng][
 
 			SECTION("And goes to non-survey state") {
 
-                REQUIRE_NOTHROW(surp->set_option(O::receive_timeout_duration, 200ms));
+                REQUIRE_NOTHROW(surp->set_option(O::recv_timeout_duration, 200ms));
 
                 // ...
                 REQUIRE_THROWS_AS_MATCHING(surp->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_estate));
