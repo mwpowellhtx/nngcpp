@@ -63,21 +63,23 @@ namespace nng {
 
         void binary_message_body::append(const buffer_vector_type& buf) {
             const auto msgp = get_msgp();
-            if (msgp == nullptr) { return; }
+            // Also save calories if there are no bytes to append.
+            if (msgp == nullptr || !buf.size()) { return; }
             const auto op = std::bind(&::nng_msg_append, _1, _2, _3);
             const auto errnum = op(msgp, (const void*)&buf[0], buf.size());
             THROW_NNG_EXCEPTION_EC(errnum);
         }
 
-        void binary_message_body::insert(const buffer_vector_type& buf) {
+        void binary_message_body::prepend(const buffer_vector_type& buf) {
             const auto msgp = get_msgp();
-            if (msgp == nullptr) { return; }
+            // Also save calories if there are no bytes to prepend.
+            if (msgp == nullptr || !buf.size()) { return; }
             const auto op = std::bind(&::nng_msg_insert, _1, _2, _3);
             const auto errnum = op(msgp, (const void*)&buf[0], buf.size());
             THROW_NNG_EXCEPTION_EC(errnum);
         }
 
-        void binary_message_body::trim(size_type sz) {
+        void binary_message_body::ltrim(size_type sz) {
             const auto msgp = get_msgp();
             if (msgp == nullptr) { return; }
             const auto op = std::bind(&::nng_msg_trim, _1, _2);
@@ -85,7 +87,7 @@ namespace nng {
             THROW_NNG_EXCEPTION_EC(errnum);
         }
 
-        void binary_message_body::chop(size_type sz) {
+        void binary_message_body::rtrim(size_type sz) {
             const auto msgp = get_msgp();
             if (msgp == nullptr) { return; }
             const auto op = std::bind(&::nng_msg_chop, _1, _2);
@@ -101,7 +103,7 @@ namespace nng {
             THROW_NNG_EXCEPTION_EC(errnum);
         }
 
-        void binary_message_body::insert(const uint32_t& val) {
+        void binary_message_body::prepend(const uint32_t& val) {
             const auto msgp = get_msgp();
             if (msgp == nullptr) { return; }
             const auto op = std::bind(&::nng_msg_insert_u32, _1, _2);
@@ -109,7 +111,7 @@ namespace nng {
             THROW_NNG_EXCEPTION_EC(errnum);
         }
 
-        void binary_message_body::trim(uint32_t* valp) {
+        void binary_message_body::ltrim(uint32_t* valp) {
             const auto msgp = get_msgp();
             if (msgp == nullptr) { return; }
             const auto op = std::bind(&::nng_msg_trim_u32, _1, _2);
@@ -117,12 +119,32 @@ namespace nng {
             THROW_NNG_EXCEPTION_EC(errnum);
         }
 
-        void binary_message_body::chop(uint32_t* valp) {
+        void binary_message_body::rtrim(uint32_t* valp) {
             const auto msgp = get_msgp();
             if (msgp == nullptr) { return; }
             const auto op = std::bind(&::nng_msg_chop_u32, _1, _2);
             const auto errnum = op(msgp, valp);
             THROW_NNG_EXCEPTION_EC(errnum);
+        }
+
+        void binary_message_body::append(const std::string& s) {
+            // Save the calories when we do not have an internal message.
+            const auto msgp = get_msgp();
+            // Also bypass when the string is empty.
+            if (msgp == nullptr || !s.length()) { return; }
+            buffer_vector_type buf(s.cbegin(), s.cend());
+            // Which is a little redundant, but it saves calories.
+            append(buf);
+        }
+
+        void binary_message_body::prepend(const std::string& s) {
+            // Save the calories when we do not have an internal message.
+            const auto msgp = get_msgp();
+            // Also bypass when the string is empty.
+            if (msgp == nullptr || !s.length()) { return; }
+            buffer_vector_type buf(s.cbegin(), s.cend());
+            // Which is a little redundant, but it saves calories.
+            prepend(buf);
         }
     }
 }

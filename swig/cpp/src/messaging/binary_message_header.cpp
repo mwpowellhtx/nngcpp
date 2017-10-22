@@ -68,7 +68,7 @@ namespace nng {
             THROW_NNG_EXCEPTION_EC(errnum);
         }
 
-        void binary_message_header::insert(const uint32_t& val) {
+        void binary_message_header::prepend(const uint32_t& val) {
             const auto msgp = get_msgp();
             if (msgp == nullptr) { return; }
             const auto op = std::bind(&::nng_msg_header_insert_u32, _1, _2);
@@ -76,7 +76,7 @@ namespace nng {
             THROW_NNG_EXCEPTION_EC(errnum);
         }
 
-        void binary_message_header::trim(uint32_t* valp) {
+        void binary_message_header::ltrim(uint32_t* valp) {
             const auto msgp = get_msgp();
             if (msgp == nullptr) { return; }
             const auto op = std::bind(&::nng_msg_header_trim_u32, _1, _2);
@@ -84,7 +84,7 @@ namespace nng {
             THROW_NNG_EXCEPTION_EC(errnum);
         }
 
-        void binary_message_header::chop(uint32_t* valp) {
+        void binary_message_header::rtrim(uint32_t* valp) {
             const auto msgp = get_msgp();
             if (msgp == nullptr) { return; }
             const auto op = std::bind(&::nng_msg_header_chop_u32, _1, _2);
@@ -96,15 +96,15 @@ namespace nng {
             THROW_API_IS_READ_ONLY();
         }
 
-        void binary_message_header::insert(const buffer_vector_type& buf) {
+        void binary_message_header::prepend(const buffer_vector_type& buf) {
             THROW_API_IS_READ_ONLY();
         }
 
-        void binary_message_header::chop(size_type sz) {
+        void binary_message_header::rtrim(size_type sz) {
             THROW_API_IS_READ_ONLY();
         }
 
-        void binary_message_header::trim(size_type sz) {
+        void binary_message_header::ltrim(size_type sz) {
             THROW_API_IS_READ_ONLY();
         }
 
@@ -113,17 +113,17 @@ namespace nng {
         //    do_type_based_op(op, _msgp, buf);
         //}
 
-        //void binary_message_header::insert(const message_base::buffer_vector_type& buf) {
+        //void binary_message_header::prepend(const message_base::buffer_vector_type& buf) {
         //    static const auto op = std::bind(&::nng_msg_header_insert, _1, _2, _3);
         //    do_type_based_op(op, _msgp, buf);
         //}
 
-        //void binary_message_header::chop(size_type sz) {
+        //void binary_message_header::rtrim(size_type sz) {
         //    static const auto op = std::bind(&::nng_msg_header_chop, _1, _2);
         //    do_size_based_op(op, _msgp, sz);
         //}
 
-        //void binary_message_header::trim(size_type sz) {
+        //void binary_message_header::ltrim(size_type sz) {
         //    static const auto op = std::bind(&::nng_msg_header_trim, _1, _2);
         //    do_size_based_op(op, _msgp, sz);
         //}

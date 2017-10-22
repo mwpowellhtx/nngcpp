@@ -31,9 +31,9 @@ namespace nng {
             : public message_part
             , public supports_get_api<buffer_vector_type>
             , public supports_append_api<buffer_vector_type, uint32_t>
-            , public supports_insert_api<buffer_vector_type, uint32_t>
-            , public supports_chop_api<size_type, uint32_t*>
-            , public supports_trim_api<size_type, uint32_t*> {
+            , public supports_prepend_api<buffer_vector_type, uint32_t>
+            , public supports_ltrim_api<size_type, uint32_t*>
+            , public supports_rtrim_api<size_type, uint32_t*> {
         protected:
 
             friend class binary_message;
@@ -53,21 +53,21 @@ namespace nng {
 
             virtual void append(const uint32_t& val);
 
-            virtual void insert(const uint32_t& val);
+            virtual void prepend(const uint32_t& val);
 
-            virtual void trim(uint32_t* valp);
+            virtual void ltrim(uint32_t* valp);
 
-            virtual void chop(uint32_t* valp);
+            virtual void rtrim(uint32_t* valp);
 
         protected:
 
             virtual void append(const buffer_vector_type& buf);
 
-            virtual void insert(const buffer_vector_type& buf);
+            virtual void prepend(const buffer_vector_type& buf);
 
-            virtual void trim(size_type sz);
+            virtual void ltrim(size_type sz);
 
-            virtual void chop(size_type sz);
+            virtual void rtrim(size_type sz);
         };
     }
 }

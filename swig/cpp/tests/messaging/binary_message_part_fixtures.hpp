@@ -32,16 +32,24 @@ namespace nng {
                 base_type::append(x);
             }
 
-            virtual void insert(const buffer_vector_type& x) override {
-                base_type::insert(x);
+            virtual void append(const std::string& x) override {
+                base_type::append(x);
             }
 
-            virtual void trim(size_type sz = 0) override {
-                base_type::trim(sz);
+            virtual void prepend(const buffer_vector_type& x) override {
+                base_type::prepend(x);
             }
 
-            virtual void chop(size_type sz = 0) override {
-                base_type::chop(sz);
+            virtual void prepend(const std::string& x) override {
+                base_type::prepend(x);
+            }
+
+            virtual void ltrim(size_type sz = 0) override {
+                base_type::ltrim(sz);
+            }
+
+            virtual void rtrim(size_type sz = 0) override {
+                base_type::rtrim(sz);
             }
         };
 

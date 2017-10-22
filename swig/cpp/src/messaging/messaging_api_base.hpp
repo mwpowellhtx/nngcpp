@@ -72,34 +72,34 @@ namespace nng {
             virtual void append(const Type_& arg) = 0;
         };
 
-        template<typename... Args_> struct supports_insert_api;
+        template<typename... Args_> struct supports_prepend_api;
 
         template<typename Type_, typename... Args_>
-        struct supports_insert_api<Type_, Args_...> {};
+        struct supports_prepend_api<Type_, Args_...> {};
 
         template<typename Type_>
-        struct supports_insert_api<Type_> {
-            virtual void insert(const Type_& arg) = 0;
+        struct supports_prepend_api<Type_> {
+            virtual void prepend(const Type_& arg) = 0;
         };
 
-        template<typename... Type_> struct supports_chop_api;
+        template<typename... Type_> struct supports_rtrim_api;
 
         template<typename Type_, typename... Args_>
-        struct supports_chop_api<Type_, Args_...> {};
+        struct supports_rtrim_api<Type_, Args_...> {};
 
         template<typename Type_>
-        struct supports_chop_api<Type_> {
-            virtual void chop(Type_ arg) = 0;
+        struct supports_rtrim_api<Type_> {
+            virtual void rtrim(Type_ arg) = 0;
         };
 
-        template<typename... Args_> struct supports_trim_api;
+        template<typename... Args_> struct supports_ltrim_api;
 
         template<typename Type_, typename... Args_>
-        struct supports_trim_api<Type_, Args_...> {};
+        struct supports_ltrim_api<Type_, Args_...> {};
 
         template<typename Type_>
-        struct supports_trim_api<Type_> {
-            virtual void trim(Type_ arg) = 0;
+        struct supports_ltrim_api<Type_> {
+            virtual void ltrim(Type_ arg) = 0;
         };
     }
 }
