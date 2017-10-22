@@ -9,9 +9,8 @@ namespace nng {
 
     namespace messaging {
 
-        void message_base_api::do_clear_op(const clear_op& op, ::nng_msg* msgp) {
-            if (msgp == nullptr) { return; }
-            op(msgp);
+        void message_base_api::do_clear_op(const clear_op& op) {
+            op();
         }
 
         message_base_api::message_base_api() {

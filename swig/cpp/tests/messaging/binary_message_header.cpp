@@ -17,7 +17,22 @@
 #include "binary_message_part_fixtures.hpp"
 
 namespace constants {
+
     const nng::messaging::buffer_vector_type default_data = {};
+
+    const std::string __empty = "";
+
+    const auto __empty_buf = default_data;
+
+
+    const uint32_t value = 0x15263748;
+    const uint32_t reversed = 0x48372615;
+
+    const nng::messaging::buffer_vector_type appended_data = { 0x15,0x26,0x37,0x48,0x48,0x37,0x26,0x15,0x15,0x26,0x37,0x48 };
+
+    const nng::messaging::buffer_vector_type remaining_after_ltrim = { 0x48,0x37,0x26,0x15,0x15,0x26,0x37,0x48 };
+
+    const nng::messaging::buffer_vector_type remaining_after_rtrim = { 0x48,0x37,0x26,0x15 };
 }
 
 /* TODO: TBD: Ditto notes concerning body message part. */
@@ -65,6 +80,99 @@ TEST_CASE("Verify default message part", Catch::Tags("header"
 
         SECTION("Parent message is properly reset") {
             REQUIRE_NOTHROW(bmp.reset());
+        }
+    }
+}
+
+namespace nng {
+    namespace messaging {
+
+        typedef binary_message_part_fixture<binary_message_header> binary_message_header_fixture;
+
+        // TODO: TBD: any reason to define a full on class derivation? perhaps for SWIG purposes? or just type-define it?
+        class binary_message_fixture : public basic_binary_message<binary_message_body, binary_message_header_fixture> {
+        public:
+
+            binary_message_fixture() :basic_binary_message() {}
+
+            virtual ~binary_message_fixture() {}
+        };
+    }
+}
+
+TEST_CASE("Message part operates correctly") {
+
+    using namespace std;
+    using namespace trx;
+    using namespace nng;
+    using namespace nng::messaging;
+    using namespace constants;
+    using namespace Catch::Matchers;
+
+    SECTION("Message can be allocated properly") {
+
+        unique_ptr<binary_message_fixture> bmp;
+
+        REQUIRE_NOTHROW(bmp = make_unique<binary_message_fixture>());
+
+        SECTION("Part operation") {
+
+            binary_message_header_fixture* partp;
+
+            REQUIRE_NOTHROW(partp = bmp->header());
+            REQUIRE(partp);
+
+            SECTION("Appending a string throws an exception") {
+                // TODO: TBD: may want to throw stronger than "not implemented", i.e. "invalid_operation"
+                REQUIRE_THROWS_AS(partp->append(__empty), not_implemented);
+            }
+
+            SECTION("Appending a byte vector throws an exception") {
+                REQUIRE_THROWS_AS(partp->append(__empty_buf), not_implemented);
+            }
+
+            size_type sz = 0;
+
+            SECTION("Left Trim size_t throws an exception") {
+                REQUIRE_THROWS_AS(partp->ltrim(sz), not_implemented);
+            }
+
+            SECTION("Right Trim size_t throws an exception") {
+                REQUIRE_THROWS_AS(partp->rtrim(sz), not_implemented);
+            }
+
+            // TODO: TBD: for now proceeding as though the 32-bit integer support is required.
+            SECTION("Should support 32-bit integers") {
+
+                REQUIRE_NOTHROW(partp->append(reversed));
+                REQUIRE_NOTHROW(partp->prepend(value));
+                REQUIRE_NOTHROW(partp->append(value));
+                REQUIRE_THAT(partp->get(), Equals(appended_data));
+
+                uint32_t trimmed = 0;
+                CHECK(!trimmed);
+
+                SECTION("Should support Left Trim of a 32-bit integer") {
+
+                    REQUIRE_NOTHROW(partp->ltrim(trimmed));
+                    REQUIRE(trimmed == value);
+                    REQUIRE_THAT(partp->get(), Equals(remaining_after_ltrim));
+
+                    SECTION("Should also support Right Trim of a 32-bit integer") {
+
+                        REQUIRE_NOTHROW(partp->rtrim(trimmed));
+                        REQUIRE(trimmed == value);
+                        REQUIRE_THAT(partp->get(), Equals(remaining_after_rtrim));
+
+                        SECTION("One final 32-bit integer Trim") {
+
+                            REQUIRE_NOTHROW(partp->ltrim(trimmed));
+                            REQUIRE(trimmed == reversed);
+                            REQUIRE_THAT(partp->get(), Equals(__empty_buf));
+                        }
+                    }
+                }
+            }
         }
     }
 }

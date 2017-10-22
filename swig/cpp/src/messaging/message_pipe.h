@@ -21,14 +21,14 @@ namespace nng {
 #endif // NNGCPP_MESSAGE_BASE_H
 
 #ifndef NNGCPP_BINARY_MESSAGE_H
-        class binary_message;
+        template<class Body_, class Header_> class basic_binary_message;
 #endif // NNGCPP_BINARY_MESSAGE_H
 
         // TODO: so, equal_to is available, but not_equal_to is not?
         class message_pipe : public options_reader, public std::equal_to<message_pipe> {
         protected:
 
-            friend class binary_message;
+            template<class Body_, class Header_> friend class basic_binary_message;
 
             ::nng_pipe pid;
 

@@ -16,7 +16,6 @@ namespace nng {
 
         using std::placeholders::_1;
         using std::placeholders::_2;
-        using std::placeholders::_3;
 
         binary_message_header::binary_message_header(message_base* const basep) : message_part(basep) {
         }
@@ -26,8 +25,8 @@ namespace nng {
 
         size_type binary_message_header::get_size() {
             const auto msgp = get_msgp();
-            const auto op = std::bind(&::nng_msg_header_len, _1);
-            return msgp == nullptr ? 0 : op(msgp);
+            const auto op = std::bind(&::nng_msg_header_len, msgp);
+            return msgp == nullptr ? 0 : op();
         }
 
         // TODO: TBD: this is fairly redundant with body: there has got to be a better way to capture this as a cross cutting concern...
@@ -56,39 +55,40 @@ namespace nng {
 
         void binary_message_header::clear() {
             const auto msgp = get_msgp();
-            const auto op = std::bind(&::nng_msg_header_clear, _1);
-            do_clear_op(op, msgp);
+            if (!msgp) { return; }
+            const auto op = std::bind(&::nng_msg_header_clear, msgp);
+            do_clear_op(op);
         }
 
         void binary_message_header::append(const uint32_t& val) {
             const auto msgp = get_msgp();
             if (msgp == nullptr) { return; }
-            const auto op = std::bind(&::nng_msg_header_append_u32, _1, _2);
-            const auto errnum = op(msgp, val);
+            const auto op = std::bind(&::nng_msg_header_append_u32, msgp, _1);
+            const auto errnum = op(val);
             THROW_NNG_EXCEPTION_EC(errnum);
         }
 
         void binary_message_header::prepend(const uint32_t& val) {
             const auto msgp = get_msgp();
             if (msgp == nullptr) { return; }
-            const auto op = std::bind(&::nng_msg_header_insert_u32, _1, _2);
-            const auto errnum = op(msgp, val);
+            const auto op = std::bind(&::nng_msg_header_insert_u32, msgp, _1);
+            const auto errnum = op(val);
             THROW_NNG_EXCEPTION_EC(errnum);
         }
 
-        void binary_message_header::ltrim(uint32_t* valp) {
+        void binary_message_header::ltrim(uint32_t& val) {
             const auto msgp = get_msgp();
             if (msgp == nullptr) { return; }
-            const auto op = std::bind(&::nng_msg_header_trim_u32, _1, _2);
-            const auto errnum = op(msgp, valp);
+            const auto op = std::bind(&::nng_msg_header_trim_u32, msgp, _1);
+            const auto errnum = op(&val);
             THROW_NNG_EXCEPTION_EC(errnum);
         }
 
-        void binary_message_header::rtrim(uint32_t* valp) {
+        void binary_message_header::rtrim(uint32_t& val) {
             const auto msgp = get_msgp();
             if (msgp == nullptr) { return; }
-            const auto op = std::bind(&::nng_msg_header_chop_u32, _1, _2);
-            const auto errnum = op(msgp, valp);
+            const auto op = std::bind(&::nng_msg_header_chop_u32, msgp, _1);
+            const auto errnum = op(&val);
             THROW_NNG_EXCEPTION_EC(errnum);
         }
 
@@ -105,6 +105,14 @@ namespace nng {
         }
 
         void binary_message_header::ltrim(size_type sz) {
+            THROW_API_IS_READ_ONLY();
+        }
+
+        void binary_message_header::append(const std::string& s) {
+            THROW_API_IS_READ_ONLY();
+        }
+
+        void binary_message_header::prepend(const std::string& s) {
             THROW_API_IS_READ_ONLY();
         }
 

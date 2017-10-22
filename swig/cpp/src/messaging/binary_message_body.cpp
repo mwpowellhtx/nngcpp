@@ -57,16 +57,17 @@ namespace nng {
         void binary_message_body::clear() {
             const auto msgp = get_msgp();
             if (msgp == nullptr) { return; }
-            const auto op = std::bind(&::nng_msg_clear, _1);
-            do_clear_op(op, msgp);
+            const auto op = std::bind(&::nng_msg_clear, msgp);
+            do_clear_op(op);
         }
 
         void binary_message_body::append(const buffer_vector_type& buf) {
             const auto msgp = get_msgp();
             // Also save calories if there are no bytes to append.
             if (msgp == nullptr || !buf.size()) { return; }
-            const auto op = std::bind(&::nng_msg_append, _1, _2, _3);
-            const auto errnum = op(msgp, (const void*)&buf[0], buf.size());
+            // Bind to concrete message ptr along same lines as with options API.
+            const auto op = std::bind(&::nng_msg_append, msgp, _1, _2);
+            const auto errnum = op((const void*)&buf[0], buf.size());
             THROW_NNG_EXCEPTION_EC(errnum);
         }
 
@@ -74,56 +75,56 @@ namespace nng {
             const auto msgp = get_msgp();
             // Also save calories if there are no bytes to prepend.
             if (msgp == nullptr || !buf.size()) { return; }
-            const auto op = std::bind(&::nng_msg_insert, _1, _2, _3);
-            const auto errnum = op(msgp, (const void*)&buf[0], buf.size());
+            const auto op = std::bind(&::nng_msg_insert, msgp, _1, _2);
+            const auto errnum = op((const void*)&buf[0], buf.size());
             THROW_NNG_EXCEPTION_EC(errnum);
         }
 
         void binary_message_body::ltrim(size_type sz) {
             const auto msgp = get_msgp();
             if (msgp == nullptr) { return; }
-            const auto op = std::bind(&::nng_msg_trim, _1, _2);
-            const auto errnum = op(msgp, sz);
+            const auto op = std::bind(&::nng_msg_trim, msgp, _1);
+            const auto errnum = op(sz);
             THROW_NNG_EXCEPTION_EC(errnum);
         }
 
         void binary_message_body::rtrim(size_type sz) {
             const auto msgp = get_msgp();
             if (msgp == nullptr) { return; }
-            const auto op = std::bind(&::nng_msg_chop, _1, _2);
-            const auto errnum = op(msgp, sz);
+            const auto op = std::bind(&::nng_msg_chop, msgp, _1);
+            const auto errnum = op(sz);
             THROW_NNG_EXCEPTION_EC(errnum);
         }
 
         void binary_message_body::append(const uint32_t& val) {
             const auto msgp = get_msgp();
             if (msgp == nullptr) { return; }
-            const auto op = std::bind(&::nng_msg_append_u32, _1, _2);
-            const auto errnum = op(msgp, val);
+            const auto op = std::bind(&::nng_msg_append_u32, msgp, _1);
+            const auto errnum = op(val);
             THROW_NNG_EXCEPTION_EC(errnum);
         }
 
         void binary_message_body::prepend(const uint32_t& val) {
             const auto msgp = get_msgp();
             if (msgp == nullptr) { return; }
-            const auto op = std::bind(&::nng_msg_insert_u32, _1, _2);
-            const auto errnum = op(msgp, val);
+            const auto op = std::bind(&::nng_msg_insert_u32, msgp, _1);
+            const auto errnum = op(val);
             THROW_NNG_EXCEPTION_EC(errnum);
         }
 
         void binary_message_body::ltrim(uint32_t* valp) {
             const auto msgp = get_msgp();
             if (msgp == nullptr) { return; }
-            const auto op = std::bind(&::nng_msg_trim_u32, _1, _2);
-            const auto errnum = op(msgp, valp);
+            const auto op = std::bind(&::nng_msg_trim_u32, msgp, _1);
+            const auto errnum = op(valp);
             THROW_NNG_EXCEPTION_EC(errnum);
         }
 
         void binary_message_body::rtrim(uint32_t* valp) {
             const auto msgp = get_msgp();
             if (msgp == nullptr) { return; }
-            const auto op = std::bind(&::nng_msg_chop_u32, _1, _2);
-            const auto errnum = op(msgp, valp);
+            const auto op = std::bind(&::nng_msg_chop_u32, msgp, _1);
+            const auto errnum = op(valp);
             THROW_NNG_EXCEPTION_EC(errnum);
         }
 

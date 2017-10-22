@@ -30,9 +30,9 @@ namespace nng {
 
             virtual ::nng_msg* get_msgp() = 0;
 
-            typedef std::function<void(::nng_msg*)> clear_op;
+            typedef std::function<void()> clear_op;
 
-            static void do_clear_op(const clear_op& op, ::nng_msg* msgp);
+            static void do_clear_op(const clear_op& op);
 
             virtual void clear() = 0;
 

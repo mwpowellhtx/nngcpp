@@ -23,7 +23,7 @@ namespace nng {
     namespace messaging {
  
 #ifndef NNGCPP_STRING_BASED_MESSAGE_H
-        class binary_message;
+        template<class Body_, class Header_> class basic_binary_message;
 #endif //NNGCPP_STRING_BASED_MESSAGE_H
 
         class binary_message_body
@@ -35,7 +35,7 @@ namespace nng {
             , public supports_rtrim_api<size_type, uint32_t*> {
         protected:
 
-            friend class binary_message;
+            template<class Body_, class Header_> friend class basic_binary_message;
 
             binary_message_body(message_base* const basep);
 
