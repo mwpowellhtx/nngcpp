@@ -140,7 +140,7 @@ TEST_CASE("Message part operates correctly") {
                 }
             }
 
-            SECTION("Can append a byte buffer") {
+            SECTION("Can append a byte vector") {
 
                 REQUIRE_NOTHROW(partp->append(mathematics_is_cool));
                 REQUIRE(partp->get_size() == mathematics_is_cool.length());
