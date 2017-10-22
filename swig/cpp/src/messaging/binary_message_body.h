@@ -31,8 +31,8 @@ namespace nng {
             , public supports_get_api<buffer_vector_type>
             , public supports_append_api<buffer_vector_type, std::string, uint32_t>
             , public supports_prepend_api<buffer_vector_type, std::string, uint32_t>
-            , public supports_ltrim_api<size_type, uint32_t*>
-            , public supports_rtrim_api<size_type, uint32_t*> {
+            , public supports_ltrim_api<size_type, uint32_t&>
+            , public supports_rtrim_api<size_type, uint32_t&> {
         protected:
 
             template<class Body_, class Header_> friend class basic_binary_message;
@@ -63,9 +63,9 @@ namespace nng {
 
             virtual void prepend(const uint32_t& val);
 
-            virtual void ltrim(uint32_t* valp);
+            virtual void ltrim(uint32_t& val);
 
-            virtual void rtrim(uint32_t* valp);
+            virtual void rtrim(uint32_t& val);
 
             virtual void append(const std::string& s);
 

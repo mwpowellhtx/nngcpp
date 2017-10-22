@@ -112,19 +112,19 @@ namespace nng {
             THROW_NNG_EXCEPTION_EC(errnum);
         }
 
-        void binary_message_body::ltrim(uint32_t* valp) {
+        void binary_message_body::ltrim(uint32_t& val) {
             const auto msgp = get_msgp();
             if (msgp == nullptr) { return; }
             const auto op = std::bind(&::nng_msg_trim_u32, msgp, _1);
-            const auto errnum = op(valp);
+            const auto errnum = op(&val);
             THROW_NNG_EXCEPTION_EC(errnum);
         }
 
-        void binary_message_body::rtrim(uint32_t* valp) {
+        void binary_message_body::rtrim(uint32_t& val) {
             const auto msgp = get_msgp();
             if (msgp == nullptr) { return; }
             const auto op = std::bind(&::nng_msg_chop_u32, msgp, _1);
-            const auto errnum = op(valp);
+            const auto errnum = op(&val);
             THROW_NNG_EXCEPTION_EC(errnum);
         }
 
