@@ -22,27 +22,10 @@ namespace nng {
 
             typedef Base_ base_type;
 
-            typedef message_base::buffer_vector_type buffer_vector_type;
-
-            typedef message_base::size_type size_type;
-
-            binary_message_part_fixture()
-                : base_type() {
-            }
-
-            binary_message_part_fixture(::nng_msg* msgp)
-                : base_type(msgp) {
+            binary_message_part_fixture(message_base* const basep) : base_type(basep) {
             }
 
             virtual ~binary_message_part_fixture() {
-
-                if (_msgp == nullptr) { return; }
-
-                REQUIRE(_msgp != nullptr);
-                CHECK_NOTHROW(::nng_msg_free(_msgp));
-
-                _msgp = nullptr;
-                CHECK(_msgp == nullptr);
             }
 
             virtual void append(const buffer_vector_type& x) override {

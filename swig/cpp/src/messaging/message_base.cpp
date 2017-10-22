@@ -1,4 +1,9 @@
 #include "message_base.h"
+#include "../core/exceptions.hpp"
+
+#define THROW_BIN_MSG_BODY_INV_OP(basep) \
+            if (!basep) \
+                throw trx::invalid_operation("binary message body cannot exist apart from a parent message")
 
 namespace nng {
 
@@ -31,6 +36,7 @@ namespace nng {
         }
 
         message_part::message_part(message_base* basep) : message_base_api(), _basep(basep) {
+            THROW_BIN_MSG_BODY_INV_OP(_basep);
         }
 
         message_part::~message_part() {

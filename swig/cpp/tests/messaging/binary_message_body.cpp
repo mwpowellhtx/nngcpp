@@ -7,96 +7,66 @@
 // found online at https://opensource.org/licenses/MIT.
 //
 
-// TODO: TBD: unit testing is the right idea, however, these no longer exist apart from binary message
-
 #include <nngcpp.h>
 
 #include "../catch/catch_exception_translations.hpp"
+#include "../catch/catch_exception_matcher_base.hpp"
+#include "../catch/catch_nng_exception_matcher.hpp"
+#include "../catch/catch_tags.h"
 
 #include "binary_message_part_fixtures.hpp"
 
 namespace constants {
-    const nng::messaging::buffer_vector_type data = { 1,2,3 };
+    const nng::messaging::buffer_vector_type default_data = {};
 }
 
-TEST_CASE("Test that the data is as expected", "[messaging][data]") {
+/* TODO: TBD: I do not really see a need to re-introduce any C style unit tests for the
+time being since I have a pretty good handle on proper message operation. However, that
+could change downstream from now. */
 
+TEST_CASE("Binary message part cannot exist apart from a parent message"
+    , Catch::Tags("body", "part", "orphan", "invalid", "operation"
+        , "messaging", "nng", "cxx").c_str()) {
+
+    using namespace trx;
+    using namespace nng::messaging;
+
+    /* Message part fixtured in order to simulate access to the ctor. This is
+    only for test purposes and should never occur under normal operation. */
+
+    typedef binary_message_part_fixture<binary_message_body> message_part_fixture_type;
+
+    REQUIRE_THROWS_AS(message_part_fixture_type(nullptr), invalid_operation);
+}
+
+TEST_CASE("Verify default message part", Catch::Tags("body"
+    , "default", "part", "messaging", "nng", "cxx").c_str()) {
+
+    using namespace std;
     using namespace nng::messaging;
     using namespace constants;
     using namespace Catch::Matchers;
 
-    buffer_vector_type expected = { 1,2,3 };
-    REQUIRE(data.size() == expected.size());
-    REQUIRE_THAT(data, Equals(expected));
-}
+    SECTION("Parent message can be allocated properly") {
 
-TEST_CASE("Test that C style NNG message appends", "[messaging][body][nng][append]") {
+        unique_ptr<binary_message> bmp;
 
-    using namespace nng::messaging;
-    using namespace constants;
+        REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
+        REQUIRE(bmp != nullptr);
+        REQUIRE(bmp->has_one() == true);
 
-    ::nng_msg* msgp;
+        SECTION("Message part can be obtained from parent") {
 
-    REQUIRE(::nng_msg_alloc(&msgp, 0) == 0);
+            binary_message_body* partp;
+            REQUIRE_NOTHROW(partp = bmp->body());
+            REQUIRE(partp);
+            REQUIRE(partp->has_one() == bmp->has_one());
+            REQUIRE(partp->get_size() == 0);
+            REQUIRE_THAT(partp->get(), Equals(default_data));
+        }
 
-    REQUIRE(::nng_msg_len(msgp) == 0);
-
-    REQUIRE(data.size() == 3);
-
-    REQUIRE(::nng_msg_append(msgp, (const void*)&data[0], data.size()) == 0);
-
-    auto actual_len = ::nng_msg_len(msgp);
-
-    REQUIRE(actual_len == data.size());
-
-    auto* p = (buffer_vector_type::value_type*)::nng_msg_body(msgp);
-
-    // Do a poor-man's comparison of each individual element; should align with the expected.
-    for (auto i = 0; i < actual_len; i++) {
-        const auto expected = *(data.begin() + i);
-        const auto actual = (p + i)[0];
-        REQUIRE(actual == expected);
+        SECTION("Parent message is properly reset") {
+            REQUIRE_NOTHROW(bmp.reset());
+        }
     }
-
-    ::nng_msg_free(msgp);
-}
-
-TEST_CASE("Test that the default message works", "[messaging][binary][body][default]") {
-
-    using namespace nng::messaging;
-    using namespace constants;
-    using namespace Catch::Matchers;
-
-    auto part = binary_message_part_fixture<binary_message_body>();
-
-    verify_default_message_part(part);
-}
-
-TEST_CASE("::nng_msg* based ctor works", "[messaging][binary][body][alloc]") {
-
-    using namespace nng::messaging;
-    using namespace constants;
-    using namespace Catch::Matchers;
-
-    ::nng_msg* msgp = nullptr;
-
-    CHECK(msgp == nullptr);
-
-    // In context with the Messaging framework, this would be provided from the binary_message.
-    REQUIRE(::nng_msg_alloc(&msgp, 0) == 0);
-
-    REQUIRE(msgp != nullptr);
-
-    // For test purposes, the fixture will assume ownership of the pointer, which will clean up on destruction.
-    auto part = binary_message_part_fixture<binary_message_body>(msgp);
-
-    verify_default_message_part(part, msgp);
-
-    REQUIRE_NOTHROW(part.append(data));
-
-    const auto& expected = data;
-    const auto _got_actual = part.get();
-
-    CHECK(part.get_size() == expected.size());
-    REQUIRE_THAT(_got_actual, Equals(expected));
 }
