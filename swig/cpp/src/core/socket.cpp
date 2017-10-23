@@ -11,7 +11,6 @@ namespace nng {
     using std::placeholders::_1;
     using std::placeholders::_2;
     using std::placeholders::_3;
-    using std::placeholders::_4;
     using std::bind;
 
     socket::socket(const nng_ctor_func& nng_ctor)
@@ -48,8 +47,8 @@ namespace nng {
     void socket::close() {
         if (sid) {
             // Close is its own operation apart from Shutdown.
-            const auto op = bind(&::nng_close, _1);
-            const auto errnum = op(sid);
+            const auto op = bind(&::nng_close, sid);
+            const auto errnum = op();
             THROW_NNG_EXCEPTION_IF_NOT_ONEOF(errnum, ec_eunknown, ec_enone);
             // Closed is closed.
             sid = 0;
@@ -59,8 +58,8 @@ namespace nng {
 
     void socket::shutdown() {
         // Shutdown is its own operation apart from Closed.
-        const auto op = bind(&::nng_shutdown, _1);
-        const auto errnum = op(sid);
+        const auto op = bind(&::nng_shutdown, sid);
+        const auto errnum = op();
         THROW_NNG_EXCEPTION_IF_NOT_ONEOF(errnum, ec_eunknown, ec_enone);
         // Which socket can still be in operation.
     }
@@ -71,27 +70,27 @@ namespace nng {
 
     // TODO: TBD: ditto ec handling...
     void socket::listen(const std::string& addr, flag_type flags) {
-        const auto& op = bind(&::nng_listen, _1, _2, _3, _4);
-        const auto errnum = op(sid, addr.c_str(), nullptr, static_cast<int>(flags));
+        const auto& op = bind(&::nng_listen, sid, _1, _2, _3);
+        const auto errnum = op(addr.c_str(), nullptr, static_cast<int>(flags));
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
     void socket::listen(const std::string& addr, listener* const lp, flag_type flags) {
-        const auto& op = bind(&::nng_listen, _1, _2, _3, _4);
-        const auto errnum = op(sid, addr.c_str(), lp ? &(lp->lid) : nullptr, static_cast<int>(flags));
+        const auto& op = bind(&::nng_listen, sid, _1, _2, _3);
+        const auto errnum = op(addr.c_str(), lp ? &(lp->lid) : nullptr, static_cast<int>(flags));
         THROW_NNG_EXCEPTION_EC(errnum);
         if (lp) { lp->on_listened(); }
     }
 
     void socket::dial(const std::string& addr, flag_type flags) {
-        const auto& op = bind(&::nng_dial, _1, _2, _3, _4);
-        const auto errnum = op(sid, addr.c_str(), nullptr, flags);
+        const auto& op = bind(&::nng_dial, sid, _1, _2, _3);
+        const auto errnum = op(addr.c_str(), nullptr, flags);
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
     void socket::dial(const std::string& addr, dialer* const dp, flag_type flags) {
-        const auto& op = bind(&::nng_dial, _1, _2, _3, _4);
-        const auto errnum = op(sid, addr.c_str(), dp ? &(dp->did) : nullptr, static_cast<int>(flags));
+        const auto& op = bind(&::nng_dial, sid, _1, _2, _3);
+        const auto errnum = op(addr.c_str(), dp ? &(dp->did) : nullptr, static_cast<int>(flags));
         THROW_NNG_EXCEPTION_EC(errnum);
         if (dp) { dp->on_dialed(); }
     }
@@ -115,8 +114,8 @@ namespace nng {
 
     void socket::send(binary_message_type* const bmp, flag_type flags) {
         auto* msgp = bmp->get_msgp();
-        const auto op = bind(&::nng_sendmsg, _1, _2, _3);
-        const auto errnum = op(sid, msgp, static_cast<int>(flags));
+        const auto op = bind(&::nng_sendmsg, sid, msgp, _1);
+        const auto errnum = op(static_cast<int>(flags));
         /* Yes, this is not a mistake. Message passing semantics means that NNG assumes
         ownership of the message after passing. Effectively, this nullifies the message. */
         // TODO: TBD: at least for now this seems reasonable: depending on the error code, we may or may not want to do this...
