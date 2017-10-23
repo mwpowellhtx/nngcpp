@@ -8,6 +8,7 @@ namespace nng {
     using std::placeholders::_1;
     using std::placeholders::_2;
     using std::placeholders::_3;
+    using std::bind;
 
     // TODO: TBD: ditto "listener" ...
     dialer::dialer() : endpoint(), did(0), _options() {
@@ -17,7 +18,7 @@ namespace nng {
     dialer::dialer(const socket* const sp, const std::string& addr)
         : endpoint(), did(0), _options() {
 
-        const auto& op = std::bind(&::nng_dialer_create, &did, sp->sid, _1);
+        const auto& op = bind(&::nng_dialer_create, &did, sp->sid, _1);
         const auto errnum = op(addr.c_str());
         THROW_NNG_EXCEPTION_EC(errnum);
 
@@ -29,14 +30,14 @@ namespace nng {
     }
 
     void dialer::start(flag_type flags) {
-        const auto& op = std::bind(&::nng_dialer_start, did, _1);
+        const auto& op = bind(&::nng_dialer_start, did, _1);
         const auto errnum = op(static_cast<int>(flags));
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
     void dialer::close() {
         if (did) {
-            const auto op = std::bind(&::nng_dialer_close, did);
+            const auto op = bind(&::nng_dialer_close, did);
             const auto errnum = op();
             THROW_NNG_EXCEPTION_EC(errnum);
             did = 0;
@@ -57,17 +58,17 @@ namespace nng {
     void dialer::configure_options() {
 
         _options.set_getters(
-            std::bind(&::nng_dialer_getopt, did, _1, _2, _3)
-            , std::bind(&::nng_dialer_getopt_int, did, _1, _2)
-            , std::bind(&::nng_dialer_getopt_size, did, _1, _2)
-            , std::bind(&::nng_dialer_getopt_ms, did, _1, _2)
+            bind(&::nng_dialer_getopt, did, _1, _2, _3)
+            , bind(&::nng_dialer_getopt_int, did, _1, _2)
+            , bind(&::nng_dialer_getopt_size, did, _1, _2)
+            , bind(&::nng_dialer_getopt_ms, did, _1, _2)
         );
 
         _options.set_setters(
-            std::bind(&::nng_dialer_setopt, did, _1, _2, _3)
-            , std::bind(&::nng_dialer_setopt_int, did, _1, _2)
-            , std::bind(&::nng_dialer_setopt_size, did, _1, _2)
-            , std::bind(&::nng_dialer_setopt_ms, did, _1, _2)
+            bind(&::nng_dialer_setopt, did, _1, _2, _3)
+            , bind(&::nng_dialer_setopt_int, did, _1, _2)
+            , bind(&::nng_dialer_setopt_size, did, _1, _2)
+            , bind(&::nng_dialer_setopt_ms, did, _1, _2)
         );
     }
 

@@ -8,6 +8,7 @@ namespace nng {
     using std::placeholders::_1;
     using std::placeholders::_2;
     using std::placeholders::_3;
+    using std::bind;
 
     message_pipe::nng_type get_id(const message_pipe& mp) {
         return mp.pid;
@@ -17,7 +18,7 @@ namespace nng {
         : pid(0), _options() {
 
         // TODO: TBD: throw an exception upon irregular pipe value...
-        const auto& op = std::bind(&::nng_msg_get_pipe, get_msgp(*mbp));
+        const auto& op = bind(&::nng_msg_get_pipe, get_msgp(*mbp));
         pid = op();
 
         configure_options();
@@ -31,7 +32,7 @@ namespace nng {
     void message_pipe::close() {
         if (!has_one()) { return; }
         using std::placeholders::_1;
-        const auto op = std::bind(::nng_pipe_close, _1);
+        const auto op = bind(::nng_pipe_close, _1);
         const auto errnum = op(pid);
         THROW_NNG_EXCEPTION_IF_NOT_ONEOF(errnum, ec_eunknown, ec_enone, ec_enoent);
         pid = 0;
@@ -45,10 +46,10 @@ namespace nng {
     void message_pipe::configure_options() {
 
         _options.set_getters(
-            std::bind(&::nng_pipe_getopt, pid, _1, _2, _3)
-            , std::bind(&::nng_pipe_getopt_int, pid, _1, _2)
-            , std::bind(&::nng_pipe_getopt_size, pid, _1, _2)
-            , std::bind(&::nng_pipe_getopt_ms, pid, _1, _2)
+            bind(&::nng_pipe_getopt, pid, _1, _2, _3)
+            , bind(&::nng_pipe_getopt_int, pid, _1, _2)
+            , bind(&::nng_pipe_getopt_size, pid, _1, _2)
+            , bind(&::nng_pipe_getopt_ms, pid, _1, _2)
         );
     }
 

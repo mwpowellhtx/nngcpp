@@ -12,6 +12,7 @@ namespace nng {
     using std::placeholders::_2;
     using std::placeholders::_3;
     using std::placeholders::_4;
+    using std::bind;
 
     socket::socket(const nng_ctor_func& nng_ctor)
         : sender(), receiver(), messenger()
@@ -30,24 +31,24 @@ namespace nng {
     void socket::configure_options() {
 
         _options.set_getters(
-            std::bind(&::nng_getopt, sid, _1, _2, _3)
-            , std::bind(::nng_getopt_int, sid, _1, _2)
-            , std::bind(::nng_getopt_size, sid, _1, _2)
-            , std::bind(&::nng_getopt_ms, sid, _1, _2)
+            bind(&::nng_getopt, sid, _1, _2, _3)
+            , bind(::nng_getopt_int, sid, _1, _2)
+            , bind(::nng_getopt_size, sid, _1, _2)
+            , bind(&::nng_getopt_ms, sid, _1, _2)
         );
 
         _options.set_setters(
-            std::bind(&::nng_setopt, sid, _1, _2, _3)
-            , std::bind(::nng_setopt_int, sid, _1, _2)
-            , std::bind(::nng_setopt_size, sid, _1, _2)
-            , std::bind(&::nng_setopt_ms, sid, _1, _2)
+            bind(&::nng_setopt, sid, _1, _2, _3)
+            , bind(::nng_setopt_int, sid, _1, _2)
+            , bind(::nng_setopt_size, sid, _1, _2)
+            , bind(&::nng_setopt_ms, sid, _1, _2)
         );
     }
 
     void socket::close() {
         if (sid) {
             // Close is its own operation apart from Shutdown.
-            const auto op = std::bind(&::nng_close, _1);
+            const auto op = bind(&::nng_close, _1);
             const auto errnum = op(sid);
             THROW_NNG_EXCEPTION_IF_NOT_ONEOF(errnum, ec_eunknown, ec_enone);
             // Closed is closed.
@@ -58,7 +59,7 @@ namespace nng {
 
     void socket::shutdown() {
         // Shutdown is its own operation apart from Closed.
-        const auto op = std::bind(&::nng_shutdown, _1);
+        const auto op = bind(&::nng_shutdown, _1);
         const auto errnum = op(sid);
         THROW_NNG_EXCEPTION_IF_NOT_ONEOF(errnum, ec_eunknown, ec_enone);
         // Which socket can still be in operation.
@@ -70,26 +71,26 @@ namespace nng {
 
     // TODO: TBD: ditto ec handling...
     void socket::listen(const std::string& addr, flag_type flags) {
-        const auto& op = std::bind(&::nng_listen, _1, _2, _3, _4);
+        const auto& op = bind(&::nng_listen, _1, _2, _3, _4);
         const auto errnum = op(sid, addr.c_str(), nullptr, static_cast<int>(flags));
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
     void socket::listen(const std::string& addr, listener* const lp, flag_type flags) {
-        const auto& op = std::bind(&::nng_listen, _1, _2, _3, _4);
+        const auto& op = bind(&::nng_listen, _1, _2, _3, _4);
         const auto errnum = op(sid, addr.c_str(), lp ? &(lp->lid) : nullptr, static_cast<int>(flags));
         THROW_NNG_EXCEPTION_EC(errnum);
         if (lp) { lp->on_listened(); }
     }
 
     void socket::dial(const std::string& addr, flag_type flags) {
-        const auto& op = std::bind(&::nng_dial, _1, _2, _3, _4);
+        const auto& op = bind(&::nng_dial, _1, _2, _3, _4);
         const auto errnum = op(sid, addr.c_str(), nullptr, flags);
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
     void socket::dial(const std::string& addr, dialer* const dp, flag_type flags) {
-        const auto& op = std::bind(&::nng_dial, _1, _2, _3, _4);
+        const auto& op = bind(&::nng_dial, _1, _2, _3, _4);
         const auto errnum = op(sid, addr.c_str(), dp ? &(dp->did) : nullptr, static_cast<int>(flags));
         THROW_NNG_EXCEPTION_EC(errnum);
         if (dp) { dp->on_dialed(); }
@@ -114,7 +115,7 @@ namespace nng {
 
     void socket::send(binary_message_type* const bmp, flag_type flags) {
         auto* msgp = bmp->get_msgp();
-        const auto op = std::bind(&::nng_sendmsg, _1, _2, _3);
+        const auto op = bind(&::nng_sendmsg, _1, _2, _3);
         const auto errnum = op(sid, msgp, static_cast<int>(flags));
         /* Yes, this is not a mistake. Message passing semantics means that NNG assumes
         ownership of the message after passing. Effectively, this nullifies the message. */
