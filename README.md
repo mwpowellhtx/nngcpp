@@ -42,6 +42,12 @@ You may verify any of these features afterwards by using the ``get_size()`` and 
 
 The ``nng`` namespace also exposes ``options_writer`` and ``options_reader`` base classes. Both of these provide strategic functional support regardless whether the request originated in ``socket``, ``listener``, ``dialer``, or ``message_pipe``. This is accomplished by concretely binding the specific id from the requester, meanwhile providing the same generalized functional API to those callers. This permitted me to route all such requests through a single invocation handler.
 
+At the time of this writing, options are *indexed* according to ``std::string`` name, defined by constants in the ``nng::option_names`` class. This is also fairly freeform in nature, allowing you to specify any of the names for any of the API.
+
+I will not go into excruciating detail over the API itself, but just list briefly the kinds of options you may get and set, including, ``std::string``, 32-bit integer values (``int`` or ``int32_t``), ``nng::size_type`` (or ``std::size_t``), and ``std::chrono::duration<int32_t, std::milli>`` durations, as well as durations in raw ``int32_t`` milliseconds.
+
+Generally, however, it is up to the consumer to align the appropriate option names with the appropriate options during either get or set operations. The API will throw an unsupported exception when that combination is inappropriate.
+
 #### Socket address
 
 There is also support around *socket addresses*, which facilitates a rich set of ``socket address`` views for you, depending on the kind of view that is in play. This is a fairly new feature discovered only recently during unit testing. For the most part you should be engaging the API with ``std::string`` addresses, but in the future, you may also be able to utilize this feature.
