@@ -87,8 +87,8 @@ TEST_CASE("Test that device functions properly", "[device]") {
             latest_pair_socket p1, p2;
 
             // TODO: TBD: in the grand scheme of things, I'm not really sure what purpose these two assertions are serving...
-            REQUIRE_NOTHROW(p1.set_option_int(O::raw, 1));
-            REQUIRE_NOTHROW(p2.set_option_int(O::raw, 1));
+            REQUIRE_NOTHROW(p1.options()->set_int(O::raw, 1));
+            REQUIRE_NOTHROW(p2.options()->set_int(O::raw, 1));
 
             REQUIRE_NOTHROW(fixture.install(&p1, &p2, true));
             REQUIRE(fixture.is_installed() == true);
@@ -103,8 +103,8 @@ TEST_CASE("Test that device functions properly", "[device]") {
 
             const auto timeout = 1000ms;
 
-            REQUIRE_NOTHROW(e1.set_option(O::recv_timeout_duration, timeout));
-            REQUIRE_NOTHROW(e2.set_option(O::recv_timeout_duration, timeout));
+            REQUIRE_NOTHROW(e1.options()->set(O::recv_timeout_duration, timeout));
+            REQUIRE_NOTHROW(e2.options()->set(O::recv_timeout_duration, timeout));
 
             SLEEP_FOR(100ms);
 

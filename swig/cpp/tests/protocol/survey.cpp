@@ -73,7 +73,7 @@ TEST_CASE("Survey pattern using C++ wrapper", Catch::Tags("surveyor", "responden
 
 		SECTION("Survey without responder times out") {
 
-            REQUIRE_NOTHROW(surp->set_option(O::surveyor_survey_time_duration, 50ms));
+            REQUIRE_NOTHROW(surp->options()->set(O::surveyor_survey_time_duration, 50ms));
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
             REQUIRE_NOTHROW(surp->send(bmp.get()));
@@ -123,7 +123,7 @@ TEST_CASE("Survey pattern using C++ wrapper", Catch::Tags("surveyor", "responden
 
         //	nng_socket sock;
 
-        REQUIRE_NOTHROW(surp->set_option(O::surveyor_survey_time_duration, 50ms));
+        REQUIRE_NOTHROW(surp->options()->set(O::surveyor_survey_time_duration, 50ms));
 
         REQUIRE_NOTHROW(surp->listen(test_addr));
         REQUIRE_NOTHROW(resp->dial(test_addr));
@@ -157,7 +157,7 @@ TEST_CASE("Survey pattern using C++ wrapper", Catch::Tags("surveyor", "responden
 
 			SECTION("And goes to non-survey state") {
 
-                REQUIRE_NOTHROW(surp->set_option(O::recv_timeout_duration, 200ms));
+                REQUIRE_NOTHROW(surp->options()->set(O::recv_timeout_duration, 200ms));
 
                 // ...
                 REQUIRE_THROWS_AS_MATCHING(surp->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_estate));

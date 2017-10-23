@@ -73,13 +73,13 @@ TEST_CASE("Poll FDs", "[pollfd]") {
 
         SECTION("We can get a Receive File Descriptor") {
             int fd;
-            //REQUIRE_NOTHROW(s1->get_option_int(_opt_::recv_fd, &fd));
-            REQUIRE_NOTHROW(s1->get_option_int(_opt_::recv_fd, fd));
+
+            REQUIRE_NOTHROW(s1->options()->get_int(_opt_::recv_fd, fd));
             REQUIRE(fd != inv_sock);
 
             SECTION("And it is always the same File Descriptor") {
                 int fd2;
-                REQUIRE_NOTHROW(s1->get_option_int(_opt_::recv_fd, fd2));
+                REQUIRE_NOTHROW(s1->options()->get_int(_opt_::recv_fd, fd2));
                 REQUIRE(fd2 == fd);
             }
 
@@ -104,8 +104,8 @@ TEST_CASE("Poll FDs", "[pollfd]") {
             std::size_t sz;
 
             sz = sizeof(fd);
-            REQUIRE_NOTHROW(s1->get_option_int(_opt_::send_fd, fd));
-            REQUIRE_NOTHROW(s1->get_option(_opt_::send_fd, &fd, sz));
+            REQUIRE_NOTHROW(s1->options()->get_int(_opt_::send_fd, fd));
+            REQUIRE_NOTHROW(s1->options()->get(_opt_::send_fd, &fd, sz));
             REQUIRE(fd != inv_sock);
 
             const auto buf = messaging_utils::to_buffer("oops");
@@ -120,10 +120,10 @@ TEST_CASE("Poll FDs", "[pollfd]") {
             std::size_t sz;
 
             sz = 1;
-            REQUIRE_THROWS_AS_MATCHING(s1->get_option(_opt_::recv_fd, &fd, sz), nng_exception, THROWS_NNG_EXCEPTION(ec_einval));
+            REQUIRE_THROWS_AS_MATCHING(s1->options()->get(_opt_::recv_fd, &fd, sz), nng_exception, THROWS_NNG_EXCEPTION(ec_einval));
 
             sz = 128;
-            REQUIRE_NOTHROW(s1->get_option(_opt_::recv_fd, &fd, sz));
+            REQUIRE_NOTHROW(s1->options()->get(_opt_::recv_fd, &fd, sz));
             REQUIRE(sz == sizeof(fd));
         }
 
@@ -137,8 +137,8 @@ TEST_CASE("Poll FDs", "[pollfd]") {
 
             sz = sizeof(fd);
             // TODO: TBD: ditto working interim answer...
-            REQUIRE_THROWS_AS_MATCHING(s3->get_option(_opt_::send_fd, &fd, sz), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
-            REQUIRE_THROWS_AS_MATCHING(s3->get_option_int(_opt_::send_fd, fd), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
+            REQUIRE_THROWS_AS_MATCHING(s3->options()->get(_opt_::send_fd, &fd, sz), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
+            REQUIRE_THROWS_AS_MATCHING(s3->options()->get_int(_opt_::send_fd, fd), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
 
             REQUIRE_NOTHROW(s3.reset());
             REQUIRE(s3 == nullptr);
@@ -154,8 +154,8 @@ TEST_CASE("Poll FDs", "[pollfd]") {
 
             sz = sizeof(fd);
             // TODO: TBD: this works as an interim measure, although the ResultBuilder needs a little help to better comprehend the result.
-            REQUIRE_THROWS_AS_MATCHING(s3->get_option(_opt_::recv_fd, &fd, sz), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
-            REQUIRE_THROWS_AS_MATCHING(s3->get_option_int(_opt_::recv_fd, fd), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
+            REQUIRE_THROWS_AS_MATCHING(s3->options()->get(_opt_::recv_fd, &fd, sz), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
+            REQUIRE_THROWS_AS_MATCHING(s3->options()->get_int(_opt_::recv_fd, fd), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
 
             REQUIRE_NOTHROW(s3.reset());
             REQUIRE(s3 == nullptr);

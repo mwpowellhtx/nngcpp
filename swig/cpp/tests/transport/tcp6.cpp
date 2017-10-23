@@ -115,7 +115,7 @@ namespace nng {
             // TODO: TBD: call address socket_address instead... would be more specific.
             address a;
 
-            REQUIRE_NOTHROW(pp->get_option(O::local_addr, a));
+            REQUIRE_NOTHROW(pp->options()->get(O::local_addr, a));
             REQUIRE(a.get_family() == af_inet6);
             auto vp = a.view();
             REQUIRE(vp->get_family() == a.get_family());
@@ -132,7 +132,7 @@ namespace nng {
             // TODO: TBD: call address socket_address instead... would be more specific.
             address a;
 
-            REQUIRE_NOTHROW(pp->get_option(O::remote_addr, a));
+            REQUIRE_NOTHROW(pp->options()->get(O::remote_addr, a));
             REQUIRE(a.get_family() == af_inet6);
             auto vp = a.view();
             REQUIRE(vp->get_family() == a.get_family());
