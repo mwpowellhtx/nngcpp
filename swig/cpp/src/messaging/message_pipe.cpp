@@ -20,7 +20,7 @@ namespace nng {
         const auto& op = std::bind(&::nng_msg_get_pipe, get_msgp(*mbp));
         pid = op();
 
-        reconfigure_options();
+        configure_options();
     }
 
     // TODO: TBD: this is looking very similar to socket. perhaps it is...
@@ -42,7 +42,7 @@ namespace nng {
         return pid > 0;
     }
 
-    void message_pipe::reconfigure_options() {
+    void message_pipe::configure_options() {
 
         _options.set_getters(
             std::bind(&::nng_pipe_getopt, pid, _1, _2, _3)

@@ -40,7 +40,7 @@ namespace nng {
 
         options_reader _options;
 
-        void reconfigure_options();
+        void configure_options();
 
     public:
 
