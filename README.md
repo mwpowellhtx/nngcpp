@@ -46,7 +46,7 @@ But for these couple of areas, and lack of thread-safety is a pretty serious def
 
 ### NNG dependencies and disclaimer
 
-As NNG is not yet suitable for production, so then can this repository be considered the same. It works pretty well, and I've provide the unit tests demonstrating as much. But until the libraries are ready for broader consumption, consider yourself warned and tread with caution. Stay tuned to the repositories, web sites, and *nanomsg* mailing lists for announcements and updates.
+As NNG is not yet suitable for production, so then can this repository be considered the same. It works pretty well, and I've provided the unit tests demonstrating as much. But until the libraries are ready for broader consumption, consider yourself warned and tread with caution. [Stay tuned](http://nanomsg.org/community.html) to the repositories, web sites, and [mailing list](https://www.freelists.org/list/nanomsg) for announcements and updates.
 
 ### Known issues
 
