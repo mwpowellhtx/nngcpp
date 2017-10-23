@@ -8,11 +8,11 @@ As NNG is a work in progress, so too must this repository necessarily be conside
 
 At the time of this writing, I've focused primarily on the Visual Studio 2015 C++ compiler, latest updates, running under 64-bit Windows 7 Professional SP1.
 
-That I know of, I am not doing anything that exotic of cutting edge for C++14. Most of the features, using functional, [std::bind](http://en.cppreference.com/w/cpp/utility/functional/bind), [std::function](http://en.cppreference.com/w/cpp/utility/functional/function), as well as strategic use of both concretely bound parameters and [placeholders](http://en.cppreference.com/w/cpp/utility/functional/placeholders), have been around since C++11 days, that I know of. There may be one or two features, such as variadics, that push the limits, but not many others to my knowledge.
+That I know of, I am not doing anything that exotic or cutting edge for C++14. Most of the features, using [functional](http://en.cppreference.com/w/cpp/header/functional), [std::bind](http://en.cppreference.com/w/cpp/utility/functional/bind), [std::function](http://en.cppreference.com/w/cpp/utility/functional/function), as well as strategic use of both concretely bound parameters and [placeholders](http://en.cppreference.com/w/cpp/utility/functional/placeholders), have been around since C++11 days, that I know of. There may be one or two features, such as variadics or template specialization, that push the limits, but not many others to my knowledge.
 
 ### Build instructions
 
-At the present time I do not have CI/CD supported.
+At the present time I do not have CI/CD supported, however, this remains one of my goals.
 
 You will at least require [*CMake 3.9*](http://cmake.org/download/) in order to build and test yourself. Specifically, I am running the latest *CMake 3.9.2*, and 3.9.4 is stable and available for download at the time of this writing, with *3.10* just around the corner (currently RC). Point CMake to your repository directory and indicate the build directory, such as *path/to/your/repo/build*. After that, simply configure and generate to produce your build environment.
 
@@ -50,13 +50,15 @@ As NNG is not yet suitable for production, so then can this repository be consid
 
 ### Known issues
 
-* I have not had any success with the interprocess communication (IPC) transport as exposed during the unit tests. That I know of, NNG utilizes named pipes, which I think Windows 7 supports, but I could be wrong. Additionally, NNG is utilizing mutexes as well as condition variables, but I have not investigated in much depth beyond that. All I know is, one of the unit tests blocks infinitely on a sleeping condition variable. Which probably means some other thread encountered an issue and failed to wake it up again, or worse, got blocked on a race-condition mutex. That's the extent of my contribution troubleshooting the issue to the best of my ability.
+* I have not had that much success with the interprocess communication (IPC) transport as exposed during the certain unit test sections. That I know of, NNG utilizes named pipes, which I think Windows 7 Professional supports, but I could be wrong. Additionally, NNG is utilizing mutexes as well as condition variables, but I have not investigated in much depth beyond that. All I know is, one of the unit tests blocks infinitely on a sleeping condition variable. Which probably means some other thread encountered an issue and failed to wake it up again, or worse, got blocked on some race-condition on the mutex. That's the extent of my contribution troubleshooting the issue to the best of my ability.
 
-* Otherwise, transport unit tests work pretty well for *inproc* as well as for *TCP*. That said, I have not been able to test ***TCP IPv6*** that I know of, or the strategy for determining whether my platform supports it or not may itself be flawed. I may need to diverge from the NNG path for making this assessment, but I have not looked closely at it yet beyond the translation to C++ and to Catch.
+* Otherwise, transport unit tests appear to be working pretty well for *inproc* as well as for *TCP*. That said, I have not been able to test ***TCP IPv6*** that I know of, or the strategy for determining whether my platform supports it may itself be flawed. I may need to diverge from the NNG path for making this assessment, but I have not looked closely at it yet beyond the translation to C++ and to Catch.
 
 * Also to my knowledge, NNG does not yet support ***UDP***. I think that may be in the works, but please stay tuned to the mailing list, etc, for more details. As such, the unit tests are commented out for the most part as they are exercising API internal to NNG.
 
-* But for *Scalability* testing, which requires threading support from Catch, the other unit tests are running great.
+* But for *Scalability* testing, which requires threading support from Catch, the other unit tests are running great. Well, to be quite frank, I suppose threading support isn't ***required*** required, but I would certainly like to have some checks being done during the thread and not just let it run freely unvetted. Let's just put it that way.
+
+* Not an issue with the repository itself, per se, but with what appears to be CMake and/or Visual Studio support for Git commands. Neither of which seems to be too happy with pulling Git repositories to a specific hash, branch, or tag. This is critical for steps involving *Catch*, in particular, which is at least working for ``v1.10.0``, but which balks at tags such as ``V2.0.0-develop.5``. Go figure. So these steps may need doing manually, unfortunately. I may look at some workarounds if at all possible, like containing the Git commands in a batch or command file. Something like this. I just haven't cross that bridge yet.
 
 ### Future goals
 
