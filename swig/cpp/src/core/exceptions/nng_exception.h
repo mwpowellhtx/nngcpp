@@ -42,6 +42,8 @@ namespace nng {
         ec_einternal = NNG_EINTERNAL,
         ec_esyserr = NNG_ESYSERR,
         ec_etranerr = NNG_ETRANERR,
+        // TODO: TBD: may also require exposing NNG_ETRANSPORT: https://github.com/nanomsg/nng/issues/128
+        //ec_etransport = ::NNG_ETRANSPORT,
     };
 
     class nng_exception : public std::exception {
