@@ -40,7 +40,7 @@ You may verify any of these features afterwards by using the ``get_size()`` and 
 
 #### Options
 
-The ``nng`` namespace also exposes ``options_writer`` and ``options_reader`` base classes. Both of these provide strategic functional support regardless whether the request originated in ``socket``, ``listener``, ``dialer``, or ``message_pipe``. This is accomplished by concretely binding the specific id from the requester, meanwhile providing the same generalized functional API to those callers. This permitted me to route all such requests through a single invocation handler.
+There are several classes that support an ``options()`` access method, which permits *getting* or *setting* options of one form or another, depending on the root class. Classes that support the ``options_reader`` API include ``socket``, ``listener``, ``dialer``, and ``message_pipe``. Except for the ``message_pipe``, each of these classes also support the ``options_writer``.
 
 At the time of this writing, options are *indexed* according to ``std::string`` name, defined by constants in the ``nng::option_names`` class. This is also fairly freeform in nature, allowing you to specify any of the names for any of the API.
 
