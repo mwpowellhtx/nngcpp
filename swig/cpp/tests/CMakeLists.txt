@@ -50,6 +50,8 @@ if (NNGCPP_ENABLE_TESTS)
 
         helpers/constants.cpp
         helpers/constants.h
+
+        messaging/binary_message_part_fixtures.hpp
         )
 
     macro (nngcpp_finalize_test TEST_NAME TIMEOUT SRCS)
