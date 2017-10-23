@@ -60,7 +60,7 @@ I have also made the decision not to support the [legacy library](https//github.
 
 Much of the wrapper functionality has been fully tested and vetted under 64-bit Windows 7 Professional SP1. There are one or two areas that are known issues which I will document a little later on.
 
-I am leveraging [Catch v1.10](http://github.com/philsquared/Catch/releases/tag/v1.10.0) at the present time in order to facilitate unit testing. I've even written a handful of helpful extensions and features complimenting the library, as well as provided feedback contributing to the Catch team's v2.0 when it finally gets released. In the meanwhile, I have found it to work fairly well but for a few glaring deficiencies.
+I am leveraging [Catch v1.10](http://github.com/philsquared/Catch/releases/tag/v1.10.0) at the present time in order to facilitate unit testing. I've even written a handful of helpful extensions and features complementing the library, as well as provided feedback contributing to the Catch team's v2.0 when it finally gets released. In the meanwhile, I have found it to work fairly well but for a few glaring deficiencies.
 
 * Lack of exception level filtering. I've provided a [crude Exception Matcher](http://github.com/mwpowellhtx/cppnngswig/blob/master/swig/cpp/tests/catch/catch_nng_exception_matcher.hpp) for this purpose, but first-class support is on the way that I know of (Catch v2.0).
 
