@@ -74,7 +74,7 @@ namespace nng {
     }
 
     void dialer::get_option(const std::string& name, duration_type& val) {
-        duration_rep_type x;
+        duration_type::rep x;
         get_option_ms(name, x);
         val = duration_type(x);
     }
@@ -104,7 +104,7 @@ namespace nng {
         options_writer::set_option_sz(op, name, val);
     }
 
-    void dialer::set_option(const std::string& name, duration_type val) {
+    void dialer::set_option(const std::string& name, const duration_type& val) {
         set_option_ms(name, val.count());
     }
 

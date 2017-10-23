@@ -52,7 +52,7 @@ namespace nng {
             virtual void set_option_int(const std::string& name, int val) override;
             virtual void set_option_sz(const std::string& name, size_type val) override;
 
-            virtual void set_option(const std::string& name, duration_type val) override;
+            virtual void set_option(const std::string& name, const duration_type& val) override;
             virtual void set_option_ms(const std::string& name, duration_rep_type val) override;
     };
 }

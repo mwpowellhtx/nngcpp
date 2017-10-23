@@ -207,7 +207,7 @@ namespace nng {
         options_writer::set_option_sz(op, name, val);
     }
 
-    void socket::set_option(const std::string& name, duration_type val) {
+    void socket::set_option(const std::string& name, const duration_type& val) {
         set_option_ms(name, val.count());
     }
 
