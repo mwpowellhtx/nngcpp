@@ -10,10 +10,12 @@
 #include <nngcpp.h>
 
 #include "../catch/catch_exception_translations.hpp"
-#include "binary_message_part_fixtures.hpp"
+#include "../helpers/constants.h"
 
 #include "../src/messaging/binary_message.h"
 #include "../src/messaging/message_pipe.h"
+
+#include "binary_message_part_fixtures.hpp"
 
 // We are not testing the ptr per se except to establish the baseline for the next require.
 #define NNGCPP_TESTS_INIT_SMART_PTR(sp, init) \
@@ -33,12 +35,6 @@
 #define NNG_TESTS_ALLOC_MSG(m) NNG_TESTS_ALLOC_MSG_SZ(m, 0)
 
 // We are not here to test the header or the body, per se, but we do need to ensure that they agree.
-
-
-namespace constants {
-    const std::string hello = "hello";
-    const nng::messaging::buffer_vector_type hello_buf = { 'h','e','l','l','o' };
-}
 
 namespace nng {
     namespace messaging {
@@ -66,6 +62,11 @@ namespace nng {
             }
         };
     }
+}
+
+namespace constants {
+    const std::string hello = "hello";
+    const auto hello_buf = to_buffer(hello);
 }
 
 TEST_CASE("Binary messages work", "[binary_message][messaging][cxx]") {
