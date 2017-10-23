@@ -175,13 +175,13 @@ TEST_CASE("Message part operates correctly") {
                 CHECK(!value);
 
                 SECTION("Left Trim is correct") {
-                    REQUIRE_NOTHROW(partp->ltrim(&value));
+                    REQUIRE_NOTHROW(partp->ltrim(value));
                     REQUIRE(value == abcd_value);
                     REQUIRE_THAT(partp->get(), Equals(efgh_value_buf));
                 }
 
                 SECTION("Right Trim is correct") {
-                    REQUIRE_NOTHROW(partp->rtrim(&value));
+                    REQUIRE_NOTHROW(partp->rtrim(value));
                     REQUIRE(value == efgh_value);
                     REQUIRE_THAT(partp->get(), Equals(abcd_value_buf));
                 }
@@ -202,13 +202,13 @@ TEST_CASE("Message part operates correctly") {
                 CHECK(!value);
 
                 SECTION("Left Trim is correct") {
-                    REQUIRE_NOTHROW(partp->ltrim(&value));
+                    REQUIRE_NOTHROW(partp->ltrim(value));
                     REQUIRE(value == abcd_value);
                     REQUIRE_THAT(partp->get(), Equals(efgh_value_buf));
                 }
 
                 SECTION("Right Trim is correct") {
-                    REQUIRE_NOTHROW(partp->rtrim(&value));
+                    REQUIRE_NOTHROW(partp->rtrim(value));
                     REQUIRE(value == efgh_value);
                     REQUIRE_THAT(partp->get(), Equals(abcd_value_buf));
                 }
