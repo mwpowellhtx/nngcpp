@@ -14,6 +14,8 @@
 #include "../catch/catch_nng_exception_matcher.hpp"
 #include "../catch/catch_exception_translations.hpp"
 #include "../catch/catch_macros.hpp"
+#include "../catch/catch_tags.h"
+
 #include "../helpers/basic_fixture.h"
 #include "../helpers/constants.h"
 
@@ -109,7 +111,8 @@ namespace constants {
     const uint32_t deadzeros = 0xdead0000;
 }
 
-TEST_CASE("Pair v1 protocol works using C code", "[pair][v1][protocol][sockets][c]") {
+TEST_CASE("Pair v1 protocol works using C style", Catch::Tags("pair"
+    , "v1", "protocol", "sockets", "pattern", "nng", "c").c_str()) {
 
     // TODO: TBD: this test case is not intended as a full treatment of the C-style unit tests, but rather as a comparison for troublesome sections.
     using namespace std;
@@ -267,7 +270,8 @@ TEST_CASE("Pair v1 protocol works using C code", "[pair][v1][protocol][sockets][
     }
 }
 
-TEST_CASE("Pair v1 protocol works using C++ wrapper", "[pair][v1][protocol][sockets][cxx]") {
+TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
+    , "v1", "protocol", "sockets", "pattern", "nng", "cxx").c_str()) {
 
     using namespace std;
     using namespace std::chrono;

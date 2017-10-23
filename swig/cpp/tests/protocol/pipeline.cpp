@@ -14,6 +14,9 @@
 #include "../catch/catch_nng_exception_matcher.hpp"
 #include "../catch/catch_exception_translations.hpp"
 #include "../catch/catch_macros.hpp"
+#include "../catch/catch_tags.h"
+
+#include "../helpers/constants.h"
 
 #include <string>
 
@@ -25,13 +28,15 @@ struct pipeline_fixture {
 };
 
 namespace constants {
+
     const std::string test_addr = "inproc://test";
     const std::string hello = "hello";
     const std::string abc = "abc";
     const std::string def = "def";
-    const nng::messaging::buffer_vector_type hello_buf = { 'h','e','l','l','o' };
-    const nng::messaging::buffer_vector_type abc_buf = { 'a','b','c' };
-    const nng::messaging::buffer_vector_type def_buf = { 'd','e','f' };
+
+    const auto hello_buf = to_buffer(hello);
+    const auto abc_buf = to_buffer(abc);
+    const auto def_buf = to_buffer(def);
 }
 
 namespace nng {
@@ -92,7 +97,8 @@ namespace nng {
     }
 }
 
-TEST_CASE("Rule out the possibility of invalid operations", "[pipeline][push][pull][invalid][operations][send][receive][try]") {
+TEST_CASE("Rule out the possibility of invalid operations", Catch::Tags("pipeline"
+    , "push", "push", "v0", "invalid", "operations", "send", "receive", "try", "cxx").c_str()) {
 
     using namespace nng;
     using namespace nng::protocol;
@@ -124,7 +130,8 @@ TEST_CASE("Rule out the possibility of invalid operations", "[pipeline][push][pu
     }
 }
 
-TEST_CASE("Pipeline (push/pull) pattern", "[pipeline][push][pull][pattern][protocol][sockets][cxx]") {
+TEST_CASE("Pipeline (push/pull) pattern using C++ wrapper", Catch::Tags("pipeline"
+    , "push", "push", "v0", "protocol", "sockets", "pattern", "nng", "cxx").c_str()) {
 
     using namespace std;
     using namespace std::chrono;
@@ -191,7 +198,8 @@ TEST_CASE("Pipeline (push/pull) pattern", "[pipeline][push][pull][pattern][proto
     }
 }
 
-TEST_CASE("We can create a linked push/pull pair", "[pipeline][push][pull][linked]") {
+TEST_CASE("We can create a linked push/pull pair", Catch::Tags("linked"
+    , "push", "push", "v0", "protocol", "sockets", "pattern", "nng", "cxx").c_str()) {
 
     using namespace std;
     using namespace nng::protocol;
@@ -241,7 +249,8 @@ TEST_CASE("We can create a linked push/pull pair", "[pipeline][push][pull][linke
     }
 }
 
-TEST_CASE("Load balancing works", "[pipeline][push][pull][load][balancing]") {
+TEST_CASE("Load balancing works", Catch::Tags("load", "balancing", "pipeline"
+    , "push", "push", "v0", "protocol", "sockets", "pattern", "nng", "cxx").c_str()) {
 
     using namespace std;
     using namespace std::chrono;

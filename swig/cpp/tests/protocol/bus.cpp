@@ -14,6 +14,7 @@
 #include "../catch/catch_nng_exception_matcher.hpp"
 #include "../catch/catch_exception_translations.hpp"
 #include "../catch/catch_macros.hpp"
+#include "../catch/catch_tags.h"
 #include "../helpers/constants.h"
 
 struct bus_fixture {
@@ -27,11 +28,12 @@ namespace constants {
     const std::string test_addr = "inproc://test";
     const std::string _99bits = "99bits";
     const std::string onthe = "onthe";
-    const nng::messaging::buffer_vector_type _99bits_buf = to_buffer(_99bits);
-    const nng::messaging::buffer_vector_type onthe_buf = to_buffer(onthe);
+    const auto _99bits_buf = to_buffer(_99bits);
+    const auto onthe_buf = to_buffer(onthe);
 }
 
-TEST_CASE("Bus pattern tests", "[bus][protocol][sockets][cxx]") {
+TEST_CASE("Bus pattern using C++ wrappers", Catch::Tags("bus"
+    , "v1", "protocol", "sockets", "pattern", "nng", "cxx").c_str()) {
 
     using namespace std;
     using namespace std::chrono;

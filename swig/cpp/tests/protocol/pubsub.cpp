@@ -14,6 +14,8 @@
 #include "../catch/catch_nng_exception_matcher.hpp"
 #include "../catch/catch_exception_translations.hpp"
 #include "../catch/catch_macros.hpp"
+#include "../catch/catch_tags.h"
+
 #include "../helpers/basic_fixture.h"
 #include "../helpers/constants.h"
 
@@ -100,7 +102,8 @@ namespace constants {
     }
 }
 
-TEST_CASE("Publisher/subscriber pattern using C++ wrapper", "[pub][sub][v0][protocol][sockets][nng][cxx]") {
+TEST_CASE("Publisher/subscriber pattern using C++ wrapper", Catch::Tags("pub", "sub"
+    , "v0", "protocol", "sockets", "patterns", "nng", "cxx").c_str()) {
 
     using namespace std;
     using namespace constants;

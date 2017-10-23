@@ -13,6 +13,8 @@
 #include "../catch/catch_nng_exception_matcher.hpp"
 #include "../catch/catch_exception_translations.hpp"
 #include "../catch/catch_macros.hpp"
+#include "../catch/catch_tags.h"
+
 #include "../helpers/basic_fixture.h"
 #include "../helpers/constants.h"
 
@@ -27,7 +29,8 @@ namespace constants {
     const auto def_buf = to_buffer(def);
 }
 
-TEST_CASE("Survey pattern", "[surveyor][respondent][v0][protocol][sockets][nng][cxx]") {
+TEST_CASE("Survey pattern using C++ wrapper", Catch::Tags("surveyor", "respondent"
+    , "v0", "protocol", "sockets", "pattern", "nng", "cxx").c_str()) {
 
     using namespace std;
     using namespace nng;
