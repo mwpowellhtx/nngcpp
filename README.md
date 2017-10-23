@@ -32,9 +32,11 @@ For the most part, I've made an effort to remain consistent with the underlying 
 
 Okay, now for those differences. The ``append`` operation still appends in NNG parlance. However, I've dubbed *insert* instead as ``prepend``, which is commented as such anyway. So let's just call it what it is. Additionally, I just got confused every time I try to parse what *trim* and *chop* mean to the message, so I dubbed them simply ``ltrim`` and ``rtrim``, respectively.
 
-As for supported types, there is a ``uint32_t`` strain, which enjoys broader support in both ``header`` and ``body`` messaging parts. This literally *appends* and *prepends* the actual value itself *at the byte level*. *Trimming left* or *right* behaves by returning the *actual value*.
+There is broad support for ``uint32_t`` in both ``header`` and ``body`` messaging parts. This literally *appends* and *prepends* the actual value itself *at the byte level*. *Trimming left* or *right* behaves by returning the *actual value*.
 
-Then there is ``uint8_t`` (i.e. *byte*) [std::vector](http://en.cppreference.com/w/cpp/container/vector) support, which is limited to the ``body`` messaging part at this time. The API is somewhat limited as well. You can *append* and *prepend* the vector itself. However, *trim* only permits you to specify the *size_t*, *std::size_t*, *std::vector\<uint8_t\>::size_type*, or *nng::size_type* (all definitions of the same underlying type), which effectively *trims left* or *right* that number of bytes. This is performed blindly without returning the bytes that were trimmed. You may verify that fact afterwards in the using the *get_size()* and *get()* ``body`` methods, however, for remaining bytes.
+There is limited support for ``std::vector<uint8_t>`` via the ``body`` messaging part only. The API itself is also somewhat limited, just in my opinion. You can *append* and *prepend* the vector itself. However, *trim* only permits you to specify the ``size_t``, ``std::size_t``, ``std::vector<uint8_t>::size_type``, or ``nng::size_type`` (all definitions of the same underlying type), which effectively *trims left* or *right* that number of bytes. This is performed blindly without returning the bytes that were trimmed.
+
+You may verify any of these features afterwards by using the ``get_size()`` and ``get()`` methods, which return ``nng::size_type`` and ``std::vector<uint8_t>``, respectively.
 
 #### Options
 
