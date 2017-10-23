@@ -22,11 +22,29 @@ At the present time I know that this project's CMake support is almost exclusive
 
 The library is composed of several key namespaces primarily. The first is ``nng`` for the core ``socket`` support, however, you ought never to be using ``socket`` directly, except perhaps as an abstract base class. The sockets you are concerned about live in ``nng::protocol``, and are dubbed *latest_xyz_socket*. Such as ``latest_pair_socket`` for the latest version ``pair_socket``.
 
+#### Messaging
+
 *Messaging* support is fairly robust at the time of this writing and are exposed via the ``nng::messaging`` namespace. I've made a serious effort to make sure that this works and is robust, with a battery of unit tests to demonstrate as much. This is a key feature of the library and puts the *"msg"* in *"nanomsg"*, in my opinion. Chiefly you should be concerned with the ``binary_message``, which I know is sort of an oxymoron in that all messages are binary, technically speaking. However, there is rich support around messages, with operators to support working with them that are highly extensible using specialized templates.
+
+#### API differences
+
+For the most part, I've made an effort to remain consistent with the underlying C API as far as naming conventions are concerned. However, there are a few differences in the way that API is supported. Messaging ``body`` supports the full range of possible API, whereas ``header`` esposure is somewhat limited, and then this was only due to exposure during unit testing. Of course, this is a work in progress and may change on a moment's notice.
+
+Okay, now for those differences. The ``append`` operation still appends in NNG parlance. However, I've dubbed *insert* instead as ``prepend``, which is commented as such anyway. So let's just call it what it is. Additionally, I just got confused every time I try to parse what *trim* and *chop* mean to the message, so I dubbed them simply ``ltrim`` and ``rtrim``, respectively.
+
+As for supported types, there is a ``uint32_t`` strain, which enjoys broader support in both ``header`` and ``body`` messaging parts. This literally *appends* and *prepends* the actual value itself *at the byte level*. *Trimming left* or *right* behaves by returning the *actual value*.
+
+Then there is ``uint8_t`` (i.e. *byte*) [std::vector](http://en.cppreference.com/w/cpp/container/vector) support, which is limited to the ``body`` messaging part at this time. The API is somewhat limited as well. You can *append* and *prepend* the vector itself. However, *trim* only permits you to specify the *size_t*, *std::size_t*, *std::vector\<uint8_t\>::size_type*, or *nng::size_type* (all definitions of the same underlying type), which effectively *trims left* or *right* that number of bytes. This is performed blindly without returning the bytes that were trimmed. You may verify that fact afterwards in the using the *get_size()* and *get()* ``body`` methods, however, for remaining bytes.
+
+#### Options
 
 The ``nng`` namespace also exposes ``options_writer`` and ``options_reader`` base classes. Both of these provide strategic functional support regardless whether the request originated in ``socket``, ``listener``, ``dialer``, or ``message_pipe``. This is accomplished by concretely binding the specific id from the requester, meanwhile providing the same generalized functional API to those callers. This permitted me to route all such requests through a single invocation handler.
 
+#### Socket address
+
 There is also support around *socket addresses*, which facilitates a rich set of ``socket address`` views for you, depending on the kind of view that is in play. This is a fairly new feature discovered only recently during unit testing. For the most part you should be engaging the API with ``std::string`` addresses, but in the future, you may also be able to utilize this feature.
+
+#### Compatibility mode
 
 I have also made the decision not to support the [legacy library](https//github.com/nanomsg/nanomsg). Not even in the NNG *compatibility* mode. After discussing with the NNG team, we agree that this adds no value, but if community contributors would like to see it, by all means. I will consider the pull request.
 
