@@ -12,7 +12,7 @@ namespace nng {
 
     // TODO: TBD: ditto "listener" ...
     dialer::dialer() : endpoint(), did(0), _options() {
-        configure_options();
+        configure_options(did);
     }
 
     dialer::dialer(const socket* const sp, const std::string& addr)
@@ -22,7 +22,7 @@ namespace nng {
         const auto errnum = op(addr.c_str());
         THROW_NNG_EXCEPTION_EC(errnum);
 
-        configure_options();
+        configure_options(did);
     }
 
     dialer::~dialer() {
@@ -36,13 +36,11 @@ namespace nng {
     }
 
     void dialer::close() {
-        if (did) {
-            const auto op = bind(&::nng_dialer_close, did);
-            const auto errnum = op();
-            THROW_NNG_EXCEPTION_EC(errnum);
-            did = 0;
-            // TODO: TBD: reconfigure afer close? may not be a bad idea...
-        }
+        if (!has_one()) { return; }
+        const auto op = bind(&::nng_dialer_close, did);
+        const auto errnum = op();
+        THROW_NNG_EXCEPTION_EC(errnum);
+        configure_options(did = 0);
     }
 
     bool dialer::has_one() const {
@@ -50,12 +48,10 @@ namespace nng {
     }
 
     void dialer::on_dialed() {
-        if (did) {
-            configure_options();
-        }
+        configure_options(did);
     }
 
-    void dialer::configure_options() {
+    void dialer::configure_options(nng_type did) {
 
         _options.set_getters(
             bind(&::nng_dialer_getopt, did, _1, _2, _3)

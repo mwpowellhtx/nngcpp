@@ -20,14 +20,14 @@ namespace nng {
         const auto errnum = nng_ctor(&sid);
         THROW_NNG_EXCEPTION_EC(errnum);
 
-        configure_options();
+        configure_options(sid);
     }
 
     socket::~socket() {
         close();
     }
 
-    void socket::configure_options() {
+    void socket::configure_options(nng_type sid) {
 
         _options.set_getters(
             bind(&::nng_getopt, sid, _1, _2, _3)
@@ -45,15 +45,13 @@ namespace nng {
     }
 
     void socket::close() {
-        if (sid) {
-            // Close is its own operation apart from Shutdown.
-            const auto op = bind(&::nng_close, sid);
-            const auto errnum = op();
-            THROW_NNG_EXCEPTION_IF_NOT_ONEOF(errnum, ec_eunknown, ec_enone);
-            // Closed is closed.
-            sid = 0;
-            // TODO: TBD: reconfigure after close? may not be a bad idea...
-        }
+        if (!has_one()) { return; }
+        // Close is its own operation apart from Shutdown.
+        const auto op = bind(&::nng_close, sid);
+        const auto errnum = op();
+        THROW_NNG_EXCEPTION_IF_NOT_ONEOF(errnum, ec_eunknown, ec_enone);
+        // Closed is closed.
+        configure_options(sid = 0);
     }
 
     void socket::shutdown() {
@@ -64,8 +62,8 @@ namespace nng {
         // Which socket can still be in operation.
     }
 
-    bool socket::is_open() const {
-        return sid != 0;
+    bool socket::has_one() const {
+        return sid > 0;
     }
 
     // TODO: TBD: ditto ec handling...

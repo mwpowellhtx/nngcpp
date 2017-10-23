@@ -21,7 +21,7 @@ namespace nng {
         const auto& op = bind(&::nng_msg_get_pipe, get_msgp(*mbp));
         pid = op();
 
-        configure_options();
+        configure_options(pid);
     }
 
     // TODO: TBD: this is looking very similar to socket. perhaps it is...
@@ -31,19 +31,17 @@ namespace nng {
 
     void message_pipe::close() {
         if (!has_one()) { return; }
-        using std::placeholders::_1;
-        const auto op = bind(::nng_pipe_close, _1);
-        const auto errnum = op(pid);
+        const auto op = bind(::nng_pipe_close, pid);
+        const auto errnum = op();
         THROW_NNG_EXCEPTION_IF_NOT_ONEOF(errnum, ec_eunknown, ec_enone, ec_enoent);
-        pid = 0;
-        // TODO: TBD: may not be a bad idea to reconfigure...
+        configure_options(pid = 0);
     }
 
     bool message_pipe::has_one() const {
         return pid > 0;
     }
 
-    void message_pipe::configure_options() {
+    void message_pipe::configure_options(nng_type pid) {
 
         _options.set_getters(
             bind(&::nng_pipe_getopt, pid, _1, _2, _3)

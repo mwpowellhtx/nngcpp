@@ -11,7 +11,7 @@ namespace nng {
 
     // TODO: TBD: is "listener" its own thing? or simply another kind of "socket"? i.e. perhaps a receive-only socket, as the name would suggest
     listener::listener() : endpoint(), lid(0), _options() {
-        configure_options();
+        configure_options(lid);
     }
 
     listener::listener(const socket* const sp, const std::string& addr)
@@ -21,7 +21,7 @@ namespace nng {
         const auto errnum = op(addr.c_str());
         THROW_NNG_EXCEPTION_EC(errnum);
 
-        configure_options();
+        configure_options(lid);
     }
 
     listener::~listener() {
@@ -35,13 +35,11 @@ namespace nng {
     }
 
     void listener::close() {
-        if (lid) {
-            const auto op = bind(&::nng_listener_close, lid);
-            const auto errnum = op();
-            THROW_NNG_EXCEPTION_EC(errnum);
-            lid = 0;
-            // TODO: TBD: reconfiguring might be a good idea here...
-        }
+        if (!has_one()) { return; }
+        const auto op = bind(&::nng_listener_close, lid);
+        const auto errnum = op();
+        THROW_NNG_EXCEPTION_EC(errnum);
+        configure_options(lid = 0);
     }
 
     bool listener::has_one() const {
@@ -49,12 +47,10 @@ namespace nng {
     }
 
     void listener::on_listened() {
-        if (lid) {
-            configure_options();
-        }
+        configure_options(lid);
     }
 
-    void listener::configure_options() {
+    void listener::configure_options(nng_type lid) {
 
         _options.set_getters(
             bind(&::nng_listener_getopt, lid, _1, _2, _3)

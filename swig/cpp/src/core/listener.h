@@ -26,7 +26,7 @@ namespace nng {
 
         options_reader_writer _options;
 
-        void configure_options();
+        void configure_options(nng_type lid);
 
     protected:
 

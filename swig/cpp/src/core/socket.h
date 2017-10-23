@@ -72,7 +72,7 @@ namespace nng {
 
         options_reader_writer _options;
 
-        void configure_options();
+        void configure_options(nng_type sid);
 
     protected:
 
@@ -94,7 +94,7 @@ namespace nng {
         void close();
         void shutdown();
 
-        bool is_open() const;
+        bool has_one() const;
 
         virtual options_reader_writer* const options();
 
