@@ -49,6 +49,9 @@ namespace nng {
             // TODO: TBD: so the only reason why we do this is to back-support the NNG structure.
             ::nng_sockaddr sa;
             std::memcpy(&sa, loopback.get(), sizeof(sa));
+            // For use during debugging sessions. Mask these out of the equation.
+            const auto etranerr_mask = ~static_cast<uint32_t>(::NNG_ETRANERR);
+            const auto esyserr_mask = ~static_cast<uint32_t>(::NNG_ESYSERR);
             auto rv = ::nni_plat_udp_open(&udpp, &sa);
             // A call like this works because the nng_sockaddr is type-defined as nni_sockaddr.
             CHECK_NOFAIL(rv == 0);
@@ -61,6 +64,7 @@ namespace nng {
 }
 
 void init(const std::string& addr) {
+    REQUIRE(::nni_init() == 0);
     REQUIRE(nng::transport::has_v6() == true);
 }
 
