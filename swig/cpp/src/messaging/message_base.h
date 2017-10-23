@@ -24,6 +24,8 @@ namespace nng {
 
             friend class message_part;
 
+            friend ::nng_msg* get_msgp(message_base_api& mb);
+
             message_base_api();
 
             virtual message_base_api& get_base() = 0;
@@ -41,17 +43,12 @@ namespace nng {
             bool has_one();
         };
 
-#ifndef NNGCPP_MESSAGE_PIPE_H
-        class message_pipe;
-#endif // NNGCPP_MESSAGE_PIPE_H
+        ::nng_msg* get_msgp(message_base_api& mb);
 
         class message_base : public message_base_api {
         private:
 
             friend class message_base_api;
-
-            friend class message_pipe;
-
             friend class socket;
 
         public:

@@ -4,9 +4,15 @@
 #define NNG_ONLY
 #include <nngcpp.h>
 
+#include "message_base.h"
 #include "../core/options.h"
 
 #include <algorithm>
+
+/* Due to some namespace weirdness during the include graph forward declarations, this could
+not live in another namespace for whatever reason. After careful consideration, decided that
+Message Pipe is closer in stature to Dialer, Listener, and even Socket, even though it bridges
+the API into Messaging. Therefore, decided that it should live in the nng::* namespace. */
 
 namespace nng {
 
@@ -14,52 +20,46 @@ namespace nng {
     class address;
 #endif //NNGCPP_ADDRESS_H
 
-    namespace messaging {
-
-#ifndef NNGCPP_MESSAGE_BASE_H
-        class message_base;
-#endif // NNGCPP_MESSAGE_BASE_H
-
 #ifndef NNGCPP_BINARY_MESSAGE_H
-        template<class Body_, class Header_> class basic_binary_message;
+    template<class Body_, class Header_> class basic_binary_message;
 #endif // NNGCPP_BINARY_MESSAGE_H
 
-        // TODO: so, equal_to is available, but not_equal_to is not?
-        class message_pipe : public options_reader, public std::equal_to<message_pipe> {
-        protected:
+    // TODO: so, equal_to is available, but not_equal_to is not?
+    class message_pipe : public std::equal_to<message_pipe> {
+    public:
 
-            template<class Body_, class Header_> friend class basic_binary_message;
+        typedef ::nng_pipe nng_type;
 
-            ::nng_pipe pid;
+    protected:
 
-        public:
+        friend message_pipe::nng_type get_id(const message_pipe& mp);
 
-            message_pipe(message_base* const mbp);
+        nng_type pid;
 
-            virtual ~message_pipe();
+    private:
 
-            virtual void close();
+        options_reader _options;
 
-            virtual bool has_one() const;
+        void reconfigure_options();
 
-            bool operator==(const message_pipe& rhs);
-            // TODO: TBD: so, apparently there is no std::not_equal_to available from the Microsoft implementation, however, we should still be able to override the operator
-            bool operator!=(const message_pipe& rhs);
+    public:
 
-            virtual void get_option(const std::string& name, void* valp, size_type& sz) override;
+        message_pipe(messaging::message_base* const mbp);
 
-            virtual void get_option(const std::string& name, std::string& val) override;
-            virtual void get_option(const std::string& name, std::string& val, size_type& sz) override;
+        virtual ~message_pipe();
 
-            virtual void get_option(const std::string& name, address& val);
+        virtual void close();
 
-            virtual void get_option_int(const std::string& name, int& val) override;
-            virtual void get_option_sz(const std::string& name, size_type& val) override;
+        virtual bool has_one() const;
 
-            virtual void get_option(const std::string& name, duration_type& val) override;
-            virtual void get_option_ms(const std::string& name, duration_rep_type& val) override;
-        };
-    }
+        virtual options_reader* const options();
+
+        bool operator==(const message_pipe& rhs);
+        // TODO: TBD: so, apparently there is no std::not_equal_to available from the Microsoft implementation, however, we should still be able to override the operator
+        bool operator!=(const message_pipe& rhs);
+    };
+
+    message_pipe::nng_type get_id(const message_pipe& mp);
 }
 
 #endif // NNGCPP_MESSAGE_PIPE_H

@@ -1,4 +1,5 @@
 #include "options.h"
+#include "../core/address.h"
 #include "exceptions.hpp"
 
 #include "algorithms/string_algo.hpp"
@@ -11,60 +12,118 @@ namespace nng {
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
-    options_writer::options_writer() {
+    options_writer::options_writer()
+        : _setopt()
+        , _setopt_int()
+        , _setopt_sz()
+        , _setopt_duration() {
     }
 
     options_writer::~options_writer() {
     }
 
-    void options_writer::set_option(const set_option_func& op, const std::string& name, const void* valp, size_type sz) {
-        invoke_op(op, name.c_str(), valp, sz);
+    void options_writer::set_setters(const setopt_func& setopt
+        , const setopt_int_func& setopt_int
+        , const setopt_sz_func& setopt_sz
+        , const setopt_duration_func& setopt_duration) {
+
+        // Cast the constness away from the setters long enough to install the new ones.
+        const_cast<setopt_func&>(_setopt) = setopt;
+        const_cast<setopt_int_func&>(_setopt_int) = setopt_int;
+        const_cast<setopt_sz_func&>(_setopt_sz) = setopt_sz;
+        const_cast<setopt_duration_func&>(_setopt_duration) = setopt_duration;
     }
 
-    void options_writer::set_option(const set_option_func& op, const std::string& name, const std::string& val) {
-        invoke_op(op, name.c_str(), val.c_str(), val.length());
+    void options_writer::set(const std::string& name, const void* valp, size_type sz) {
+        invoke_op(_setopt, name.c_str(), valp, sz);
     }
 
-    void options_writer::set_option_int(const set_option_int_func& op, const std::string& name, int val) {
-        invoke_op(op, name.c_str(), val);
+    void options_writer::set(const std::string& name, const std::string& val) {
+        invoke_op(_setopt, name.c_str(), val.c_str(), val.length());
     }
 
-    void options_writer::set_option_sz(const set_option_sz_func& op, const std::string& name, size_type val) {
-        invoke_op(op, name.c_str(), val);
+    void options_writer::set_int(const std::string& name, int val) {
+        invoke_op(_setopt_int, name.c_str(), val);
     }
 
-    void options_writer::set_option_ms(const set_option_duration_func& op, const std::string& name, duration_rep_type val) {
-        invoke_op(op, name.c_str(), val);
+    void options_writer::set_sz(const std::string& name, size_type val) {
+        invoke_op(_setopt_sz, name.c_str(), val);
     }
 
-    options_reader::options_reader() {
+    void options_writer::set(const std::string& name, const duration_type& val) {
+        set_milliseconds(name, val.count());
+    }
+
+    void options_writer::set_milliseconds(const std::string& name, duration_rep_type val) {
+        invoke_op(_setopt_duration, name.c_str(), val);
+    }
+
+    options_reader::options_reader()
+        : _getopt()
+        , _getopt_int()
+        , _getopt_sz()
+        , _getopt_duration() {
+    }
+
+    void options_reader::set_getters(const getopt_func& getopt
+        , const getopt_int_func& getopt_int
+        , const getopt_sz_func& getopt_sz
+        , const getopt_duration_func& getopt_duration) {
+
+        // Ditto casting constness away...
+        const_cast<getopt_func&>(_getopt) = getopt;
+        const_cast<getopt_int_func&>(_getopt_int) = getopt_int;
+        const_cast<getopt_sz_func&>(_getopt_sz) = getopt_sz;
+        const_cast<getopt_duration_func&>(_getopt_duration) = getopt_duration;
     }
 
     options_reader::~options_reader() {
     }
 
-    void options_reader::get_option(const get_option_func& op, const std::string& name, void* valp, size_type& sz) {
-        invoke_op(op, name.c_str(), valp, &sz);
+    void options_reader::get(const std::string& name, void* valp, size_type& sz) {
+        invoke_op(_getopt, name.c_str(), valp, &sz);
     }
 
-    void options_reader::get_option(const get_option_func& op, const std::string& name, std::string& val) {
+    void options_reader::get(const std::string& name, std::string& val, size_type& sz) {
+        val.resize(sz);
+        get(name, val);
+    }
+
+    void options_reader::get(const std::string& name, std::string& val) {
         auto sz = val.size();
-        invoke_op(op, name.c_str(), &val[0], &sz);
+        invoke_op(_getopt, name.c_str(), &val[0], &sz);
         /* So we do use the string trimming algorithms after all...
         Which the in-place is sufficient, no need to use the copying version. */
         trx::trim(val);
     }
 
-    void options_reader::get_option_int(const get_option_int_func& op, const std::string& name, int& val) {
-        invoke_op(op, name.c_str(), &val);
+    void options_reader::get(const std::string& name, address& val) {
+        auto sz = val.get_size();
+        invoke_op(_getopt, name.c_str(), val.get(), &sz);
     }
 
-    void options_reader::get_option_sz(const get_option_sz_func& op, const std::string& name, size_type& val) {
-        invoke_op(op, name.c_str(), &val);
+    void options_reader::get_int(const std::string& name, int& val) {
+        invoke_op(_getopt_int, name.c_str(), &val);
     }
 
-    void options_reader::get_option_ms(const get_option_ms_func& op, const std::string& name, duration_rep_type& val) {
-        invoke_op(op, name.c_str(), &val);
+    void options_reader::get_sz(const std::string& name, size_type& val) {
+        invoke_op(_getopt_sz, name.c_str(), &val);
+    }
+
+    void options_reader::get(const std::string& name, duration_type& val) {
+        duration_rep_type x;
+        get_milliseconds(name, x);
+        val = duration_type(x);
+    }
+
+    void options_reader::get_milliseconds(const std::string& name, duration_rep_type& val) {
+        invoke_op(_getopt_duration, name.c_str(), &val);
+    }
+
+    options_reader_writer::options_reader_writer() : options_reader(), options_writer() {
+    }
+
+    options_reader_writer::~options_reader_writer() {
     }
 
     option_names::option_names() {

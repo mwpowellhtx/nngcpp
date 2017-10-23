@@ -8,74 +8,123 @@
 
 namespace nng {
 
+#ifndef NNGCPP_ADDRESS_H
+    class address;
+#endif // NNGCPP_ADDRESS_H
+
+#ifndef NNGCPP_SOCKET_H
+    class socket;
+#endif // NNGCPP_SOCKET_H
+//
+#ifndef NNGCPP_LISTENER_H
+    class listener;
+#endif //NNGCPP_LISTENER_H
+
+#ifndef NNGCPP_DIALER_H
+    class dialer;
+#endif // NNGCPP_DIALER_H
+
+#ifndef NNGCPP_MESSAGE_PIPE_H
+    class message_pipe;
+#endif //NNGCPP_MESSAGE_PIPE_H
+
     class options_writer {
+    public:
+
+        typedef std::function<int(const char*, const void*, size_type)> setopt_func;
+
+        typedef std::function<int(const char*, int val)> setopt_int_func;
+        typedef std::function<int(const char*, size_type val)> setopt_sz_func;
+
+        typedef std::function<int(const char*, duration_rep_type)> setopt_duration_func;
+
+    private:
+
+        const setopt_func _setopt;
+        const setopt_int_func _setopt_int;
+        const setopt_sz_func _setopt_sz;
+        const setopt_duration_func _setopt_duration;
+
     protected:
 
         options_writer();
 
-        typedef std::function<int(const char*, const void*, size_type)> set_option_func;
-
-        typedef std::function<int(const char*, int val)> set_option_int_func;
-        typedef std::function<int(const char*, size_type val)> set_option_sz_func;
-
-        typedef std::function<int(const char*, duration_rep_type)> set_option_duration_func;
-
-        void set_option(const set_option_func& op, const std::string& name, const void* valp, size_type sz);
-        void set_option(const set_option_func& op, const std::string& name, const std::string& val);
-
-        void set_option_int(const set_option_int_func& op, const std::string& name, int val);
-        void set_option_sz(const set_option_sz_func& op, const std::string& name, size_type val);
-
-        void set_option_ms(const set_option_duration_func& op, const std::string& name, duration_rep_type val);
+        // TODO: TBD: ditto sticky friendship web...
+        void set_setters(const setopt_func& setopt
+            , const setopt_int_func& setopt_int
+            , const setopt_sz_func& setopt_sz
+            , const setopt_duration_func& setopt_duration);
 
     public:
 
-        ~options_writer();
+        virtual ~options_writer();
 
-        virtual void set_option(const std::string& name, const void* valp, size_type sz) = 0;
-        virtual void set_option(const std::string& name, const std::string& val) = 0;
+        virtual void set(const std::string& name, const void* valp, size_type sz);
+        virtual void set(const std::string& name, const std::string& val);
 
-        virtual void set_option_int(const std::string& name, int val) = 0;
-        virtual void set_option_sz(const std::string& name, size_type val) = 0;
+        virtual void set_int(const std::string& name, int val);
+        virtual void set_sz(const std::string& name, size_type val);
 
-        virtual void set_option(const std::string& name, const duration_type& val) = 0;
-        virtual void set_option_ms(const std::string& name, duration_rep_type val) = 0;
+        virtual void set(const std::string& name, const duration_type& val);
+        virtual void set_milliseconds(const std::string& name, duration_rep_type val);
     };
 
     class options_reader {
+    public:
+
+        typedef std::function<int(const char*, void* valp, size_type* szp)> getopt_func;
+
+        typedef std::function<int(const char*, int* valp)> getopt_int_func;
+        typedef std::function<int(const char*, size_type* valp)> getopt_sz_func;
+
+        typedef std::function<int(const char*, duration_rep_type* valp)> getopt_duration_func;
+
+    private:
+
+        const getopt_func _getopt;
+        const getopt_int_func _getopt_int;
+        const getopt_sz_func _getopt_sz;
+        const getopt_duration_func _getopt_duration;
+
     protected:
+
+        friend class message_pipe;
 
         options_reader();
 
-        typedef std::function<int(const char*, void* valp, size_type* szp)> get_option_func;
-
-        typedef std::function<int(const char*, int* valp)> get_option_int_func;
-        typedef std::function<int(const char*, size_type* valp)> get_option_sz_func;
-
-        typedef std::function<int(const char*, duration_rep_type* valp)> get_option_ms_func;
-
-        void get_option(const get_option_func& op, const std::string& name, void* valp, size_type& sz);
-        void get_option(const get_option_func& op, const std::string& name, std::string& val);
-
-        void get_option_int(const get_option_int_func& op, const std::string& name, int& val);
-        void get_option_sz(const get_option_sz_func& op, const std::string& name, size_type& val);
-
-        void get_option_ms(const get_option_ms_func& op, const std::string& name, duration_rep_type& val);
+        // TODO: TBD: making them public against my better judgment; however friendship web is getting kind of sticky IMHO...
+        void set_getters(const getopt_func& getopt
+            , const getopt_int_func& getopt_int
+            , const getopt_sz_func& getopt_sz
+            , const getopt_duration_func& getopt_duration);
 
     public:
 
         virtual ~options_reader();
 
-        virtual void get_option(const std::string& name, void* valp, size_type& szp) = 0;
+        virtual void get(const std::string& name, void* valp, size_type& szp);
 
-        virtual void get_option(const std::string& name, std::string& val, size_type& sz) = 0;
-        virtual void get_option(const std::string& name, std::string& val) = 0;
+        virtual void get(const std::string& name, std::string& val, size_type& sz);
+        virtual void get(const std::string& name, std::string& val);
+        virtual void get(const std::string& name, address& val);
 
-        virtual void get_option_int(const std::string& name, int& val) = 0;
-        virtual void get_option_sz(const std::string& name, size_type& val) = 0;
+        virtual void get_int(const std::string& name, int& val);
+        virtual void get_sz(const std::string& name, size_type& val);
 
-        virtual void get_option(const std::string& name, duration_type& val) = 0;
-        virtual void get_option_ms(const std::string& name, duration_rep_type& val) = 0;
+        virtual void get(const std::string& name, duration_type& val);
+        virtual void get_milliseconds(const std::string& name, duration_rep_type& val);
+    };
+
+    class options_reader_writer : public options_reader, public options_writer {
+    protected:
+
+        friend class socket;
+        friend class dialer;
+        friend class listener;
+
+        options_reader_writer();
+
+        virtual ~options_reader_writer();
     };
 
     struct option_names {

@@ -9,6 +9,10 @@ namespace nng {
 
     namespace messaging {
 
+        ::nng_msg* get_msgp(message_base_api& mb) {
+            return mb.get_msgp();
+        }
+
         void message_base_api::do_clear_op(const clear_op& op) {
             op();
         }

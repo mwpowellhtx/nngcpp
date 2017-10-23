@@ -2,7 +2,6 @@
 #include "messenger.h"
 #include "listener.h"
 #include "dialer.h"
-#include "options.h"
 #include "exceptions.hpp"
 
 #include <vector>
@@ -15,19 +14,34 @@ namespace nng {
     using std::placeholders::_4;
 
     socket::socket(const nng_ctor_func& nng_ctor)
-        : sid(0)
-        , sender()
-        , receiver()
-        , messenger()
-        , options_reader()
-        , options_writer() {
+        : sender(), receiver(), messenger()
+        , sid(0), _options() {
 
         const auto errnum = nng_ctor(&sid);
         THROW_NNG_EXCEPTION_EC(errnum);
+
+        configure_options();
     }
 
     socket::~socket() {
         close();
+    }
+
+    void socket::configure_options() {
+
+        _options.set_getters(
+            std::bind(&::nng_getopt, sid, _1, _2, _3)
+            , std::bind(::nng_getopt_int, sid, _1, _2)
+            , std::bind(::nng_getopt_size, sid, _1, _2)
+            , std::bind(&::nng_getopt_ms, sid, _1, _2)
+        );
+
+        _options.set_setters(
+            std::bind(&::nng_setopt, sid, _1, _2, _3)
+            , std::bind(::nng_setopt_int, sid, _1, _2)
+            , std::bind(::nng_setopt_size, sid, _1, _2)
+            , std::bind(&::nng_setopt_ms, sid, _1, _2)
+        );
     }
 
     void socket::close() {
@@ -38,6 +52,7 @@ namespace nng {
             THROW_NNG_EXCEPTION_IF_NOT_ONEOF(errnum, ec_eunknown, ec_enone);
             // Closed is closed.
             sid = 0;
+            // TODO: TBD: reconfigure after close? may not be a bad idea...
         }
     }
 
@@ -64,6 +79,7 @@ namespace nng {
         const auto& op = std::bind(&::nng_listen, _1, _2, _3, _4);
         const auto errnum = op(sid, addr.c_str(), lp ? &(lp->lid) : nullptr, static_cast<int>(flags));
         THROW_NNG_EXCEPTION_EC(errnum);
+        if (lp) { lp->on_listened(); }
     }
 
     void socket::dial(const std::string& addr, flag_type flags) {
@@ -76,6 +92,7 @@ namespace nng {
         const auto& op = std::bind(&::nng_dial, _1, _2, _3, _4);
         const auto errnum = op(sid, addr.c_str(), dp ? &(dp->did) : nullptr, static_cast<int>(flags));
         THROW_NNG_EXCEPTION_EC(errnum);
+        if (dp) { dp->on_dialed(); }
     }
 
     template<class Buffer_>
@@ -150,70 +167,8 @@ namespace nng {
         return nng::try_receive(sid, *bufp, sz, flags);
     }
 
-    // Convenience option wrappers.
-    void socket::get_option(const std::string& name, void* valp, size_type& sz) {
-        const auto& op = std::bind(&::nng_getopt, sid, _1, _2, _3);
-        options_reader::get_option(op, name, valp, sz);
-    }
-
-    void socket::get_option(const std::string& name, std::string& val, size_type& sz) {
-        val.resize(sz);
-        get_option(name, val);
-    }
-
-    void socket::get_option(const std::string& name, std::string& val) {
-        const auto& op = std::bind(::nng_getopt, sid, _1, _2, _3);
-        options_reader::get_option(op, name, val);
-    }
-
-    void socket::get_option_int(const std::string& name, int& val) {
-        const auto& op = std::bind(::nng_getopt_int, sid, _1, _2);
-        options_reader::get_option_int(op, name, val);
-    }
-
-    void socket::get_option_sz(const std::string& name, size_type& val) {
-        const auto& op = std::bind(::nng_getopt_size, sid, _1, _2);
-        options_reader::get_option_sz(op, name, val);
-    }
-
-    void socket::get_option(const std::string& name, duration_type& val) {
-        duration_type::rep x;
-        get_option_ms(name, x);
-        val = duration_type(x);
-    }
-
-    void socket::get_option_ms(const std::string& name, duration_rep_type& val) {
-        const auto op = std::bind(&::nng_getopt_ms, sid, _1, _2);
-        options_reader::get_option_ms(op, name.c_str(), val);
-    }
-
-    void socket::set_option(const std::string& name, const void* valp, size_type sz) {
-        const auto op = std::bind(&::nng_setopt, sid, _1, _2, _3);
-        options_writer::set_option(op, name, valp, sz);
-    }
-
-    void socket::set_option(const std::string& name, const std::string& val) {
-        const auto op = std::bind(&::nng_setopt, sid, _1, _2, _3);
-        options_writer::set_option(op, name, val);
-    }
-
-    void socket::set_option_int(const std::string& name, int val) {
-        const auto& op = std::bind(&::nng_setopt_int, sid, _1, _2);
-        options_writer::set_option_int(op, name, val);
-    }
-
-    void socket::set_option_sz(const std::string& name, size_type val) {
-        const auto& op = std::bind(&::nng_setopt_size, sid, _1, _2);
-        options_writer::set_option_sz(op, name, val);
-    }
-
-    void socket::set_option(const std::string& name, const duration_type& val) {
-        set_option_ms(name, val.count());
-    }
-
-    void socket::set_option_ms(const std::string& name, duration_rep_type val) {
-        const auto op = std::bind(&::nng_setopt_ms, sid, _1, _2);
-        options_writer::set_option_ms(op, name, val);
+    options_reader_writer* const socket::options() {
+        return &_options;
     }
 
     protocol_type to_protocol_type(int value) {

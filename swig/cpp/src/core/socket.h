@@ -7,16 +7,13 @@
 #include "sender.h"
 #include "receiver.h"
 #include "messenger.h"
+#include "options.h"
 
 // nng should be in the include path.
 #include <functional>
 #include <string>
 
 namespace nng {
-
-#ifndef NNGCPP_OPTIONS_H
-    class options;
-#endif // NNGCPP_OPTIONS_H
 
     enum protocol_type {
         protocol_none = ::NNG_PROTO_NONE,
@@ -55,11 +52,13 @@ namespace nng {
     class dialer;
     struct device_path;
 
-    class socket : public sender, public receiver, public messenger, public options_reader, public options_writer {
+    class socket : public sender, public receiver, public messenger {
     public:
 
         typedef messaging::buffer_vector_type buffer_vector_type;
         typedef messaging::binary_message binary_message_type;
+
+        typedef ::nng_socket nng_type;
 
     private:
 
@@ -69,11 +68,15 @@ namespace nng {
         // For use with Device Thread Callback.
         friend void install_device_sockets_callback(const device_path* const);
 
-        ::nng_socket sid;
+        nng_type sid;
+
+        options_reader_writer _options;
+
+        void configure_options();
 
     protected:
 
-        typedef std::function<int(::nng_socket* const)> nng_ctor_func;
+        typedef std::function<int(nng_type* const)> nng_ctor_func;
 
         socket(const nng_ctor_func& nng_ctor);
 
@@ -93,26 +96,7 @@ namespace nng {
 
         bool is_open() const;
 
-        // Convenience option wrappers.
-        virtual void get_option(const std::string& name, void* valp, size_type& sz) override;
-
-        virtual void get_option(const std::string& name, std::string& val) override;
-        virtual void get_option(const std::string& name, std::string& val, size_type& sz) override;
-
-        virtual void get_option_int(const std::string& name, int& val) override;
-        virtual void get_option_sz(const std::string& name, size_type& val) override;
-
-        virtual void get_option(const std::string& name, duration_type& val) override;
-        virtual void get_option_ms(const std::string& name, duration_rep_type& val) override;
-
-        virtual void set_option(const std::string& name, const void* valp, size_type sz) override;
-        virtual void set_option(const std::string& name, const std::string& val) override;
-
-        virtual void set_option_int(const std::string& name, int val) override;
-        virtual void set_option_sz(const std::string& name, size_type val) override;
-
-        virtual void set_option(const std::string& name, const duration_type& val) override;
-        virtual void set_option_ms(const std::string& name, duration_rep_type val) override;
+        virtual options_reader_writer* const options();
 
         virtual void send(binary_message_type* const bmp, flag_type flags = flag_none) override;
 

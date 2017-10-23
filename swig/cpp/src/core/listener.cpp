@@ -9,22 +9,18 @@ namespace nng {
     using std::placeholders::_3;
 
     // TODO: TBD: is "listener" its own thing? or simply another kind of "socket"? i.e. perhaps a receive-only socket, as the name would suggest
-    listener::listener()
-        : lid(0)
-        , endpoint()
-        , options_reader()
-        , options_writer() {
+    listener::listener() : endpoint(), lid(0), _options() {
+        configure_options();
     }
 
     listener::listener(const socket* const sp, const std::string& addr)
-        : lid(0)
-        , endpoint()
-        , options_reader()
-        , options_writer() {
+        : endpoint(), lid(0), _options() {
 
-        const auto op = std::bind(&::nng_listener_create, _1, _2, _3);
-        const auto errnum = op(&lid, sp->sid, addr.c_str());
+        const auto op = std::bind(&::nng_listener_create, &lid, sp->sid, _1);
+        const auto errnum = op(addr.c_str());
         THROW_NNG_EXCEPTION_EC(errnum);
+
+        configure_options();
     }
 
     listener::~listener() {
@@ -32,17 +28,18 @@ namespace nng {
     }
 
     void listener::start(flag_type flags) {
-        const auto op = std::bind(&::nng_listener_start, _1, _2);
-        const auto errnum = op(lid, static_cast<int>(flags));
+        const auto op = std::bind(&::nng_listener_start, lid, _1);
+        const auto errnum = op(static_cast<int>(flags));
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
     void listener::close() {
         if (lid) {
-            const auto op = std::bind(&::nng_listener_close, _1);
-            const auto errnum = op(lid);
+            const auto op = std::bind(&::nng_listener_close, lid);
+            const auto errnum = op();
             THROW_NNG_EXCEPTION_EC(errnum);
             lid = 0;
+            // TODO: TBD: reconfiguring might be a good idea here...
         }
     }
 
@@ -50,68 +47,30 @@ namespace nng {
         return lid != 0;
     }
 
-    void listener::get_option(const std::string& name, void* valp, size_type& sz) {
-        const auto& op = std::bind(&::nng_listener_getopt, lid, _1, _2, _3);
-        options_reader::get_option(op, name, valp, sz);
+    void listener::on_listened() {
+        if (lid) {
+            configure_options();
+        }
     }
 
-    void listener::get_option(const std::string& name, std::string& val, size_type& sz) {
-        val.resize(sz);
-        get_option(name, val);
+    void listener::configure_options() {
+
+        _options.set_getters(
+            std::bind(&::nng_listener_getopt, lid, _1, _2, _3)
+            , std::bind(&::nng_listener_getopt_int, lid, _1, _2)
+            , std::bind(::nng_listener_getopt_size, lid, _1, _2)
+            , std::bind(::nng_listener_getopt_ms, lid, _1, _2)
+        );
+
+        _options.set_setters(
+            std::bind(&::nng_listener_setopt, lid, _1, _2, _3)
+            , std::bind(&::nng_listener_setopt_int, lid, _1, _2)
+            , std::bind(&::nng_listener_setopt_size, lid, _1, _2)
+            , std::bind(&::nng_listener_setopt_ms, lid, _1, _2)
+        );
     }
 
-    void listener::get_option(const std::string& name, std::string& val) {
-        const auto& op = std::bind(::nng_listener_getopt, lid, _1, _2, _3);
-        options_reader::get_option(op, name, val);
-    }
-
-    void listener::get_option_int(const std::string& name, int& val) {
-        const auto op = std::bind(&::nng_listener_getopt_int, lid, _1, _2);
-        options_reader::get_option_int(op, name, val);
-    }
-
-    void listener::get_option_sz(const std::string& name, size_type& val) {
-        const auto& op = std::bind(::nng_listener_getopt_size, lid, _1, _2);
-        options_reader::get_option_sz(op, name, val);
-    }
-
-    void listener::get_option(const std::string& name, duration_type& val) {
-        duration_type::rep x;
-        get_option_ms(name, x);
-        val = duration_type(x);
-    }
-
-    void listener::get_option_ms(const std::string& name, duration_rep_type& val) {
-        const auto& op = std::bind(::nng_listener_getopt_ms, lid, _1, _2);
-        options_reader::get_option_ms(op, name.c_str(), val);
-    }
-
-    void listener::set_option(const std::string& name, const void* valp, size_type sz) {
-        const auto op = std::bind(&::nng_listener_setopt, lid, _1, _2, _3);
-        options_writer::set_option(op, name, valp, sz);
-    }
-
-    void listener::set_option(const std::string& name, const std::string& val) {
-        const auto op = std::bind(&::nng_listener_setopt, lid, _1, _2, _3);
-        options_writer::set_option(op, name, val);
-    }
-
-    void listener::set_option_int(const std::string& name, int val) {
-        const auto& op = std::bind(&::nng_listener_setopt_int, lid, _1, _2);
-        options_writer::set_option_int(op, name, val);
-    }
-
-    void listener::set_option_sz(const std::string& name, size_type val) {
-        const auto& op = std::bind(&::nng_listener_setopt_size, lid, _1, _2);
-        options_writer::set_option_sz(op, name, val);
-    }
-
-    void listener::set_option(const std::string& name, const duration_type& val) {
-        set_option_ms(name, val.count());
-    }
-
-    void listener::set_option_ms(const std::string& name, duration_rep_type val) {
-        const auto op = std::bind(&::nng_listener_setopt_ms, lid, _1, _2);
-        options_writer::set_option_ms(op, name, val);
+    options_reader_writer* const listener::options() {
+        return &_options;
     }
 }

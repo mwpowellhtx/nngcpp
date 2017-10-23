@@ -1,5 +1,6 @@
 #include "dialer.h"
 #include "socket.h"
+#include "options.h"
 #include "exceptions.hpp"
 
 namespace nng {
@@ -9,21 +10,18 @@ namespace nng {
     using std::placeholders::_3;
 
     // TODO: TBD: ditto "listener" ...
-    dialer::dialer()
-        : did(0)
-        , endpoint()
-        , options_reader()
-        , options_writer() {
+    dialer::dialer() : endpoint(), did(0), _options() {
+        configure_options();
     }
 
     dialer::dialer(const socket* const sp, const std::string& addr)
-        : did(0)
-        , endpoint()
-        , options_reader()
-        , options_writer() {
+        : endpoint(), did(0), _options() {
 
-        const auto errnum = ::nng_dialer_create(&did, sp->sid, addr.c_str());
+        const auto& op = std::bind(&::nng_dialer_create, &did, sp->sid, _1);
+        const auto errnum = op(addr.c_str());
         THROW_NNG_EXCEPTION_EC(errnum);
+
+        configure_options();
     }
 
     dialer::~dialer() {
@@ -31,16 +29,18 @@ namespace nng {
     }
 
     void dialer::start(flag_type flags) {
-        const auto errnum = ::nng_dialer_start(did, static_cast<int>(flags));
+        const auto& op = std::bind(&::nng_dialer_start, did, _1);
+        const auto errnum = op(static_cast<int>(flags));
         THROW_NNG_EXCEPTION_EC(errnum);
     }
 
     void dialer::close() {
         if (did) {
-            const auto op = std::bind(&::nng_dialer_close, _1);
-            const auto errnum = op(did);
+            const auto op = std::bind(&::nng_dialer_close, did);
+            const auto errnum = op();
             THROW_NNG_EXCEPTION_EC(errnum);
             did = 0;
+            // TODO: TBD: reconfigure afer close? may not be a bad idea...
         }
     }
 
@@ -48,68 +48,30 @@ namespace nng {
         return did != 0;
     }
 
-    void dialer::get_option(const std::string& name, std::string& val, size_type& sz) {
-        val.resize(sz);
-        get_option(name, val);
+    void dialer::on_dialed() {
+        if (did) {
+            configure_options();
+        }
     }
 
-    void dialer::get_option(const std::string& name, void* valp, size_type& sz) {
-        const auto& op = std::bind(&::nng_dialer_getopt, did, _1, _2, _3);
-        options_reader::get_option(op, name, valp, sz);
+    void dialer::configure_options() {
+
+        _options.set_getters(
+            std::bind(&::nng_dialer_getopt, did, _1, _2, _3)
+            , std::bind(&::nng_dialer_getopt_int, did, _1, _2)
+            , std::bind(&::nng_dialer_getopt_size, did, _1, _2)
+            , std::bind(&::nng_dialer_getopt_ms, did, _1, _2)
+        );
+
+        _options.set_setters(
+            std::bind(&::nng_dialer_setopt, did, _1, _2, _3)
+            , std::bind(&::nng_dialer_setopt_int, did, _1, _2)
+            , std::bind(&::nng_dialer_setopt_size, did, _1, _2)
+            , std::bind(&::nng_dialer_setopt_ms, did, _1, _2)
+        );
     }
 
-    void dialer::get_option(const std::string& name, std::string& val) {
-        const auto& op = std::bind(::nng_dialer_getopt, did, _1, _2, _3);
-        options_reader::get_option(op, name, val);
-    }
-
-    void dialer::get_option_int(const std::string& name, int& val) {
-        const auto& op = std::bind(::nng_dialer_getopt_int, did, _1, _2);
-        options_reader::get_option_int(op, name, val);
-    }
-
-    void dialer::get_option_sz(const std::string& name, size_type& val) {
-        const auto& op = std::bind(::nng_dialer_getopt_size, did, _1, _2);
-        options_reader::get_option_sz(op, name, val);
-    }
-
-    void dialer::get_option(const std::string& name, duration_type& val) {
-        duration_type::rep x;
-        get_option_ms(name, x);
-        val = duration_type(x);
-    }
-
-    void dialer::get_option_ms(const std::string& name, duration_rep_type& val) {
-        const auto& op = std::bind(&::nng_dialer_getopt_ms, did, _1, _2);
-        options_reader::get_option_ms(op, name.c_str(), val);
-    }
-
-    void dialer::set_option(const std::string& name, const void* valp, size_type sz) {
-        const auto& op = std::bind(&::nng_dialer_setopt, did, _1, _2, _3);
-        options_writer::set_option(op, name, valp, sz);
-    }
-
-    void dialer::set_option(const std::string& name, const std::string& val) {
-        const auto& op = std::bind(&::nng_dialer_setopt, did, _1, _2, _3);
-        options_writer::set_option(op, name, val);
-    }
-
-    void dialer::set_option_int(const std::string& name, int val) {
-        const auto& op = std::bind(&::nng_dialer_setopt_int, did, _1, _2);
-        options_writer::set_option_int(op, name, val);
-    }
-
-    void dialer::set_option_sz(const std::string& name, size_type val) {
-        const auto& op = std::bind(&::nng_dialer_setopt_size, did, _1, _2);
-        options_writer::set_option_sz(op, name, val);
-    }
-
-    void dialer::set_option(const std::string& name, const duration_type& val) {
-        set_option_ms(name, val.count());
-    }
-
-    void dialer::set_option_ms(const std::string& name, duration_rep_type val) {
-        const auto& op = std::bind(&::nng_dialer_setopt_ms, did, _1, _2);
-        options_writer::set_option_ms(op, name, val);
+    options_reader_writer* const dialer::options() {
+        return &_options;
     }
 }

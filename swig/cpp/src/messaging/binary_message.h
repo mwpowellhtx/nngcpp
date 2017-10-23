@@ -12,22 +12,19 @@
 
 namespace nng {
 
-    namespace messaging {
-
 #ifndef NNGCPP_MESSAGE_PIPE_H
-        class message_pipe;
+    class message_pipe;
 #endif //NNGCPP_MESSAGE_PIPE_H
+
+    namespace messaging {
 
         // TODO: TBD: of course they are all "binary" messages close to the wire; however, we may shim a string-based API around this one...
         template<class Body_, class Header_>
         class basic_binary_message : public message_base {
         public:
 
-            typedef Body_ body_type;
-
             typedef Header_ header_type;
-
-            typedef basic_binary_message<Body_, Header_> basic_binary_message_type;
+            typedef Body_ body_type;
 
         private:
 
@@ -36,51 +33,46 @@ namespace nng {
             ::nng_msg* _msgp;
 
             header_type _header;
-
             body_type _body;
 
         protected:
 
             basic_binary_message()
                 : message_base()
-                , _msgp(nullptr)
-                , _header(this)
-                , _body(this) {
+                , _msgp(nullptr), _header(this), _body(this) {
 
                 allocate();
             }
 
             basic_binary_message(size_type sz)
                 : message_base()
-                , _msgp(nullptr)
-                , _header(this)
-                , _body(this) {
+                , _msgp(nullptr), _header(this), _body(this) {
 
                 allocate(sz);
             }
 
             basic_binary_message(::nng_msg* msgp)
                 : message_base()
-                , _msgp(msgp)
-                , _header(this)
-                , _body(this) {
+                , _msgp(msgp), _header(this), _body(this) {
             }
 
         public:
 
-            virtual ~basic_binary_message() { free(); }
+            virtual ~basic_binary_message() {
+                free();
+            }
 
-            header_type* const header() {
+            virtual header_type* const header() {
                 if (!has_one()) { allocate(); }
                 return &_header;
             }
 
-            body_type* const body() {
+            virtual body_type* const body() {
                 if (!has_one()) { allocate(); }
                 return &_body;
             }
 
-            virtual ::nng_msg* get_msgp() override {
+            virtual ::nng_msg* get_msgp() {
                 return _msgp;
             }
 
@@ -101,7 +93,7 @@ namespace nng {
                 return _header.get_size() + _body.get_size();
             }
 
-            virtual void clear() override {
+            virtual void clear() {
                 if (!has_one()) { return; }
                 _header.clear();
                 _body.clear();
@@ -133,8 +125,8 @@ namespace nng {
                 using std::placeholders::_1;
                 // This is another convenience moment: allocate beforehand, if necessary.
                 // TODO: TBD: there is no return value here unfortunately... perhaps there should be?
-                const auto op = std::bind(&::nng_msg_set_pipe, _msgp, _1);
-                op(mpp->pid);
+                const auto op = std::bind(&::nng_msg_set_pipe, _msgp, get_id(*mpp));
+                op();
             }
 
         protected:
@@ -149,7 +141,7 @@ namespace nng {
 
         public:
 
-            operator std::string() {
+            virtual operator std::string() {
                 std::string s;
                 const auto buf = body()->get();
                 for (auto it = buf.begin(); it != buf.end(); it++) {
