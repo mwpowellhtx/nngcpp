@@ -30,19 +30,19 @@ namespace nng {
 
                 virtual ~pub_socket_fixture() {}
 
-                std::unique_ptr<binary_message_type> receive(flag_type flags = flag_none) {
+                virtual std::unique_ptr<binary_message_type> receive(flag_type flags = flag_none) override {
                     return pub_socket::receive(flags);
                 }
 
-                int try_receive(binary_message_type* const bmp, flag_type flags = flag_none) {
+                virtual bool try_receive(binary_message_type* const bmp, flag_type flags = flag_none) override {
                     return pub_socket::try_receive(bmp, flags);
                 }
 
-                buffer_vector_type receive(size_type& sz, flag_type flags = flag_none) {
+                virtual buffer_vector_type receive(size_type& sz, flag_type flags = flag_none) override {
                     return pub_socket::receive(sz, flags);
                 }
 
-                int try_receive(buffer_vector_type* const bufp, size_type& sz, flag_type flags = flag_none) {
+                virtual bool try_receive(buffer_vector_type* const bufp, size_type& sz, flag_type flags = flag_none) override {
                     return pub_socket::try_receive(bufp, sz, flags);
                 }
             };
@@ -54,16 +54,16 @@ namespace nng {
 
                 virtual ~sub_socket_fixture() {}
 
-                void send(binary_message_type* const bmp, flag_type flags = flag_none) {
+                virtual void send(binary_message_type* const bmp, flag_type flags = flag_none) override {
                     sub_socket::send(bmp, flags);
                 }
 
-                int send(const buffer_vector_type* const bufp, flag_type flags = flag_none) {
-                    return sub_socket::send(bufp, flags);
+                virtual void send(const buffer_vector_type* const bufp, flag_type flags = flag_none) override {
+                    sub_socket::send(bufp, flags);
                 }
 
-                int send(const buffer_vector_type* const bufp, size_type sz, flag_type flags = flag_none) {
-                    return sub_socket::send(bufp, sz, flags);
+                virtual void send(const buffer_vector_type* const bufp, size_type sz, flag_type flags = flag_none) override {
+                    sub_socket::send(bufp, sz, flags);
                 }
             };
         }

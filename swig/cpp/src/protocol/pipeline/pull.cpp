@@ -20,11 +20,11 @@ namespace nng {
                 THROW_PULL_SOCKET_INV_OP();
             }
 
-            int pull_socket::send(const buffer_vector_type* const bufp, flag_type flags) {
+            void pull_socket::send(const buffer_vector_type* const bufp, flag_type flags) {
                 THROW_PULL_SOCKET_INV_OP();
             }
 
-            int pull_socket::send(const buffer_vector_type* const bufp, size_type sz, flag_type flags) {
+            void pull_socket::send(const buffer_vector_type* const bufp, size_type sz, flag_type flags) {
                 THROW_PULL_SOCKET_INV_OP();
             }
         }

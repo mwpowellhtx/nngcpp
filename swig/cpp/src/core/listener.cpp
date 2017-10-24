@@ -1,6 +1,6 @@
 #include "listener.h"
 #include "socket.h"
-#include "exceptions.hpp"
+#include "invocation.hpp"
 
 namespace nng {
 
@@ -18,9 +18,7 @@ namespace nng {
         : endpoint(), lid(0), _options() {
 
         const auto op = bind(&::nng_listener_create, &lid, sp->sid, _1);
-        const auto errnum = op(addr.c_str());
-        THROW_NNG_EXCEPTION_EC(errnum);
-
+        invocation::with_default_error_handling(op, addr.c_str());
         configure_options(lid);
     }
 
@@ -30,15 +28,13 @@ namespace nng {
 
     void listener::start(flag_type flags) {
         const auto op = bind(&::nng_listener_start, lid, _1);
-        const auto errnum = op(static_cast<int>(flags));
-        THROW_NNG_EXCEPTION_EC(errnum);
+        invocation::with_default_error_handling(op, static_cast<int>(flags));
     }
 
     void listener::close() {
         if (!has_one()) { return; }
         const auto op = bind(&::nng_listener_close, lid);
-        const auto errnum = op();
-        THROW_NNG_EXCEPTION_EC(errnum);
+        invocation::with_default_error_handling(op);
         configure_options(lid = 0);
     }
 

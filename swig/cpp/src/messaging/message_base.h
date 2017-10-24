@@ -34,8 +34,6 @@ namespace nng {
 
             typedef std::function<void()> clear_op;
 
-            static void do_clear_op(const clear_op& op);
-
             virtual void clear() = 0;
 
         public:

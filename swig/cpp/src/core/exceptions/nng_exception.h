@@ -13,6 +13,10 @@ namespace nng {
     namespace exceptions {
 
         class nng_exception : public std::exception {
+        private:
+
+            std::string message;
+
         public:
 
             typedef uint32_t error_type;
@@ -28,6 +32,8 @@ namespace nng {
             nng_exception(error_code_type ec);
 
             virtual ~nng_exception();
+
+            virtual const char* what() const override;
         };
     }
 }

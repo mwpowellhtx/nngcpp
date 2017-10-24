@@ -100,21 +100,17 @@ namespace nng {
 
         virtual void send(binary_message_type* const bmp, flag_type flags = flag_none) override;
 
-        virtual int send(const buffer_vector_type* const bufp, flag_type flags = flag_none) override;
-        virtual int send(const buffer_vector_type* const bufp, size_type sz, flag_type flags = flag_none) override;
+        virtual void send(const buffer_vector_type* const bufp, flag_type flags = flag_none) override;
+        virtual void send(const buffer_vector_type* const bufp, size_type sz, flag_type flags = flag_none) override;
 
         virtual std::unique_ptr<binary_message_type> receive(flag_type flags = flag_none) override;
-        virtual int try_receive(binary_message_type* const bmp, flag_type flags = flag_none) override;
+        virtual bool try_receive(binary_message_type* const bmp, flag_type flags = flag_none) override;
 
-        virtual buffer_vector_type receive(nng::size_type& sz, flag_type flags = flag_none) override;
-        virtual int try_receive(buffer_vector_type* const bufp, size_type& sz, flag_type flags = flag_none) override;
+        virtual buffer_vector_type receive(size_type& sz, flag_type flags = flag_none) override;
+        virtual bool try_receive(buffer_vector_type* const bufp, size_type& sz, flag_type flags = flag_none) override;
 
         protocol_type get_protocol() const;
         protocol_type get_peer() const;
-        
-        // TODO: TBD: I'm not sure it makes that much quite as much sense to ask whether the socket is this that or the other protocol type...
-        bool is_protocol_configured() const;
-        bool is_peer_configured() const;
     };
 }
 

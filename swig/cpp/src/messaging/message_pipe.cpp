@@ -1,7 +1,6 @@
 #include "message_pipe.h"
 #include "message_base.h"
-#include "../core/address.h"
-#include "../core/exceptions.hpp"
+#include "../core/invocation.hpp"
 
 namespace nng {
 
@@ -19,8 +18,7 @@ namespace nng {
 
         // TODO: TBD: throw an exception upon irregular pipe value...
         const auto& op = bind(&::nng_msg_get_pipe, get_msgp(*mbp));
-        pid = op();
-
+        invocation::with_result(op, &pid);
         configure_options(pid);
     }
 
@@ -31,9 +29,9 @@ namespace nng {
 
     void message_pipe::close() {
         if (!has_one()) { return; }
-        const auto op = bind(::nng_pipe_close, pid);
-        const auto errnum = op();
-        THROW_NNG_EXCEPTION_IF_NOT_ONE_OF(errnum, ec_enone, ec_enoent);
+        const auto op = bind(&::nng_pipe_close, pid);
+        // TODO: TBD: should be fine trapping non-ec_enone RV's only; but consider whether ec_enoent was appropriate...
+        invocation::with_error_handling_if_not_one_of(op, { ec_enone, ec_enoent });
         configure_options(pid = 0);
     }
 

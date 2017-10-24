@@ -20,13 +20,14 @@ namespace nng {
     private:
 
         typedef messaging::binary_message binary_message_type;
+        typedef messaging::buffer_vector_type buffer_vector_type;
 
     public:
 
         virtual void send(binary_message_type* const bmp, flag_type flags = flag_none) = 0;
 
-        virtual int send(const messaging::buffer_vector_type* const bufp, flag_type flags = flag_none) = 0;
-        virtual int send(const messaging::buffer_vector_type* const bufp, size_type sz, flag_type flags = flag_none) = 0;
+        virtual void send(const buffer_vector_type* const bufp, flag_type flags = flag_none) = 0;
+        virtual void send(const buffer_vector_type* const bufp, size_type sz, flag_type flags = flag_none) = 0;
     };
 }
 

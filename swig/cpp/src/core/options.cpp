@@ -1,16 +1,9 @@
 #include "options.h"
-#include "../core/address.h"
-#include "exceptions.hpp"
-
+#include "address.h"
+#include "invocation.hpp"
 #include "algorithms/string_algo.hpp"
 
 namespace nng {
-
-    template<typename Op_, typename... Args_>
-    void invoke_op(const Op_& op, Args_... args) {
-        const auto errnum = op(args...);
-        THROW_NNG_EXCEPTION_EC(errnum);
-    }
 
     options_writer::options_writer()
         : _setopt()
@@ -35,19 +28,19 @@ namespace nng {
     }
 
     void options_writer::set(const std::string& name, const void* valp, size_type sz) {
-        invoke_op(_setopt, name.c_str(), valp, sz);
+        invocation::with_default_error_handling(_setopt, name.c_str(), valp, sz);
     }
 
     void options_writer::set(const std::string& name, const std::string& val) {
-        invoke_op(_setopt, name.c_str(), val.c_str(), val.length());
+        invocation::with_default_error_handling(_setopt, name.c_str(), val.c_str(), val.length());
     }
 
     void options_writer::set_int(const std::string& name, int val) {
-        invoke_op(_setopt_int, name.c_str(), val);
+        invocation::with_default_error_handling(_setopt_int, name.c_str(), val);
     }
 
     void options_writer::set_sz(const std::string& name, size_type val) {
-        invoke_op(_setopt_sz, name.c_str(), val);
+        invocation::with_default_error_handling(_setopt_sz, name.c_str(), val);
     }
 
     void options_writer::set(const std::string& name, const duration_type& val) {
@@ -55,7 +48,7 @@ namespace nng {
     }
 
     void options_writer::set_milliseconds(const std::string& name, duration_rep_type val) {
-        invoke_op(_setopt_duration, name.c_str(), val);
+        invocation::with_default_error_handling(_setopt_duration, name.c_str(), val);
     }
 
     options_reader::options_reader()
@@ -81,7 +74,7 @@ namespace nng {
     }
 
     void options_reader::get(const std::string& name, void* valp, size_type& sz) {
-        invoke_op(_getopt, name.c_str(), valp, &sz);
+        invocation::with_default_error_handling(_getopt, name.c_str(), valp, &sz);
     }
 
     void options_reader::get(const std::string& name, std::string& val, size_type& sz) {
@@ -91,7 +84,7 @@ namespace nng {
 
     void options_reader::get(const std::string& name, std::string& val) {
         auto sz = val.size();
-        invoke_op(_getopt, name.c_str(), &val[0], &sz);
+        invocation::with_default_error_handling(_getopt, name.c_str(), &val[0], &sz);
         /* So we do use the string trimming algorithms after all...
         Which the in-place is sufficient, no need to use the copying version. */
         trx::trim(val);
@@ -99,15 +92,15 @@ namespace nng {
 
     void options_reader::get(const std::string& name, address& val) {
         auto sz = val.get_size();
-        invoke_op(_getopt, name.c_str(), val.get(), &sz);
+        invocation::with_default_error_handling(_getopt, name.c_str(), val.get(), &sz);
     }
 
     void options_reader::get_int(const std::string& name, int& val) {
-        invoke_op(_getopt_int, name.c_str(), &val);
+        invocation::with_default_error_handling(_getopt_int, name.c_str(), &val);
     }
 
     void options_reader::get_sz(const std::string& name, size_type& val) {
-        invoke_op(_getopt_sz, name.c_str(), &val);
+        invocation::with_default_error_handling(_getopt_sz, name.c_str(), &val);
     }
 
     void options_reader::get(const std::string& name, duration_type& val) {
@@ -117,7 +110,7 @@ namespace nng {
     }
 
     void options_reader::get_milliseconds(const std::string& name, duration_rep_type& val) {
-        invoke_op(_getopt_duration, name.c_str(), &val);
+        invocation::with_default_error_handling(_getopt_duration, name.c_str(), &val);
     }
 
     options_reader_writer::options_reader_writer() : options_reader(), options_writer() {

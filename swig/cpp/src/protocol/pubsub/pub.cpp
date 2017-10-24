@@ -20,7 +20,7 @@ namespace nng {
                 THROW_PUB_SOCKET_INV_OP();
             }
 
-            int pub_socket::try_receive(binary_message_type* const bmp, flag_type flags) {
+            bool pub_socket::try_receive(binary_message_type* const bmp, flag_type flags) {
                 THROW_PUB_SOCKET_INV_OP();
             }
 
@@ -28,7 +28,7 @@ namespace nng {
                 THROW_PUB_SOCKET_INV_OP();
             }
 
-            int pub_socket::try_receive(buffer_vector_type* const bufp, size_type& sz, flag_type flags) {
+            bool pub_socket::try_receive(buffer_vector_type* const bufp, size_type& sz, flag_type flags) {
                 THROW_PUB_SOCKET_INV_OP();
             }
         }

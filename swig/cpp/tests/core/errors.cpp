@@ -13,6 +13,12 @@
 #include <string>
 #include <cstring>
 
+namespace constants {
+    const std::string obj_closed = "Object closed";
+    const std::string timed_out = "Timed out";
+    const std::string __empty = "";
+}
+
 // Loosely based on the underlying NNG unit tests. We ought to be able to confirm along the same lines.
 TEST_CASE("Error messages work", "[errors]") {
 
@@ -22,22 +28,25 @@ TEST_CASE("Error messages work", "[errors]") {
 
     using namespace std;
     using namespace nng;
-    using namespace trx::exceptions;
+    using namespace constants;
+    using namespace Catch::Matchers;
 
     SECTION("Known errors work") {
         REQUIRE(true);
-        REQUIRE(exception_utils::strerror(ec_eclosed) == "Object closed");
-        REQUIRE(exception_utils::strerror(ec_etimedout) == "Timed out");
+        REQUIRE_THAT(STRERROR(ec_eclosed), Equals(obj_closed));
+        REQUIRE_THAT(STRERROR(ec_etimedout), Equals(timed_out));
     }
 
     SECTION("We always get a valid error") {
         for (int errnum = 1; errnum < 0x1000000; errnum = errnum * 2 + 100) {
-            REQUIRE(exception_utils::strerror(errnum) != "");
+            REQUIRE_THAT(STRERROR(errnum), Not(Equals(__empty)));
         }
     }
 
+    // TODO: TBD: all roads to not lead through Rome; in this case they lead through ::strerror, that to say I'm not sure how much of a test this really is any more...
     SECTION("System errors work") {
-        REQUIRE(exception_utils::strerror(static_cast<int>(ec_esyserr) + ENOENT) == ::strerror(ENOENT));
-        REQUIRE(exception_utils::strerror(static_cast<int>(ec_esyserr) + EINVAL) == ::strerror(EINVAL));
+        const auto syserr_base = static_cast<int>(ec_esyserr);
+        REQUIRE_THAT(STRERROR(syserr_base + ENOENT), Not(Equals(__empty)));
+        REQUIRE_THAT(STRERROR(syserr_base + EINVAL), Not(Equals(__empty)));
     }
 }

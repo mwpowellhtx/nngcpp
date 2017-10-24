@@ -30,6 +30,7 @@
 set (NNGCPP_CPP_SRCS
     nngcpp.h
     algorithms/string_algo.hpp
+    core/invocation.hpp
     core/core.h
     core/types.h
     core/enums.h

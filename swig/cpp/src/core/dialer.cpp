@@ -1,7 +1,7 @@
 #include "dialer.h"
 #include "socket.h"
 #include "options.h"
-#include "exceptions.hpp"
+#include "invocation.hpp"
 
 namespace nng {
 
@@ -19,9 +19,7 @@ namespace nng {
         : endpoint(), did(0), _options() {
 
         const auto& op = bind(&::nng_dialer_create, &did, sp->sid, _1);
-        const auto errnum = op(addr.c_str());
-        THROW_NNG_EXCEPTION_EC(errnum);
-
+        invocation::with_default_error_handling(op, addr.c_str());
         configure_options(did);
     }
 
@@ -31,15 +29,13 @@ namespace nng {
 
     void dialer::start(flag_type flags) {
         const auto& op = bind(&::nng_dialer_start, did, _1);
-        const auto errnum = op(static_cast<int>(flags));
-        THROW_NNG_EXCEPTION_EC(errnum);
+        invocation::with_default_error_handling(op, static_cast<int>(flags));
     }
 
     void dialer::close() {
         if (!has_one()) { return; }
         const auto op = bind(&::nng_dialer_close, did);
-        const auto errnum = op();
-        THROW_NNG_EXCEPTION_EC(errnum);
+        invocation::with_default_error_handling(op);
         configure_options(did = 0);
     }
 

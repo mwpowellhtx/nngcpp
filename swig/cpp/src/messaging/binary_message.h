@@ -2,7 +2,7 @@
 #define NNGCPP_BINARY_MESSAGE_H
 
 #include "../core/types.h"
-#include "../core/exceptions.hpp"
+#include "../core/invocation.hpp"
 
 #include "message_pipe.h"
 #include "binary_message_header.h"
@@ -105,8 +105,7 @@ namespace nng {
                 try {
                     using std::placeholders::_1;
                     const auto op = std::bind(&::nng_msg_alloc, &msgp, _1);
-                    const auto errnum = op(sz);
-                    THROW_NNG_EXCEPTION_EC(errnum);
+                    invocation::with_default_error_handling(op, sz);
                 }
                 catch (...) {
                     //// TODO: TBD: not sure this would be valid... or depending on the error...

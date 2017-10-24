@@ -13,10 +13,6 @@ namespace nng {
             return mb.get_msgp();
         }
 
-        void message_base_api::do_clear_op(const clear_op& op) {
-            op();
-        }
-
         message_base_api::message_base_api() {
         }
 

@@ -8,6 +8,7 @@
 //
 
 #include "binary_message_header.h"
+#include "../core/invocation.hpp"
 
 namespace nng {
 
@@ -56,39 +57,35 @@ namespace nng {
             const auto msgp = get_msgp();
             if (!msgp) { return; }
             const auto op = std::bind(&::nng_msg_header_clear, msgp);
-            do_clear_op(op);
+            invocation::with_void_return_value(op);
         }
 
         void binary_message_header::append(const uint32_t& val) {
             const auto msgp = get_msgp();
             if (msgp == nullptr) { return; }
             const auto op = std::bind(&::nng_msg_header_append_u32, msgp, _1);
-            const auto errnum = op(val);
-            THROW_NNG_EXCEPTION_EC(errnum);
+            invocation::with_default_error_handling(op, val);
         }
 
         void binary_message_header::prepend(const uint32_t& val) {
             const auto msgp = get_msgp();
             if (msgp == nullptr) { return; }
             const auto op = std::bind(&::nng_msg_header_insert_u32, msgp, _1);
-            const auto errnum = op(val);
-            THROW_NNG_EXCEPTION_EC(errnum);
+            invocation::with_default_error_handling(op, val);
         }
 
         void binary_message_header::ltrim(uint32_t& val) {
             const auto msgp = get_msgp();
             if (msgp == nullptr) { return; }
             const auto op = std::bind(&::nng_msg_header_trim_u32, msgp, _1);
-            const auto errnum = op(&val);
-            THROW_NNG_EXCEPTION_EC(errnum);
+            invocation::with_default_error_handling(op, &val);
         }
 
         void binary_message_header::rtrim(uint32_t& val) {
             const auto msgp = get_msgp();
             if (msgp == nullptr) { return; }
             const auto op = std::bind(&::nng_msg_header_chop_u32, msgp, _1);
-            const auto errnum = op(&val);
-            THROW_NNG_EXCEPTION_EC(errnum);
+            invocation::with_default_error_handling(op, &val);
         }
 
         void binary_message_header::append(const buffer_vector_type& buf) {
