@@ -3,6 +3,8 @@
 
 #include "../core/types.h"
 
+#include "../core/having_one.hpp"
+
 #include <cstddef>
 #include <cstdint>
 #include <vector>
@@ -16,38 +18,25 @@ namespace nng {
 
     namespace messaging {
 
-        typedef std::vector<uint8_t> buffer_vector_type;
+        typedef ::nng_msg msg_type;
 
-        // TODO: TBD: not the best placement for this one, but it will have to do.
-        class message_base_api {
-        protected:
-
-            friend class message_part;
-
-            friend ::nng_msg* get_msgp(message_base_api& mb);
-
-            message_base_api();
-
-            virtual message_base_api& get_base() = 0;
-
-            virtual ::nng_msg* get_msgp() = 0;
-
-            typedef std::function<void()> clear_op;
-
+        struct supports_clear_api {
             virtual void clear() = 0;
-
-        public:
-
-            bool has_one();
         };
 
-        ::nng_msg* get_msgp(message_base_api& mb);
+        struct supports_getting_msg {
+        protected:
+            virtual msg_type* get_msgp() const = 0;
+        };
 
-        class message_base : public message_base_api {
+        typedef std::vector<uint8_t> buffer_vector_type;
+
+        class message_base : public having_one, public supports_clear_api, public supports_getting_msg {
         private:
 
-            friend class message_base_api;
             friend class socket;
+
+            msg_type* _msgp;
 
         public:
 
@@ -57,19 +46,23 @@ namespace nng {
 
             message_base();
 
-            virtual message_base& get_base() override;
+            friend msg_type* get_msgp(message_base* const mbp);
+
+            virtual msg_type* get_msgp() const override;
 
         public:
 
             virtual ~message_base();
+
+            virtual bool has_one() const override;
         };
 
-        class message_part : public message_base_api {
+        msg_type* get_msgp(message_base* const mbp);
+
+        class message_part : public having_one, public supports_clear_api, public supports_getting_msg {
         private:
 
             message_base* _basep;
-
-            virtual message_base_api& get_base() override;
 
         protected:
 
@@ -77,7 +70,11 @@ namespace nng {
 
             virtual ~message_part();
 
-            virtual ::nng_msg* get_msgp() override;
+            virtual msg_type* get_msgp() const override;
+
+        public:
+
+            virtual bool has_one() const override;
         };
     }
 }

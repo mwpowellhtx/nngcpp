@@ -30,6 +30,8 @@
 set (NNGCPP_CPP_SRCS
     nngcpp.h
     algorithms/string_algo.hpp
+    core/having_one.hpp
+    core/can_close.hpp
     core/invocation.hpp
     core/core.h
     core/types.h

@@ -2,6 +2,7 @@
 #define NNGCPP_ADDRESS_H
 
 #include "types.h"
+#include "having_one.hpp"
 
 #include <cstddef>
 #include <memory>
@@ -133,7 +134,7 @@ namespace nng {
     //typedef ::nng_sockaddr_zt sockaddr_zt_view;
     typedef sockaddr_zt_t sockaddr_zt_view;
 
-    struct family_view_base : public std::equal_to<family_view_base> {
+    struct family_view_base : public having_one, public std::equal_to<family_view_base> {
 
         virtual ~family_view_base();
 
@@ -141,7 +142,7 @@ namespace nng {
 
         virtual sockaddr_family_type get_family() const = 0;
 
-        virtual bool has_one() const;
+        virtual bool has_one() const override;
 
     protected:
 
@@ -333,7 +334,7 @@ namespace nng {
         virtual bool operator!=(const detail_type& other) override;
     };
 
-    class address : public std::equal_to<address> {
+    class address : public having_one, public std::equal_to<address> {
     public:
 
         //typedef ::nng_sockaddr sockaddr_type;
@@ -345,7 +346,7 @@ namespace nng {
 
         std::unique_ptr<family_view_base> _view;
 
-        void align_view();
+        friend void align_view(const address& _Address);
 
     public:
 
@@ -355,12 +356,6 @@ namespace nng {
 
         virtual ~address();
 
-        bool operator==(const address& other);
-
-        bool operator!=(const address& other);
-
-        bool has_one();
-
         size_type get_size() const;
 
         sockaddr_type* get();
@@ -369,7 +364,13 @@ namespace nng {
 
         void set_family(const sockaddr_family_type value);
 
-        family_view_base* const view();
+        family_view_base* const view() const;
+
+        virtual bool has_one() const override;
+
+        bool operator==(const address& other);
+
+        bool operator!=(const address& other);
 
         static address in_loopback();
 

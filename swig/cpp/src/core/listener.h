@@ -41,7 +41,7 @@ namespace nng {
         virtual ~listener();
 
         virtual void start(flag_type flags = flag_none);
-        virtual void close();
+        virtual void close() override;
 
         virtual bool has_one() const override;
 

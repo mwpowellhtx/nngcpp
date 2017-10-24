@@ -24,8 +24,8 @@ namespace nng {
     const std::string sockaddr_family_name<af_zt>::name = SOCKADDR_FAMILY_TO_STRING(af_zt);
 
     family_view_base::family_view_base(sockaddr_type* const sap, sockaddr_family_type jewel)
-        : _sap(sap)
-        , _jewel(jewel) {
+        : having_one(), equal_to()
+        , _sap(sap), _jewel(jewel) {
     }
 
     family_view_base::~family_view_base() {
@@ -36,7 +36,7 @@ namespace nng {
     }
 
     bool family_view_base::has_one() const {
-        return _sap != nullptr&&_sap->s_un.s_family == get_jewel();
+        return _sap != nullptr && _sap->s_un.s_family == get_jewel();
     }
 
     bool family_view_base::operator==(const family_view_base& other) {
@@ -447,22 +447,6 @@ namespace nng {
     address::~address() {
     }
 
-    bool address::operator==(const address& other) {
-
-        // Return early when the Families are different.
-        if (get_family() != other.get_family()) { return false; }
-
-        // We must cast the constness out of the other for this operation.
-        auto otherp = const_cast<address*>(&other);
-
-        // We must take this Long Way Round on account of NNG treating the misaligned data as indeterminate.
-        return view()->operator==(*(otherp->view()));
-    }
-
-    bool address::operator!=(const address& other) {
-        return !operator==(other);
-    }
-
     std::string address::name_of(uint16_t value) {
         switch (value) {
         case af_inproc: return sockaddr_family_name<af_inproc>::name;
@@ -478,7 +462,13 @@ namespace nng {
         return os.str();
     }
 
-    void address::align_view() {
+    void align_view(const address& _Address) {
+
+        // Do the const cast dance to thread the needle.
+        auto& a = const_cast<address&>(_Address);
+
+        auto& _sa = a._sa;
+        auto& _view = a._view;
 
         // Should be safe to do this regardless of the state of the union.
         const auto actual_jewel = _sa.s_un.s_family;
@@ -488,7 +478,7 @@ namespace nng {
         }
 
         // For use regardless of the intended view.
-        const auto sap = get();
+        const auto sap = a.get();
 
         // Trusting that Jewel is not somehow otherwise accidentally correct!
         switch (actual_jewel) {
@@ -514,8 +504,12 @@ namespace nng {
         }
     }
 
-    bool address::has_one() {
-        align_view();
+    family_view_base* const address::view() const {
+        align_view(*this);
+        return _view.get();
+    }
+
+    bool address::has_one() const {
         return view() != nullptr;
     }
 
@@ -527,17 +521,28 @@ namespace nng {
         return &_sa;
     }
 
-    family_view_base* const address::view() {
-        align_view();
-        return _view.get();
-    }
-
     sockaddr_family_type address::get_family() const {
         return static_cast<sockaddr_family_type>(_sa.s_un.s_family);
     }
 
     void address::set_family(const sockaddr_family_type value) {
         _sa.s_un.s_family = value;
+    }
+
+    bool address::operator==(const address& other) {
+
+        // Return early when the Families are different.
+        if (get_family() != other.get_family()) { return false; }
+
+        // We must cast the constness out of the other for this operation.
+        auto otherp = const_cast<address*>(&other);
+
+        // We must take this Long Way Round on account of NNG treating the misaligned data as indeterminate.
+        return view()->operator==(*(otherp->view()));
+    }
+
+    bool address::operator!=(const address& other) {
+        return !operator==(other);
     }
 
     address address::in_loopback() {

@@ -5,7 +5,11 @@
 #include <nngcpp.h>
 
 #include "message_base.h"
+
 #include "../core/options.h"
+
+#include "../core/having_one.hpp"
+#include "../core/can_close.hpp"
 
 #include <algorithm>
 
@@ -25,7 +29,7 @@ namespace nng {
 #endif // NNGCPP_BINARY_MESSAGE_H
 
     // TODO: so, equal_to is available, but not_equal_to is not?
-    class message_pipe : public std::equal_to<message_pipe> {
+    class message_pipe : public having_one, public can_close, public std::equal_to<message_pipe> {
     public:
 
         typedef ::nng_pipe nng_type;
@@ -48,9 +52,9 @@ namespace nng {
 
         virtual ~message_pipe();
 
-        virtual void close();
+        virtual bool has_one() const override;
 
-        virtual bool has_one() const;
+        virtual void close() override;
 
         virtual options_reader* const options();
 

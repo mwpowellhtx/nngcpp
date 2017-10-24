@@ -16,6 +16,36 @@ namespace nng {
         flag_dryrun = NNG_FLAG_DRYRUN
     };
 
+    enum protocol_type {
+        protocol_none = ::NNG_PROTO_NONE,
+
+        proto_bus_v0 = ::NNG_PROTO_BUS_V0,
+        proto_pair_v0 = ::NNG_PROTO_PAIR_V0,
+        proto_pair_v1 = ::NNG_PROTO_PAIR_V1,
+        proto_subscriber_v0 = ::NNG_PROTO_SUB_V0,
+        proto_publisher_v0 = ::NNG_PROTO_PUB_V0,
+        proto_requestor_v0 = ::NNG_PROTO_REQ_V0,
+        proto_replier_v0 = ::NNG_PROTO_REP_V0,
+        proto_pusher_v0 = ::NNG_PROTO_PUSH_V0,
+        proto_puller_v0 = ::NNG_PROTO_PULL_V0,
+        proto_surveyor_v0 = ::NNG_PROTO_SURVEYOR_V0,
+        proto_respondent_v0 = ::NNG_PROTO_RESPONDENT_V0,
+        proto_star_v0 = ::NNG_PROTO_STAR_V0,
+
+        proto_bus = ::NNG_PROTO_BUS,
+        proto_pair = ::NNG_PROTO_PAIR,
+        proto_subscriber = ::NNG_PROTO_SUB,
+        proto_publisher = ::NNG_PROTO_PUB,
+        proto_requestor = ::NNG_PROTO_REQ,
+        proto_replier = ::NNG_PROTO_REP,
+        proto_pusher = ::NNG_PROTO_PUSH,
+        proto_puller = ::NNG_PROTO_PULL,
+        proto_surveyor = ::NNG_PROTO_SURVEYOR,
+        proto_respondent = ::NNG_PROTO_RESPONDENT,
+        // TODO: TBD: NNG_PROTO_STAR undefined as of now; expecting NNG_PROTO_STAR moving forward? with protocol to boot?
+        proto_star = ::NNG_PROTO_STAR_V0
+    };
+
     // https://www.gnu.org/software/libc/manual/html_node/Error-Codes.html
     enum error_code_type : uint32_t {
         ec_enone = 0,

@@ -14,10 +14,11 @@ namespace nng {
     }
 
     message_pipe::message_pipe(messaging::message_base* const mbp)
-        : pid(0), _options() {
+        : having_one(), can_close()
+        , pid(0), _options() {
 
         // TODO: TBD: throw an exception upon irregular pipe value...
-        const auto& op = bind(&::nng_msg_get_pipe, get_msgp(*mbp));
+        const auto& op = bind(&::nng_msg_get_pipe, get_msgp(mbp));
         invocation::with_result(op, &pid);
         configure_options(pid);
     }
