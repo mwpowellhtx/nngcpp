@@ -97,6 +97,7 @@ namespace nng {
         // TODO: TBD: there is no return value here unfortunately... perhaps there should be?
         const auto op = bind(&::nng_msg_set_pipe, _msgp, get_id(*mpp));
         invocation::with_void_return_value(op);
+        // TODO: TBD: upon "setting the pipe" is that akin to handing of ownership of the pipe back to the message?
     }
 
     message_part::message_part(message_base* basep)
