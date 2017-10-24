@@ -2,7 +2,6 @@
 #define NNGCPP_MESSAGE_BASE_H
 
 #include "../core/types.h"
-
 #include "../core/having_one.hpp"
 
 #include <cstddef>
@@ -11,10 +10,6 @@
 #include <functional>
 
 namespace nng {
-
-#ifndef NNGCPP_SOCKET_H
-    class socket;
-#endif // NNGCPP_SOCKET_H
 
 #ifndef NNGCPP_MESSAGE_PIPE_H
     class message_pipe;
@@ -36,13 +31,7 @@ namespace nng {
     class message_base : public having_one, public supports_clear_api, public supports_getting_msg {
     private:
 
-        friend class socket;
-
         void allocate(size_type sz = 0);
-
-    public:
-
-        typedef void* part_type;
 
     protected:
 
