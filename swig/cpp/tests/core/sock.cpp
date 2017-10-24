@@ -108,9 +108,10 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
     using namespace nng;
     using namespace nng::messaging;
     using namespace nng::protocol;
+    using namespace nng::exceptions;
+    using namespace constants;
     using namespace Catch;
     using namespace Catch::Matchers;
-    using namespace constants;
     using O = option_names;
 
     // TODO: TBD: re-work this in better alignment with whatever message-based API was being tested.

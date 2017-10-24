@@ -63,6 +63,10 @@ set (NNGCPP_CPP_SRCS
     core/exceptions/not_implemented.h
     core/exceptions/invalid_operation.cpp
     core/exceptions/invalid_operation.h
+    core/exceptions/system_error.cpp
+    core/exceptions/system_error.h
+    core/exceptions/transport_error.cpp
+    core/exceptions/transport_error.h
     messaging/messaging.h
     messaging/binary_message.cpp
     messaging/binary_message.h

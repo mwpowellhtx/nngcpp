@@ -278,6 +278,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
     using namespace nng;
     using namespace nng::protocol;
     using namespace nng::messaging;
+    using namespace nng::exceptions;
     using namespace nng::transactions;
     using namespace constants;
     using namespace Catch::Matchers;

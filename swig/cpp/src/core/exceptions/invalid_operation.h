@@ -1,24 +1,24 @@
-#ifndef NNGCPP_TRX_INVALID_OPERATION_EXCEPTION_H
-#define NNGCPP_TRX_INVALID_OPERATION_EXCEPTION_H
+#ifndef NNGCPP_EXCEPTIONS_INVALID_OPERATION_H
+#define NNGCPP_EXCEPTIONS_INVALID_OPERATION_H
 
 #include <exception>
 #include <string>
 
-namespace trx {
+namespace nng {
+    namespace exceptions {
 
-    class invalid_operation : public std::logic_error {
-    private:
+        class invalid_operation : public std::logic_error {
+        public:
 
-        std::string _message;
+            invalid_operation();
 
-    public:
+            invalid_operation(const char* _Message);
 
-        invalid_operation();
+            invalid_operation(const std::string& _Message);
 
-        invalid_operation(const std::string& message);
-
-        virtual ~invalid_operation();
-    };
+            virtual ~invalid_operation();
+        };
+    }
 }
 
-#endif // NNGCPP_TRX_INVALID_OPERATION_EXCEPTION_H
+#endif // NNGCPP_EXCEPTIONS_INVALID_OPERATION_H

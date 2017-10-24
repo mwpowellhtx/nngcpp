@@ -33,7 +33,7 @@ namespace nng {
         if (!has_one()) { return; }
         const auto op = bind(::nng_pipe_close, pid);
         const auto errnum = op();
-        THROW_NNG_EXCEPTION_IF_NOT_ONEOF(errnum, ec_eunknown, ec_enone, ec_enoent);
+        THROW_NNG_EXCEPTION_IF_NOT_ONE_OF(errnum, ec_enone, ec_enoent);
         configure_options(pid = 0);
     }
 

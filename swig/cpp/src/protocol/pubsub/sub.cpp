@@ -1,7 +1,7 @@
 #include "sub.h"
 #include "../../core/exceptions.hpp"
 
-#define THROW_SUB_SOCKET_INV_OP() throw trx::invalid_operation("subscriber sockets cannot send")
+#define THROW_SUB_SOCKET_INV_OP() throw nng::exceptions::invalid_operation("subscriber sockets cannot send")
 
 namespace nng {
     namespace protocol {

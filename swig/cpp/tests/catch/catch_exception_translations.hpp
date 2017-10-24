@@ -27,7 +27,7 @@ CATCH_TRANSLATE_EXCEPTION(std::exception& ex) {
         : ("std::exception: " + ex_what_).c_str();
 }
 
-CATCH_TRANSLATE_EXCEPTION(nng::nng_exception& ex) {
+CATCH_TRANSLATE_EXCEPTION(nng::exceptions::nng_exception& ex) {
     // TODO: TBD: consider making this a part of the nng::nng_exception::what method...
     std::ostringstream os;
     const auto errnum = static_cast<int>(ex.error_code);
@@ -35,18 +35,32 @@ CATCH_TRANSLATE_EXCEPTION(nng::nng_exception& ex) {
     return os.str();
 }
 
-CATCH_TRANSLATE_EXCEPTION(trx::not_implemented& ex) {
+CATCH_TRANSLATE_EXCEPTION(nng::exceptions::not_implemented& ex) {
     const auto ex_what_ = std::string(ex.what());
     return ex_what_.empty()
         ? "unknown " STRINGIFY(trx::not_implemented)
-        : ("trx::not_implemented: " + ex_what_).c_str();
+        : ("nng::exceptions::not_implemented: " + ex_what_).c_str();
 }
 
-CATCH_TRANSLATE_EXCEPTION(trx::invalid_operation& ex) {
+CATCH_TRANSLATE_EXCEPTION(nng::exceptions::invalid_operation& ex) {
     const auto ex_what_ = std::string(ex.what());
     return ex_what_.empty()
         ? "unknown " STRINGIFY(trx::invalid_operation)
-        : ("trx::invalid_operation: " + ex_what_).c_str();
+        : ("nng::exceptions::invalid_operation: " + ex_what_).c_str();
+}
+
+CATCH_TRANSLATE_EXCEPTION(nng::exceptions::system_error& ex) {
+    const auto ex_what_ = std::string(ex.what());
+    return ex_what_.empty()
+        ? "unknown " STRINGIFY(trx::invalid_operation)
+        : ("nng::exceptions::system_error: " + ex_what_).c_str();
+}
+
+CATCH_TRANSLATE_EXCEPTION(nng::exceptions::transport_error& ex) {
+    const auto ex_what_ = std::string(ex.what());
+    return ex_what_.empty()
+        ? "unknown " STRINGIFY(trx::invalid_operation)
+        : ("nng::exceptions::transport_error: " + ex_what_).c_str();
 }
 
 #endif // NNGCPP_CATCH_EXCEPTION_TRANSLATIONS_HPP

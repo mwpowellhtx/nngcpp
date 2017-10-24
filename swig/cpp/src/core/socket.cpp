@@ -49,7 +49,7 @@ namespace nng {
         // Close is its own operation apart from Shutdown.
         const auto op = bind(&::nng_close, sid);
         const auto errnum = op();
-        THROW_NNG_EXCEPTION_IF_NOT_ONEOF(errnum, ec_eunknown, ec_enone);
+        THROW_NNG_EXCEPTION_IF_NOT_ONE_OF(errnum, ec_enone);
         // Closed is closed.
         configure_options(sid = 0);
     }
@@ -58,7 +58,7 @@ namespace nng {
         // Shutdown is its own operation apart from Closed.
         const auto op = bind(&::nng_shutdown, sid);
         const auto errnum = op();
-        THROW_NNG_EXCEPTION_IF_NOT_ONEOF(errnum, ec_eunknown, ec_enone);
+        THROW_NNG_EXCEPTION_IF_NOT_ONE_OF(errnum, ec_enone);
         // Which socket can still be in operation.
     }
 

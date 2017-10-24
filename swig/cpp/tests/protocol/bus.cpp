@@ -40,6 +40,7 @@ TEST_CASE("Bus pattern using C++ wrappers", Catch::Tags("bus"
     using namespace nng;
     using namespace nng::protocol;
     using namespace nng::messaging;
+    using namespace nng::exceptions;
     using namespace constants;
     using namespace Catch::Matchers;
     using O = option_names;

@@ -43,8 +43,9 @@ TEST_CASE("Poll FDs", "[pollfd]") {
     using namespace nng;
     using namespace nng::protocol;
     using namespace nng::messaging;
-    using namespace Catch::Matchers;
+    using namespace nng::exceptions;
     using namespace constants;
+    using namespace Catch::Matchers;
     using _opt_ = option_names;
 
     std::unique_ptr<latest_pair_socket> s1, s2;

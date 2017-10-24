@@ -109,6 +109,7 @@ TEST_CASE("We cannot connect to wildcards", Catch::Tags(constants::prefix_tags
     using namespace std;
     using namespace nng;
     using namespace nng::protocol;
+    using namespace nng::exceptions;
     using namespace constants;
     using namespace Catch::Matchers;
 

@@ -45,6 +45,7 @@ TEST_CASE("Request/reply pattern using C++ wrapper", Catch::Tags("req", "rep"
     using namespace nng;
     using namespace nng::protocol;
     using namespace nng::messaging;
+    using namespace nng::exceptions;
     using namespace constants;
     using namespace Catch::Matchers;
     using O = option_names;

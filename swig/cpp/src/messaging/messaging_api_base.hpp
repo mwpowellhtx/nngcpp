@@ -3,11 +3,13 @@
 
 #include "message_base.h"
 
+#include "../core/exceptions.hpp"
+
 #include <memory>
 #include <functional>
 
 #ifndef THROW_API_IS_READ_ONLY
-#define THROW_API_IS_READ_ONLY() throw trx::not_implemented("API is read-only")
+#define THROW_API_IS_READ_ONLY() throw nng::exceptions::not_implemented("API is read-only")
 #endif //THROW_API_IS_READ_ONLY
 
 namespace nng {

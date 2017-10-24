@@ -8,7 +8,6 @@
 //
 
 #include "binary_message_header.h"
-#include "../core/exceptions.hpp"
 
 namespace nng {
 

@@ -103,7 +103,7 @@ TEST_CASE("Rule out the possibility of invalid operations", Catch::Tags("pipelin
     using namespace nng;
     using namespace nng::protocol;
     using namespace nng::messaging;
-    using namespace trx;
+    using namespace nng::exceptions;
 
     // Even though we are technically doing nothing with these, we MUST initialize them anyhow.
     size_type sz = 0;
@@ -257,6 +257,7 @@ TEST_CASE("Load balancing works", Catch::Tags("load", "balancing", "pipeline"
     using namespace nng;
     using namespace nng::protocol;
     using namespace nng::messaging;
+    using namespace nng::exceptions;
     using namespace constants;
     using namespace Catch::Matchers;
     using O = option_names;

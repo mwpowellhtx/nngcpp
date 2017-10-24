@@ -128,6 +128,7 @@ TEST_CASE("Test the transport using C++ wrappers", Catch::Tags(constants::prefix
     using namespace nng;
     using namespace nng::protocol;
     using namespace nng::messaging;
+    using namespace nng::exceptions;
     using namespace constants;
     using namespace Catch::Matchers;
     using O = option_names;

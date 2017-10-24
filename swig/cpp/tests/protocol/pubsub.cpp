@@ -110,7 +110,7 @@ TEST_CASE("Publisher/subscriber pattern using C++ wrapper", Catch::Tags("pub", "
     using namespace nng;
     using namespace nng::protocol;
     using namespace nng::messaging;
-    using namespace trx;
+    using namespace nng::exceptions;
     using namespace Catch::Matchers;
     using O = option_names;
 

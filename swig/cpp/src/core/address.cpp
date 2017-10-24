@@ -10,7 +10,7 @@
 #include <sstream>
 #include <cstring>
 
-#define THROW_VIEW_NOT_IMPLEMENTED_EX(name) throw trx::not_implemented(#name " view is not implemented for the address family");
+#define THROW_VIEW_NOT_IMPLEMENTED_EX(name) throw nng::exceptions::not_implemented(#name " view is not implemented for the address family");
 
 namespace nng {
 

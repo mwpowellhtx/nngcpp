@@ -1,13 +1,18 @@
-#include "invalid_operation.h"
+#include "../exceptions.hpp"
 
-namespace trx {
+namespace nng {
+    namespace exceptions {
 
-    invalid_operation::invalid_operation() : logic_error("the operation is invalid") {
-    }
+        invalid_operation::invalid_operation() : logic_error("the operation is invalid") {
+        }
 
-    invalid_operation::invalid_operation(const std::string& message) : logic_error(message) {
-    }
+        invalid_operation::invalid_operation(const char* _Message) : logic_error(_Message) {
+        }
 
-    invalid_operation::~invalid_operation() {
+        invalid_operation::invalid_operation(const std::string& _Message) : logic_error(_Message) {
+        }
+
+        invalid_operation::~invalid_operation() {
+        }
     }
 }

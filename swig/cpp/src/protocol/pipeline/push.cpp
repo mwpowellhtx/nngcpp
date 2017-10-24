@@ -1,7 +1,7 @@
 #include "push.h"
 #include "../../core/exceptions.hpp"
 
-#define THROW_PUSH_SOCKET_INV_OP() throw trx::invalid_operation("push sockets cannot receive")
+#define THROW_PUSH_SOCKET_INV_OP() throw nng::exceptions::invalid_operation("push sockets cannot receive")
 
 namespace nng {
     namespace protocol {

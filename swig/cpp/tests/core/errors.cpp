@@ -22,21 +22,22 @@ TEST_CASE("Error messages work", "[errors]") {
 
     using namespace std;
     using namespace nng;
+    using namespace trx::exceptions;
 
     SECTION("Known errors work") {
         REQUIRE(true);
-        REQUIRE(nng_exception::strerror(ec_eclosed) == "Object closed");
-        REQUIRE(nng_exception::strerror(ec_etimedout) == "Timed out");
+        REQUIRE(exception_utils::strerror(ec_eclosed) == "Object closed");
+        REQUIRE(exception_utils::strerror(ec_etimedout) == "Timed out");
     }
 
     SECTION("We always get a valid error") {
         for (int errnum = 1; errnum < 0x1000000; errnum = errnum * 2 + 100) {
-            REQUIRE(nng_exception::strerror(errnum) != "");
+            REQUIRE(exception_utils::strerror(errnum) != "");
         }
     }
 
     SECTION("System errors work") {
-        REQUIRE(nng_exception::strerror(static_cast<int>(ec_esyserr) + ENOENT) == ::strerror(ENOENT));
-        REQUIRE(nng_exception::strerror(static_cast<int>(ec_esyserr) + EINVAL) == ::strerror(EINVAL));
+        REQUIRE(exception_utils::strerror(static_cast<int>(ec_esyserr) + ENOENT) == ::strerror(ENOENT));
+        REQUIRE(exception_utils::strerror(static_cast<int>(ec_esyserr) + EINVAL) == ::strerror(EINVAL));
     }
 }

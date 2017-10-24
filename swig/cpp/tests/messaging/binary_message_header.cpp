@@ -41,8 +41,8 @@ TEST_CASE("Binary message part cannot exist apart from a parent message"
     , Catch::Tags("header", "part", "orphan", "invalid", "operation"
         , "messaging", "nng", "cxx").c_str()) {
 
-    using namespace trx;
     using namespace nng::messaging;
+    using namespace nng::exceptions;
 
     /* Message part fixtured in order to simulate access to the ctor. This is
     only for test purposes and should never occur under normal operation. */
@@ -103,9 +103,9 @@ namespace nng {
 TEST_CASE("Message part operates correctly") {
 
     using namespace std;
-    using namespace trx;
     using namespace nng;
     using namespace nng::messaging;
+    using namespace nng::exceptions;
     using namespace constants;
     using namespace Catch::Matchers;
 

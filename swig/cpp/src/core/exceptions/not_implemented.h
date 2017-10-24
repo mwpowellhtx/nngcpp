@@ -1,24 +1,24 @@
-#ifndef NNGCPP_TRX_NOT_IMPLEMENTED_EXCEPTION_H
-#define NNGCPP_TRX_NOT_IMPLEMENTED_EXCEPTION_H
+#ifndef NNGCPP_EXCEPTIONS_NOT_IMPLEMENTED_H
+#define NNGCPP_EXCEPTIONS_NOT_IMPLEMENTED_H
 
 #include <exception>
 #include <string>
 
-namespace trx {
+namespace nng {
+    namespace exceptions {
 
-    class not_implemented : public std::logic_error {
-    private:
+        class not_implemented : public std::logic_error {
+        public:
 
-        std::string _message;
+            not_implemented();
 
-    public:
+            not_implemented(const char* _Message);
 
-        not_implemented();
+            not_implemented(const std::string& _Message);
 
-        not_implemented(const std::string& message);
-
-        virtual ~not_implemented();
-    };
+            virtual ~not_implemented();
+        };
+    }
 }
 
-#endif // NNGCPP_CORE_NOT_IMPLEMENTED_EXCEPTION_H
+#endif // NNGCPP_EXCEPTIONS_NOT_IMPLEMENTED_H

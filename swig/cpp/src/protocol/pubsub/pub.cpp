@@ -1,7 +1,7 @@
 #include "pub.h"
 #include "../../core/exceptions.hpp"
 
-#define THROW_PUB_SOCKET_INV_OP() throw trx::invalid_operation("publisher sockets cannot receive")
+#define THROW_PUB_SOCKET_INV_OP() throw nng::exceptions::invalid_operation("publisher sockets cannot receive")
 
 namespace nng {
     namespace protocol {

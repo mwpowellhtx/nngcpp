@@ -3,7 +3,7 @@
 
 #define THROW_BIN_MSG_BODY_INV_OP(basep) \
             if (!basep) \
-                throw trx::invalid_operation("binary message body cannot exist apart from a parent message")
+                throw nng::exceptions::invalid_operation("binary message body cannot exist apart from a parent message")
 
 namespace nng {
 
