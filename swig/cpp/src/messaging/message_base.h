@@ -16,67 +16,84 @@ namespace nng {
     class socket;
 #endif // NNGCPP_SOCKET_H
 
-    namespace messaging {
+#ifndef NNGCPP_MESSAGE_PIPE_H
+    class message_pipe;
+#endif // NNGCPP_MESSAGE_PIPE_H
 
-        typedef ::nng_msg msg_type;
+    typedef ::nng_msg msg_type;
 
-        struct supports_clear_api {
-            virtual void clear() = 0;
-        };
+    struct supports_clear_api {
+        virtual void clear() = 0;
+    };
 
-        struct supports_getting_msg {
-        protected:
-            virtual msg_type* get_msgp() const = 0;
-        };
+    struct supports_getting_msg {
+    protected:
+        virtual msg_type* get_msgp() const = 0;
+    };
 
-        typedef std::vector<uint8_t> buffer_vector_type;
+    typedef std::vector<uint8_t> buffer_vector_type;
 
-        class message_base : public having_one, public supports_clear_api, public supports_getting_msg {
-        private:
+    class message_base : public having_one, public supports_clear_api, public supports_getting_msg {
+    private:
 
-            friend class socket;
+        friend class socket;
 
-            msg_type* _msgp;
+        void allocate(size_type sz = 0);
 
-        public:
+    public:
 
-            typedef void* part_type;
+        typedef void* part_type;
 
-        protected:
+    protected:
 
-            message_base();
+        msg_type* _msgp;
 
-            friend msg_type* get_msgp(message_base* const mbp);
+        message_base();
 
-            virtual msg_type* get_msgp() const override;
+        message_base(size_type sz);
 
-        public:
+        message_base(msg_type* msgp);
 
-            virtual ~message_base();
+        friend msg_type* get_msgp(message_base* const mbp);
 
-            virtual bool has_one() const override;
-        };
+        void on_one_required();
 
-        msg_type* get_msgp(message_base* const mbp);
+        virtual void free();
 
-        class message_part : public having_one, public supports_clear_api, public supports_getting_msg {
-        private:
+    public:
 
-            message_base* _basep;
+        virtual ~message_base();
 
-        protected:
+        virtual bool has_one() const override;
 
-            message_part(message_base* basep);
+        virtual void set_msgp(msg_type* msgp);
 
-            virtual ~message_part();
+        virtual msg_type* get_msgp() const override;
 
-            virtual msg_type* get_msgp() const override;
+        virtual void on_sent();
 
-        public:
+        virtual void set_pipe(const message_pipe* const mpp);
+    };
 
-            virtual bool has_one() const override;
-        };
-    }
+    msg_type* get_msgp(message_base* const mbp);
+
+    class message_part : public having_one, public supports_clear_api, public supports_getting_msg {
+    private:
+
+        message_base* _basep;
+
+    protected:
+
+        message_part(message_base* basep);
+
+        virtual ~message_part();
+
+        virtual msg_type* get_msgp() const override;
+
+    public:
+
+        virtual bool has_one() const override;
+    };
 }
 
 #endif // NNGCPP_MESSAGE_BASE_H

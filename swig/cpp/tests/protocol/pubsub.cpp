@@ -30,11 +30,11 @@ namespace nng {
 
                 virtual ~pub_socket_fixture() {}
 
-                virtual std::unique_ptr<binary_message_type> receive(flag_type flags = flag_none) override {
+                virtual std::unique_ptr<binary_message> receive(flag_type flags = flag_none) override {
                     return pub_socket::receive(flags);
                 }
 
-                virtual bool try_receive(binary_message_type* const bmp, flag_type flags = flag_none) override {
+                virtual bool try_receive(binary_message* const bmp, flag_type flags = flag_none) override {
                     return pub_socket::try_receive(bmp, flags);
                 }
 
@@ -54,7 +54,7 @@ namespace nng {
 
                 virtual ~sub_socket_fixture() {}
 
-                virtual void send(binary_message_type* const bmp, flag_type flags = flag_none) override {
+                virtual void send(binary_message* const bmp, flag_type flags = flag_none) override {
                     sub_socket::send(bmp, flags);
                 }
 
@@ -109,7 +109,6 @@ TEST_CASE("Publisher/subscriber pattern using C++ wrapper", Catch::Tags("pub", "
     using namespace constants;
     using namespace nng;
     using namespace nng::protocol;
-    using namespace nng::messaging;
     using namespace nng::exceptions;
     using namespace Catch::Matchers;
     using O = option_names;

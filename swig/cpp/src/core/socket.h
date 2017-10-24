@@ -27,9 +27,6 @@ namespace nng {
     class socket : public having_one, public sender, public receiver, public messenger {
     public:
 
-        typedef messaging::buffer_vector_type buffer_vector_type;
-        typedef messaging::binary_message binary_message_type;
-
         typedef ::nng_socket nng_type;
 
     private:
@@ -70,13 +67,13 @@ namespace nng {
 
         virtual options_reader_writer* const options();
 
-        virtual void send(binary_message_type* const bmp, flag_type flags = flag_none) override;
+        virtual void send(binary_message* const bmp, flag_type flags = flag_none) override;
 
         virtual void send(const buffer_vector_type* const bufp, flag_type flags = flag_none) override;
         virtual void send(const buffer_vector_type* const bufp, size_type sz, flag_type flags = flag_none) override;
 
-        virtual std::unique_ptr<binary_message_type> receive(flag_type flags = flag_none) override;
-        virtual bool try_receive(binary_message_type* const bmp, flag_type flags = flag_none) override;
+        virtual std::unique_ptr<binary_message> receive(flag_type flags = flag_none) override;
+        virtual bool try_receive(binary_message* const bmp, flag_type flags = flag_none) override;
 
         virtual buffer_vector_type receive(size_type& sz, flag_type flags = flag_none) override;
         virtual bool try_receive(buffer_vector_type* const bufp, size_type& sz, flag_type flags = flag_none) override;

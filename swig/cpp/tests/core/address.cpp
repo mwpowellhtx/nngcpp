@@ -12,6 +12,8 @@
 #include <nngcpp.h>
 
 #include "../catch/catch_exception_translations.hpp"
+#include "../catch/catch_tags.h"
+
 #include "../helpers/constants.h"
 
 #ifdef _WIN32
@@ -52,7 +54,7 @@ namespace nng {
 namespace nng {
 
     using namespace std;
-    using namespace trx;
+    using namespace nng::exceptions;
     using namespace Catch::Matchers;
 
     struct address_test {
@@ -236,11 +238,12 @@ namespace nng {
     };
 }
 
-TEST_CASE("Tests that socket addresses are handled correctly", "[address][socket][cxx]") {
+TEST_CASE("Tests that socket addresses are handled correctly", Catch::Tags(
+    "address", "socket", "cxx").c_str()) {
 
     using namespace std;
     using namespace nng;
-    using namespace trx;
+    using namespace nng::exceptions;
     using namespace Catch::Matchers;
 
     address_fixture af;

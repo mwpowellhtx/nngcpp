@@ -65,24 +65,21 @@ namespace nng {
         std::srand(static_cast<int>(seed));
     }
 
-    namespace messaging {
+    // TODO: TBD: this is a likely candidate for everything besides just transport.
+    void init_random_buffer(buffer_vector_type& buf, const size_type sz) {
 
-        // TODO: TBD: this is a likely candidate for everything besides just transport.
-        void init_random_buffer(buffer_vector_type& buf,  const size_type sz) {
+        buf.resize(sz);
 
-            buf.resize(sz);
-
-            for (size_type i = 0; i < sz; i++) {
-                buf[i] = std::rand() & 0xff;
-            }
+        for (size_type i = 0; i < sz; i++) {
+            buf[i] = std::rand() & 0xff;
         }
+    }
 
-        void twos_compliment_buffer(buffer_vector_type& buf) {
-            const auto &twos_compliment = [](buffer_vector_type::value_type& x) {
-                x = ~x;
-            };
-            std::for_each(buf.begin(), buf.end(), twos_compliment);
-        }
+    void twos_compliment_buffer(buffer_vector_type& buf) {
+        const auto &twos_compliment = [](buffer_vector_type::value_type& x) {
+            x = ~x;
+        };
+        std::for_each(buf.begin(), buf.end(), twos_compliment);
     }
 
     c_style_transport_fixture_redeux::c_style_transport_fixture_redeux()
@@ -127,7 +124,7 @@ TEST_CASE("Test the transport using C++ wrappers", Catch::Tags(constants::prefix
     using namespace std;
     using namespace nng;
     using namespace nng::protocol;
-    using namespace nng::messaging;
+    //using namespace nng::messaging;
     using namespace nng::exceptions;
     using namespace constants;
     using namespace Catch::Matchers;
@@ -213,13 +210,13 @@ TEST_CASE("Test the transport using C++ wrappers", Catch::Tags(constants::prefix
         REQUIRE_NOTHROW(repp->try_receive(recvp.get()));
         REQUIRE_THAT(recvp->body()->get(), Equals(ping_buf));
 
-        REQUIRE_NOTHROW(*sendp << acknowledge);
-        REQUIRE_NOTHROW(repp->send(sendp.get()));
-        REQUIRE_NOTHROW(recvp->set_msgp(nullptr));
-        REQUIRE_NOTHROW(reqp->try_receive(recvp.get()));
-        REQUIRE_THAT(recvp->body()->get(), Equals(acknowledge_buf));
+        REQUIRE_NOTHROW(recvp->body()->ltrim(ping.length()));
+        REQUIRE_NOTHROW(*recvp << acknowledge);
+        REQUIRE_NOTHROW(repp->send(recvp.get()));
+        REQUIRE_NOTHROW(reqp->try_receive(sendp.get()));
+        REQUIRE_THAT(sendp->body()->get(), Equals(acknowledge_buf));
 
-        REQUIRE_NOTHROW(pp = make_unique<message_pipe>(recvp.get()));
+        REQUIRE_NOTHROW(pp = make_unique<message_pipe>(sendp.get()));
         REQUIRE(pp->has_one() == true);
 
         // TODO: TBD: this bit is borderline message pipe unit testing and that's about it...
@@ -263,13 +260,13 @@ TEST_CASE("Test the transport using C++ wrappers", Catch::Tags(constants::prefix
         REQUIRE_THAT(recvp->body()->get(), Equals(data));
 
         REQUIRE_NOTHROW(twos_compliment_buffer(data));
-        REQUIRE_NOTHROW(sendp = make_unique<binary_message>());
-        REQUIRE_NOTHROW(*sendp << data);
-        REQUIRE_NOTHROW(repp->send(sendp.get()));
-        REQUIRE_NOTHROW(recvp = make_unique<binary_message>(nullptr));
-        REQUIRE_NOTHROW(reqp->try_receive(recvp.get()));
+        REQUIRE_NOTHROW(recvp = make_unique<binary_message>());
+        REQUIRE_NOTHROW(*recvp << data);
+        REQUIRE_NOTHROW(repp->send(recvp.get()));
+        REQUIRE_NOTHROW(sendp = make_unique<binary_message>(nullptr));
+        REQUIRE_NOTHROW(reqp->try_receive(sendp.get()));
         // Ditto excessive size truncation.
-        REQUIRE_THAT(recvp->body()->get(), Equals(data));
+        REQUIRE_THAT(sendp->body()->get(), Equals(data));
     }
 }
 
@@ -280,7 +277,6 @@ TEST_CASE("Test the transport in C style", Catch::Tags(constants::prefix_tags
     using namespace trx;
     using namespace nng;
     using namespace nng::protocol;
-    using namespace nng::messaging;
     using namespace constants;
     using namespace Catch::Matchers;
     using O = option_names;

@@ -8,8 +8,7 @@
 #include <string>
 
 namespace nng {
-
-    namespace messaging {
+    //namespace messaging {
 
         struct messaging_utils {
         public:
@@ -31,7 +30,7 @@ namespace nng {
             static buffer_vector_type to_buffer(const std::string* const sp);
             static buffer_vector_type to_buffer(const std::string* const sp, size_type sz);
         };
-    }
+    //}
 }
 
 #endif // NNGCPP_MESSAGING_UTILS_H

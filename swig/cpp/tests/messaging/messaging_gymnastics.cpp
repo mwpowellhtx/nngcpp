@@ -9,19 +9,20 @@
 
 #include <nngcpp.h>
 
-#include <catch.hpp>
+#include "../catch/catch_tags.h"
 
 #include "../helpers/constants.h"
 
 namespace constants {
     const std::string hello = "hello";
-    const nng::messaging::buffer_vector_type hello_buf = to_buffer(hello);
+    const auto hello_buf = to_buffer(hello);
 }
 
-TEST_CASE("Run some gymnastic conversion scenarios", "[convert][messaging][gymnastics][cxx]") {
+TEST_CASE("Run some gymnastic conversion scenarios", Catch::Tags(
+    "convert", "messaging", "gymnastics", "cxx").c_str()) {
 
     using namespace std;
-    using namespace nng::messaging;
+    using namespace nng;
     using namespace Catch::Matchers;
     using namespace constants;
 
@@ -41,13 +42,14 @@ TEST_CASE("Run some gymnastic conversion scenarios", "[convert][messaging][gymna
 /* If we want more in depth surface testing, look at binary_message tests. Short
 of a full on verification, howevre, we do require that a message is allocated. */
 #define NNGCPP_TESTS_INITIALIZE_BINARY_MESSAGE(m) \
-    nng::messaging::binary_message m
+    nng::binary_message m
 
 TEST_CASE("Can write (append) to and read (get) from binary message using byte vector"
-    , "[vector][write][append][read][get][binary][message][messaging][messages][gymnastics][cxx]") {
+    , Catch::Tags("vector", "write", "append", "read", "get", "binary", "message"
+        , "messaging", "messages", "gymnastics", "cxx").c_str()) {
 
     using namespace std;
-    using namespace nng::messaging;
+    using namespace nng;
     using namespace Catch::Matchers;
     using namespace constants;
 
@@ -72,10 +74,11 @@ TEST_CASE("Can write (append) to and read (get) from binary message using byte v
 }
 
 TEST_CASE("Can write (append) to and read (get) from binary message using string"
-    , "[string][write][append][read][get][binary][message][messaging][messages][gymnastics][cxx]") {
+    , Catch::Tags("string", "write", "append", "read", "get", "binary", "message"
+        , "messaging", "messages", "gymnastics", "cxx").c_str()) {
 
     using namespace std;
-    using namespace nng::messaging;
+    using namespace nng;
     using namespace Catch::Matchers;
     using namespace constants;
 
@@ -105,10 +108,11 @@ TEST_CASE("Can write (append) to and read (get) from binary message using string
     REQUIRE(bmb != nullptr)
 
 TEST_CASE("Can write (append) to and read (get) from binary message body using byte vector"
-    , "[vector][write][append][read][get][binary][message][body][messaging][messages][gymnastics][cxx]") {
+    , Catch::Tags("vector", "write", "append", "read", "get", "binary", "message", "body"
+        , "messaging", "messages", "gymnastics", "cxx").c_str()) {
 
     using namespace std;
-    using namespace nng::messaging;
+    using namespace nng;
     using namespace Catch::Matchers;
     using namespace constants;
 
@@ -137,10 +141,11 @@ TEST_CASE("Can write (append) to and read (get) from binary message body using b
 }
 
 TEST_CASE("Can write (append) to and read (get) from binary message body using string"
-    , "[string][write][append][read][get][binary][message][body][messaging][messages][gymnastics][cxx]") {
+    , Catch::Tags("string", "write", "append", "read", "get", "binary", "message"
+        , "body", "messaging", "messages", "gymnastics", "cxx").c_str()) {
 
     using namespace std;
-    using namespace nng::messaging;
+    using namespace nng;
     using namespace Catch::Matchers;
     using namespace constants;
 

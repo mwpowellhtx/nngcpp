@@ -17,7 +17,7 @@
 
 namespace constants {
     const std::string props = "props";
-    const nng::messaging::buffer_vector_type props_buf = to_buffer(props);
+    const nng::buffer_vector_type props_buf = to_buffer(props);
 }
 
 TEST_CASE("Check some properties", "[check][properties][nng][cxx][bonus]") {
@@ -25,7 +25,6 @@ TEST_CASE("Check some properties", "[check][properties][nng][cxx][bonus]") {
     using namespace std;
     using namespace nng;
     using namespace nng::protocol;
-    using namespace nng::messaging;
     using namespace constants;
     using namespace Catch::Matchers;
     using O = option_names;
@@ -93,7 +92,6 @@ TEST_CASE("Check some properties in C style", "[check][properties][nng][c][bonus
 
     using namespace std;
     using namespace nng;
-    using namespace nng::messaging;
     using namespace constants;
     using namespace Catch::Matchers;
 

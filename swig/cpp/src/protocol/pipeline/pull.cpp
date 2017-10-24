@@ -8,15 +8,16 @@ namespace nng {
         namespace v0 {
 
             using std::placeholders::_1;
+            using std::bind;
 
             // While we could use nng_pull_open, I think it is sufficient to just use the versioned symbol.
-            pull_socket::pull_socket() : socket(std::bind(&(::nng_pull0_open), _1)) {
+            pull_socket::pull_socket() : socket(bind(&(::nng_pull0_open), _1)) {
             }
 
             pull_socket::~pull_socket() {
             }
 
-            void pull_socket::send(binary_message_type* const bmp, flag_type flags) {
+            void pull_socket::send(binary_message* const bmp, flag_type flags) {
                 THROW_PULL_SOCKET_INV_OP();
             }
 

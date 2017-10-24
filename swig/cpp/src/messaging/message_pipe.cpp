@@ -13,7 +13,7 @@ namespace nng {
         return mp.pid;
     }
 
-    message_pipe::message_pipe(messaging::message_base* const mbp)
+    message_pipe::message_pipe(message_base* const mbp)
         : having_one(), can_close()
         , pid(0), _options() {
 

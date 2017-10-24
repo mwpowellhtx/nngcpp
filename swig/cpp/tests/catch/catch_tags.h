@@ -12,6 +12,8 @@
 #ifndef NNGCPP_TESTS_CATCH_TAGS_H
 #define NNGCPP_TESTS_CATCH_TAGS_H
 
+#include <catch.hpp>
+
 #include <string>
 #include <vector>
 

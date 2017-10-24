@@ -48,11 +48,11 @@ namespace constants {
     const char port_delim = '\0';
 }
 
-TEST_CASE("Simple C style program to open reqrep IPC and send", "[ipc][req][rep][send][recv][msg][simple][c]") {
+TEST_CASE("Simple C style program to open reqrep IPC and send", Catch::Tags(
+    "ipc", "req", "rep", "send", "recv", "msg", "simple", "c").c_str()) {
 
     using namespace std;
     using namespace nng;
-    using namespace nng::messaging;
 
     ::nng_dialer d;
     ::nng_listener l;

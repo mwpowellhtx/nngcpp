@@ -33,7 +33,7 @@ namespace nng {
             std::vector<std::shared_ptr<protocol::latest_req_socket>> _req_sockets;
             std::vector<std::shared_ptr<protocol::latest_rep_socket>> _rep_sockets;
 
-            std::vector<std::shared_ptr<messaging::binary_message>> _messages;
+            std::vector<std::shared_ptr<binary_message>> _messages;
 
             std::vector<std::shared_ptr<device>> _devices;
 
@@ -71,8 +71,8 @@ namespace nng {
             std::shared_ptr<device> create_device(socket* const asockp, socket* const bsockp, bool shouldCloseSockets);
             void remove_device(const device* const dp);
 
-            std::shared_ptr<messaging::binary_message> create_message();
-            void remove_message(const messaging::binary_message* const mp);
+            std::shared_ptr<binary_message> create_message();
+            void remove_message(const binary_message* const mp);
     };
 }
 

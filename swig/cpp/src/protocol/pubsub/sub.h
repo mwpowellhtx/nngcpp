@@ -18,7 +18,7 @@ namespace nng {
 
             protected:
 
-                virtual void send(binary_message_type* const bmp, flag_type flags = flag_none) override;
+                virtual void send(binary_message* const bmp, flag_type flags = flag_none) override;
 
                 virtual void send(const buffer_vector_type* const bufp, flag_type flags = flag_none) override;
                 virtual void send(const buffer_vector_type* const bufp, size_type sz, flag_type flags = flag_none) override;

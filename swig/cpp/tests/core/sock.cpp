@@ -97,7 +97,7 @@ namespace constants {
 
     const size_t max_addr_length = NNG_MAXADDRLEN;
 
-    const nng::messaging::buffer_vector_type empty_buf = {};
+    const nng::buffer_vector_type empty_buf = {};
     const auto data_buf = to_buffer("data");
 }
 
@@ -106,7 +106,6 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
     using namespace std;
     using namespace std::chrono;
     using namespace nng;
-    using namespace nng::messaging;
     using namespace nng::protocol;
     using namespace nng::exceptions;
     using namespace constants;

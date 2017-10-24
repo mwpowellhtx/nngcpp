@@ -8,23 +8,24 @@ namespace nng {
         namespace v0 {
 
             using std::placeholders::_1;
+            using std::bind;
 
             // While we could use nng_pub_open, I think it is sufficient to just use the versioned symbol.
-            pub_socket::pub_socket() : socket(std::bind(&(::nng_pub0_open), _1)) {
+            pub_socket::pub_socket() : socket(bind(&(::nng_pub0_open), _1)) {
             }
 
             pub_socket::~pub_socket() {
             }
 
-            std::unique_ptr<pub_socket::binary_message_type> pub_socket::receive(flag_type flags) {
+            std::unique_ptr<binary_message> pub_socket::receive(flag_type flags) {
                 THROW_PUB_SOCKET_INV_OP();
             }
 
-            bool pub_socket::try_receive(binary_message_type* const bmp, flag_type flags) {
+            bool pub_socket::try_receive(binary_message* const bmp, flag_type flags) {
                 THROW_PUB_SOCKET_INV_OP();
             }
 
-            pub_socket::buffer_vector_type pub_socket::receive(size_type& sz, flag_type flags) {
+            buffer_vector_type pub_socket::receive(size_type& sz, flag_type flags) {
                 THROW_PUB_SOCKET_INV_OP();
             }
 

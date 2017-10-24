@@ -33,11 +33,11 @@ namespace trx {
             static bool __one_of(ErrorCode_ ec, const Arg_& arg, const Args_&... args) {
                 // The variadics surrounding this are fairly generic. But this is where rubber meets asphalt.
                 const auto given_ec = static_cast<error_code_type>(ec);
-                const auto actual_arg = static_cast<error_code_type>(arg);
+                const auto actual_ec = static_cast<error_code_type>(arg);
                 /* This is also a bit tricky. First, if we expected the zero base case,
                 then we expect neither of them. Otherwise, this is more of a MASK than
                 a numeric EQUALITY. OR, whether ONE OF the other ones. */
-                const auto _was_this_one = !(ec || arg) || given_ec & actual_arg;
+                const auto _was_this_one = !(ec || arg) || given_ec & actual_ec;
                 return _was_this_one || __one_of(ec, args...);
             }
 
@@ -45,11 +45,11 @@ namespace trx {
             static bool __one_of(ErrorCode_ ec, const error_code_vector& ecs, const Args_&... args) {
                 // The variadics surrounding this are fairly generic. But this is where rubber meets asphalt.
                 const auto given_ec = static_cast<error_code_type>(ec);
-                const auto predicated_ec = [given_ec](const error_code_vector::value_type ec) {
-                    return !(ec || given_ec) || given_ec & ec;
+                const auto a_predicated_ec = [given_ec](const error_code_vector::value_type x) {
+                    return !(x || given_ec) || given_ec & x;
                 };
                 const auto _was_this_one = std::find_if(ecs.cbegin(), ecs.cend()
-                    , predicated_ec) != ecs.cend();
+                    , a_predicated_ec) != ecs.cend();
                 return _was_this_one || __one_of(ec, args...);
             }
 

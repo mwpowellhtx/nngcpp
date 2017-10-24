@@ -37,31 +37,29 @@
 // We are not here to test the header or the body, per se, but we do need to ensure that they agree.
 
 namespace nng {
-    namespace messaging {
 
-        struct message_pipe_fixture : public message_pipe {
+    struct message_pipe_fixture : public message_pipe {
 
-            message_pipe_fixture(message_base* const mbp) : message_pipe(mbp) {
-            }
+        message_pipe_fixture(message_base* const mbp) : message_pipe(mbp) {
+        }
 
-            ::nng_pipe get_pid() const {
-                return pid;
-            }
-        };
+        ::nng_pipe get_pid() const {
+            return pid;
+        }
+    };
 
-        struct binary_message_fixture : public binary_message {
+    struct binary_message_fixture : public binary_message {
 
-            binary_message_fixture() : binary_message() {
-            }
+        binary_message_fixture() : binary_message() {
+        }
 
-            binary_message_fixture(::nng_msg* msgp) : binary_message(msgp) {
-            }
+        binary_message_fixture(::nng_msg* msgp) : binary_message(msgp) {
+        }
 
-            virtual void free() override {
-                binary_message::free();
-            }
-        };
-    }
+        virtual void free() override {
+            message_base::free();
+        }
+    };
 }
 
 namespace constants {
@@ -72,7 +70,7 @@ namespace constants {
 TEST_CASE("Binary messages work", "[binary_message][messaging][cxx]") {
 
     using namespace std;
-    using namespace nng::messaging;
+    using namespace nng;
     using namespace constants;
     using namespace Catch::Matchers;
 

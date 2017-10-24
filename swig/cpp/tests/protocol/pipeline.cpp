@@ -52,11 +52,11 @@ namespace nng {
                 virtual ~push_socket_inv_ops_fixture() {
                 }
 
-                virtual std::unique_ptr<push_socket::binary_message_type> receive(flag_type flags = flag_none) override {
+                virtual std::unique_ptr<binary_message> receive(flag_type flags = flag_none) override {
                     return push_socket::receive(flags);
                 }
 
-                virtual bool try_receive(binary_message_type* const bmp, flag_type flags = flag_none) override {
+                virtual bool try_receive(binary_message* const bmp, flag_type flags = flag_none) override {
                     return push_socket::try_receive(bmp, flags);
                 }
 
@@ -78,7 +78,7 @@ namespace nng {
                 virtual ~pull_socket_inv_ops_fixture() {
                 }
 
-                virtual void send(binary_message_type* const bmp, flag_type flags = flag_none) override {
+                virtual void send(binary_message* const bmp, flag_type flags = flag_none) override {
                     pull_socket::send(bmp, flags);
                 }
 
@@ -102,7 +102,6 @@ TEST_CASE("Rule out the possibility of invalid operations", Catch::Tags("pipelin
 
     using namespace nng;
     using namespace nng::protocol;
-    using namespace nng::messaging;
     using namespace nng::exceptions;
 
     // Even though we are technically doing nothing with these, we MUST initialize them anyhow.
@@ -137,7 +136,6 @@ TEST_CASE("Pipeline (push/pull) pattern using C++ wrapper", Catch::Tags("pipelin
     using namespace std::chrono;
     using namespace nng;
     using namespace nng::protocol;
-    using namespace nng::messaging;
     using namespace trx;
     using namespace Catch;
     using namespace Catch::Matchers;
@@ -202,8 +200,8 @@ TEST_CASE("We can create a linked push/pull pair", Catch::Tags("linked"
     , "push", "push", "v0", "protocol", "sockets", "pattern", "nng", "cxx").c_str()) {
 
     using namespace std;
+    using namespace nng;
     using namespace nng::protocol;
-    using namespace nng::messaging;
     using namespace constants;
     using namespace Catch::Matchers;
 
@@ -256,7 +254,6 @@ TEST_CASE("Load balancing works", Catch::Tags("load", "balancing", "pipeline"
     using namespace std::chrono;
     using namespace nng;
     using namespace nng::protocol;
-    using namespace nng::messaging;
     using namespace nng::exceptions;
     using namespace constants;
     using namespace Catch::Matchers;

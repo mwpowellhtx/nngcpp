@@ -69,79 +69,77 @@ void init(const std::string& addr) {
 }
 
 namespace nng {
-    namespace messaging {
 
-        const family_view_base::in6_addr_vector_type expected_loopback_long_addr
-            = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1 };
+    const family_view_base::in6_addr_vector_type expected_loopback_long_addr
+        = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1 };
 
-        const family_view_base::in6_addr_vector_type expected_loopback_short_addr = { 1 };
+    const family_view_base::in6_addr_vector_type expected_loopback_short_addr = { 1 };
 
-        using O = option_names;
+    using O = option_names;
 
-        template<>
-        void test_local_addr_properties<::nng_pipe, ::nng_listener, ::nng_dialer>(::nng_pipe* const pp
-            , ::nng_listener* const lp, ::nng_dialer* const dp, uint16_t expected_port) {
+    template<>
+    void test_local_addr_properties<::nng_pipe, ::nng_listener, ::nng_dialer>(::nng_pipe* const pp
+        , ::nng_listener* const lp, ::nng_dialer* const dp, uint16_t expected_port) {
 
-            using namespace std;
+        using namespace std;
 
-            ::nng_sockaddr a;
-            size_type sz = sizeof(a);
+        ::nng_sockaddr a;
+        size_type sz = sizeof(a);
 
-            REQUIRE(::nng_pipe_getopt(*pp, O::local_addr.c_str(), (void*)&a, &sz) == 0);
-            REQUIRE(sz == sizeof(a));
-            REQUIRE(a.s_un.s_family == ::NNG_AF_INET6);
-            REQUIRE(memcmp(&(a.s_un.s_in6.sa_addr), &expected_loopback_long_addr[0], 16) == 0);
-            REQUIRE(a.s_un.s_in6.sa_port == ::htons(expected_port));
-        }
+        REQUIRE(::nng_pipe_getopt(*pp, O::local_addr.c_str(), (void*)&a, &sz) == 0);
+        REQUIRE(sz == sizeof(a));
+        REQUIRE(a.s_un.s_family == ::NNG_AF_INET6);
+        REQUIRE(memcmp(&(a.s_un.s_in6.sa_addr), &expected_loopback_long_addr[0], 16) == 0);
+        REQUIRE(a.s_un.s_in6.sa_port == ::htons(expected_port));
+    }
 
-        template<>
-        void test_remote_addr_properties<::nng_pipe, ::nng_listener, ::nng_dialer>(::nng_pipe* const pp
-            , ::nng_listener* const lp, ::nng_dialer* const dp, uint16_t expected_port) {
+    template<>
+    void test_remote_addr_properties<::nng_pipe, ::nng_listener, ::nng_dialer>(::nng_pipe* const pp
+        , ::nng_listener* const lp, ::nng_dialer* const dp, uint16_t expected_port) {
 
-            using namespace std;
+        using namespace std;
 
-            ::nng_sockaddr a;
-            size_type sz = sizeof(a);
+        ::nng_sockaddr a;
+        size_type sz = sizeof(a);
 
-            REQUIRE(::nng_pipe_getopt(*pp, O::remote_addr.c_str(), (void*)&a, &sz) == 0);
-            REQUIRE(sz == sizeof(a));
-            REQUIRE(a.s_un.s_family == ::NNG_AF_INET6);
-            REQUIRE(memcmp(&(a.s_un.s_in6.sa_addr), &expected_loopback_long_addr[0], 16) == 0);
-            REQUIRE(a.s_un.s_in.sa_port != 0);
-        }
+        REQUIRE(::nng_pipe_getopt(*pp, O::remote_addr.c_str(), (void*)&a, &sz) == 0);
+        REQUIRE(sz == sizeof(a));
+        REQUIRE(a.s_un.s_family == ::NNG_AF_INET6);
+        REQUIRE(memcmp(&(a.s_un.s_in6.sa_addr), &expected_loopback_long_addr[0], 16) == 0);
+        REQUIRE(a.s_un.s_in.sa_port != 0);
+    }
 
-        template<>
-        void test_local_addr_properties<message_pipe, listener, dialer>(message_pipe* const pp
-            , listener* const lp, dialer* const dp, uint16_t expected_port) {
+    template<>
+    void test_local_addr_properties<message_pipe, listener, dialer>(message_pipe* const pp
+        , listener* const lp, dialer* const dp, uint16_t expected_port) {
 
-            using namespace Catch::Matchers;
+        using namespace Catch::Matchers;
 
-            // TODO: TBD: call address socket_address instead... would be more specific.
-            address a;
+        // TODO: TBD: call address socket_address instead... would be more specific.
+        address a;
 
-            REQUIRE_NOTHROW(pp->options()->get(O::local_addr, a));
-            REQUIRE(a.get_family() == af_inet6);
-            auto vp = a.view();
-            REQUIRE(vp->get_family() == a.get_family());
-            REQUIRE_THAT(vp->get_in6_addr(), Equals(expected_loopback_short_addr));
-            REQUIRE(vp->get_port() == expected_port);
-        }
+        REQUIRE_NOTHROW(pp->options()->get(O::local_addr, a));
+        REQUIRE(a.get_family() == af_inet6);
+        auto vp = a.view();
+        REQUIRE(vp->get_family() == a.get_family());
+        REQUIRE_THAT(vp->get_in6_addr(), Equals(expected_loopback_short_addr));
+        REQUIRE(vp->get_port() == expected_port);
+    }
 
-        template<>
-        void test_remote_addr_properties<message_pipe, listener, dialer>(message_pipe* const pp
-            , listener* const lp, dialer* const dp, uint16_t expected_port) {
+    template<>
+    void test_remote_addr_properties<message_pipe, listener, dialer>(message_pipe* const pp
+        , listener* const lp, dialer* const dp, uint16_t expected_port) {
 
-            using namespace Catch::Matchers;
+        using namespace Catch::Matchers;
 
-            // TODO: TBD: call address socket_address instead... would be more specific.
-            address a;
+        // TODO: TBD: call address socket_address instead... would be more specific.
+        address a;
 
-            REQUIRE_NOTHROW(pp->options()->get(O::remote_addr, a));
-            REQUIRE(a.get_family() == af_inet6);
-            auto vp = a.view();
-            REQUIRE(vp->get_family() == a.get_family());
-            REQUIRE_THAT(vp->get_in6_addr(), Equals(expected_loopback_short_addr));
-            REQUIRE(vp->get_port() != 0);
-        }
+        REQUIRE_NOTHROW(pp->options()->get(O::remote_addr, a));
+        REQUIRE(a.get_family() == af_inet6);
+        auto vp = a.view();
+        REQUIRE(vp->get_family() == a.get_family());
+        REQUIRE_THAT(vp->get_in6_addr(), Equals(expected_loopback_short_addr));
+        REQUIRE(vp->get_port() != 0);
     }
 }

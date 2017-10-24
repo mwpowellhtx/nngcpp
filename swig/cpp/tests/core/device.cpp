@@ -14,6 +14,8 @@
 #include "../catch/catch_exception_translations.hpp"
 #include "../catch/catch_macros.hpp"
 
+#include "../helpers/constants.h"
+
 #include <ostream>
 
 struct device_fixture {
@@ -55,24 +57,26 @@ public:
 };
 
 namespace constants {
+
     const std::string dev1_addr = "inproc://dev1";
     const std::string dev2_addr = "inproc://dev2";
+
     const std::string alpha = "alpha";
     const std::string omega = "omega";
-    const nng::messaging::buffer_vector_type alpha_buf = { 'a','l','p','h','a' };
-    const nng::messaging::buffer_vector_type omega_buf = { 'o','m','e','g','a' };
+
+    const auto alpha_buf = to_buffer(alpha);
+    const auto omega_buf = to_buffer(omega);
 }
 
 TEST_CASE("Test that device functions properly", "[device]") {
 
-    using namespace Catch;
-    using namespace Catch::Matchers;
     using namespace std;
     using namespace std::chrono;
     using namespace nng;
     using namespace nng::protocol;
-    using namespace nng::messaging;
     using namespace constants;
+    using namespace Catch;
+    using namespace Catch::Matchers;
     using O = option_names;
 
     /* No need to involve any "sessions" at this level. In fact, I think that having

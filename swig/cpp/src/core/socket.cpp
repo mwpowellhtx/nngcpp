@@ -103,7 +103,7 @@ namespace nng {
         nng::send(sid, *bufp, sz, flags);
     }
 
-    void socket::send(binary_message_type* const bmp, flag_type flags) {
+    void socket::send(binary_message* const bmp, flag_type flags) {
         auto* msgp = bmp->get_msgp();
         if (msgp == nullptr) { return; }
         const auto op = bind(&::nng_sendmsg, sid, msgp, _1);
@@ -122,13 +122,13 @@ namespace nng {
         return sz > 0;
     }
 
-    std::unique_ptr<socket::binary_message_type> socket::receive(flag_type flags) {
-        auto bmup = std::make_unique<binary_message_type>();
+    std::unique_ptr<binary_message> socket::receive(flag_type flags) {
+        auto bmup = std::make_unique<binary_message>();
         try_receive(bmup.get(), flags);
         return bmup;
     }
 
-    bool socket::try_receive(binary_message_type* const bmp, flag_type flags) {
+    bool socket::try_receive(binary_message* const bmp, flag_type flags) {
         /* So this is somewhat of a long way around, but it represents the cost of NNG message
         ownership semantics. The cost has to be paid at some point, either on the front side or
         the back side, so we pay for it here in additional semantics. */
@@ -137,7 +137,11 @@ namespace nng {
             const auto& recv_ = bind(&::nng_recvmsg, sid, &msgp, _1);
             invocation::with_default_error_handling(recv_, static_cast<int>(flags));
         }
+#if 0
+        catch (std::exception& ex) {
+#else
         catch (...) {
+#endif
             // TODO: TBD: this is probably (PROBABLY) about as good as we can expect here...
             if (msgp) {
                 const auto& free_ = bind(&::nng_msg_free, msgp);
@@ -150,7 +154,7 @@ namespace nng {
         return bmp->has_one();
     }
 
-    socket::buffer_vector_type socket::receive(size_type& sz, flag_type flags) {
+    buffer_vector_type socket::receive(size_type& sz, flag_type flags) {
         buffer_vector_type buf;
         // TODO: TBD: if we do not or cannot receive anything, return whatever we do have?
         this->try_receive(&buf, sz, flags);

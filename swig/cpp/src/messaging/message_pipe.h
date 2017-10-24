@@ -4,8 +4,6 @@
 #define NNG_ONLY
 #include <nngcpp.h>
 
-#include "message_base.h"
-
 #include "../core/options.h"
 
 #include "../core/having_one.hpp"
@@ -28,6 +26,10 @@ namespace nng {
     template<class Body_, class Header_> class basic_binary_message;
 #endif // NNGCPP_BINARY_MESSAGE_H
 
+#ifndef NNGCPP_MESSAGE_BASE_H
+    class message_base;
+#endif // NNGCPP_MESSAGE_BASE_H
+
     // TODO: so, equal_to is available, but not_equal_to is not?
     class message_pipe : public having_one, public can_close, public std::equal_to<message_pipe> {
     public:
@@ -48,7 +50,7 @@ namespace nng {
 
     public:
 
-        message_pipe(messaging::message_base* const mbp);
+        message_pipe(message_base* const mbp);
 
         virtual ~message_pipe();
 

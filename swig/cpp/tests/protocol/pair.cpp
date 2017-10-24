@@ -277,7 +277,6 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
     using namespace std::chrono;
     using namespace nng;
     using namespace nng::protocol;
-    using namespace nng::messaging;
     using namespace nng::exceptions;
     using namespace nng::transactions;
     using namespace constants;
@@ -414,7 +413,6 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
             // Assume successful up front. If no exception, then groovy.
             for (i = 0; i < 10; actual_ec = ec_enone, i++) {
                 REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
-                REQUIRE_NOTHROW(bmp->allocate());
                 try {
                     // This is a RARE instance where we do NOT want to check/require ANYTHING.
                     serverp1->send(bmp.get());

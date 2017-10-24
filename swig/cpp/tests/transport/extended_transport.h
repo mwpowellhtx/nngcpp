@@ -14,42 +14,41 @@
 
 #include <nngcpp.h>
 
+#include "../helpers/constants.h"
+
 #include "transport.h"
 
 namespace constants {
     extern const std::string props;
-    extern const nng::messaging::buffer_vector_type props_buf;
+    extern const nng::buffer_vector_type props_buf;
 }
 
 namespace nng {
 
-    namespace messaging {
+    // Parameters should be as fully vetted as possible prior to presentation to the extended tests function.
+    template<typename Pipe_, typename Listener_, typename Dialer_>
+    void test_local_addr_properties(Pipe_* const pp, Listener_* const lp
+        , Dialer_* const dp, uint16_t expected_port) {}
 
-        // Parameters should be as fully vetted as possible prior to presentation to the extended tests function.
-        template<typename Pipe_, typename Listener_, typename Dialer_>
-        void test_local_addr_properties(Pipe_* const pp, Listener_* const lp
-            , Dialer_* const dp, uint16_t expected_port) {}
+    template<typename Pipe_, typename Listener_, typename Dialer_>
+    void test_remote_addr_properties(Pipe_* const pp, Listener_* const lp
+        , Dialer_* const dp, uint16_t expected_port) {}
 
-        template<typename Pipe_, typename Listener_, typename Dialer_>
-        void test_remote_addr_properties(Pipe_* const pp, Listener_* const lp
-            , Dialer_* const dp, uint16_t expected_port) {}
+    template<>
+    extern void test_local_addr_properties<::nng_pipe, ::nng_listener, ::nng_dialer>(::nng_pipe* const pp
+        , ::nng_listener* const lp, ::nng_dialer* const dp, uint16_t expected_port);
 
-        template<>
-        extern void test_local_addr_properties<::nng_pipe, ::nng_listener, ::nng_dialer>(::nng_pipe* const pp
-            , ::nng_listener* const lp, ::nng_dialer* const dp, uint16_t expected_port);
+    template<>
+    extern void test_remote_addr_properties<::nng_pipe, ::nng_listener, ::nng_dialer>(::nng_pipe* const pp
+        , ::nng_listener* const lp, ::nng_dialer* const dp, uint16_t expected_port);
 
-        template<>
-        extern void test_remote_addr_properties<::nng_pipe, ::nng_listener, ::nng_dialer>(::nng_pipe* const pp
-            , ::nng_listener* const lp, ::nng_dialer* const dp, uint16_t expected_port);
+    template<>
+    extern void test_local_addr_properties<message_pipe, listener, dialer>(message_pipe* const pp
+        , listener* const lp, dialer* const dp, uint16_t expected_port);
 
-        template<>
-        extern void test_local_addr_properties<message_pipe, listener, dialer>(message_pipe* const pp
-            , listener* const lp, dialer* const dp, uint16_t expected_port);
-
-        template<>
-        extern void test_remote_addr_properties<message_pipe, listener, dialer>(message_pipe* const pp
-            , listener* const lp, dialer* const dp, uint16_t expected_port);
-    }
+    template<>
+    extern void test_remote_addr_properties<message_pipe, listener, dialer>(message_pipe* const pp
+        , listener* const lp, dialer* const dp, uint16_t expected_port);
 }
 
 #endif // NNGCPP_TESTS_EXTENDED_TRANSPORT_TESTS_H

@@ -19,7 +19,7 @@
 
 namespace constants {
 
-    const nng::messaging::buffer_vector_type default_data = {};
+    const nng::buffer_vector_type default_data = {};
 
     const std::string this_is_a_test = "this is a test";
     const std::string mathematics_is_cool = "mathematics is cool";
@@ -29,12 +29,12 @@ namespace constants {
 
     // Hopefully these are not too awfully contrived examples.
     const uint32_t abcd_value = ('a' << 24) | ('b' << 16) | ('c' << 8) | 'd';
-    const nng::messaging::buffer_vector_type abcd_value_buf = { 'a','b','c','d' };
+    const auto abcd_value_buf = to_buffer("abcd");
 
     const uint32_t efgh_value = ('e' << 24) | ('f' << 16) | ('g' << 8) | 'h';
-    const nng::messaging::buffer_vector_type efgh_value_buf = { 'e','f','g','h' };
+    const auto efgh_value_buf = to_buffer("efgh");
 
-    const nng::messaging::buffer_vector_type abcdefgh_value_buf = { 'a','b','c','d','e','f','g','h' };
+    const auto abcdefgh_value_buf = to_buffer("abcdefgh");
 
     const std::string mathematics_ = "mathematics ";
     const std::string _cool = " cool";
@@ -44,7 +44,7 @@ namespace constants {
     const std::string _a_test = " a test";
     const auto this_is_buf = to_buffer("this is");
 
-    const nng::messaging::buffer_vector_type it_is_what_it_is_buf = { 'i','s' };
+    const auto it_is_what_it_is_buf = to_buffer("is");
 }
 
 /* TODO: TBD: I do not really see a need to re-introduce any C style unit tests for the
@@ -55,7 +55,7 @@ TEST_CASE("Binary message part cannot exist apart from a parent message"
     , Catch::Tags("body", "part", "orphan", "invalid", "operation"
         , "messaging", "nng", "cxx").c_str()) {
 
-    using namespace nng::messaging;
+    using namespace nng;
     using namespace nng::exceptions;
 
     /* Message part fixtured in order to simulate access to the ctor. This is
@@ -70,7 +70,7 @@ TEST_CASE("Verify default message part", Catch::Tags("body"
     , "default", "part", "messaging", "nng", "cxx").c_str()) {
 
     using namespace std;
-    using namespace nng::messaging;
+    using namespace nng;
     using namespace constants;
     using namespace Catch::Matchers;
 
@@ -98,10 +98,11 @@ TEST_CASE("Verify default message part", Catch::Tags("body"
     }
 }
 
-TEST_CASE("Message part operates correctly") {
+TEST_CASE("Message part operates correctly", Catch::Tags("body"
+    , "message", "parts", "operation", "messaging", "cxx").c_str()) {
 
     using namespace std;
-    using namespace nng::messaging;
+    using namespace nng;
     using namespace constants;
     using namespace Catch::Matchers;
 

@@ -18,7 +18,7 @@
 
 namespace constants {
 
-    const nng::messaging::buffer_vector_type default_data = {};
+    const nng::buffer_vector_type default_data = {};
 
     const std::string __empty = "";
 
@@ -28,11 +28,11 @@ namespace constants {
     const uint32_t value = 0x15263748;
     const uint32_t reversed = 0x48372615;
 
-    const nng::messaging::buffer_vector_type appended_data = { 0x15,0x26,0x37,0x48,0x48,0x37,0x26,0x15,0x15,0x26,0x37,0x48 };
+    const nng::buffer_vector_type appended_data = { 0x15,0x26,0x37,0x48,0x48,0x37,0x26,0x15,0x15,0x26,0x37,0x48 };
 
-    const nng::messaging::buffer_vector_type remaining_after_ltrim = { 0x48,0x37,0x26,0x15,0x15,0x26,0x37,0x48 };
+    const nng::buffer_vector_type remaining_after_ltrim = { 0x48,0x37,0x26,0x15,0x15,0x26,0x37,0x48 };
 
-    const nng::messaging::buffer_vector_type remaining_after_rtrim = { 0x48,0x37,0x26,0x15 };
+    const nng::buffer_vector_type remaining_after_rtrim = { 0x48,0x37,0x26,0x15 };
 }
 
 /* TODO: TBD: Ditto notes concerning body message part. */
@@ -41,7 +41,7 @@ TEST_CASE("Binary message part cannot exist apart from a parent message"
     , Catch::Tags("header", "part", "orphan", "invalid", "operation"
         , "messaging", "nng", "cxx").c_str()) {
 
-    using namespace nng::messaging;
+    using namespace nng;
     using namespace nng::exceptions;
 
     /* Message part fixtured in order to simulate access to the ctor. This is
@@ -56,7 +56,7 @@ TEST_CASE("Verify default message part", Catch::Tags("header"
     , "default", "part", "messaging", "nng", "cxx").c_str()) {
 
     using namespace std;
-    using namespace nng::messaging;
+    using namespace nng;
     using namespace constants;
     using namespace Catch::Matchers;
 
@@ -85,26 +85,24 @@ TEST_CASE("Verify default message part", Catch::Tags("header"
 }
 
 namespace nng {
-    namespace messaging {
 
-        typedef binary_message_part_fixture<binary_message_header> binary_message_header_fixture;
+    typedef binary_message_part_fixture<binary_message_header> binary_message_header_fixture;
 
-        // TODO: TBD: any reason to define a full on class derivation? perhaps for SWIG purposes? or just type-define it?
-        class binary_message_fixture : public basic_binary_message<binary_message_body, binary_message_header_fixture> {
-        public:
+    // TODO: TBD: any reason to define a full on class derivation? perhaps for SWIG purposes? or just type-define it?
+    class binary_message_fixture : public basic_binary_message<binary_message_body, binary_message_header_fixture> {
+    public:
 
-            binary_message_fixture() :basic_binary_message() {}
+        binary_message_fixture() : basic_binary_message() {}
 
-            virtual ~binary_message_fixture() {}
-        };
-    }
+        virtual ~binary_message_fixture() {}
+    };
 }
 
-TEST_CASE("Message part operates correctly") {
+TEST_CASE("Message part operates correctly", Catch::Tags("header"
+    , "message", "parts", "operation", "messaging", "cxx").c_str()) {
 
     using namespace std;
     using namespace nng;
-    using namespace nng::messaging;
     using namespace nng::exceptions;
     using namespace constants;
     using namespace Catch::Matchers;

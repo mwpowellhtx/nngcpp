@@ -1,8 +1,7 @@
 #include "messaging_utils.h"
 
 namespace nng {
-
-    namespace messaging {
+    //namespace messaging {
 
         messaging_utils::messaging_utils() {
         }
@@ -47,5 +46,5 @@ namespace nng {
         buffer_vector_type messaging_utils::to_buffer(const std::string* const sp, size_type sz) {
             return __to_dest<std::string, buffer_vector_type>(sp, sz);
         }
-    }
+    //}
 }

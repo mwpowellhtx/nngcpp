@@ -9,7 +9,10 @@
 
 #include <nngcpp.h>
 
-#include "../tests/catch/catch_macros.hpp"
+#include "../catch/catch_macros.hpp"
+#include "../catch/catch_tags.h"
+
+#include "../helpers/constants.h"
 
 #include <memory>
 
@@ -21,8 +24,8 @@ namespace constants {
     const std::string hello = "hello";
     const std::string again = "again";
 
-    const nng::messaging::buffer_vector_type hello_buf = { 'h','e','l','l','o' };
-    const nng::messaging::buffer_vector_type again_buf = { 'a','g','a','i','n' };
+    const auto hello_buf = to_buffer(hello);
+    const auto again_buf = to_buffer(again);
 }
 
 /* This is interesting in the event we actually need/want to separate the code under
@@ -54,18 +57,16 @@ struct c_style_fixture {
 };
 
 namespace nng {
-    namespace messaging {
 
-        struct message_pipe_fixture : public message_pipe {
+    struct message_pipe_fixture : public message_pipe {
 
-            message_pipe_fixture(message_base* const mbp) : message_pipe(mbp) {
-            }
+        message_pipe_fixture(message_base* const mbp) : message_pipe(mbp) {
+        }
 
-            ::nng_pipe get_pid() const {
-                return pid;
-            }
-        };
-    }
+        ::nng_pipe get_pid() const {
+            return pid;
+        }
+    };
 }
 
 #define NNG_TESTS_VERIFY_TEST_CASE_DATA() \
@@ -74,7 +75,8 @@ namespace nng {
     REQUIRE_THAT(constants::nng_addr, Catch::Matchers::Equals("inproc://nng")); \
     REQUIRE_THAT(constants::test_addr, Catch::Matchers::Equals("inproc://test"))
 
-TEST_CASE("Catch translation of NNG C reconnect unit tests", "[nng][c][reconnect]") {
+TEST_CASE("Catch translation of NNG C reconnect unit tests", Catch::Tags(
+    "reconnect", "nng", "c").c_str()) {
 
     using namespace std;
     using namespace std::chrono;
@@ -176,13 +178,13 @@ TEST_CASE("Catch translation of NNG C reconnect unit tests", "[nng][c][reconnect
     }
 }
 
-TEST_CASE("NNG C++ wrapper reconnect works", "[nng][reconnect][cxx]") {
+TEST_CASE("NNG C++ wrapper reconnect works", Catch::Tags(
+    "reconnect", "nng", "cxx").c_str()) {
 
     using namespace std;
     using namespace std::chrono;
     using namespace nng;
     using namespace nng::protocol;
-    using namespace nng::messaging;
     using namespace constants;
     using namespace Catch::Matchers;
     using _opt_ = option_names;

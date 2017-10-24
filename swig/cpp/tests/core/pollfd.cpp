@@ -42,7 +42,6 @@ TEST_CASE("Poll FDs", "[pollfd]") {
     using namespace std;
     using namespace nng;
     using namespace nng::protocol;
-    using namespace nng::messaging;
     using namespace nng::exceptions;
     using namespace constants;
     using namespace Catch::Matchers;

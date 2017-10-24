@@ -18,8 +18,8 @@ namespace nng {
 
             protected:
 
-                virtual std::unique_ptr<binary_message_type> receive(flag_type flags = flag_none) override;
-                virtual bool try_receive(binary_message_type* const bmp, flag_type flags = flag_none) override;
+                virtual std::unique_ptr<binary_message> receive(flag_type flags = flag_none) override;
+                virtual bool try_receive(binary_message* const bmp, flag_type flags = flag_none) override;
 
                 virtual buffer_vector_type receive(size_type& sz, flag_type flags = flag_none) override;
                 virtual bool try_receive(buffer_vector_type* const bufp, size_type& sz, flag_type flags = flag_none) override;
