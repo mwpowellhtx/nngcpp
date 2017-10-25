@@ -5,20 +5,25 @@
 
 #include "having_one.hpp"
 #include "can_close.hpp"
+#include "options.h"
 
 namespace nng {
 
     // TODO: TBD: carries along with it information about ::nng_pipe ... just a matter of how to present it to the C++ (or SWIG) community...
-    class endpoint : public having_one, public can_close {
-        protected:
+    class endpoint
+        : public having_one
+        , public can_close
+        , public supports_options<options_reader_writer> {
 
-            endpoint();
+    protected:
 
-        public:
+        endpoint();
 
-            virtual ~endpoint();
+    public:
 
-            virtual void start(flag_type flags = flag_none) = 0;
+        virtual ~endpoint();
+
+        virtual void start(flag_type flags = flag_none) = 0;
     };
 }
 

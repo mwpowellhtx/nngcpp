@@ -24,7 +24,12 @@ namespace nng {
     class dialer;
     struct device_path;
 
-    class socket : public having_one, public sender, public receiver, public messenger {
+    class socket
+        : public having_one
+        , public sender
+        , public receiver
+        , public messenger
+        , public supports_options<options_reader_writer> {
     public:
 
         typedef ::nng_socket nng_type;
@@ -38,8 +43,6 @@ namespace nng {
         friend void install_device_sockets_callback(const device_path* const);
 
         nng_type sid;
-
-        options_reader_writer _options;
 
         void configure_options(nng_type sid);
 
@@ -64,8 +67,6 @@ namespace nng {
         void shutdown();
 
         virtual bool has_one() const override;
-
-        virtual options_reader_writer* const options();
 
         virtual void send(binary_message* const bmp, flag_type flags = flag_none) override;
 

@@ -2,7 +2,10 @@
 
 namespace nng {
 
-    endpoint::endpoint() {
+    endpoint::endpoint()
+        : having_one()
+        , can_close()
+        , supports_options() {
     }
 
     endpoint::~endpoint() {

@@ -28,7 +28,11 @@ namespace nng {
 #endif // NNGCPP_MESSAGE_BASE_H
 
     // TODO: so, equal_to is available, but not_equal_to is not?
-    class message_pipe : public having_one, public can_close, public std::equal_to<message_pipe> {
+    class message_pipe
+        : public having_one
+        , public can_close
+        , public supports_options<options_reader>
+        , public std::equal_to<message_pipe> {
     public:
 
         typedef ::nng_pipe nng_type;
@@ -40,8 +44,6 @@ namespace nng {
         msg_type* _msgp;
 
     private:
-
-        options_reader _options;
 
         typedef std::function<::nng_pipe()> get_pipe_func;
         typedef std::function<void()> set_pipe_func;
@@ -72,8 +74,6 @@ namespace nng {
         virtual void reset();
 
         virtual void set(message_base* const mbp);
-
-        virtual options_reader* const options();
 
         bool operator==(const message_pipe& rhs);
         // TODO: TBD: so, apparently there is no std::not_equal_to available from the Microsoft implementation, however, we should still be able to override the operator

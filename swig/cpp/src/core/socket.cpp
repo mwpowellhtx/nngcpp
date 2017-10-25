@@ -14,8 +14,8 @@ namespace nng {
     using std::bind;
 
     socket::socket(const nng_ctor_func& nng_ctor)
-        : having_one(), sender(), receiver(), messenger()
-        , sid(0), _options() {
+        : having_one(), sender(), receiver(), messenger(), supports_options()
+        , sid(0) {
 
         invocation::with_default_error_handling(nng_ctor, &sid);
         configure_options(sid);
@@ -27,14 +27,16 @@ namespace nng {
 
     void socket::configure_options(nng_type sid) {
 
-        _options.set_getters(
+        auto op = options();
+
+        op->set_getters(
             bind(&::nng_getopt, sid, _1, _2, _3)
             , bind(::nng_getopt_int, sid, _1, _2)
             , bind(::nng_getopt_size, sid, _1, _2)
             , bind(&::nng_getopt_ms, sid, _1, _2)
         );
 
-        _options.set_setters(
+        op->set_setters(
             bind(&::nng_setopt, sid, _1, _2, _3)
             , bind(::nng_setopt_int, sid, _1, _2)
             , bind(::nng_setopt_size, sid, _1, _2)
@@ -163,10 +165,6 @@ namespace nng {
 
     bool socket::try_receive(buffer_vector_type* const bufp, size_type& sz, flag_type flags) {
         return nng::try_receive(sid, *bufp, sz, flags);
-    }
-
-    options_reader_writer* const socket::options() {
-        return &_options;
     }
 
     protocol_type to_protocol_type(int value) {

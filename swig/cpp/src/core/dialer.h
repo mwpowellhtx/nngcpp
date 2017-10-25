@@ -3,7 +3,6 @@
 
 #include "enums.h"
 #include "endpoint.h"
-#include "options.h"
 
 #include <string>
 
@@ -24,8 +23,6 @@ namespace nng {
 
         nng_type did;
 
-        options_reader_writer _options;
-
         void configure_options(nng_type did);
 
     protected:
@@ -44,8 +41,6 @@ namespace nng {
         virtual void close() override;
 
         virtual bool has_one() const override;
-
-        virtual options_reader_writer* const options();
     };
 }
 

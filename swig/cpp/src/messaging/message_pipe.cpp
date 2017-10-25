@@ -10,8 +10,8 @@ namespace nng {
     using std::bind;
 
     message_pipe::message_pipe(msg_type* const msgp)
-        : having_one(), can_close()
-        , pid(0), _msgp(msgp), _options()
+        : having_one(), can_close(), supports_options(), equal_to()
+        , pid(0), _msgp(msgp)
         , __getter(bind(&::nng_msg_get_pipe, _msgp))
         , __setter(), __closer() {
 
@@ -62,16 +62,14 @@ namespace nng {
         __setter = bind(&::nng_msg_set_pipe, msgp, pid);
         __closer = bind(&::nng_pipe_close, pid);
 
-        _options.set_getters(
+        auto op = options();
+
+        op->set_getters(
             bind(&::nng_pipe_getopt, pid, _1, _2, _3)
             , bind(&::nng_pipe_getopt_int, pid, _1, _2)
             , bind(&::nng_pipe_getopt_size, pid, _1, _2)
             , bind(&::nng_pipe_getopt_ms, pid, _1, _2)
         );
-    }
-
-    options_reader* const message_pipe::options() {
-        return &_options;
     }
 
     bool message_pipe::operator==(const message_pipe& rhs) {

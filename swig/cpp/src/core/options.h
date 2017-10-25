@@ -47,8 +47,6 @@ namespace nng {
 
     protected:
 
-        options_writer();
-
         // TODO: TBD: ditto sticky friendship web...
         void set_setters(const setopt_func& setopt
             , const setopt_int_func& setopt_int
@@ -56,6 +54,8 @@ namespace nng {
             , const setopt_duration_func& setopt_duration);
 
     public:
+
+        options_writer();
 
         virtual ~options_writer();
 
@@ -90,8 +90,6 @@ namespace nng {
 
         friend class message_pipe;
 
-        options_reader();
-
         // TODO: TBD: making them public against my better judgment; however friendship web is getting kind of sticky IMHO...
         void set_getters(const getopt_func& getopt
             , const getopt_int_func& getopt_int
@@ -99,6 +97,8 @@ namespace nng {
             , const getopt_duration_func& getopt_duration);
 
     public:
+
+        options_reader();
 
         virtual ~options_reader();
 
@@ -122,9 +122,33 @@ namespace nng {
         friend class dialer;
         friend class listener;
 
+    public:
+
         options_reader_writer();
 
         virtual ~options_reader_writer();
+    };
+
+    template<class Options_>
+    struct supports_options {
+
+        typedef Options_ options_type;
+
+    private:
+
+        options_type _options;
+
+    protected:
+
+        supports_options() : _options() {}
+
+    public:
+
+        virtual ~supports_options() {}
+
+        virtual options_type* const options() {
+            return &_options;
+        }
     };
 
     struct option_names {

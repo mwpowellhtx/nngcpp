@@ -1,6 +1,5 @@
 #include "dialer.h"
 #include "socket.h"
-#include "options.h"
 #include "invocation.hpp"
 
 namespace nng {
@@ -11,12 +10,11 @@ namespace nng {
     using std::bind;
 
     // TODO: TBD: ditto "listener" ...
-    dialer::dialer() : endpoint(), did(0), _options() {
+    dialer::dialer() : endpoint(), did(0) {
         configure_options(did);
     }
 
-    dialer::dialer(const socket* const sp, const std::string& addr)
-        : endpoint(), did(0), _options() {
+    dialer::dialer(const socket* const sp, const std::string& addr) : endpoint(), did(0) {
 
         const auto& op = bind(&::nng_dialer_create, &did, sp->sid, _1);
         invocation::with_default_error_handling(op, addr.c_str());
@@ -49,22 +47,20 @@ namespace nng {
 
     void dialer::configure_options(nng_type did) {
 
-        _options.set_getters(
+        auto op = options();
+
+        op->set_getters(
             bind(&::nng_dialer_getopt, did, _1, _2, _3)
             , bind(&::nng_dialer_getopt_int, did, _1, _2)
             , bind(&::nng_dialer_getopt_size, did, _1, _2)
             , bind(&::nng_dialer_getopt_ms, did, _1, _2)
         );
 
-        _options.set_setters(
+        op->set_setters(
             bind(&::nng_dialer_setopt, did, _1, _2, _3)
             , bind(&::nng_dialer_setopt_int, did, _1, _2)
             , bind(&::nng_dialer_setopt_size, did, _1, _2)
             , bind(&::nng_dialer_setopt_ms, did, _1, _2)
         );
-    }
-
-    options_reader_writer* const dialer::options() {
-        return &_options;
     }
 }
