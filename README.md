@@ -35,7 +35,7 @@ The library is composed of several key namespaces primarily. The first is ``nng`
 
 #### Messaging
 
-*Messaging* support is fairly robust at the time of this writing and are exposed via the ``nng::messaging`` namespace. I've made a serious effort to make sure that this works and is robust, with a battery of unit tests to demonstrate as much. This is a key feature of the library and puts the *"msg"* in *"nanomsg"*, in my opinion. Chiefly you should be concerned with the ``binary_message``, which I know is sort of an oxymoron in that all messages are binary, technically speaking. However, there is rich support around messages, with operators to support working with them that are highly extensible using specialized templates.
+*Messaging* support is fairly robust at the time of this writing and are exposed via the ``nng`` namespace. I've made a serious effort to make sure that this works and is robust, with a battery of unit tests to demonstrate as much. This is a key feature of the library and puts the *"msg"* in *"nanomsg"*, in my opinion. Chiefly you should be concerned with the ``binary_message``, which I know is sort of an oxymoron in that all messages are binary, technically speaking. However, there is rich support around messages, with operators to support working with them that are highly extensible using specialized templates.
 
 #### API differences
 
