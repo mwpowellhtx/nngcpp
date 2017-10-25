@@ -128,13 +128,13 @@ TEST_CASE("Message pipe subordinates properly", Catch::Tags("message", "pipe"
         // We will verify the source Socket's "raw" option via the Message Pipe.
         int actual;
 
-        SECTION("And which Message Pipe Resets properly") {
+        SECTION("And resets properly") {
             // Do not confuse the Message Pipe itself Resetting with the smart pointer.
             REQUIRE_NOTHROW(mpp->reset());
             REQUIRE(mpp->has_one() == false);
         }
 
-        SECTION("And that operating even after originating Message goes away") {
+        SECTION("And operates after associated Message is destroyed") {
 
             REQUIRE_NOTHROW(recvp.reset());
 
@@ -144,20 +144,20 @@ TEST_CASE("Message pipe subordinates properly", Catch::Tags("message", "pipe"
             REQUIRE_NOTHROW(mpp->close());
         }
 
-        SECTION("And which Throws 'ec_enoent' when Socket channel is destroyed") {
+        SECTION("And throws 'ec_enoent' when socket channel is destroyed") {
 
             REQUIRE_NOTHROW(sp2.reset());
             // Operations on the Message Pipe following Channel (Socket) closure are no longer valid.
             REQUIRE_THROWS_AS_MATCHING(mpp->options()->get_int(O::recv_buf, actual), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
 
-            SECTION("And which Closing is transparent") {
+            SECTION("And closes transparently") {
                 /* However, we should be able to "Destroy" the resource, which effectively
                 ignores the same condition as being one among several expectations. */
                 REQUIRE_NOTHROW(mpp->close());
             }
         }
 
-        SECTION("And which can be associated with another Socket channel") {
+        SECTION("And can be associated with another Socket channel") {
             REQUIRE_NOTHROW(sendp = make_unique<binary_message>());
             REQUIRE_NOTHROW(mpp->set(sendp.get()));
             // Remember the Pipe was associated with the Receive Channel, so we expect that Option.
@@ -165,7 +165,7 @@ TEST_CASE("Message pipe subordinates properly", Catch::Tags("message", "pipe"
             REQUIRE(actual == expected_recv_buf);
         }
 
-        SECTION("And that cleans up properly") {
+        SECTION("And cleans up properly") {
             // Do not confuse the Smart Pointer resetting with the Message Pipe.
             REQUIRE_NOTHROW(mpp.reset());
         }
