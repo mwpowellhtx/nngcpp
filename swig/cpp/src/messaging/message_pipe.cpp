@@ -20,13 +20,7 @@ namespace nng {
     }
 
     message_pipe::message_pipe(message_base* const mbp)
-        : having_one(), can_close()
-        , pid(0), _msgp(mbp->get_msgp()), _options()
-        , __getter(bind(&::nng_msg_get_pipe, _msgp))
-        , __setter(), __closer() {
-
-        invocation::with_result(__getter, &pid);
-        configure(pid, _msgp);
+        : message_pipe(mbp->get_msgp()) {
     }
 
     // TODO: TBD: this is looking very similar to socket. perhaps it is...
