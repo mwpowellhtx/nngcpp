@@ -77,7 +77,7 @@ namespace nng {
     };
 
     template<class Part_>
-    void verify_default_message_part(const Part_& part, ::nng_msg* msgp = nullptr) {
+    void verify_default_message_part(const Part_& part, msg_type* msgp = nullptr) {
 
         const auto expected_has_message = msgp != nullptr;
         const auto actual_has_message = part.has_message();

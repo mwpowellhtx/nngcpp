@@ -351,7 +351,7 @@ TEST_CASE("Test the transport in C style", Catch::Tags(constants::prefix_tags
         messaging work. Just not so much of the transport at the moment. Just be careful of the message
         ownership semantics and it ought to be fine. */
 
-        ::nng_msg* msgp;
+        msg_type* msgp;
         unique_ptr<binary_message> sendp, recvp;
 
         REQUIRE_NOTHROW(sendp = make_unique<binary_message>());

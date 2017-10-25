@@ -15,6 +15,8 @@ namespace nng {
     typedef std::chrono::duration<duration_rep_type, std::milli> duration_type;
 
     typedef std::size_t size_type;
+
+    typedef ::nng_msg msg_type;
 }
 
 #endif // NNGCPP_TYPES_H

@@ -53,7 +53,7 @@ namespace nng {
         binary_message_fixture() : binary_message() {
         }
 
-        binary_message_fixture(::nng_msg* msgp) : binary_message(msgp) {
+        binary_message_fixture(msg_type* msgp) : binary_message(msgp) {
         }
 
         virtual void free() override {
@@ -98,7 +98,7 @@ TEST_CASE("Binary messages work", "[binary_message][messaging][cxx]") {
 
             SECTION("C API constructor means having a message") {
 
-                ::nng_msg* msgp;
+                msg_type* msgp;
 
                 NNG_TESTS_ALLOC_MSG(msgp);
 

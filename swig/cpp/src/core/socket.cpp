@@ -132,7 +132,7 @@ namespace nng {
         /* So this is somewhat of a long way around, but it represents the cost of NNG message
         ownership semantics. The cost has to be paid at some point, either on the front side or
         the back side, so we pay for it here in additional semantics. */
-        ::nng_msg* msgp = nullptr;
+        msg_type* msgp = nullptr;
         try {
             const auto& recv_ = bind(&::nng_recvmsg, sid, &msgp, _1);
             invocation::with_default_error_handling(recv_, static_cast<int>(flags));

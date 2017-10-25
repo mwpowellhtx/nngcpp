@@ -86,7 +86,7 @@ TEST_CASE("Simple C style program to open reqrep IPC and send", Catch::Tags(
     // On Sent is signaled during Socket::Send operations upon transfer of message ownership to NNG API.
     REQUIRE_NOTHROW(bmp->on_sent());
 
-    ::nng_msg* msgp;
+    msg_type* msgp;
     REQUIRE(::nng_recvmsg(s2, &msgp, 0) == 0);
     REQUIRE(msgp);
     REQUIRE_NOTHROW(bmp->set_msgp(msgp));
