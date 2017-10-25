@@ -11,12 +11,6 @@
 
 namespace nng {
 
-#ifndef NNGCPP_MESSAGE_PIPE_H
-    class message_pipe;
-#endif // NNGCPP_MESSAGE_PIPE_H
-
-    typedef ::nng_msg msg_type;
-
     struct supports_clear_api {
         virtual void clear() = 0;
     };
@@ -60,8 +54,6 @@ namespace nng {
         virtual msg_type* get_msgp() const override;
 
         virtual void on_sent();
-
-        virtual void set_pipe(const message_pipe* const mpp);
     };
 
     msg_type* get_msgp(message_base* const mbp);

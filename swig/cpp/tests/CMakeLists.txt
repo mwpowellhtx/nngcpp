@@ -168,6 +168,7 @@ nngcpp_add_test (messaging/binary_message_body 0)
 nngcpp_add_test (messaging/binary_message_header 0)
 nngcpp_add_test (messaging/binary_message 0)
 nngcpp_add_test (messaging/messaging_gymnastics 0)
+nngcpp_add_test (messaging/message_pipe 0)
 
 nngcpp_add_test (protocol/bus 5)
 nngcpp_add_test (protocol/pair 5)

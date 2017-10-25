@@ -4,11 +4,12 @@
 #define NNG_ONLY
 #include <nngcpp.h>
 
-#include "../core/options.h"
-
 #include "../core/having_one.hpp"
 #include "../core/can_close.hpp"
 
+#include "../core/options.h"
+
+#include <functional>
 #include <algorithm>
 
 /* Due to some namespace weirdness during the include graph forward declarations, this could
@@ -21,10 +22,6 @@ namespace nng {
 #ifndef NNGCPP_ADDRESS_H
     class address;
 #endif //NNGCPP_ADDRESS_H
-
-#ifndef NNGCPP_BINARY_MESSAGE_H
-    template<class Body_, class Header_> class basic_binary_message;
-#endif // NNGCPP_BINARY_MESSAGE_H
 
 #ifndef NNGCPP_MESSAGE_BASE_H
     class message_base;
@@ -42,13 +39,26 @@ namespace nng {
 
         nng_type pid;
 
+        msg_type* _msgp;
+
     private:
 
         options_reader _options;
 
-        void configure_options(nng_type pid);
+        typedef std::function<::nng_pipe()> get_pipe_func;
+        typedef std::function<void()> set_pipe_func;
+        typedef std::function<int()> close_pipe_func;
+
+        get_pipe_func __getter;
+        set_pipe_func __setter;
+        close_pipe_func __closer;
+
+        //void configure(msg_type* msgp);
+        void configure(nng_type pid, msg_type* msgp = nullptr);
 
     public:
+
+        message_pipe(msg_type* const msgp);
 
         message_pipe(message_base* const mbp);
 
@@ -57,6 +67,8 @@ namespace nng {
         virtual bool has_one() const override;
 
         virtual void close() override;
+
+        virtual void reset();
 
         virtual options_reader* const options();
 
