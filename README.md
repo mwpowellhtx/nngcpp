@@ -1,8 +1,6 @@
 ## Welcome to C++ NNG
 
-This library is at its core a C++1y compliant wrapper around the [next generation nanomsg](http://github.com/nanomsg/nng) SP protocol.
-
-As NNG is a work in progress, so too must this repository necessarily be considered a work in progress.
+This library is at its core a C++1y compliant wrapper around the [next generation nanomsg](http://github.com/nanomsg/nng) Scalability Protocol (SP). As NNG is a work in progress, so too must this repository necessarily be considered a work in progress.
 
 ### Supported platforms
 
@@ -21,6 +19,19 @@ At the present time I know that this project's CMake support is almost exclusive
 ### Current status
 
 The library is composed of several key namespaces primarily. The first is ``nng`` for the core ``socket`` support, however, you ought never to be using ``socket`` directly, except perhaps as an abstract base class. The sockets you are concerned about live in ``nng::protocol``, and are dubbed *latest_xyz_socket*. Such as ``latest_pair_socket`` for the latest version ``pair_socket``.
+
+|Pattern|Protocol|Version(s)|Latest|
+|-------|--------|----------|------|
+|Pair (Bidirectional Communication)|pair_socket|0,1|1|
+|Topical Broadcasting (Publisher/Subscriber)|pub_socket|0|0|
+||sub_socket|0|0|
+|Pipeline (Push/Pull)|push_socket|0|0|
+||pull_socket|0|0|
+|Bus (Mesh)|bus_socket|0|0|
+|Survey (Surveyor/Respondent)|survey_socket|0|0|
+||respond_socket|0|0|
+|Client/Server (Request/Reply)|req_socket|0|0|
+||rep_socket|0|0|
 
 #### Messaging
 
