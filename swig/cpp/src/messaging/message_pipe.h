@@ -19,10 +19,6 @@ the API into Messaging. Therefore, decided that it should live in the nng::* nam
 
 namespace nng {
 
-#ifndef NNGCPP_ADDRESS_H
-    class address;
-#endif //NNGCPP_ADDRESS_H
-
 #ifndef NNGCPP_MESSAGE_BASE_H
     class message_base;
 #endif // NNGCPP_MESSAGE_BASE_H
