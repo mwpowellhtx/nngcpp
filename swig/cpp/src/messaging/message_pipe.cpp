@@ -46,10 +46,8 @@ namespace nng {
     }
 
     void message_pipe::reset() {
+        // Which means that the Message Pipe is now (re-)connected with the Message. And that's it.
         invocation::with_void_return_value(__setter);
-        /* TODO: TBD: once the pipe has been returned to the originating Message Base,
-        I believe the semantics means we must consider the pipe invalidated. */
-        configure(pid = 0, _msgp = nullptr);
     }
 
     void message_pipe::set(msg_type* const msgp) {

@@ -129,9 +129,20 @@ TEST_CASE("Message pipe subordinates properly", Catch::Tags("message", "pipe"
         int actual;
 
         SECTION("And resets properly") {
+
+            /* TODO: TBD: we may want to do a little more arranging just to make sure that "resetting"
+            means we are walking the message/pipe connection back from a meaningful, disassociated state. */
+
             // Do not confuse the Message Pipe itself Resetting with the smart pointer.
             REQUIRE_NOTHROW(mpp->reset());
-            REQUIRE(mpp->has_one() == false);
+            // Which we still expect the Pipe to be valid.
+            REQUIRE(mpp->has_one() == true);
+
+            // And check these operations as well.
+            REQUIRE_NOTHROW(mpp->options()->get_int(O::recv_buf, actual));
+            REQUIRE(actual == expected_recv_buf);
+
+            REQUIRE_NOTHROW(mpp->close());
         }
 
         SECTION("And operates after associated Message is destroyed") {
