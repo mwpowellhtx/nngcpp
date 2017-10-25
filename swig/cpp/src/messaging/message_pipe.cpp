@@ -9,31 +9,22 @@ namespace nng {
     using std::placeholders::_3;
     using std::bind;
 
-    message_pipe::nng_type get_id(const message_pipe& mp) {
-        return mp.pid;
-    }
-
     message_pipe::message_pipe(msg_type* const msgp)
         : having_one(), can_close()
         , pid(0), _msgp(msgp), _options()
         , __getter(bind(&::nng_msg_get_pipe, _msgp))
-        , __setter(bind(&::nng_msg_set_pipe, _msgp, pid))
-        , __closer(bind(&::nng_pipe_close, pid)) {
+        , __setter(), __closer() {
 
-        //configure(msgp);
         invocation::with_result(__getter, &pid);
         configure(pid, _msgp);
     }
 
     message_pipe::message_pipe(message_base* const mbp)
         : having_one(), can_close()
-        , pid(0), _msgp(get_msgp(mbp)), _options()
+        , pid(0), _msgp(mbp->get_msgp()), _options()
         , __getter(bind(&::nng_msg_get_pipe, _msgp))
-        , __setter(bind(&::nng_msg_set_pipe, _msgp, pid))
-        , __closer(bind(&::nng_pipe_close, pid)) {
+        , __setter(), __closer() {
 
-        // TODO: TBD: throw an exception upon irregular pipe value...
-        //configure(msgp);
         invocation::with_result(__getter, &pid);
         configure(pid, _msgp);
     }
@@ -61,9 +52,18 @@ namespace nng {
         configure(pid = 0, _msgp = nullptr);
     }
 
-    //void message_pipe::configure(msg_type* msgp) {
-    //    __getter = bind(&::nng_msg_get_pipe, msgp);
-    //}
+    void message_pipe::set(msg_type* const msgp) {
+        // Re-bind the getter to keep aligned with the new message.
+        __getter = bind(&::nng_msg_get_pipe, _msgp = msgp);
+        // Except in this case we want to preserve the current PID.
+        configure(pid, _msgp);
+        // And in which case we simply want to pass the Message Pipe along to the caller.
+        invocation::with_void_return_value(__setter);
+    }
+
+    void message_pipe::set(message_base* const mbp) {
+        set(mbp->get_msgp());
+    }
 
     void message_pipe::configure(nng_type pid, msg_type* msgp) {
 

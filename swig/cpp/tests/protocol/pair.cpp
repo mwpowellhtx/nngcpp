@@ -626,7 +626,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
 
             // Slightly different from the C-based unit tests. We will need it for the next lines.
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
-            REQUIRE_NOTHROW(bmp->set_pipe(mpp1.get()));
+            REQUIRE_NOTHROW(mpp1->set(bmp.get()));
             REQUIRE_NOTHROW(*bmp << uno);
             REQUIRE_NOTHROW(serverp1->send(bmp.get()));
             REQUIRE_NOTHROW(clientp1->try_receive(bmp.get()));
@@ -634,7 +634,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
 
             // Similar scenario as with Uno.
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
-            REQUIRE_NOTHROW(bmp->set_pipe(mpp2.get()));
+            REQUIRE_NOTHROW(mpp2->set(bmp.get()));
             REQUIRE_NOTHROW(*bmp << dos);
             REQUIRE_NOTHROW(serverp1->send(bmp.get()));
             REQUIRE_NOTHROW(clientp2->try_receive(bmp.get()));
@@ -645,7 +645,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
 
             // TODO: TBD: from the "C" code, playing a bit fast and loose with the pipe ownership semantics here aren't we?
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
-            REQUIRE_NOTHROW(bmp->set_pipe(mpp1.get()));
+            REQUIRE_NOTHROW(mpp1->set(bmp.get()));
             REQUIRE_NOTHROW(*bmp << ein);
             REQUIRE_NOTHROW(serverp1->send(bmp.get()));
             REQUIRE_THROWS_AS_MATCHING(clientp2->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
@@ -725,7 +725,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
                 REQUIRE(*mpp1 != *mpp2);
 
                 REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
-                REQUIRE_NOTHROW(bmp->set_pipe(mpp1.get()));
+                REQUIRE_NOTHROW(mpp1->set(bmp.get()));
                 REQUIRE_NOTHROW(*bmp << uno);
                 REQUIRE_NOTHROW(bmp->header()->append(1));
                 REQUIRE_NOTHROW(serverp1->send(bmp.get()));
@@ -733,7 +733,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
                 REQUIRE_THAT(bmp->body()->get(), Equals(uno_buf));
 
                 REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
-                REQUIRE_NOTHROW(bmp->set_pipe(mpp2.get()));
+                REQUIRE_NOTHROW(mpp2->set(bmp.get()));
                 REQUIRE_NOTHROW(*bmp << dos);
                 REQUIRE_NOTHROW(bmp->header()->append(1));
                 REQUIRE_NOTHROW(serverp1->send(bmp.get()));
@@ -754,7 +754,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
                 REQUIRE_NOTHROW(clientp1->close());
 
                 REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
-                REQUIRE_NOTHROW(bmp->set_pipe(mpp1.get()));
+                REQUIRE_NOTHROW(mpp1->set(bmp.get()));
                 REQUIRE_NOTHROW(*bmp << ein);
                 REQUIRE_NOTHROW(bmp->header()->append(1));
                 REQUIRE_NOTHROW(serverp1->send(bmp.get()));

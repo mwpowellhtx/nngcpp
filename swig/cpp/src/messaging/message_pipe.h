@@ -35,8 +35,6 @@ namespace nng {
 
     protected:
 
-        friend message_pipe::nng_type get_id(const message_pipe& mp);
-
         nng_type pid;
 
         msg_type* _msgp;
@@ -56,8 +54,11 @@ namespace nng {
         //void configure(msg_type* msgp);
         void configure(nng_type pid, msg_type* msgp = nullptr);
 
+        virtual void set(msg_type* const msgp);
+
     public:
 
+        // TODO: TBD: is exposing the raw pointer ctor really necessary? may make it protected at least? if at all...
         message_pipe(msg_type* const msgp);
 
         message_pipe(message_base* const mbp);
@@ -70,14 +71,14 @@ namespace nng {
 
         virtual void reset();
 
+        virtual void set(message_base* const mbp);
+
         virtual options_reader* const options();
 
         bool operator==(const message_pipe& rhs);
         // TODO: TBD: so, apparently there is no std::not_equal_to available from the Microsoft implementation, however, we should still be able to override the operator
         bool operator!=(const message_pipe& rhs);
     };
-
-    message_pipe::nng_type get_id(const message_pipe& mp);
 }
 
 #endif // NNGCPP_MESSAGE_PIPE_H

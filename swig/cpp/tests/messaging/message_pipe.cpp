@@ -99,9 +99,9 @@ TEST_CASE("Message pipe subordinates properly", Catch::Tags("message", "pipe"
         REQUIRE_NOTHROW(sp1 = make_unique<latest_pair_socket>());
         REQUIRE_NOTHROW(sp2 = make_unique<latest_pair_socket>());
 
-        const int expected_raw = 1;
+        const int expected_recv_buf = 3;
         // Which sets us up to verify some Message Pipe expectations afterwards.
-        REQUIRE_NOTHROW(sp2->options()->set_int(O::raw, expected_raw));
+        REQUIRE_NOTHROW(sp2->options()->set_int(O::recv_buf, expected_recv_buf));
 
         // Using nominal defaults.
         REQUIRE_NOTHROW(sp1->listen(test_addr));
@@ -126,7 +126,7 @@ TEST_CASE("Message pipe subordinates properly", Catch::Tags("message", "pipe"
             " resetting , which sets the pipe back on the root message.");
 
         // We will verify the source Socket's "raw" option via the Message Pipe.
-        int actual_raw;
+        int actual;
 
         SECTION("And which Message Pipe Resets properly") {
             // Do not confuse the Message Pipe itself Resetting with the smart pointer.
@@ -134,29 +134,38 @@ TEST_CASE("Message pipe subordinates properly", Catch::Tags("message", "pipe"
             REQUIRE(mpp->has_one() == false);
         }
 
-        SECTION("And Message Pipe continues operating even after originating Message goes away") {
+        SECTION("And that operating even after originating Message goes away") {
 
             REQUIRE_NOTHROW(recvp.reset());
 
-            REQUIRE_NOTHROW(mpp->options()->get_int(O::raw, actual_raw));
-            REQUIRE(actual_raw == expected_raw);
+            REQUIRE_NOTHROW(mpp->options()->get_int(O::recv_buf, actual));
+            REQUIRE(actual == expected_recv_buf);
 
             REQUIRE_NOTHROW(mpp->close());
         }
 
-        SECTION("And Message Pipe continues operating even after originating Message goes away") {
+        SECTION("And which Throws 'ec_enoent' when Socket channel is destroyed") {
 
             REQUIRE_NOTHROW(sp2.reset());
-
             // Operations on the Message Pipe following Channel (Socket) closure are no longer valid.
-            REQUIRE_THROWS_AS_MATCHING(mpp->options()->get_int(O::raw, actual_raw), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
+            REQUIRE_THROWS_AS_MATCHING(mpp->options()->get_int(O::recv_buf, actual), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
 
-            /* However, we should be able to "Destroy" the resource, which effectively
-            ignores the same condition as being one among several expectations. */
-            REQUIRE_NOTHROW(mpp->close());
+            SECTION("And which Closing is transparent") {
+                /* However, we should be able to "Destroy" the resource, which effectively
+                ignores the same condition as being one among several expectations. */
+                REQUIRE_NOTHROW(mpp->close());
+            }
         }
 
-        SECTION("And cleans up properly") {
+        SECTION("And which can be associated with another Socket channel") {
+            REQUIRE_NOTHROW(sendp = make_unique<binary_message>());
+            REQUIRE_NOTHROW(mpp->set(sendp.get()));
+            // Remember the Pipe was associated with the Receive Channel, so we expect that Option.
+            REQUIRE_NOTHROW(mpp->options()->get_int(O::recv_buf, actual));
+            REQUIRE(actual == expected_recv_buf);
+        }
+
+        SECTION("And that cleans up properly") {
             // Do not confuse the Smart Pointer resetting with the Message Pipe.
             REQUIRE_NOTHROW(mpp.reset());
         }
