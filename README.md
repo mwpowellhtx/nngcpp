@@ -65,7 +65,7 @@ There is also support around *socket addresses*, which facilitates a rich set of
 
 #### Compatibility mode
 
-I have also made the decision not to support the [legacy library](https//github.com/nanomsg/nanomsg). Not even in the NNG *compatibility* mode. After discussing with the NNG team, we agree that this adds no value, but if community contributors would like to see it, by all means. I will consider the pull request.
+I have also made the decision not to support the [legacy library](https://github.com/nanomsg/nanomsg). Not even in the NNG *compatibility* mode. After discussing with the NNG team, we agree that this adds no value, but if community contributors would like to see it, by all means. I will consider the pull request.
 
 ### Unit tests
 
