@@ -106,12 +106,15 @@ namespace nng {
     }
 
     void socket::send(binary_message* const bmp, flag_type flags) {
-        auto* msgp = bmp->get_msgp();
+        auto* msgp = bmp->cede_message();
         if (msgp == nullptr) { return; }
         const auto op = bind(&::nng_sendmsg, sid, msgp, _1);
         invocation::with_default_error_handling(op, static_cast<int>(flags));
-        // If we got this far then simply signal On-Sent to the message.
-        bmp->on_sent();
+    }
+
+    void socket::send_async(const basic_async_service* const svcp) {
+        const auto& op = bind(&::nng_send_aio, sid, svcp->_aiop);
+        invocation::with_void_return_value(op);
     }
 
     template<class Buffer_>
@@ -152,7 +155,7 @@ namespace nng {
             // Re-throw the exception after taking care of potential memory allocation.
             throw;
         }
-        bmp->set_msgp(msgp);
+        bmp->retain(msgp);
         return bmp->HasOne();
     }
 
@@ -165,6 +168,11 @@ namespace nng {
 
     bool socket::try_receive(buffer_vector_type* const bufp, size_type& sz, flag_type flags) {
         return nng::try_receive(sid, *bufp, sz, flags);
+    }
+
+    void socket::receive_async(basic_async_service* const svcp) {
+        const auto& op = bind(&::nng_recv_aio, sid, svcp->_aiop);
+        invocation::with_void_return_value(op);
     }
 
     protocol_type to_protocol_type(int value) {

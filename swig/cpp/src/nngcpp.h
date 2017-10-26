@@ -29,6 +29,7 @@
 #ifndef NNG_ONLY
 
 #include <core/core.h>
+#include <core/async.h>
 #include <messaging/messaging.h>
 #include <protocol/protocol.h>
 

@@ -16,6 +16,12 @@ namespace nng {
         flag_dryrun = NNG_FLAG_DRYRUN
     };
 
+    enum duration_ms : int32_t {
+        dur_zero = NNG_DURATION_ZERO,
+        dur_infinite = NNG_DURATION_INFINITE,
+        dur_default = NNG_DURATION_DEFAULT
+    };
+
     enum protocol_type {
         protocol_none = ::NNG_PROTO_NONE,
 

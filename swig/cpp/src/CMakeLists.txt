@@ -33,8 +33,9 @@ set (NNGCPP_CPP_SRCS
     core/having_one.hpp
     core/can_close.hpp
     core/invocation.hpp
-    core/core.h
     core/types.h
+    core/core.h
+    core/async.h
     core/enums.h
     core/enums.cpp
     core/address.cpp
@@ -59,6 +60,8 @@ set (NNGCPP_CPP_SRCS
     core/session.h
     core/socket.cpp
     core/socket.h
+    core/async/basic_async_service.cpp
+    core/async/basic_async_service.h
     core/exceptions.hpp
     core/exceptions/nng_exception.cpp
     core/exceptions/nng_exception.h

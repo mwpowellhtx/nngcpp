@@ -373,25 +373,23 @@ TEST_CASE("Test the transport in C style", Catch::Tags(constants::prefix_tags
         SLEEP_FOR(20ms);
 
         REQUIRE_NOTHROW(*sendp << ping);
-        REQUIRE(::nng_sendmsg(req, sendp->get_msgp(), 0) == 0);
-        REQUIRE_NOTHROW(sendp->on_sent());
+        REQUIRE(::nng_sendmsg(req, sendp->cede_message(), 0) == 0);
         msgp = nullptr;
         REQUIRE(::nng_recvmsg(rep, &msgp, 0) == 0);
         REQUIRE(msgp);
-        REQUIRE_NOTHROW(recvp->set_msgp(msgp));
+        REQUIRE_NOTHROW(recvp->retain(msgp));
         REQUIRE_THAT(recvp->body()->get(), Equals(ping_buf));
 
         REQUIRE_NOTHROW(recvp->body()->rtrim(ping.size()));
         REQUIRE_NOTHROW(*recvp << acknowledge);
-        REQUIRE(::nng_sendmsg(rep, recvp->get_msgp(), 0) == 0);
-        REQUIRE_NOTHROW(recvp->on_sent());
+        REQUIRE(::nng_sendmsg(rep, recvp->cede_message(), 0) == 0);
         msgp = nullptr;
         REQUIRE(::nng_recvmsg(req, &msgp, 0) == 0);
         REQUIRE(msgp);
-        REQUIRE_NOTHROW(sendp->set_msgp(msgp));
+        REQUIRE_NOTHROW(sendp->retain(msgp));
         REQUIRE_THAT(sendp->body()->get(), Equals(acknowledge_buf));
 
-        REQUIRE_NOTHROW(p = ::nng_msg_get_pipe(sendp->get_msgp()));
+        REQUIRE_NOTHROW(p = ::nng_msg_get_pipe(sendp->get_message()));
         REQUIRE(p);
 
         REQUIRE_NOTHROW(url.resize(NNG_MAXADDRLEN));

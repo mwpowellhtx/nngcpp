@@ -152,7 +152,7 @@ TEST_CASE("Survey pattern using C++ wrapper", Catch::Tags("surveyor", "responden
             REQUIRE_NOTHROW(surp->try_receive(bmp.get()));
             REQUIRE_THAT(bmp->body()->get(), Equals(def_buf));
 
-            REQUIRE_NOTHROW(bmp->set_msgp(nullptr));
+            REQUIRE_NOTHROW(bmp->retain(nullptr));
             REQUIRE_THROWS_AS_MATCHING(surp->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
 
 			SECTION("And goes to non-survey state") {

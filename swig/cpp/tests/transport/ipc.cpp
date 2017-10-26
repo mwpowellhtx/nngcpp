@@ -82,14 +82,12 @@ TEST_CASE("Simple C style program to open reqrep IPC and send", Catch::Tags(
     REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
     REQUIRE_NOTHROW(*bmp << "hello");
 
-    REQUIRE(::nng_sendmsg(s1, bmp->get_msgp(), 0) == 0);
-    // On Sent is signaled during Socket::Send operations upon transfer of message ownership to NNG API.
-    REQUIRE_NOTHROW(bmp->on_sent());
+    REQUIRE(::nng_sendmsg(s1, bmp->cede_message(), 0) == 0);
 
     msg_type* msgp;
     REQUIRE(::nng_recvmsg(s2, &msgp, 0) == 0);
     REQUIRE(msgp);
-    REQUIRE_NOTHROW(bmp->set_msgp(msgp));
+    REQUIRE_NOTHROW(bmp->retain(msgp));
 
     REQUIRE(::nng_close(s1) == 0);
     REQUIRE(::nng_close(s2) == 0);

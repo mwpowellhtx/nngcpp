@@ -20,7 +20,7 @@ namespace nng {
     }
 
     message_pipe::message_pipe(_MessageBase* const mbp)
-        : message_pipe(mbp->get_msgp()) {
+        : message_pipe(mbp->get_message()) {
     }
 
     // TODO: TBD: this is looking very similar to socket. perhaps it is...
@@ -54,7 +54,7 @@ namespace nng {
     }
 
     void message_pipe::set(_MessageBase* const mbp) {
-        set(mbp->get_msgp());
+        set(mbp->get_message());
     }
 
     void message_pipe::configure(nng_type pid, msg_type* msgp) {

@@ -115,13 +115,13 @@ TEST_CASE("Bus pattern using C++ wrappers", Catch::Tags("bus"
 
                 REQUIRE_NOTHROW(busp2->try_receive(bmp.get()));
                 // Will compare with the second received message.
-               const auto* const msgp1 = bmp->get_msgp();
+                const auto* const msgp1 = bmp->get_message();
                 REQUIRE_THAT(bmp->body()->get(), Equals(onthe_buf));
 
                 REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
                 REQUIRE_NOTHROW(busp3->try_receive(bmp.get()));
                 // To demonstrate this is an entirely new message received.
-                const auto* const msgp2 = bmp->get_msgp();
+                const auto* const msgp2 = bmp->get_message();
                 REQUIRE_THAT(bmp->body()->get(), Equals(onthe_buf));
                 REQUIRE(msgp1 != msgp2);
             }

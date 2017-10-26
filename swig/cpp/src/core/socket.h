@@ -75,11 +75,15 @@ namespace nng {
         virtual void send(const buffer_vector_type* const bufp, flag_type flags = flag_none) override;
         virtual void send(const buffer_vector_type* const bufp, size_type sz, flag_type flags = flag_none) override;
 
+        virtual void send_async(const basic_async_service* const svcp) override;
+
         virtual std::unique_ptr<binary_message> receive(flag_type flags = flag_none) override;
         virtual bool try_receive(binary_message* const bmp, flag_type flags = flag_none) override;
 
         virtual buffer_vector_type receive(size_type& sz, flag_type flags = flag_none) override;
         virtual bool try_receive(buffer_vector_type* const bufp, size_type& sz, flag_type flags = flag_none) override;
+
+        virtual void receive_async(basic_async_service* const svcp) override;
 
         protocol_type get_protocol() const;
         protocol_type get_peer() const;

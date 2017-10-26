@@ -30,7 +30,7 @@ namespace nng {
     }
 
     size_type binary_message_header::get_size() {
-        const auto msgp = get_msgp();
+        const auto msgp = get_message();
         const auto op = bind(&::nng_msg_header_len, msgp);
         return msgp == nullptr ? 0 : op();
     }
@@ -38,7 +38,7 @@ namespace nng {
     // TODO: TBD: this is fairly redundant with body: there has got to be a better way to capture this as a cross cutting concern...
     bool binary_message_header::try_get(buffer_vector_type& value) {
 
-        const auto msgp = get_msgp();
+        const auto msgp = get_message();
 
         if (msgp == nullptr) { return false; }
 
@@ -60,35 +60,35 @@ namespace nng {
     }
 
     void binary_message_header::Clear() {
-        const auto msgp = get_msgp();
+        const auto msgp = get_message();
         if (!msgp) { return; }
         const auto op = bind(&::nng_msg_header_clear, msgp);
         invocation::with_void_return_value(op);
     }
 
     void binary_message_header::append(const uint32_t& val) {
-        const auto msgp = get_msgp();
+        const auto msgp = get_message();
         if (msgp == nullptr) { return; }
         const auto op = bind(&::nng_msg_header_append_u32, msgp, _1);
         invocation::with_default_error_handling(op, val);
     }
 
     void binary_message_header::prepend(const uint32_t& val) {
-        const auto msgp = get_msgp();
+        const auto msgp = get_message();
         if (msgp == nullptr) { return; }
         const auto op = bind(&::nng_msg_header_insert_u32, msgp, _1);
         invocation::with_default_error_handling(op, val);
     }
 
     void binary_message_header::ltrim(uint32_t& val) {
-        const auto msgp = get_msgp();
+        const auto msgp = get_message();
         if (msgp == nullptr) { return; }
         const auto op = bind(&::nng_msg_header_trim_u32, msgp, _1);
         invocation::with_default_error_handling(op, &val);
     }
 
     void binary_message_header::rtrim(uint32_t& val) {
-        const auto msgp = get_msgp();
+        const auto msgp = get_message();
         if (msgp == nullptr) { return; }
         const auto op = bind(&::nng_msg_header_chop_u32, msgp, _1);
         invocation::with_default_error_handling(op, &val);

@@ -17,7 +17,7 @@ namespace nng {
 
     class supports_getting_msg {
     protected:
-        virtual msg_type* get_msgp() const = 0;
+        virtual msg_type* get_message() const = 0;
     };
 
     typedef std::vector<uint8_t> buffer_vector_type;
@@ -52,11 +52,11 @@ namespace nng {
 
         virtual bool HasOne() const override;
 
-        virtual void set_msgp(msg_type* msgp);
+        virtual msg_type* get_message() const override;
 
-        virtual msg_type* get_msgp() const override;
+        virtual msg_type* cede_message();
 
-        virtual void on_sent();
+        virtual void retain(msg_type* msgp);
     };
 
     msg_type* get_msgp(_MessageBase* const mbp);
@@ -75,7 +75,7 @@ namespace nng {
 
         virtual ~message_part();
 
-        virtual msg_type* get_msgp() const override;
+        virtual msg_type* get_message() const override;
 
     public:
 

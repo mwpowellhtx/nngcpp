@@ -126,19 +126,18 @@ TEST_CASE("Check some properties in C style", "[check][properties][nng][c][bonus
         SLEEP_FOR(20ms); // Allow listener to catch up from being slightly behind.
 
         REQUIRE_NOTHROW(*sendp << props);
-        REQUIRE(::nng_sendmsg(req, sendp->get_msgp(), 0) == 0);
-        REQUIRE_NOTHROW(sendp->on_sent());
+        REQUIRE(::nng_sendmsg(req, sendp->cede_message(), 0) == 0);
         REQUIRE(sendp->HasOne() == false);
 
         REQUIRE(::nng_recvmsg(rep, &msgp, 0) == 0);
-        REQUIRE_NOTHROW(recvp->set_msgp(msgp));
+        REQUIRE_NOTHROW(recvp->retain(msgp));
         REQUIRE(recvp->HasOne() == true);
         REQUIRE_THAT(recvp->body()->get(), Equals(props_buf));
 
         SECTION("Now test the properties") {
 
             // Vet the Pipe and the Port ahead of time.
-            ::nng_pipe p = ::nng_msg_get_pipe(recvp->get_msgp());
+            ::nng_pipe p = ::nng_msg_get_pipe(recvp->get_message());
             REQUIRE(p);
 
             auto current_port = get_current_port();

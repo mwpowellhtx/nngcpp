@@ -4,6 +4,8 @@
 #include "types.h"
 #include "enums.h"
 
+#include "async/basic_async_service.h"
+
 #include "../messaging/messaging.h"
 
 #include <cstddef>
@@ -26,6 +28,8 @@ namespace nng {
 
         virtual buffer_vector_type receive(size_type& sz, flag_type flags = flag_none) = 0;
         virtual bool try_receive(buffer_vector_type* const bufp, size_type& sz, flag_type flags = flag_none) = 0;
+
+        virtual void receive_async(basic_async_service* const svcp) = 0;
     };
 }
 

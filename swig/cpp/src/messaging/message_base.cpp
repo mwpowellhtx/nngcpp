@@ -61,7 +61,7 @@ namespace nng {
             //}
             throw;
         }
-        set_msgp(msgp);
+        retain(msgp);
     }
 
     void _MessageBase::free() {
@@ -72,21 +72,24 @@ namespace nng {
         _msgp = nullptr;
     }
 
-    msg_type* _MessageBase::get_msgp() const {
+    msg_type* _MessageBase::get_message() const {
         return _msgp;
-    }
-
-    void _MessageBase::set_msgp(msg_type* msgp) {
-        free();
-        _msgp = msgp;
     }
 
     bool _MessageBase::HasOne() const {
         return _msgp != nullptr;
     }
 
-    void _MessageBase::on_sent() {
+    msg_type* _MessageBase::cede_message() {
+        // Keep hold of the ptr locally while we also nullify the internal ptr.
+        auto msgp = _msgp;
         _msgp = nullptr;
+        return msgp;
+    }
+
+    void _MessageBase::retain(msg_type* msgp) {
+        free();
+        _msgp = msgp;
     }
 
     message_part::message_part(_MessageBase* basep)
@@ -99,11 +102,11 @@ namespace nng {
         _basep = nullptr;
     }
 
-    msg_type* message_part::get_msgp() const {
+    msg_type* message_part::get_message() const {
         return nng::get_msgp(_basep);
     }
 
     bool message_part::HasOne() const {
-        return get_msgp() != nullptr;
+        return get_message() != nullptr;
     }
 }

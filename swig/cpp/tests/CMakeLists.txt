@@ -1,8 +1,4 @@
 #
-#   Copyright (c) 2012 Martin Sustrik  All rights reserved.
-#   Copyright (c) 2013 GoPivotal, Inc.  All rights reserved.
-#   Copyright (c) 2015-2016 Jack R. Dunaway. All rights reserved.
-#   Copyright 2016 Franklin "Snaipe" Mathieu <franklinmathieu@gmail.com>
 #   Copyright 2017 Garrett D'Amore <garrett@damore.org>
 #   Copyright 2017 Capitar IT Group BV <info@capitar.com>
 #   Copyright (c) 2017 Michael W Powell <mwpowellhtx@gmail.com>
@@ -163,6 +159,7 @@ nngcpp_add_test (core/reconnect 5)
 nngcpp_add_test (core/sock 5)
 nngcpp_add_test (core/device 5)
 nngcpp_add_test (core/scalability 20)
+nngcpp_add_test (core/async/async 5)
 
 nngcpp_add_test (messaging/binary_message_body 0)
 nngcpp_add_test (messaging/binary_message_header 0)

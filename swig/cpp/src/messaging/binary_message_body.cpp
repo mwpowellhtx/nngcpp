@@ -23,7 +23,7 @@ namespace nng {
     }
 
     size_type binary_message_body::get_size() {
-        const auto msgp = get_msgp();
+        const auto msgp = get_message();
         auto result = static_cast<size_type>(0);
         if (msgp == nullptr) { return result; }
         const auto op = std::bind(&::nng_msg_len, msgp);
@@ -33,7 +33,7 @@ namespace nng {
 
     bool binary_message_body::try_get(buffer_vector_type& value) {
 
-        const auto msgp = get_msgp();
+        const auto msgp = get_message();
 
         if (msgp == nullptr) { return false; }
 
@@ -56,14 +56,14 @@ namespace nng {
     }
 
     void binary_message_body::Clear() {
-        const auto msgp = get_msgp();
+        const auto msgp = get_message();
         if (msgp == nullptr) { return; }
         const auto op = std::bind(&::nng_msg_clear, msgp);
         invocation::with_void_return_value(op);
     }
 
     void binary_message_body::append(const buffer_vector_type& buf) {
-        const auto msgp = get_msgp();
+        const auto msgp = get_message();
         // Also save calories if there are no bytes to append.
         if (msgp == nullptr || !buf.size()) { return; }
         // Bind to concrete message ptr along same lines as with options API.
@@ -72,7 +72,7 @@ namespace nng {
     }
 
     void binary_message_body::prepend(const buffer_vector_type& buf) {
-        const auto msgp = get_msgp();
+        const auto msgp = get_message();
         // Also save calories if there are no bytes to prepend.
         if (msgp == nullptr || !buf.size()) { return; }
         const auto op = std::bind(&::nng_msg_insert, msgp, _1, _2);
@@ -80,42 +80,42 @@ namespace nng {
     }
 
     void binary_message_body::ltrim(size_type sz) {
-        const auto msgp = get_msgp();
+        const auto msgp = get_message();
         if (msgp == nullptr) { return; }
         const auto op = std::bind(&::nng_msg_trim, msgp, _1);
         invocation::with_default_error_handling(op, sz);
     }
 
     void binary_message_body::rtrim(size_type sz) {
-        const auto msgp = get_msgp();
+        const auto msgp = get_message();
         if (msgp == nullptr) { return; }
         const auto op = std::bind(&::nng_msg_chop, msgp, _1);
         invocation::with_default_error_handling(op, sz);
     }
 
     void binary_message_body::append(const uint32_t& val) {
-        const auto msgp = get_msgp();
+        const auto msgp = get_message();
         if (msgp == nullptr) { return; }
         const auto op = std::bind(&::nng_msg_append_u32, msgp, _1);
         invocation::with_default_error_handling(op, val);
     }
 
     void binary_message_body::prepend(const uint32_t& val) {
-        const auto msgp = get_msgp();
+        const auto msgp = get_message();
         if (msgp == nullptr) { return; }
         const auto op = std::bind(&::nng_msg_insert_u32, msgp, _1);
         invocation::with_default_error_handling(op, val);
     }
 
     void binary_message_body::ltrim(uint32_t& val) {
-        const auto msgp = get_msgp();
+        const auto msgp = get_message();
         if (msgp == nullptr) { return; }
         const auto op = std::bind(&::nng_msg_trim_u32, msgp, _1);
         invocation::with_default_error_handling(op, &val);
     }
 
     void binary_message_body::rtrim(uint32_t& val) {
-        const auto msgp = get_msgp();
+        const auto msgp = get_message();
         if (msgp == nullptr) { return; }
         const auto op = std::bind(&::nng_msg_chop_u32, msgp, _1);
         invocation::with_default_error_handling(op, &val);
@@ -123,7 +123,7 @@ namespace nng {
 
     void binary_message_body::append(const std::string& s) {
         // Save the calories when we do not have an internal message.
-        const auto msgp = get_msgp();
+        const auto msgp = get_message();
         // Also bypass when the string is empty.
         if (msgp == nullptr || !s.length()) { return; }
         buffer_vector_type buf(s.cbegin(), s.cend());
@@ -133,7 +133,7 @@ namespace nng {
 
     void binary_message_body::prepend(const std::string& s) {
         // Save the calories when we do not have an internal message.
-        const auto msgp = get_msgp();
+        const auto msgp = get_message();
         // Also bypass when the string is empty.
         if (msgp == nullptr || !s.length()) { return; }
         buffer_vector_type buf(s.cbegin(), s.cend());
