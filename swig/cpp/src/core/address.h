@@ -134,7 +134,9 @@ namespace nng {
     //typedef ::nng_sockaddr_zt sockaddr_zt_view;
     typedef sockaddr_zt_t sockaddr_zt_view;
 
-    struct family_view_base : public having_one, public std::equal_to<family_view_base> {
+    struct family_view_base
+        : public IHaveOne
+        , public std::equal_to<family_view_base> {
 
         virtual ~family_view_base();
 
@@ -142,7 +144,7 @@ namespace nng {
 
         virtual sockaddr_family_type get_family() const = 0;
 
-        virtual bool has_one() const override;
+        virtual bool HasOne() const override;
 
     protected:
 
@@ -215,7 +217,7 @@ namespace nng {
 
         virtual ~unspec_family_view();
 
-        virtual bool has_one() const override;
+        virtual bool HasOne() const override;
     };
 
     struct inproc_family_view : public family_view<af_inproc, sockaddr_inproc_t> {
@@ -334,7 +336,9 @@ namespace nng {
         virtual bool operator!=(const detail_type& other) override;
     };
 
-    class address : public having_one, public std::equal_to<address> {
+    class address
+        : public IHaveOne
+        , public std::equal_to<address> {
     public:
 
         //typedef ::nng_sockaddr sockaddr_type;
@@ -366,7 +370,7 @@ namespace nng {
 
         family_view_base* const view() const;
 
-        virtual bool has_one() const override;
+        virtual bool HasOne() const override;
 
         bool operator==(const address& other);
 

@@ -63,12 +63,12 @@ TEST_CASE("Message pipe subordinates properly", Catch::Tags("message", "pipe"
         unique_ptr<binary_message> bmp;
 
         REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
-        REQUIRE(bmp->has_one() == true);
+        REQUIRE(bmp->HasOne() == true);
 
         SECTION("Message pipe without sockets constructs properly given binary message") {
 
             REQUIRE_NOTHROW(mpp = make_unique<message_pipe>(bmp.get()));
-            REQUIRE(mpp->has_one() == false);
+            REQUIRE(mpp->HasOne() == false);
 
             REQUIRE_NOTHROW(mpp.reset());
         }
@@ -79,7 +79,7 @@ TEST_CASE("Message pipe subordinates properly", Catch::Tags("message", "pipe"
             REQUIRE(fixture.msgp != nullptr);
 
             REQUIRE_NOTHROW(mpp = make_unique<message_pipe>(fixture.msgp));
-            REQUIRE(mpp->has_one() == false);
+            REQUIRE(mpp->HasOne() == false);
 
             REQUIRE_NOTHROW(mpp.reset());
         }
@@ -111,14 +111,14 @@ TEST_CASE("Message pipe subordinates properly", Catch::Tags("message", "pipe"
 
         REQUIRE_NOTHROW(*sendp << a_message_was_sent);
         REQUIRE_NOTHROW(sp1->send(sendp.get()));
-        REQUIRE(sendp->has_one() == false);
+        REQUIRE(sendp->HasOne() == false);
         REQUIRE_NOTHROW(sp2->try_receive(recvp.get()));
-        REQUIRE(recvp->has_one() == true);
+        REQUIRE(recvp->HasOne() == true);
         REQUIRE_THAT(recvp->body()->get(), Equals(a_message_was_sent_buf));
 
         // And which here's the rub.
         REQUIRE_NOTHROW(mpp = make_unique<message_pipe>(recvp.get()));
-        REQUIRE(mpp->has_one() == true);
+        REQUIRE(mpp->HasOne() == true);
 
         // Perchance to dream, ay, there's the rub! Who doesn't enjoy a little Shakespeare from time to time?
         INFO("When the pointer to the message pipe resets, i.e. is deleted"
@@ -136,13 +136,13 @@ TEST_CASE("Message pipe subordinates properly", Catch::Tags("message", "pipe"
             // Do not confuse the Message Pipe itself Resetting with the smart pointer.
             REQUIRE_NOTHROW(mpp->reset());
             // Which we still expect the Pipe to be valid.
-            REQUIRE(mpp->has_one() == true);
+            REQUIRE(mpp->HasOne() == true);
 
             // And check these operations as well.
             REQUIRE_NOTHROW(mpp->options()->get_int(O::recv_buf, actual));
             REQUIRE(actual == expected_recv_buf);
 
-            REQUIRE_NOTHROW(mpp->close());
+            REQUIRE_NOTHROW(mpp->Close());
         }
 
         SECTION("And operates after associated Message is destroyed") {
@@ -152,7 +152,7 @@ TEST_CASE("Message pipe subordinates properly", Catch::Tags("message", "pipe"
             REQUIRE_NOTHROW(mpp->options()->get_int(O::recv_buf, actual));
             REQUIRE(actual == expected_recv_buf);
 
-            REQUIRE_NOTHROW(mpp->close());
+            REQUIRE_NOTHROW(mpp->Close());
         }
 
         SECTION("And throws 'ec_enoent' when socket channel is destroyed") {
@@ -164,7 +164,7 @@ TEST_CASE("Message pipe subordinates properly", Catch::Tags("message", "pipe"
             SECTION("And closes transparently") {
                 /* However, we should be able to "Destroy" the resource, which effectively
                 ignores the same condition as being one among several expectations. */
-                REQUIRE_NOTHROW(mpp->close());
+                REQUIRE_NOTHROW(mpp->Close());
             }
         }
 

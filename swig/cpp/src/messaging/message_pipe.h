@@ -20,13 +20,13 @@ the API into Messaging. Therefore, decided that it should live in the nng::* nam
 namespace nng {
 
 #ifndef NNGCPP_MESSAGE_BASE_H
-    class message_base;
+    class _MessageBase;
 #endif // NNGCPP_MESSAGE_BASE_H
 
     // TODO: so, equal_to is available, but not_equal_to is not?
     class message_pipe
-        : public having_one
-        , public can_close
+        : public IHaveOne
+        , public ICanClose
         , public supports_options<options_reader>
         , public std::equal_to<message_pipe> {
     public:
@@ -59,17 +59,17 @@ namespace nng {
         // TODO: TBD: is exposing the raw pointer ctor really necessary? may make it protected at least? if at all...
         message_pipe(msg_type* const msgp);
 
-        message_pipe(message_base* const mbp);
+        message_pipe(_MessageBase* const mbp);
 
         virtual ~message_pipe();
 
-        virtual bool has_one() const override;
+        virtual bool HasOne() const override;
 
-        virtual void close() override;
+        virtual void Close() override;
 
         virtual void reset();
 
-        virtual void set(message_base* const mbp);
+        virtual void set(_MessageBase* const mbp);
 
         bool operator==(const message_pipe& rhs);
         // TODO: TBD: so, apparently there is no std::not_equal_to available from the Microsoft implementation, however, we should still be able to override the operator

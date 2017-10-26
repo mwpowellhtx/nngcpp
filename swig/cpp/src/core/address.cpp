@@ -24,7 +24,7 @@ namespace nng {
     const std::string sockaddr_family_name<af_zt>::name = SOCKADDR_FAMILY_TO_STRING(af_zt);
 
     family_view_base::family_view_base(sockaddr_type* const sap, sockaddr_family_type jewel)
-        : having_one(), equal_to()
+        : IHaveOne(), equal_to()
         , _sap(sap), _jewel(jewel) {
     }
 
@@ -35,7 +35,7 @@ namespace nng {
         return _jewel;
     }
 
-    bool family_view_base::has_one() const {
+    bool family_view_base::HasOne() const {
         return _sap != nullptr && _sap->s_un.s_family == get_jewel();
     }
 
@@ -95,7 +95,7 @@ namespace nng {
     unspec_family_view::~unspec_family_view() {
     }
 
-    bool unspec_family_view::has_one() const {
+    bool unspec_family_view::HasOne() const {
         return false;
     }
 
@@ -509,7 +509,7 @@ namespace nng {
         return _view.get();
     }
 
-    bool address::has_one() const {
+    bool address::HasOne() const {
         return view() != nullptr;
     }
 

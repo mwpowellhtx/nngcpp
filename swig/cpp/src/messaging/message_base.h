@@ -11,18 +11,21 @@
 
 namespace nng {
 
-    struct supports_clear_api {
-        virtual void clear() = 0;
+    struct ISupportsClear {
+        virtual void Clear() = 0;
     };
 
-    struct supports_getting_msg {
+    class supports_getting_msg {
     protected:
         virtual msg_type* get_msgp() const = 0;
     };
 
     typedef std::vector<uint8_t> buffer_vector_type;
 
-    class message_base : public having_one, public supports_clear_api, public supports_getting_msg {
+    class _MessageBase
+        : public IHaveOne
+        , public ISupportsClear
+        , public supports_getting_msg {
     private:
 
         void allocate(size_type sz = 0);
@@ -31,13 +34,13 @@ namespace nng {
 
         msg_type* _msgp;
 
-        message_base();
+        _MessageBase();
 
-        message_base(size_type sz);
+        _MessageBase(size_type sz);
 
-        message_base(msg_type* msgp);
+        _MessageBase(msg_type* msgp);
 
-        friend msg_type* get_msgp(message_base* const mbp);
+        friend msg_type* get_msgp(_MessageBase* const mbp);
 
         void on_one_required();
 
@@ -45,9 +48,9 @@ namespace nng {
 
     public:
 
-        virtual ~message_base();
+        virtual ~_MessageBase();
 
-        virtual bool has_one() const override;
+        virtual bool HasOne() const override;
 
         virtual void set_msgp(msg_type* msgp);
 
@@ -56,16 +59,19 @@ namespace nng {
         virtual void on_sent();
     };
 
-    msg_type* get_msgp(message_base* const mbp);
+    msg_type* get_msgp(_MessageBase* const mbp);
 
-    class message_part : public having_one, public supports_clear_api, public supports_getting_msg {
+    class message_part
+        : public IHaveOne
+        , public ISupportsClear
+        , public supports_getting_msg {
     private:
 
-        message_base* _basep;
+        _MessageBase* _basep;
 
     protected:
 
-        message_part(message_base* basep);
+        message_part(_MessageBase* basep);
 
         virtual ~message_part();
 
@@ -73,8 +79,11 @@ namespace nng {
 
     public:
 
-        virtual bool has_one() const override;
+        virtual bool HasOne() const override;
     };
+
+    // Define for internal use.
+    typedef _MessageBase message_base;
 }
 
 #endif // NNGCPP_MESSAGE_BASE_H

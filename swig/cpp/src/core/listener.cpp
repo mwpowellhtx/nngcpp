@@ -22,7 +22,7 @@ namespace nng {
     }
 
     listener::~listener() {
-        close();
+        Close();
     }
 
     void listener::start(flag_type flags) {
@@ -30,14 +30,14 @@ namespace nng {
         invocation::with_default_error_handling(op, static_cast<int>(flags));
     }
 
-    void listener::close() {
-        if (!has_one()) { return; }
+    void listener::Close() {
+        if (!HasOne()) { return; }
         const auto op = bind(&::nng_listener_close, lid);
         invocation::with_default_error_handling(op);
         configure_options(lid = 0);
     }
 
-    bool listener::has_one() const {
+    bool listener::HasOne() const {
         return lid != 0;
     }
 

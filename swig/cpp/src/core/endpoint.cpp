@@ -3,8 +3,8 @@
 namespace nng {
 
     endpoint::endpoint()
-        : having_one()
-        , can_close()
+        : IHaveOne()
+        , ICanClose()
         , supports_options() {
     }
 

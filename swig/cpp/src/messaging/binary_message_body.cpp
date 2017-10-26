@@ -16,7 +16,7 @@ namespace nng {
     using std::placeholders::_2;
     using std::placeholders::_3;
 
-    binary_message_body::binary_message_body(message_base* basep) : message_part(basep) {
+    binary_message_body::binary_message_body(_MessageBase* basep) : message_part(basep) {
     }
 
     binary_message_body::~binary_message_body() {
@@ -55,7 +55,7 @@ namespace nng {
         return policy_type::try_get(value, msgp, get_, convert_);
     }
 
-    void binary_message_body::clear() {
+    void binary_message_body::Clear() {
         const auto msgp = get_msgp();
         if (msgp == nullptr) { return; }
         const auto op = std::bind(&::nng_msg_clear, msgp);

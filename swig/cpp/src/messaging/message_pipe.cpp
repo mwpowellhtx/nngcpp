@@ -10,7 +10,7 @@ namespace nng {
     using std::bind;
 
     message_pipe::message_pipe(msg_type* const msgp)
-        : having_one(), can_close(), supports_options(), equal_to()
+        : IHaveOne(), ICanClose(), supports_options(), equal_to()
         , pid(0), _msgp(msgp)
         , __getter(bind(&::nng_msg_get_pipe, _msgp))
         , __setter(), __closer() {
@@ -19,23 +19,23 @@ namespace nng {
         configure(pid, _msgp);
     }
 
-    message_pipe::message_pipe(message_base* const mbp)
+    message_pipe::message_pipe(_MessageBase* const mbp)
         : message_pipe(mbp->get_msgp()) {
     }
 
     // TODO: TBD: this is looking very similar to socket. perhaps it is...
     message_pipe::~message_pipe() {
-        close();
+        Close();
     }
 
-    void message_pipe::close() {
-        if (!has_one()) { return; }
+    void message_pipe::Close() {
+        if (!HasOne()) { return; }
         // TODO: TBD: should be fine trapping non-ec_enone RV's only; but consider whether ec_enoent was appropriate...
         invocation::with_error_handling_if_not_one_of(__closer, { ec_enone, ec_enoent });
         configure(pid = 0);
     }
 
-    bool message_pipe::has_one() const {
+    bool message_pipe::HasOne() const {
         return pid > 0;
     }
 
@@ -53,7 +53,7 @@ namespace nng {
         invocation::with_void_return_value(__setter);
     }
 
-    void message_pipe::set(message_base* const mbp) {
+    void message_pipe::set(_MessageBase* const mbp) {
         set(mbp->get_msgp());
     }
 

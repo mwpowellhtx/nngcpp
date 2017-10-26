@@ -3,9 +3,8 @@
 
 namespace nng {
 
-    class can_close {
-    public:
-        virtual void close() = 0;
+    struct ICanClose {
+        virtual void Close() = 0;
     };
 }
 

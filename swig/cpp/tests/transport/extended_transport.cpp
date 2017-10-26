@@ -53,17 +53,17 @@ TEST_CASE("Check some properties", "[check][properties][nng][cxx][bonus]") {
         REQUIRE_NOTHROW(recvp = make_unique<binary_message>(nullptr));
 
         REQUIRE_NOTHROW(rep->listen(addr, &l));
-        REQUIRE(l.has_one() == true);
+        REQUIRE(l.HasOne() == true);
         REQUIRE_NOTHROW(req->dial(addr, &d));
-        REQUIRE(d.has_one() == true);
+        REQUIRE(d.HasOne() == true);
         SLEEP_FOR(20ms); // Allow listener to catch up from being slightly behind.
 
         REQUIRE_NOTHROW(*sendp << props);
         REQUIRE_NOTHROW(req->send(sendp.get()));
-        REQUIRE(sendp->has_one() == false);
+        REQUIRE(sendp->HasOne() == false);
 
         REQUIRE_NOTHROW(rep->try_receive(recvp.get()));
-        REQUIRE(recvp->has_one() == true);
+        REQUIRE(recvp->HasOne() == true);
         REQUIRE_THAT(recvp->body()->get(), Equals(props_buf));
 
         SECTION("Now test the properties") {
@@ -72,7 +72,7 @@ TEST_CASE("Check some properties", "[check][properties][nng][cxx][bonus]") {
 
             // Vet the Pipe and the Port ahead of time.
             REQUIRE_NOTHROW(pp = make_unique<message_pipe>(recvp.get()));
-            REQUIRE(pp->has_one() == true);
+            REQUIRE(pp->HasOne() == true);
 
             auto current_port = get_current_port();
             REQUIRE(current_port != 0);
@@ -128,11 +128,11 @@ TEST_CASE("Check some properties in C style", "[check][properties][nng][c][bonus
         REQUIRE_NOTHROW(*sendp << props);
         REQUIRE(::nng_sendmsg(req, sendp->get_msgp(), 0) == 0);
         REQUIRE_NOTHROW(sendp->on_sent());
-        REQUIRE(sendp->has_one() == false);
+        REQUIRE(sendp->HasOne() == false);
 
         REQUIRE(::nng_recvmsg(rep, &msgp, 0) == 0);
         REQUIRE_NOTHROW(recvp->set_msgp(msgp));
-        REQUIRE(recvp->has_one() == true);
+        REQUIRE(recvp->HasOne() == true);
         REQUIRE_THAT(recvp->body()->get(), Equals(props_buf));
 
         SECTION("Now test the properties") {

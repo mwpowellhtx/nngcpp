@@ -224,10 +224,10 @@ TEST_CASE("NNG C++ wrapper reconnect works", Catch::Tags(
                 REQUIRE_NOTHROW(push->send(bmp.get()));
                 /* Ditto message passing semantics. The Send() operation effectively
                 nullifies the internal message. */
-                REQUIRE(bmp->has_one() == false);
+                REQUIRE(bmp->HasOne() == false);
 
                 REQUIRE_NOTHROW(pull->try_receive(bmp.get()));
-                REQUIRE(bmp->has_one() == true);
+                REQUIRE(bmp->HasOne() == true);
                 // Just verify that the message matches the buffer.
                 REQUIRE_THAT(bmp->body()->get(), Equals(hello_buf));
             }
@@ -257,17 +257,17 @@ TEST_CASE("NNG C++ wrapper reconnect works", Catch::Tags(
                 this_thread::sleep_for(100ms);
                 REQUIRE_NOTHROW(*bmp << hello);
                 REQUIRE_NOTHROW(push->send(bmp.get()));
-                REQUIRE(bmp->has_one() == false);
+                REQUIRE(bmp->HasOne() == false);
 
                 // See notes above. Sending transfers ownership of the internal message to NNG.
                 REQUIRE_NOTHROW(pull->try_receive(bmp.get()));
-                REQUIRE(bmp->has_one() == true);
+                REQUIRE(bmp->HasOne() == true);
                 // Just verify that the message matches the buffer.
                 REQUIRE_THAT(bmp->body()->get(), Equals(hello_buf));
 
                 // TODO: TBD: this one deserves its own unit test as well so that we are not cluttering the integration tests
                 message_pipe_fixture mp1(bmp.get());
-                REQUIRE(mp1.has_one() == true);
+                REQUIRE(mp1.HasOne() == true);
                 // TODO: TBD: deserves its own unit testing...
                 REQUIRE(mp1.get_pid() > 0);
                 /* Resetting the message pointer is effectively the same, if stronger, for purposes
@@ -279,23 +279,23 @@ TEST_CASE("NNG C++ wrapper reconnect works", Catch::Tags(
 
                     // Get the fixtured PID for test purposes prior to closing.
                     auto mp1_pid = mp1.get_pid();
-                    REQUIRE_NOTHROW(mp1.close());
-                    REQUIRE(mp1.has_one() == false);
+                    REQUIRE_NOTHROW(mp1.Close());
+                    REQUIRE(mp1.HasOne() == false);
 
                     this_thread::sleep_for(100ms);
                     auto bmp2 = std::make_unique<binary_message>();
                     REQUIRE_NOTHROW(*bmp2 << again);
                     // TODO: TBD: send/no-message -> receive/message is a pattern that deserves its own focused unit test...
                     REQUIRE_NOTHROW(push->send(bmp2.get()));
-                    REQUIRE(bmp2->has_one() == false);
+                    REQUIRE(bmp2->HasOne() == false);
 
                     REQUIRE_NOTHROW(pull->try_receive(bmp2.get()));
-                    REQUIRE(bmp2->has_one() == true);
+                    REQUIRE(bmp2->HasOne() == true);
                     // Just verify that the message matches the buffer.
                     REQUIRE_THAT(bmp2->body()->get(), Equals(again_buf));
 
                     message_pipe_fixture mp2(bmp2.get());
-                    REQUIRE(mp2.has_one() == true);
+                    REQUIRE(mp2.HasOne() == true);
                     // Ditto resetting the pointer versus exposing the free method.
                     REQUIRE_NOTHROW(bmp2.reset());
                     REQUIRE(bmp2.get() == nullptr);

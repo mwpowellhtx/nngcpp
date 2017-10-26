@@ -53,44 +53,64 @@ namespace nng {
         }
     };
 
-    template<typename... Args_> struct supports_append_api;
+    //template<typename... Args_> struct supports_append_api;
 
-    template<typename Type_, typename... Args_>
-    struct supports_append_api<Type_, Args_...> {
-    };
+    //template<typename Type_, typename... Args_>
+    //struct supports_append_api<Type_, Args_...> {
+    //};
+
+    //template<typename Type_>
+    //struct supports_append_api<Type_> {
+    //    virtual void append(const Type_& arg) = 0;
+    //};
 
     template<typename Type_>
-    struct supports_append_api<Type_> {
+    struct supports_append_api {
         virtual void append(const Type_& arg) = 0;
     };
 
-    template<typename... Args_> struct supports_prepend_api;
+    //template<typename... Args_> struct supports_prepend_api;
 
-    template<typename Type_, typename... Args_>
-    struct supports_prepend_api<Type_, Args_...> {};
+    //template<typename Type_, typename... Args_>
+    //struct supports_prepend_api<Type_, Args_...> {};
+
+    //template<typename Type_>
+    //struct supports_prepend_api<Type_> {
+    //    virtual void prepend(const Type_& arg) = 0;
+    //};
 
     template<typename Type_>
-    struct supports_prepend_api<Type_> {
+    struct supports_prepend_api {
         virtual void prepend(const Type_& arg) = 0;
     };
 
-    template<typename... Type_> struct supports_rtrim_api;
+    //template<typename... Type_> struct supports_rtrim_api;
 
-    template<typename Type_, typename... Args_>
-    struct supports_rtrim_api<Type_, Args_...> {};
+    //template<typename Type_, typename... Args_>
+    //struct supports_rtrim_api<Type_, Args_...> {};
+
+    //template<typename Type_>
+    //struct supports_rtrim_api<Type_> {
+    //    virtual void rtrim(Type_ arg) = 0;
+    //};
 
     template<typename Type_>
-    struct supports_rtrim_api<Type_> {
+    struct supports_rtrim_api {
         virtual void rtrim(Type_ arg) = 0;
     };
 
-    template<typename... Args_> struct supports_ltrim_api;
+    //template<typename... Args_> struct supports_ltrim_api;
 
-    template<typename Type_, typename... Args_>
-    struct supports_ltrim_api<Type_, Args_...> {};
+    //template<typename Type_, typename... Args_>
+    //struct supports_ltrim_api<Type_, Args_...> {};
+
+    //template<typename Type_>
+    //struct supports_ltrim_api<Type_> {
+    //    virtual void ltrim(Type_ arg) = 0;
+    //};
 
     template<typename Type_>
-    struct supports_ltrim_api<Type_> {
+    struct supports_ltrim_api {
         virtual void ltrim(Type_ arg) = 0;
     };
 }

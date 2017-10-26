@@ -10,40 +10,40 @@ namespace nng {
     using std::placeholders::_1;
     using std::bind;
 
-    msg_type* get_msgp(message_base* const mbp) {
+    msg_type* get_msgp(_MessageBase* const mbp) {
         // TODO: TBD: this should never be the case I think.
         return mbp == nullptr ? nullptr : mbp->_msgp;
     }
 
-    message_base::message_base()
-        : having_one(), supports_clear_api(), supports_getting_msg()
+    _MessageBase::_MessageBase()
+        : IHaveOne(), ISupportsClear(), supports_getting_msg()
         , _msgp(nullptr) {
 
         allocate();
     }
 
-    message_base::message_base(size_type sz)
-        : having_one(), supports_clear_api(), supports_getting_msg()
+    _MessageBase::_MessageBase(size_type sz)
+        : IHaveOne(), ISupportsClear(), supports_getting_msg()
         , _msgp(nullptr) {
 
         allocate(sz);
     }
 
-    message_base::message_base(msg_type* msgp)
-        : having_one(), supports_clear_api(), supports_getting_msg()
+    _MessageBase::_MessageBase(msg_type* msgp)
+        : IHaveOne(), ISupportsClear(), supports_getting_msg()
         , _msgp(msgp) {
     }
 
-    message_base::~message_base() {
+    _MessageBase::~_MessageBase() {
         free();
     }
 
-    void message_base::on_one_required() {
-        if (has_one()) { return; }
+    void _MessageBase::on_one_required() {
+        if (HasOne()) { return; }
     }
 
-    void message_base::allocate(size_type sz) {
-        if (has_one()) { return; }
+    void _MessageBase::allocate(size_type sz) {
+        if (HasOne()) { return; }
         msg_type* msgp = nullptr;
         try {
             const auto op = bind(&::nng_msg_alloc, &msgp, _1);
@@ -64,33 +64,33 @@ namespace nng {
         set_msgp(msgp);
     }
 
-    void message_base::free() {
-        if (!has_one()) { return; }
+    void _MessageBase::free() {
+        if (!HasOne()) { return; }
         const auto op = bind(&::nng_msg_free, _msgp);
         invocation::with_void_return_value(op);
         // Just set the member directly since we own it.
         _msgp = nullptr;
     }
 
-    msg_type* message_base::get_msgp() const {
+    msg_type* _MessageBase::get_msgp() const {
         return _msgp;
     }
 
-    void message_base::set_msgp(msg_type* msgp) {
+    void _MessageBase::set_msgp(msg_type* msgp) {
         free();
         _msgp = msgp;
     }
 
-    bool message_base::has_one() const {
+    bool _MessageBase::HasOne() const {
         return _msgp != nullptr;
     }
 
-    void message_base::on_sent() {
+    void _MessageBase::on_sent() {
         _msgp = nullptr;
     }
 
-    message_part::message_part(message_base* basep)
-        : having_one(), supports_clear_api(), supports_getting_msg()
+    message_part::message_part(_MessageBase* basep)
+        : IHaveOne(), ISupportsClear(), supports_getting_msg()
         , _basep(basep) {
         THROW_BIN_MSG_BODY_INV_OP(_basep);
     }
@@ -103,7 +103,7 @@ namespace nng {
         return nng::get_msgp(_basep);
     }
 
-    bool message_part::has_one() const {
+    bool message_part::HasOne() const {
         return get_msgp() != nullptr;
     }
 }

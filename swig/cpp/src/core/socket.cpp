@@ -14,7 +14,7 @@ namespace nng {
     using std::bind;
 
     socket::socket(const nng_ctor_func& nng_ctor)
-        : having_one(), sender(), receiver(), messenger(), supports_options()
+        : IHaveOne(), sender(), receiver(), messenger(), supports_options()
         , sid(0) {
 
         invocation::with_default_error_handling(nng_ctor, &sid);
@@ -22,7 +22,7 @@ namespace nng {
     }
 
     socket::~socket() {
-        close();
+        Close();
     }
 
     void socket::configure_options(nng_type sid) {
@@ -44,8 +44,8 @@ namespace nng {
         );
     }
 
-    void socket::close() {
-        if (!has_one()) { return; }
+    void socket::Close() {
+        if (!HasOne()) { return; }
         // Close is its own operation apart from Shutdown.
         const auto op = bind(&::nng_close, sid);
         invocation::with_default_error_handling(op);
@@ -60,7 +60,7 @@ namespace nng {
         // Which socket can still be in operation.
     }
 
-    bool socket::has_one() const {
+    bool socket::HasOne() const {
         return sid > 0;
     }
 
@@ -153,7 +153,7 @@ namespace nng {
             throw;
         }
         bmp->set_msgp(msgp);
-        return bmp->has_one();
+        return bmp->HasOne();
     }
 
     buffer_vector_type socket::receive(size_type& sz, flag_type flags) {

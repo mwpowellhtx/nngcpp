@@ -160,11 +160,11 @@ TEST_CASE("Test the transport using C++ wrappers", Catch::Tags(constants::prefix
         listener l1, l2;
 
         REQUIRE_NOTHROW(repp->listen(addr, &l1));
-        REQUIRE(l1.has_one() == true);
+        REQUIRE(l1.HasOne() == true);
 
         // Leaving the first Listener open and available.
         REQUIRE_THROWS_AS_MATCHING(reqp->listen(addr, &l2), nng_exception, THROWS_NNG_EXCEPTION(ec_eaddrinuse));
-        REQUIRE(l2.has_one() == false);
+        REQUIRE(l2.HasOne() == false);
     }
 
     SECTION("Listener and dialer accepted") {
@@ -176,10 +176,10 @@ TEST_CASE("Test the transport using C++ wrappers", Catch::Tags(constants::prefix
         dialer d;
 
         REQUIRE_NOTHROW(repp->listen(addr, &l));
-        REQUIRE(l.has_one() == true);
+        REQUIRE(l.HasOne() == true);
 
         REQUIRE_NOTHROW(reqp->dial(addr, &d));
-        REQUIRE(d.has_one() == true);
+        REQUIRE(d.HasOne() == true);
     }
 
     SECTION("Send and receive") {
@@ -195,9 +195,9 @@ TEST_CASE("Test the transport using C++ wrappers", Catch::Tags(constants::prefix
         string actual_addr;
 
         REQUIRE_NOTHROW(repp->listen(addr, &l));
-        REQUIRE(l.has_one() == true);
+        REQUIRE(l.HasOne() == true);
         REQUIRE_NOTHROW(reqp->dial(addr, &d));
-        REQUIRE(d.has_one() == true);
+        REQUIRE(d.HasOne() == true);
 
         // Sleep so listener catches up, may be running slightly behind.
         SLEEP_FOR(20ms);
@@ -217,7 +217,7 @@ TEST_CASE("Test the transport using C++ wrappers", Catch::Tags(constants::prefix
         REQUIRE_THAT(sendp->body()->get(), Equals(acknowledge_buf));
 
         REQUIRE_NOTHROW(pp = make_unique<message_pipe>(sendp.get()));
-        REQUIRE(pp->has_one() == true);
+        REQUIRE(pp->HasOne() == true);
 
         // TODO: TBD: this bit is borderline message pipe unit testing and that's about it...
         REQUIRE_NOTHROW(actual_addr.resize(NNG_MAXADDRLEN));
@@ -243,10 +243,10 @@ TEST_CASE("Test the transport using C++ wrappers", Catch::Tags(constants::prefix
         REQUIRE_NOTHROW(init_random_buffer(data, sz));
 
         REQUIRE_NOTHROW(repp->listen(addr, &l));
-        REQUIRE(l.has_one() == true);
+        REQUIRE(l.HasOne() == true);
 
         REQUIRE_NOTHROW(reqp->dial(addr, &d));
-        REQUIRE(d.has_one() == true);
+        REQUIRE(d.HasOne() == true);
 
         // Wait for listener to catch up since it may be slightly behind.
         SLEEP_FOR(20ms);

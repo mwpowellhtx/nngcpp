@@ -11,8 +11,8 @@ namespace nng {
 
     device_path::~device_path() {
         if (!_shouldClose) { return; }
-        if (_asockp) { _asockp->close(); }
-        if (_bsockp) { _bsockp->close(); }
+        if (_asockp) { _asockp->Close(); }
+        if (_bsockp) { _bsockp->Close(); }
     }
 
     void install_device_sockets_callback(const device_path* const dpp) {

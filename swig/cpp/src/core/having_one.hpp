@@ -3,9 +3,8 @@
 
 namespace nng {
 
-    class having_one {
-    public:
-        virtual bool has_one() const = 0;
+    struct IHaveOne {
+        virtual bool HasOne() const = 0;
     };
 }
 

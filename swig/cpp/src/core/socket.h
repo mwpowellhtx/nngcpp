@@ -10,6 +10,7 @@
 #include "options.h"
 
 #include "having_one.hpp"
+#include "can_close.hpp"
 
 // nng should be in the include path.
 #include <functional>
@@ -25,7 +26,8 @@ namespace nng {
     struct device_path;
 
     class socket
-        : public having_one
+        : public IHaveOne
+        , public ICanClose
         , public sender
         , public receiver
         , public messenger
@@ -63,10 +65,10 @@ namespace nng {
         void dial(const std::string& addr, flag_type flags = flag_none);
         void dial(const std::string& addr, dialer* const dp, flag_type flags = flag_none);
 
-        void close();
+        void Close();
         void shutdown();
 
-        virtual bool has_one() const override;
+        virtual bool HasOne() const override;
 
         virtual void send(binary_message* const bmp, flag_type flags = flag_none) override;
 

@@ -18,7 +18,7 @@ namespace nng {
 
     // TODO: TBD: of course they are all "binary" messages close to the wire; however, we may shim a string-based API around this one...
     template<class Body_, class Header_>
-    class basic_binary_message : public message_base {
+    class basic_binary_message : public _MessageBase {
     public:
 
         typedef Header_ header_type;
@@ -34,17 +34,17 @@ namespace nng {
     protected:
 
         basic_binary_message()
-            : message_base()
+            : _MessageBase()
             , _header(this), _body(this) {
         }
 
         basic_binary_message(size_type sz)
-            : message_base(sz)
+            : _MessageBase(sz)
             , _header(this), _body(this) {
         }
 
         basic_binary_message(msg_type* msgp)
-            : message_base(msgp)
+            : _MessageBase(msgp)
             , _header(this), _body(this) {
         }
 
@@ -69,10 +69,10 @@ namespace nng {
             return _header.get_size() + _body.get_size();
         }
 
-        virtual void clear() {
-            if (!has_one()) { return; }
-            _header.clear();
-            _body.clear();
+        virtual void Clear() override {
+            if (!HasOne()) { return; }
+            _header.Clear();
+            _body.Clear();
         }
 
         virtual operator std::string() {

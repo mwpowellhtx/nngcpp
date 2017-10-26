@@ -80,14 +80,14 @@ TEST_CASE("Verify default message part", Catch::Tags("body"
 
         REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
         REQUIRE(bmp != nullptr);
-        REQUIRE(bmp->has_one() == true);
+        REQUIRE(bmp->HasOne() == true);
 
         SECTION("Message part can be obtained from parent") {
 
             binary_message_body* partp;
             REQUIRE_NOTHROW(partp = bmp->body());
             REQUIRE(partp);
-            REQUIRE(partp->has_one() == bmp->has_one());
+            REQUIRE(partp->HasOne() == bmp->HasOne());
             REQUIRE(partp->get_size() == 0);
             REQUIRE_THAT(partp->get(), Equals(default_data));
         }
@@ -112,7 +112,7 @@ TEST_CASE("Message part operates correctly", Catch::Tags("body"
 
         REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
         REQUIRE(bmp != nullptr);
-        REQUIRE(bmp->has_one() == true);
+        REQUIRE(bmp->HasOne() == true);
 
         SECTION("Part operation") {
 

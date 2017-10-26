@@ -22,7 +22,7 @@ namespace nng {
     }
 
     dialer::~dialer() {
-        close();
+        Close();
     }
 
     void dialer::start(flag_type flags) {
@@ -30,14 +30,14 @@ namespace nng {
         invocation::with_default_error_handling(op, static_cast<int>(flags));
     }
 
-    void dialer::close() {
-        if (!has_one()) { return; }
+    void dialer::Close() {
+        if (!HasOne()) { return; }
         const auto op = bind(&::nng_dialer_close, did);
         invocation::with_default_error_handling(op);
         configure_options(did = 0);
     }
 
-    bool dialer::has_one() const {
+    bool dialer::HasOne() const {
         return did != 0;
     }
 

@@ -27,15 +27,21 @@ namespace nng {
     class binary_message_body
         : public message_part
         , public supports_get_api<buffer_vector_type>
-        , public supports_append_api<buffer_vector_type, std::string, uint32_t>
-        , public supports_prepend_api<buffer_vector_type, std::string, uint32_t>
-        , public supports_ltrim_api<size_type, uint32_t&>
-        , public supports_rtrim_api<size_type, uint32_t&> {
+        , public supports_append_api<buffer_vector_type>
+        , public supports_append_api<std::string>
+        , public supports_append_api<uint32_t>
+        , public supports_prepend_api<buffer_vector_type>
+        , public supports_prepend_api<std::string>
+        , public supports_prepend_api<uint32_t>
+        , public supports_ltrim_api<size_type>
+        , public supports_ltrim_api<uint32_t&>
+        , public supports_rtrim_api<size_type>
+        , public supports_rtrim_api<uint32_t&> {
     protected:
 
         template<class Body_, class Header_> friend class basic_binary_message;
 
-        binary_message_body(message_base* const basep);
+        binary_message_body(_MessageBase* const basep);
 
     public:
 
@@ -47,27 +53,27 @@ namespace nng {
 
     public:
 
-        virtual void clear() override;
+        virtual void Clear() override;
 
-        virtual void append(const buffer_vector_type& buf);
+        virtual void append(const buffer_vector_type& buf) override;
 
-        virtual void prepend(const buffer_vector_type& buf);
+        virtual void prepend(const buffer_vector_type& buf) override;
 
-        virtual void ltrim(size_type sz);
+        virtual void ltrim(size_type sz) override;
 
-        virtual void rtrim(size_type sz);
+        virtual void rtrim(size_type sz) override;
 
-        virtual void append(const uint32_t& val);
+        virtual void append(const uint32_t& val) override;
 
-        virtual void prepend(const uint32_t& val);
+        virtual void prepend(const uint32_t& val) override;
 
-        virtual void ltrim(uint32_t& val);
+        virtual void ltrim(uint32_t& val) override;
 
-        virtual void rtrim(uint32_t& val);
+        virtual void rtrim(uint32_t& val) override;
 
-        virtual void append(const std::string& s);
+        virtual void append(const std::string& s) override;
 
-        virtual void prepend(const std::string& s);
+        virtual void prepend(const std::string& s) override;
     };
 }
 

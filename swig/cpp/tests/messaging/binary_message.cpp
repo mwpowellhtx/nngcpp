@@ -88,7 +88,7 @@ TEST_CASE("Binary messages work", "[binary_message][messaging][cxx]") {
 
                 REQUIRE(bmp->body() != nullptr);
                 REQUIRE(bmp->header() != nullptr);
-                REQUIRE(bmp->has_one() == true);
+                REQUIRE(bmp->HasOne() == true);
                 REQUIRE(bmp->get_msgp() != nullptr);
 
                 SECTION("Destructor works") {
@@ -106,7 +106,7 @@ TEST_CASE("Binary messages work", "[binary_message][messaging][cxx]") {
 
                 REQUIRE(bmp->body() != nullptr);
                 REQUIRE(bmp->header() != nullptr);
-                REQUIRE(bmp->has_one() == true);
+                REQUIRE(bmp->HasOne() == true);
                 REQUIRE(bmp->get_msgp() == msgp);
 
                 SECTION("Destructor works") {

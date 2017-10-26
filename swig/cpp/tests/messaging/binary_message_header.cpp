@@ -66,14 +66,14 @@ TEST_CASE("Verify default message part", Catch::Tags("header"
 
         REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
         REQUIRE(bmp != nullptr);
-        REQUIRE(bmp->has_one() == true);
+        REQUIRE(bmp->HasOne() == true);
 
         SECTION("Message part can be obtained from parent") {
 
             binary_message_header* headerp;
             REQUIRE_NOTHROW(headerp = bmp->header());
             REQUIRE(headerp);
-            REQUIRE(headerp->has_one() == bmp->has_one());
+            REQUIRE(headerp->HasOne() == bmp->HasOne());
             REQUIRE(headerp->get_size() == 0);
             REQUIRE_THAT(headerp->get(), Equals(default_data));
         }

@@ -205,7 +205,7 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
 
                 REQUIRE_NOTHROW(bmp = make_unique<binary_message>((::nng_msg*)nullptr));
                 REQUIRE_THROWS_AS_MATCHING(s1->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
-                REQUIRE(bmp->has_one() == false);
+                REQUIRE(bmp->HasOne() == false);
             });
         }
 

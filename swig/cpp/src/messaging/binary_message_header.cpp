@@ -22,7 +22,7 @@ namespace nng {
     using std::placeholders::_2;
     using std::bind;
 
-    binary_message_header::binary_message_header(message_base* const basep)
+    binary_message_header::binary_message_header(_MessageBase* const basep)
         : message_part(basep) {
     }
 
@@ -59,7 +59,7 @@ namespace nng {
         return policy_type::try_get(value, msgp, get_, convert_);
     }
 
-    void binary_message_header::clear() {
+    void binary_message_header::Clear() {
         const auto msgp = get_msgp();
         if (!msgp) { return; }
         const auto op = bind(&::nng_msg_header_clear, msgp);

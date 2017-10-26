@@ -38,9 +38,9 @@ namespace nng {
         virtual ~dialer();
 
         virtual void start(flag_type flags = flag_none);
-        virtual void close() override;
+        virtual void Close() override;
 
-        virtual bool has_one() const override;
+        virtual bool HasOne() const override;
     };
 }
 
