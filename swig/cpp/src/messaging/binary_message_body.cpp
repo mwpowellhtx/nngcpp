@@ -16,26 +16,24 @@ namespace nng {
     using std::placeholders::_2;
     using std::placeholders::_3;
 
-    binary_message_body::binary_message_body(_MessageBase* basep) : message_part(basep) {
+    binary_message_body::binary_message_body(_MessageBase* basep)
+        : _MessagePart(basep) {
     }
 
     binary_message_body::~binary_message_body() {
     }
 
     size_type binary_message_body::get_size() {
-        const auto msgp = get_message();
         auto result = static_cast<size_type>(0);
-        if (msgp == nullptr) { return result; }
-        const auto op = std::bind(&::nng_msg_len, msgp);
+        if (!HasOne()) { return result; }
+        const auto op = std::bind(&::nng_msg_len, get_message());
         invocation::with_result(op, &result);
         return result;
     }
 
     bool binary_message_body::try_get(buffer_vector_type& value) {
 
-        const auto msgp = get_message();
-
-        if (msgp == nullptr) { return false; }
+        if (!HasOne()) { return false; }
 
         typedef message_getter_try_get_policy<buffer_vector_type, void*> policy_type;
 
@@ -52,92 +50,79 @@ namespace nng {
             return y.size() > 0;
         };
 
-        return policy_type::try_get(value, msgp, get_, convert_);
+        return policy_type::try_get(value, get_message(), get_, convert_);
     }
 
     void binary_message_body::Clear() {
-        const auto msgp = get_message();
-        if (msgp == nullptr) { return; }
-        const auto op = std::bind(&::nng_msg_clear, msgp);
+        if (!HasOne()) { return; }
+        const auto op = std::bind(&::nng_msg_clear, get_message());
         invocation::with_void_return_value(op);
     }
 
-    void binary_message_body::append(const buffer_vector_type& buf) {
-        const auto msgp = get_message();
+    void binary_message_body::Append(const buffer_vector_type& buf) {
         // Also save calories if there are no bytes to append.
-        if (msgp == nullptr || !buf.size()) { return; }
+        if (!(HasOne() || buf.size())) { return; }
         // Bind to concrete message ptr along same lines as with options API.
-        const auto op = std::bind(&::nng_msg_append, msgp, _1, _2);
+        const auto op = std::bind(&::nng_msg_append, get_message(), _1, _2);
         invocation::with_default_error_handling(op, (const void*)&buf[0], buf.size());
     }
 
-    void binary_message_body::prepend(const buffer_vector_type& buf) {
-        const auto msgp = get_message();
+    void binary_message_body::Prepend(const buffer_vector_type& buf) {
         // Also save calories if there are no bytes to prepend.
-        if (msgp == nullptr || !buf.size()) { return; }
-        const auto op = std::bind(&::nng_msg_insert, msgp, _1, _2);
+        if (!(HasOne() || buf.size())) { return; }
+        const auto op = std::bind(&::nng_msg_insert, get_message(), _1, _2);
         invocation::with_default_error_handling(op, (const void*)&buf[0], buf.size());
     }
 
-    void binary_message_body::ltrim(size_type sz) {
-        const auto msgp = get_message();
-        if (msgp == nullptr) { return; }
-        const auto op = std::bind(&::nng_msg_trim, msgp, _1);
+    void binary_message_body::TrimLeft(size_type sz) {
+        if (!HasOne()) { return; }
+        const auto op = std::bind(&::nng_msg_trim, get_message(), _1);
         invocation::with_default_error_handling(op, sz);
     }
 
-    void binary_message_body::rtrim(size_type sz) {
-        const auto msgp = get_message();
-        if (msgp == nullptr) { return; }
-        const auto op = std::bind(&::nng_msg_chop, msgp, _1);
+    void binary_message_body::TrimRight(size_type sz) {
+        if (!HasOne()) { return; }
+        const auto op = std::bind(&::nng_msg_chop, get_message(), _1);
         invocation::with_default_error_handling(op, sz);
     }
 
-    void binary_message_body::append(const uint32_t& val) {
-        const auto msgp = get_message();
-        if (msgp == nullptr) { return; }
-        const auto op = std::bind(&::nng_msg_append_u32, msgp, _1);
+    void binary_message_body::Append(uint32_t val) {
+        if (!HasOne()) { return; }
+        const auto op = std::bind(&::nng_msg_append_u32, get_message(), _1);
         invocation::with_default_error_handling(op, val);
     }
 
-    void binary_message_body::prepend(const uint32_t& val) {
-        const auto msgp = get_message();
-        if (msgp == nullptr) { return; }
-        const auto op = std::bind(&::nng_msg_insert_u32, msgp, _1);
+    void binary_message_body::Prepend(uint32_t val) {
+        if (!HasOne()) { return; }
+        const auto op = std::bind(&::nng_msg_insert_u32, get_message(), _1);
         invocation::with_default_error_handling(op, val);
     }
 
-    void binary_message_body::ltrim(uint32_t& val) {
-        const auto msgp = get_message();
-        if (msgp == nullptr) { return; }
-        const auto op = std::bind(&::nng_msg_trim_u32, msgp, _1);
+    void binary_message_body::TrimLeft(uint32_t& val) {
+        if (!HasOne()) { return; }
+        const auto op = std::bind(&::nng_msg_trim_u32, get_message(), _1);
         invocation::with_default_error_handling(op, &val);
     }
 
-    void binary_message_body::rtrim(uint32_t& val) {
-        const auto msgp = get_message();
-        if (msgp == nullptr) { return; }
-        const auto op = std::bind(&::nng_msg_chop_u32, msgp, _1);
+    void binary_message_body::TrimRight(uint32_t& val) {
+        if (!HasOne()) { return; }
+        const auto op = std::bind(&::nng_msg_chop_u32, get_message(), _1);
         invocation::with_default_error_handling(op, &val);
     }
 
-    void binary_message_body::append(const std::string& s) {
-        // Save the calories when we do not have an internal message.
-        const auto msgp = get_message();
+    void binary_message_body::Append(const std::string& s) {
         // Also bypass when the string is empty.
-        if (msgp == nullptr || !s.length()) { return; }
+        if (!(HasOne() || s.length())) { return; }
         buffer_vector_type buf(s.cbegin(), s.cend());
         // Which is a little redundant, but it saves calories.
-        append(buf);
+        Append(buf);
     }
 
-    void binary_message_body::prepend(const std::string& s) {
-        // Save the calories when we do not have an internal message.
-        const auto msgp = get_message();
+    void binary_message_body::Prepend(const std::string& s) {
         // Also bypass when the string is empty.
-        if (msgp == nullptr || !s.length()) { return; }
+        if (!(HasOne() || s.length())) { return; }
         buffer_vector_type buf(s.cbegin(), s.cend());
         // Which is a little redundant, but it saves calories.
-        prepend(buf);
+        Prepend(buf);
     }
 }

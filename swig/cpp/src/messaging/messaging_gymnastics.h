@@ -40,24 +40,24 @@ namespace nng {
         typedef Message_ message_type;
         typedef message_conversion_appender_policy<Target_, Message_> base_type;
 
-        virtual void append(message_type& lhs, const target_type& rhs) {
-            lhs.append(rhs);
+        virtual void Append(message_type& lhs, const target_type& rhs) {
+            lhs.Append(rhs);
         }
     };
 
     template<>
-    struct message_conversion_getter_policy<buffer_vector_type, supports_get_api<buffer_vector_type>> {
+    struct message_conversion_getter_policy<buffer_vector_type, ISupportsGet<buffer_vector_type>> {
 
-        virtual buffer_vector_type get(supports_get_api<buffer_vector_type>& rhs) {
+        virtual buffer_vector_type get(ISupportsGet<buffer_vector_type>& rhs) {
             return rhs.get();
         }
     };
 
     template<>
-    struct message_conversion_appender_policy<buffer_vector_type, supports_append_api<buffer_vector_type>> {
+    struct message_conversion_appender_policy<buffer_vector_type, ISupportsAppend<buffer_vector_type>> {
 
-        virtual void append(supports_append_api<buffer_vector_type>& lhs, const buffer_vector_type& rhs) {
-            lhs.append(rhs);
+        virtual void Append(ISupportsAppend<buffer_vector_type>& lhs, const buffer_vector_type& rhs) {
+            lhs.Append(rhs);
         }
     };
 
@@ -73,20 +73,20 @@ namespace nng {
     }
 
     template<>
-    struct message_conversion_getter_policy<std::string, supports_get_api<buffer_vector_type>> {
+    struct message_conversion_getter_policy<std::string, ISupportsGet<buffer_vector_type>> {
 
-        virtual std::string get(supports_get_api<buffer_vector_type>& rhs) {
+        virtual std::string get(ISupportsGet<buffer_vector_type>& rhs) {
             auto lhs_ = rhs.get();
             return gymanstic_convert<buffer_vector_type, std::string, std::string::value_type>(lhs_);
         }
     };
 
     template<>
-    struct message_conversion_appender_policy<std::string, supports_append_api<buffer_vector_type>> {
+    struct message_conversion_appender_policy<std::string, ISupportsAppend<buffer_vector_type>> {
 
-        virtual void append(supports_append_api<buffer_vector_type>& lhs, const std::string& rhs) {
+        virtual void Append(ISupportsAppend<buffer_vector_type>& lhs, const std::string& rhs) {
             auto buf_ = gymanstic_convert<std::string, buffer_vector_type, buffer_vector_type::value_type>(rhs);
-            lhs.append(buf_);
+            lhs.Append(buf_);
         }
     };
 
@@ -102,9 +102,9 @@ namespace nng {
     template<class Body_, class Header_>
     struct message_conversion_appender_policy<std::string, basic_binary_message<Body_, Header_>> {
 
-        virtual void append(binary_message& lhs, const std::string& rhs) {
+        virtual void Append(binary_message& lhs, const std::string& rhs) {
             const auto buf_ = gymanstic_convert<std::string, buffer_vector_type, buffer_vector_type::value_type>(rhs);
-            lhs.body()->append(buf_);
+            lhs.body()->Append(buf_);
         }
     };
 
@@ -119,9 +119,9 @@ namespace nng {
     template<class Body_, class Header_>
     struct message_conversion_appender_policy<buffer_vector_type, basic_binary_message<Body_, Header_>> {
 
-        virtual void append(binary_message& lhs, const buffer_vector_type& rhs) {
+        virtual void Append(binary_message& lhs, const buffer_vector_type& rhs) {
             auto buf_ = gymanstic_convert<buffer_vector_type, buffer_vector_type, buffer_vector_type::value_type>(rhs);
-            lhs.body()->append(buf_);
+            lhs.body()->Append(buf_);
         }
     };
 
@@ -137,9 +137,9 @@ namespace nng {
     template<>
     struct message_conversion_appender_policy<std::string, binary_message> {
 
-        virtual void append(binary_message& lhs, const std::string& rhs) {
+        virtual void Append(binary_message& lhs, const std::string& rhs) {
             const auto buf_ = gymanstic_convert<std::string, buffer_vector_type, buffer_vector_type::value_type>(rhs);
-            lhs.body()->append(buf_);
+            lhs.body()->Append(buf_);
         }
     };
 
@@ -154,16 +154,16 @@ namespace nng {
     template<>
     struct message_conversion_appender_policy<buffer_vector_type, binary_message> {
 
-        virtual void append(binary_message& lhs, const buffer_vector_type& rhs) {
+        virtual void Append(binary_message& lhs, const buffer_vector_type& rhs) {
             auto buf_ = gymanstic_convert<buffer_vector_type, buffer_vector_type, buffer_vector_type::value_type>(rhs);
-            lhs.body()->append(buf_);
+            lhs.body()->Append(buf_);
         }
     };
 
     template<class Body_, class Header_>
     binary_message& operator<<(basic_binary_message<Body_, Header_>& lhs, const buffer_vector_type& rhs) {
         auto ops = message_conversion_appender_policy<buffer_vector_type, binary_message>();
-        ops.append(lhs, rhs);
+        ops.Append(lhs, rhs);
         return lhs;
     }
 
@@ -177,7 +177,7 @@ namespace nng {
     template<class Body_, class Header_>
     binary_message& operator<<(basic_binary_message<Body_, Header_>& lhs, const std::string& rhs) {
         auto ops = message_conversion_appender_policy<std::string, binary_message>();
-        ops.append(lhs, rhs);
+        ops.Append(lhs, rhs);
         return lhs;
     }
 
@@ -196,13 +196,13 @@ namespace nng {
 
     binary_message& operator >> (binary_message& lhs, std::string& rhs);
 
-    supports_append_api<buffer_vector_type>& operator<<(supports_append_api<buffer_vector_type>& lhs, const buffer_vector_type& rhs);
+    ISupportsAppend<buffer_vector_type>& operator<<(ISupportsAppend<buffer_vector_type>& lhs, const buffer_vector_type& rhs);
 
-    supports_get_api<buffer_vector_type>& operator >> (supports_get_api<buffer_vector_type>& lhs, buffer_vector_type& rhs);
+    ISupportsGet<buffer_vector_type>& operator >> (ISupportsGet<buffer_vector_type>& lhs, buffer_vector_type& rhs);
 
-    supports_append_api<buffer_vector_type>& operator<<(supports_append_api<buffer_vector_type>& lhs, const std::string& rhs);
+    ISupportsAppend<buffer_vector_type>& operator<<(ISupportsAppend<buffer_vector_type>& lhs, const std::string& rhs);
 
-    supports_get_api<buffer_vector_type>& operator >> (supports_get_api<buffer_vector_type>& lhs, std::string& rhs);
+    ISupportsGet<buffer_vector_type>& operator >> (ISupportsGet<buffer_vector_type>& lhs, std::string& rhs);
 }
 
 #endif // NNGCPP_MESSAGING_GYMNASTICS_HPP

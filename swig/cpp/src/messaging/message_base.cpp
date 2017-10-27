@@ -92,21 +92,21 @@ namespace nng {
         _msgp = msgp;
     }
 
-    message_part::message_part(_MessageBase* basep)
+    _MessagePart::_MessagePart(_MessageBase* basep)
         : IHaveOne(), ISupportsClear(), supports_getting_msg()
         , _basep(basep) {
         THROW_BIN_MSG_BODY_INV_OP(_basep);
     }
 
-    message_part::~message_part() {
+    _MessagePart::~_MessagePart() {
         _basep = nullptr;
     }
 
-    msg_type* message_part::get_message() const {
+    msg_type* _MessagePart::get_message() const {
         return nng::get_msgp(_basep);
     }
 
-    bool message_part::HasOne() const {
+    bool _MessagePart::HasOne() const {
         return get_message() != nullptr;
     }
 }

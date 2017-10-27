@@ -61,7 +61,7 @@ namespace nng {
 
     msg_type* get_msgp(_MessageBase* const mbp);
 
-    class message_part
+    class _MessagePart
         : public IHaveOne
         , public ISupportsClear
         , public supports_getting_msg {
@@ -71,9 +71,9 @@ namespace nng {
 
     protected:
 
-        message_part(_MessageBase* basep);
+        _MessagePart(_MessageBase* basep);
 
-        virtual ~message_part();
+        virtual ~_MessagePart();
 
         virtual msg_type* get_message() const override;
 
@@ -84,6 +84,8 @@ namespace nng {
 
     // Define for internal use.
     typedef _MessageBase message_base;
+
+    typedef _MessagePart message_part;
 }
 
 #endif // NNGCPP_MESSAGE_BASE_H

@@ -146,7 +146,7 @@ TEST_CASE("Survey pattern using C++ wrapper", Catch::Tags("surveyor", "responden
             REQUIRE_NOTHROW(resp->try_receive(bmp.get()));
             REQUIRE_THAT(bmp->body()->get(), Equals(abc_buf));
 
-            REQUIRE_NOTHROW(bmp->body()->ltrim(abc.length()));
+            REQUIRE_NOTHROW(bmp->body()->TrimLeft(abc.length()));
             REQUIRE_NOTHROW(*bmp << def);
             REQUIRE_NOTHROW(resp->send(bmp.get()));
             REQUIRE_NOTHROW(surp->try_receive(bmp.get()));

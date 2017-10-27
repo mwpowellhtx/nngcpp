@@ -152,7 +152,7 @@ TEST_CASE("Request/reply pattern using C++ wrapper", Catch::Tags("req", "rep"
             REQUIRE_THAT(pongp->body()->get(), Equals(ping_buf));
 
             // Interesting, now use the Trim API.
-            REQUIRE_NOTHROW(pongp->body()->ltrim(ping.length()));
+            REQUIRE_NOTHROW(pongp->body()->TrimLeft(ping.length()));
             REQUIRE_NOTHROW(*pongp << pong);
             REQUIRE_NOTHROW(repp->send(pongp.get()));
             // Here we are using the above assertion to our advantage.

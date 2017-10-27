@@ -9,12 +9,30 @@
 
 namespace nng {
 
+#ifdef USING_SWIG
+
+    // Do this in order to workaround a SWIG concern not seeing the standard definition for ::uint32_t
+    typedef unsigned char uint8_t;
+    typedef unsigned int uint32_t;
+
+    typedef unsigned long long size_type;
+
+    typedef int duration_rep_type;
+
+#else // USING_SWIG
+
+    // TODO: TBD: unless perchance there is a way of telling SWIG what ALL of our include directories ought to be?
+    typedef ::uint8_t uint8_t;
+    typedef ::uint32_t uint32_t;
+
+    typedef std::size_t size_type;
+
     // TODO: TBD: trying to contain the underlying type definitions/change a best we can as relates to testing the API
     typedef ::nng_duration duration_rep_type;
 
-    typedef std::chrono::duration<duration_rep_type, std::milli> duration_type;
+#endif // USING_SWIG
 
-    typedef std::size_t size_type;
+    typedef std::chrono::duration<duration_rep_type, std::milli> duration_type;
 
     typedef ::nng_msg msg_type;
 }

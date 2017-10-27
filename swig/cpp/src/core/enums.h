@@ -12,8 +12,7 @@ namespace nng {
     enum flag_type {
         flag_none = 0,
         flag_alloc = ::NNG_FLAG_ALLOC,
-        flag_nonblock = ::NNG_FLAG_NONBLOCK,
-        flag_dryrun = NNG_FLAG_DRYRUN
+        flag_nonblock = ::NNG_FLAG_NONBLOCK
     };
 
     enum duration_ms : int32_t {

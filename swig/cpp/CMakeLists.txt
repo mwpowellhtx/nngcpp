@@ -1,9 +1,4 @@
 #
-#   Copyright (c) 2012 Martin Sustrik  All rights reserved.
-#   Copyright (c) 2013 GoPivotal, Inc.  All rights reserved.
-#   Copyright (c) 2015-2016 Jack R. Dunaway. All rights reserved.
-#   Copyright 2016 Franklin "Snaipe" Mathieu <franklinmathieu@gmail.com>
-#   Copyright 2017 Garrett D'Amore <garrett@damore.org>
 #   Copyright (c) 2017 Michael W. Powell <mwpowellhtx@gmail.com> All rights reserved.
 #
 #   Permission is hereby granted, free of charge, to any person obtaining a copy

@@ -13,7 +13,7 @@ namespace nng {
 
     binary_message& operator<<(binary_message& lhs, const buffer_vector_type& rhs) {
         auto ops = message_conversion_appender_policy<buffer_vector_type, binary_message>();
-        ops.append(lhs, rhs);
+        ops.Append(lhs, rhs);
         return lhs;
     }
 
@@ -25,7 +25,7 @@ namespace nng {
 
     binary_message& operator<<(binary_message& lhs, const std::string& rhs) {
         auto ops = message_conversion_appender_policy<std::string, binary_message>();
-        ops.append(lhs, rhs);
+        ops.Append(lhs, rhs);
         return lhs;
     }
 
@@ -35,26 +35,26 @@ namespace nng {
         return lhs;
     }
 
-    supports_append_api<buffer_vector_type>& operator<<(supports_append_api<buffer_vector_type>& lhs, const buffer_vector_type& rhs) {
-        auto ops = message_conversion_appender_policy<buffer_vector_type, supports_append_api<buffer_vector_type>>();
-        ops.append(lhs, rhs);
+    ISupportsAppend<buffer_vector_type>& operator<<(ISupportsAppend<buffer_vector_type>& lhs, const buffer_vector_type& rhs) {
+        auto ops = message_conversion_appender_policy<buffer_vector_type, ISupportsAppend<buffer_vector_type>>();
+        ops.Append(lhs, rhs);
         return lhs;
     }
 
-    supports_get_api<buffer_vector_type>& operator >> (supports_get_api<buffer_vector_type>& lhs, buffer_vector_type& rhs) {
-        auto ops = message_conversion_getter_policy<buffer_vector_type, supports_get_api<buffer_vector_type>>();
+    ISupportsGet<buffer_vector_type>& operator >> (ISupportsGet<buffer_vector_type>& lhs, buffer_vector_type& rhs) {
+        auto ops = message_conversion_getter_policy<buffer_vector_type, ISupportsGet<buffer_vector_type>>();
         rhs = ops.get(lhs);
         return lhs;
     }
 
-    supports_append_api<buffer_vector_type>& operator<<(supports_append_api<buffer_vector_type>& lhs, const std::string& rhs) {
-        auto ops = message_conversion_appender_policy<std::string, supports_append_api<buffer_vector_type>>();
-        ops.append(lhs, rhs);
+    ISupportsAppend<buffer_vector_type>& operator<<(ISupportsAppend<buffer_vector_type>& lhs, const std::string& rhs) {
+        auto ops = message_conversion_appender_policy<std::string, ISupportsAppend<buffer_vector_type>>();
+        ops.Append(lhs, rhs);
         return lhs;
     }
 
-    supports_get_api<buffer_vector_type>& operator >> (supports_get_api<buffer_vector_type>& lhs, std::string& rhs) {
-        auto ops = message_conversion_getter_policy<std::string, supports_get_api<buffer_vector_type>>();
+    ISupportsGet<buffer_vector_type>& operator >> (ISupportsGet<buffer_vector_type>& lhs, std::string& rhs) {
+        auto ops = message_conversion_getter_policy<std::string, ISupportsGet<buffer_vector_type>>();
         rhs = ops.get(lhs);
         return lhs;
     }

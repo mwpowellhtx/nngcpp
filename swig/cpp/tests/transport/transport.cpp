@@ -210,7 +210,7 @@ TEST_CASE("Test the transport using C++ wrappers", Catch::Tags(constants::prefix
         REQUIRE_NOTHROW(repp->try_receive(recvp.get()));
         REQUIRE_THAT(recvp->body()->get(), Equals(ping_buf));
 
-        REQUIRE_NOTHROW(recvp->body()->ltrim(ping.length()));
+        REQUIRE_NOTHROW(recvp->body()->TrimLeft(ping.length()));
         REQUIRE_NOTHROW(*recvp << acknowledge);
         REQUIRE_NOTHROW(repp->send(recvp.get()));
         REQUIRE_NOTHROW(reqp->try_receive(sendp.get()));
@@ -380,7 +380,7 @@ TEST_CASE("Test the transport in C style", Catch::Tags(constants::prefix_tags
         REQUIRE_NOTHROW(recvp->retain(msgp));
         REQUIRE_THAT(recvp->body()->get(), Equals(ping_buf));
 
-        REQUIRE_NOTHROW(recvp->body()->rtrim(ping.size()));
+        REQUIRE_NOTHROW(recvp->body()->TrimRight(ping.size()));
         REQUIRE_NOTHROW(*recvp << acknowledge);
         REQUIRE(::nng_sendmsg(rep, recvp->cede_message(), 0) == 0);
         msgp = nullptr;

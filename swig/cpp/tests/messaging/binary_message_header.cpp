@@ -106,6 +106,7 @@ TEST_CASE("Message part operates correctly", Catch::Tags("header"
     using namespace nng::exceptions;
     using namespace constants;
     using namespace Catch::Matchers;
+    using nng::uint32_t;
 
     SECTION("Message can be allocated properly") {
 
@@ -122,29 +123,29 @@ TEST_CASE("Message part operates correctly", Catch::Tags("header"
 
             SECTION("Appending a string throws an exception") {
                 // TODO: TBD: may want to throw stronger than "not implemented", i.e. "invalid_operation"
-                REQUIRE_THROWS_AS(partp->append(__empty), not_implemented);
+                REQUIRE_THROWS_AS(partp->Append(__empty), not_implemented);
             }
 
             SECTION("Appending a byte vector throws an exception") {
-                REQUIRE_THROWS_AS(partp->append(__empty_buf), not_implemented);
+                REQUIRE_THROWS_AS(partp->Append(__empty_buf), not_implemented);
             }
 
             size_type sz = 0;
 
             SECTION("Left Trim size_t throws an exception") {
-                REQUIRE_THROWS_AS(partp->ltrim(sz), not_implemented);
+                REQUIRE_THROWS_AS(partp->TrimLeft(sz), not_implemented);
             }
 
             SECTION("Right Trim size_t throws an exception") {
-                REQUIRE_THROWS_AS(partp->rtrim(sz), not_implemented);
+                REQUIRE_THROWS_AS(partp->TrimRight(sz), not_implemented);
             }
 
             // TODO: TBD: for now proceeding as though the 32-bit integer support is required.
             SECTION("Should support 32-bit integers") {
 
-                REQUIRE_NOTHROW(partp->append(reversed));
-                REQUIRE_NOTHROW(partp->prepend(value));
-                REQUIRE_NOTHROW(partp->append(value));
+                REQUIRE_NOTHROW(partp->Append(reversed));
+                REQUIRE_NOTHROW(partp->Prepend(value));
+                REQUIRE_NOTHROW(partp->Append(value));
                 REQUIRE_THAT(partp->get(), Equals(appended_data));
 
                 uint32_t trimmed = 0;
@@ -152,19 +153,19 @@ TEST_CASE("Message part operates correctly", Catch::Tags("header"
 
                 SECTION("Should support Left Trim of a 32-bit integer") {
 
-                    REQUIRE_NOTHROW(partp->ltrim(trimmed));
+                    REQUIRE_NOTHROW(partp->TrimLeft(trimmed));
                     REQUIRE(trimmed == value);
                     REQUIRE_THAT(partp->get(), Equals(remaining_after_ltrim));
 
                     SECTION("Should also support Right Trim of a 32-bit integer") {
 
-                        REQUIRE_NOTHROW(partp->rtrim(trimmed));
+                        REQUIRE_NOTHROW(partp->TrimRight(trimmed));
                         REQUIRE(trimmed == value);
                         REQUIRE_THAT(partp->get(), Equals(remaining_after_rtrim));
 
                         SECTION("One final 32-bit integer Trim") {
 
-                            REQUIRE_NOTHROW(partp->ltrim(trimmed));
+                            REQUIRE_NOTHROW(partp->TrimLeft(trimmed));
                             REQUIRE(trimmed == reversed);
                             REQUIRE_THAT(partp->get(), Equals(__empty_buf));
                         }

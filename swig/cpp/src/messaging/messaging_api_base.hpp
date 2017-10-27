@@ -3,29 +3,25 @@
 
 #include "message_base.h"
 
-
 namespace nng {
 
-    class message_header;
-    class message_body;
-
     template<typename Type_>
-    class supports_get_api {
+    class ISupportsGet {
     protected:
 
         typedef Type_ getter_type;
 
-        typedef supports_get_api<Type_> getter_api_type;
+        typedef ISupportsGet<Type_> ISupportsGetType;
 
     public:
 
         virtual size_type get_size() = 0;
 
-        virtual bool try_get(Type_& value) = 0;
+        virtual bool try_get(getter_type& value) = 0;
 
-        virtual const Type_ get() {
-            Type_ result;
-            return try_get(result) ? result : Type_();
+        virtual const getter_type get() {
+            getter_type result;
+            return try_get(result) ? result : getter_type();
         }
     };
 
@@ -53,65 +49,24 @@ namespace nng {
         }
     };
 
-    //template<typename... Args_> struct supports_append_api;
-
-    //template<typename Type_, typename... Args_>
-    //struct supports_append_api<Type_, Args_...> {
-    //};
-
-    //template<typename Type_>
-    //struct supports_append_api<Type_> {
-    //    virtual void append(const Type_& arg) = 0;
-    //};
-
     template<typename Type_>
-    struct supports_append_api {
-        virtual void append(const Type_& arg) = 0;
+    struct ISupportsAppend {
+        virtual void Append(Type_ val) = 0;
     };
 
-    //template<typename... Args_> struct supports_prepend_api;
-
-    //template<typename Type_, typename... Args_>
-    //struct supports_prepend_api<Type_, Args_...> {};
-
-    //template<typename Type_>
-    //struct supports_prepend_api<Type_> {
-    //    virtual void prepend(const Type_& arg) = 0;
-    //};
-
     template<typename Type_>
-    struct supports_prepend_api {
-        virtual void prepend(const Type_& arg) = 0;
+    struct ISupportsPrepend {
+        virtual void Prepend(Type_ val) = 0;
     };
 
-    //template<typename... Type_> struct supports_rtrim_api;
-
-    //template<typename Type_, typename... Args_>
-    //struct supports_rtrim_api<Type_, Args_...> {};
-
-    //template<typename Type_>
-    //struct supports_rtrim_api<Type_> {
-    //    virtual void rtrim(Type_ arg) = 0;
-    //};
-
     template<typename Type_>
-    struct supports_rtrim_api {
-        virtual void rtrim(Type_ arg) = 0;
+    struct ISupportsTrimRight {
+        virtual void TrimRight(Type_ val) = 0;
     };
 
-    //template<typename... Args_> struct supports_ltrim_api;
-
-    //template<typename Type_, typename... Args_>
-    //struct supports_ltrim_api<Type_, Args_...> {};
-
-    //template<typename Type_>
-    //struct supports_ltrim_api<Type_> {
-    //    virtual void ltrim(Type_ arg) = 0;
-    //};
-
     template<typename Type_>
-    struct supports_ltrim_api {
-        virtual void ltrim(Type_ arg) = 0;
+    struct ISupportsTrimLeft {
+        virtual void TrimLeft(Type_ val) = 0;
     };
 }
 

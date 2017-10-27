@@ -14,6 +14,8 @@
 
 #include <catch.hpp>
 
+//#include "core/types.h"
+
 namespace nng {
 
 #ifndef NNGCPP_BINARY_MESSAGE_H
@@ -31,44 +33,44 @@ namespace nng {
         virtual ~binary_message_part_fixture() {
         }
 
-        virtual void append(const uint32_t& x) override {
-            base_type::append(x);
+        virtual void Append(uint32_t x) override {
+            base_type::Append(x);
         }
 
-        virtual void append(const buffer_vector_type& x) override {
-            base_type::append(x);
+        virtual void Append(const buffer_vector_type& x) override {
+            base_type::Append(x);
         }
 
-        virtual void append(const std::string& x) override {
-            base_type::append(x);
+        virtual void Append(const std::string& x) override {
+            base_type::Append(x);
         }
 
-        virtual void prepend(const uint32_t& x) override {
-            base_type::prepend(x);
+        virtual void Prepend(uint32_t x) override {
+            base_type::Prepend(x);
         }
 
-        virtual void prepend(const buffer_vector_type& x) override {
-            base_type::prepend(x);
+        virtual void Prepend(const buffer_vector_type& x) override {
+            base_type::Prepend(x);
         }
 
-        virtual void prepend(const std::string& x) override {
-            base_type::prepend(x);
+        virtual void Prepend(const std::string& x) override {
+            base_type::Prepend(x);
         }
 
-        virtual void ltrim(size_type sz = 0) override {
-            base_type::ltrim(sz);
+        virtual void TrimLeft(size_type sz = 0) override {
+            base_type::TrimLeft(sz);
         }
 
-        virtual void ltrim(uint32_t& val) override {
-            base_type::ltrim(val);
+        virtual void TrimLeft(uint32_t& val) override {
+            base_type::TrimLeft(val);
         }
 
-        virtual void rtrim(size_type sz = 0) override {
-            base_type::rtrim(sz);
+        virtual void TrimRight(size_type sz = 0) override {
+            base_type::TrimRight(sz);
         }
 
-        virtual void rtrim(uint32_t& val) override {
-            base_type::rtrim(val);
+        virtual void TrimRight(uint32_t& val) override {
+            base_type::TrimRight(val);
         }
 
     protected:

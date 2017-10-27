@@ -105,6 +105,7 @@ TEST_CASE("Message part operates correctly", Catch::Tags("body"
     using namespace nng;
     using namespace constants;
     using namespace Catch::Matchers;
+    using nng::uint32_t;
 
     SECTION("Message can be allocated properly") {
 
@@ -122,7 +123,7 @@ TEST_CASE("Message part operates correctly", Catch::Tags("body"
 
             SECTION("Can append a string") {
 
-                REQUIRE_NOTHROW(partp->append(this_is_a_test));
+                REQUIRE_NOTHROW(partp->Append(this_is_a_test));
                 REQUIRE(partp->get_size() == this_is_a_test.length());
 
                 SECTION("Get is correct") {
@@ -131,11 +132,11 @@ TEST_CASE("Message part operates correctly", Catch::Tags("body"
 
                 SECTION("Right Trim is correct") {
 
-                    REQUIRE_NOTHROW(partp->rtrim(_a_test.length()));
+                    REQUIRE_NOTHROW(partp->TrimRight(_a_test.length()));
                     REQUIRE_THAT(partp->get(), Equals(this_is_buf));
 
                     SECTION("Left Trim is correct") {
-                        REQUIRE_NOTHROW(partp->ltrim(this_.length()));
+                        REQUIRE_NOTHROW(partp->TrimLeft(this_.length()));
                         REQUIRE_THAT(partp->get(), Equals(it_is_what_it_is_buf));
                     }
                 }
@@ -143,7 +144,7 @@ TEST_CASE("Message part operates correctly", Catch::Tags("body"
 
             SECTION("Can append a byte vector") {
 
-                REQUIRE_NOTHROW(partp->append(mathematics_is_cool));
+                REQUIRE_NOTHROW(partp->Append(mathematics_is_cool));
                 REQUIRE(partp->get_size() == mathematics_is_cool.length());
 
                 SECTION("Get is correct") {
@@ -152,11 +153,11 @@ TEST_CASE("Message part operates correctly", Catch::Tags("body"
 
                 SECTION("Right Trim is correct") {
 
-                    REQUIRE_NOTHROW(partp->rtrim(_cool.length()));
+                    REQUIRE_NOTHROW(partp->TrimRight(_cool.length()));
                     REQUIRE_THAT(partp->get(), Equals(mathematics_is_buf));
 
                     SECTION("Left Trim is correct") {
-                        REQUIRE_NOTHROW(partp->ltrim(mathematics_.length()));
+                        REQUIRE_NOTHROW(partp->TrimLeft(mathematics_.length()));
                         REQUIRE_THAT(partp->get(), Equals(it_is_what_it_is_buf));
                     }
                 }
@@ -164,8 +165,8 @@ TEST_CASE("Message part operates correctly", Catch::Tags("body"
 
             SECTION("Can append integers") {
 
-                REQUIRE_NOTHROW(partp->append(abcd_value));
-                REQUIRE_NOTHROW(partp->append(efgh_value));
+                REQUIRE_NOTHROW(partp->Append(abcd_value));
+                REQUIRE_NOTHROW(partp->Append(efgh_value));
 
                 SECTION("Get is correct") {
                     REQUIRE_THAT(partp->get(), Equals(abcdefgh_value_buf));
@@ -176,13 +177,13 @@ TEST_CASE("Message part operates correctly", Catch::Tags("body"
                 CHECK(!value);
 
                 SECTION("Left Trim is correct") {
-                    REQUIRE_NOTHROW(partp->ltrim(value));
+                    REQUIRE_NOTHROW(partp->TrimLeft(value));
                     REQUIRE(value == abcd_value);
                     REQUIRE_THAT(partp->get(), Equals(efgh_value_buf));
                 }
 
                 SECTION("Right Trim is correct") {
-                    REQUIRE_NOTHROW(partp->rtrim(value));
+                    REQUIRE_NOTHROW(partp->TrimRight(value));
                     REQUIRE(value == efgh_value);
                     REQUIRE_THAT(partp->get(), Equals(abcd_value_buf));
                 }
@@ -191,8 +192,8 @@ TEST_CASE("Message part operates correctly", Catch::Tags("body"
             SECTION("Can prepend integers") {
 
                 // Notice in reverse order from the append.
-                REQUIRE_NOTHROW(partp->prepend(efgh_value));
-                REQUIRE_NOTHROW(partp->prepend(abcd_value));
+                REQUIRE_NOTHROW(partp->Prepend(efgh_value));
+                REQUIRE_NOTHROW(partp->Prepend(abcd_value));
 
                 SECTION("Get is correct") {
                     REQUIRE_THAT(partp->get(), Equals(abcdefgh_value_buf));
@@ -203,13 +204,13 @@ TEST_CASE("Message part operates correctly", Catch::Tags("body"
                 CHECK(!value);
 
                 SECTION("Left Trim is correct") {
-                    REQUIRE_NOTHROW(partp->ltrim(value));
+                    REQUIRE_NOTHROW(partp->TrimLeft(value));
                     REQUIRE(value == abcd_value);
                     REQUIRE_THAT(partp->get(), Equals(efgh_value_buf));
                 }
 
                 SECTION("Right Trim is correct") {
-                    REQUIRE_NOTHROW(partp->rtrim(value));
+                    REQUIRE_NOTHROW(partp->TrimRight(value));
                     REQUIRE(value == efgh_value);
                     REQUIRE_THAT(partp->get(), Equals(abcd_value_buf));
                 }
