@@ -6,6 +6,9 @@
 
 #include "../types.h"
 
+#include "../having_one.hpp"
+#include "../can_close.hpp"
+
 #include <functional>
 
 namespace nng {
@@ -18,7 +21,7 @@ namespace nng {
     class binary_message;
 #endif // NNGCPP_BINARY_MESSAGE_H
 
-    class basic_async_service {
+    class basic_async_service : public IHaveOne, public ICanClose {
 
         friend class socket;
 
@@ -59,6 +62,16 @@ namespace nng {
 
         virtual ~basic_async_service();
 
+        virtual bool HasOne() const override;
+
+        virtual void Close() override;
+
+        virtual void Close(bool force);
+
+        virtual void start(const basic_callback_func& on_cb);
+
+        virtual void start();
+
         virtual void wait() const;
 
         virtual void stop() const;
@@ -68,6 +81,10 @@ namespace nng {
         virtual bool success() const;
 
         virtual bool try_success() const;
+
+        virtual void timed_wait(const duration_type& timeout);
+
+        virtual void timed_wait(duration_rep_type val);
 
         virtual void set(const duration_type& timeout);
 
@@ -80,6 +97,8 @@ namespace nng {
     private:
 
         basic_callback_func _on_cb;
+
+        void free();
     };
 }
 

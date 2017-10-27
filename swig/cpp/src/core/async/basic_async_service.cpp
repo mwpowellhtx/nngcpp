@@ -13,16 +13,20 @@ namespace nng {
     }
 
     basic_async_service::basic_async_service(const basic_callback_func& on_cb)
-        : _aiop(nullptr), _on_cb(on_cb)
+        : IHaveOne(), ICanClose()
+        , _aiop(nullptr), _on_cb()
         , _free(), _wait(), _stop(), _cancel()
         , _result(), _set_timeout(), _get_msg(), _set_msg() {
 
-        auto alloc = bind(&::nng_aio_alloc, _1, &basic_async_service::_aoi_cb, this);
-        invocation::with_default_error_handling(alloc, &_aiop);
-        configure(_aiop);
+        start(on_cb);
     }
 
     basic_async_service::~basic_async_service() {
+        free();
+    }
+
+    void basic_async_service::free() {
+        if (!HasOne()) { return; }
         invocation::with_void_return_value(_free);
         _aiop = nullptr;
     }
@@ -43,6 +47,36 @@ namespace nng {
         auto __selfp = static_cast<basic_async_service*>(selfp);
         if (!__selfp) throw invalid_operation("Invalid asynchronous callback");
         __selfp->_on_cb();
+    }
+
+    bool basic_async_service::HasOne() const {
+        return _aiop != nullptr;
+    }
+
+    void basic_async_service::Close() {
+        Close(false);
+    }
+
+    void basic_async_service::Close(bool force) {
+        if (force) { cancel(); }
+        else { stop(); }
+        // TODO: TBD: this is probably sufficient; may need to wait() however.
+        free();
+        configure(_aiop = nullptr);
+    }
+
+    void basic_async_service::start(const basic_callback_func& on_cb) {
+        // Calling this version of Start means we at least want to re-set the Callback.
+        _on_cb = on_cb;
+        start();
+    }
+
+    void basic_async_service::start() {
+        // This version of Start leaves the Callback intact, whatever was once upon a time.
+        if (HasOne()) { return; }
+        auto alloc = bind(&::nng_aio_alloc, _1, &basic_async_service::_aoi_cb, this);
+        invocation::with_default_error_handling(alloc, &_aiop);
+        configure(_aiop);
     }
 
     void basic_async_service::wait() const {
@@ -70,6 +104,16 @@ namespace nng {
             // TODO: TBD: may log the exception here...
             return false;
         }
+    }
+
+    void basic_async_service::timed_wait(const duration_type& timeout) {
+        set(timeout);
+        wait();
+    }
+
+    void basic_async_service::timed_wait(duration_rep_type val) {
+        set_timeout(val);
+        wait();
     }
 
     void basic_async_service::set(const duration_type& timeout) {
