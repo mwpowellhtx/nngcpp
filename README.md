@@ -1,5 +1,7 @@
 ## Welcome to C++ NNG
 
+Preface to say, the API is changing a little bit making preparations for SWIG engagement. When that firms up I will update the documentation here. In the meanwhile the names have not changed that dramatically nor have the underlying concepts changed whatsoever from previous versions.
+
 This library is at its core a C++1y compliant wrapper around the [next generation nanomsg](http://github.com/nanomsg/nng) Scalability Protocol (SP). As NNG is a work in progress, so too must this repository necessarily be considered a work in progress.
 
 ### Supported platforms
