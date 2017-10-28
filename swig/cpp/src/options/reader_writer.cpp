@@ -2,9 +2,9 @@
 
 namespace nng {
 
-    options_reader_writer::options_reader_writer() : options_reader(), options_writer() {
+    _OptionReaderWriter::_OptionReaderWriter() : _OptionReader(), _OptionWriter() {
     }
 
-    options_reader_writer::~options_reader_writer() {
+    _OptionReaderWriter::~_OptionReaderWriter() {
     }
 }

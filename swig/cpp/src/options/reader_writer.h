@@ -4,18 +4,17 @@
 #include "reader.h"
 #include "writer.h"
 
-#include <string>
-#include <functional>
-
 namespace nng {
 
-    class options_reader_writer : public options_reader, public options_writer {
+    class _OptionReaderWriter : public _OptionReader, public _OptionWriter {
     public:
 
-        options_reader_writer();
+        _OptionReaderWriter();
 
-        virtual ~options_reader_writer();
+        virtual ~_OptionReaderWriter();
     };
+
+    typedef _OptionReaderWriter options_reader_writer;
 }
 
 #endif // NNGCPP_OPTIONS_READER_WRITER_H

@@ -13,7 +13,7 @@ namespace nng {
     class endpoint
         : public IHaveOne
         , public ICanClose
-        , public ISupportOptions<options_reader_writer> {
+        , public ISupportOptions<_OptionReaderWriter> {
 
     protected:
 
@@ -24,6 +24,8 @@ namespace nng {
         virtual ~endpoint();
 
         virtual void start(flag_type flags = flag_none) = 0;
+
+        virtual _OptionReaderWriter* const GetOptions() override;
     };
 }
 

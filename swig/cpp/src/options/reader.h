@@ -28,7 +28,7 @@ namespace nng {
     class message_pipe;
 #endif // NNGCPP_DIALER_H
 
-    class options_reader {
+    class _OptionReader {
     public:
 
         typedef std::function<int(const char*, void* valp, size_type* szp)> getopt_func;
@@ -60,9 +60,9 @@ namespace nng {
 
     public:
 
-        options_reader();
+        _OptionReader();
 
-        virtual ~options_reader();
+        virtual ~_OptionReader();
 
         virtual void get(const std::string& name, void* valp, size_type& szp);
 
@@ -76,6 +76,8 @@ namespace nng {
         virtual void get(const std::string& name, duration_type& val);
         virtual void get_milliseconds(const std::string& name, duration_rep_type& val);
     };
+
+    typedef _OptionReader options_reader;
 }
 
 #endif // NNGCPP_OPTIONS_READER_H

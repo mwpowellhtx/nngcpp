@@ -10,4 +10,8 @@ namespace nng {
 
     endpoint::~endpoint() {
     }
+
+    endpoint::options_type* const endpoint::GetOptions() {
+        return support_options_type::GetOptions();
+    }
 }

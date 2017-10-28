@@ -25,6 +25,10 @@ namespace nng {
         Close();
     }
 
+    listener::options_type* const listener::GetOptions() {
+        return endpoint::GetOptions();
+    }
+
     void listener::start(flag_type flags) {
         const auto op = bind(&::nng_listener_start, lid, _1);
         invocation::with_default_error_handling(op, static_cast<int>(flags));

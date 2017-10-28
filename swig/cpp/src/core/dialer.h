@@ -38,6 +38,9 @@ namespace nng {
         virtual ~dialer();
 
         virtual void start(flag_type flags = flag_none);
+
+        _OptionReaderWriter* const GetOptions() override;
+
         virtual void Close() override;
 
         virtual bool HasOne() const override;

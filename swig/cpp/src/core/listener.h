@@ -37,7 +37,10 @@ namespace nng {
 
         virtual ~listener();
 
+        _OptionReaderWriter* const GetOptions() override;
+
         virtual void start(flag_type flags = flag_none);
+
         virtual void Close() override;
 
         virtual bool HasOne() const override;

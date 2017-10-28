@@ -20,7 +20,7 @@ namespace nng {
     class dialer;
 #endif // NNGCPP_DIALER_H
 
-    class options_writer {
+    class _OptionWriter {
     public:
 
         typedef std::function<int(const char*, const void*, size_type)> setopt_func;
@@ -51,9 +51,9 @@ namespace nng {
 
     public:
 
-        options_writer();
+        _OptionWriter();
 
-        virtual ~options_writer();
+        virtual ~_OptionWriter();
 
         virtual void set(const std::string& name, const void* valp, size_type sz);
         virtual void set(const std::string& name, const std::string& val);
@@ -64,6 +64,8 @@ namespace nng {
         virtual void set(const std::string& name, const duration_type& val);
         virtual void set_milliseconds(const std::string& name, duration_rep_type val);
     };
+
+    typedef _OptionWriter options_writer;
 }
 
 #endif // NNGCPP_OPTIONS_WRITER_H

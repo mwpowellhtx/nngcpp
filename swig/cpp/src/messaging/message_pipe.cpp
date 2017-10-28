@@ -28,6 +28,10 @@ namespace nng {
         Close();
     }
 
+    message_pipe::options_type* const message_pipe::GetOptions() {
+        return support_options_type::GetOptions();
+    }
+
     void message_pipe::Close() {
         if (!HasOne()) { return; }
         // TODO: TBD: should be fine trapping non-ec_enone RV's only; but consider whether ec_enoent was appropriate...

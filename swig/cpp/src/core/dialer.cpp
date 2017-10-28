@@ -25,6 +25,10 @@ namespace nng {
         Close();
     }
 
+    dialer::options_type* const dialer::GetOptions() {
+        return endpoint::GetOptions();
+    }
+
     void dialer::start(flag_type flags) {
         const auto& op = bind(&::nng_dialer_start, did, _1);
         invocation::with_default_error_handling(op, static_cast<int>(flags));

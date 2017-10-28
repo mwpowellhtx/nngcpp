@@ -14,6 +14,8 @@ namespace nng {
 
     protected:
 
+        typedef ISupportOptions<Options_> support_options_type;
+
         ISupportOptions() : _options() {}
 
     public:
