@@ -6,10 +6,10 @@
 namespace nng {
 
     template<typename Type_>
-    class ISupportsGet {
+    class ICanGet {
     protected:
 
-        typedef ISupportsGet<Type_> ISupportsGetType;
+        typedef ICanGet<Type_> ICanGetType;
 
     public:
 
@@ -50,22 +50,22 @@ namespace nng {
     };
 
     template<typename Type_>
-    struct ISupportsAppend {
+    struct ICanAppend {
         virtual void Append(Type_ val) = 0;
     };
 
     template<typename Type_>
-    struct ISupportsPrepend {
+    struct ICanPrepend {
         virtual void Prepend(Type_ val) = 0;
     };
 
     template<typename Type_>
-    struct ISupportsTrimRight {
+    struct ICanTrimRight {
         virtual void TrimRight(Type_ val) = 0;
     };
 
     template<typename Type_>
-    struct ISupportsTrimLeft {
+    struct ICanTrimLeft {
         virtual void TrimLeft(Type_ val) = 0;
     };
 }

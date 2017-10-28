@@ -232,7 +232,7 @@ TEST_CASE("We can create a linked push/pull pair", Catch::Tags("linked"
         REQUIRE_NOTHROW(bm << hello);
         REQUIRE_NOTHROW(pushsp->send(&bm));
         REQUIRE_NOTHROW(pullsp->try_receive(&bm));
-        REQUIRE_THAT(bm.body()->Get(), Equals(hello_buf));
+        REQUIRE_THAT(bm.GetBody()->Get(), Equals(hello_buf));
     }
 
     SECTION("Can close sockets") {
@@ -314,9 +314,9 @@ TEST_CASE("Load balancing works", Catch::Tags("load", "balancing", "pipeline"
     REQUIRE_NOTHROW(pushsp->send(defsp.get()));
 
     REQUIRE_NOTHROW(pullsp1->try_receive(abcsp.get()));
-    REQUIRE_THAT(abcsp->body()->Get(), Equals(abc_buf));
+    REQUIRE_THAT(abcsp->GetBody()->Get(), Equals(abc_buf));
     REQUIRE_NOTHROW(pullsp2->try_receive(defsp.get()));
-    REQUIRE_THAT(defsp->body()->Get(), Equals(def_buf));
+    REQUIRE_THAT(defsp->GetBody()->Get(), Equals(def_buf));
 
     // Yes, re-make the binary messages.
     REQUIRE_NOTHROW(abcsp = make_unique<binary_message>());

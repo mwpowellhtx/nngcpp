@@ -114,7 +114,7 @@ TEST_CASE("Message pipe subordinates properly", Catch::Tags("message", "pipe"
         REQUIRE(sendp->HasOne() == false);
         REQUIRE_NOTHROW(sp2->try_receive(recvp.get()));
         REQUIRE(recvp->HasOne() == true);
-        REQUIRE_THAT(recvp->body()->Get(), Equals(a_message_was_sent_buf));
+        REQUIRE_THAT(recvp->GetBody()->Get(), Equals(a_message_was_sent_buf));
 
         // And which here's the rub.
         REQUIRE_NOTHROW(mpp = make_unique<message_pipe>(recvp.get()));

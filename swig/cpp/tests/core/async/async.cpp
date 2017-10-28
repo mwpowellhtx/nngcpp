@@ -81,7 +81,7 @@ TEST_CASE("Asynchronous operations using C++ wrapper", Catch::Tags(
             REQUIRE(async_txp->success() == true);
 
             REQUIRE_NOTHROW(async_rxp->cede_message(bmp.get()));
-            REQUIRE_THAT(bmp->body()->Get(), Equals(hello_buf));
+            REQUIRE_THAT(bmp->GetBody()->Get(), Equals(hello_buf));
 
             REQUIRE(tx_count == 1);
             REQUIRE(rx_count == 1);

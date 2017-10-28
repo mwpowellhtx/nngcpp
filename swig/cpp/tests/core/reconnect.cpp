@@ -229,7 +229,7 @@ TEST_CASE("NNG C++ wrapper reconnect works", Catch::Tags(
                 REQUIRE_NOTHROW(pull->try_receive(bmp.get()));
                 REQUIRE(bmp->HasOne() == true);
                 // Just verify that the message matches the buffer.
-                REQUIRE_THAT(bmp->body()->Get(), Equals(hello_buf));
+                REQUIRE_THAT(bmp->GetBody()->Get(), Equals(hello_buf));
             }
         }
 
@@ -263,7 +263,7 @@ TEST_CASE("NNG C++ wrapper reconnect works", Catch::Tags(
                 REQUIRE_NOTHROW(pull->try_receive(bmp.get()));
                 REQUIRE(bmp->HasOne() == true);
                 // Just verify that the message matches the buffer.
-                REQUIRE_THAT(bmp->body()->Get(), Equals(hello_buf));
+                REQUIRE_THAT(bmp->GetBody()->Get(), Equals(hello_buf));
 
                 // TODO: TBD: this one deserves its own unit test as well so that we are not cluttering the integration tests
                 message_pipe_fixture mp1(bmp.get());
@@ -292,7 +292,7 @@ TEST_CASE("NNG C++ wrapper reconnect works", Catch::Tags(
                     REQUIRE_NOTHROW(pull->try_receive(bmp2.get()));
                     REQUIRE(bmp2->HasOne() == true);
                     // Just verify that the message matches the buffer.
-                    REQUIRE_THAT(bmp2->body()->Get(), Equals(again_buf));
+                    REQUIRE_THAT(bmp2->GetBody()->Get(), Equals(again_buf));
 
                     message_pipe_fixture mp2(bmp2.get());
                     REQUIRE(mp2.HasOne() == true);

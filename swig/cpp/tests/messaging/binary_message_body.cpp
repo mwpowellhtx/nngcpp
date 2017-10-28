@@ -85,7 +85,7 @@ TEST_CASE("Verify default message part", Catch::Tags("body"
         SECTION("Message part can be obtained from parent") {
 
             binary_message_body* partp;
-            REQUIRE_NOTHROW(partp = bmp->body());
+            REQUIRE_NOTHROW(partp = bmp->GetBody());
             REQUIRE(partp);
             REQUIRE(partp->HasOne() == bmp->HasOne());
             REQUIRE(partp->GetSize() == 0);
@@ -118,7 +118,7 @@ TEST_CASE("Message part operates correctly", Catch::Tags("body"
         SECTION("Part operation") {
 
             binary_message_body* partp;
-            REQUIRE_NOTHROW(partp = bmp->body());
+            REQUIRE_NOTHROW(partp = bmp->GetBody());
             REQUIRE(partp);
 
             SECTION("Can append a string") {

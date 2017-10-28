@@ -12,7 +12,7 @@
 
 #include "../core/types.h"
 
-#include "message_base.h"
+#include "message_part.h"
 
 #include "messaging_api_base.hpp"
 
@@ -24,19 +24,7 @@ namespace nng {
     template<class Body_, class Header_> class _BasicMessage;
 #endif //NNGCPP_STRING_BASED_MESSAGE_H
 
-    class _BodyMessagePart
-        : public _MessagePart
-        , public ISupportsGet<buffer_vector_type>
-        , public ISupportsAppend<const buffer_vector_type&>
-        , public ISupportsAppend<const std::string&>
-        , public ISupportsAppend<uint32_t>
-        , public ISupportsPrepend<const buffer_vector_type&>
-        , public ISupportsPrepend<const std::string&>
-        , public ISupportsPrepend<uint32_t>
-        , public ISupportsTrimLeft<size_type>
-        , public ISupportsTrimLeft<uint32_t*>
-        , public ISupportsTrimRight<size_type>
-        , public ISupportsTrimRight<uint32_t*> {
+    class _BodyMessagePart : public _MessagePart {
     protected:
 
         template<class Body_, class Header_> friend class _BasicMessage;
@@ -47,14 +35,13 @@ namespace nng {
 
         virtual ~_BodyMessagePart();
 
-        // TODO: TBD: ditto SWIG explicit concerns...
+        virtual bool HasOne() const override;
+
         virtual bool TryGet(buffer_vector_type const* resultp) override;
 
         virtual const buffer_vector_type Get() override;
 
         virtual size_type GetSize() override;
-
-    public:
 
         virtual void Clear() override;
 

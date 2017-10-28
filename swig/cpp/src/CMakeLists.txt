@@ -74,6 +74,7 @@ set (NNGCPP_CPP_SRCS
     core/exceptions/transport_error.cpp
     core/exceptions/transport_error.h
     messaging/messaging.h
+    messaging/basic_binary_message.hpp
     messaging/binary_message.cpp
     messaging/binary_message.h
     messaging/binary_message_body.cpp
@@ -82,6 +83,8 @@ set (NNGCPP_CPP_SRCS
     messaging/binary_message_header.h
     messaging/message_base.cpp
     messaging/message_base.h
+    messaging/message_part.cpp
+    messaging/message_part.h
     messaging/message_pipe.cpp
     messaging/message_pipe.h
     messaging/messaging_utils.cpp

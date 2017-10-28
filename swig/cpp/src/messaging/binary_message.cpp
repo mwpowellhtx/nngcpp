@@ -12,9 +12,25 @@ namespace nng {
         // We do not want to alter the given Other...
         auto op_ = const_cast<_Message*>(&other);
         // But yet we still need to thread the needle.
-        header()->Append(op_->header()->Get());
-        body()->Append(op_->body()->Get());
+        GetHeader()->Append(op_->GetHeader()->Get());
+        GetBody()->Append(op_->GetBody()->Get());
     }
 
     _Message::~_Message() {}
+
+    _Message::header_type* const _Message::GetHeader() {
+        return basic_message_type::GetHeader();
+    }
+
+    _Message::body_type* const _Message::GetBody() {
+        return basic_message_type::GetBody();
+    }
+
+    size_type _Message::GetSize() {
+        return basic_message_type::GetSize();
+    }
+
+    void _Message::Clear() {
+        return basic_message_type::Clear();
+    }
 }

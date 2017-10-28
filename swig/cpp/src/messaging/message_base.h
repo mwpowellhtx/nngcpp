@@ -11,7 +11,7 @@
 
 namespace nng {
 
-    struct ISupportsClear {
+    struct IClearable {
         virtual void Clear() = 0;
     };
 
@@ -24,7 +24,7 @@ namespace nng {
 
     class _MessageBase
         : public IHaveOne
-        , public ISupportsClear
+        , public IClearable
         , public supports_getting_msg {
     private:
 
@@ -61,31 +61,8 @@ namespace nng {
 
     msg_type* get_msgp(_MessageBase* const mbp);
 
-    class _MessagePart
-        : public IHaveOne
-        , public ISupportsClear
-        , public supports_getting_msg {
-    private:
-
-        _MessageBase* _basep;
-
-    protected:
-
-        _MessagePart(_MessageBase* basep);
-
-        virtual ~_MessagePart();
-
-        virtual msg_type* get_message() const override;
-
-    public:
-
-        virtual bool HasOne() const override;
-    };
-
     // Define for internal use.
     typedef _MessageBase message_base;
-
-    typedef _MessagePart message_part;
 }
 
 #endif // NNGCPP_MESSAGE_BASE_H

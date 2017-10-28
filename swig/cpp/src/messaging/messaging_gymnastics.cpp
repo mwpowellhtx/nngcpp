@@ -35,26 +35,26 @@ namespace nng {
         return lhs;
     }
 
-    ISupportsAppend<buffer_vector_type>& operator<<(ISupportsAppend<buffer_vector_type>& lhs, const buffer_vector_type& rhs) {
-        auto ops = message_conversion_appender_policy<buffer_vector_type, ISupportsAppend<buffer_vector_type>>();
+    ICanAppend<buffer_vector_type>& operator<<(ICanAppend<buffer_vector_type>& lhs, const buffer_vector_type& rhs) {
+        auto ops = message_conversion_appender_policy<buffer_vector_type, ICanAppend<buffer_vector_type>>();
         ops.Append(lhs, rhs);
         return lhs;
     }
 
-    ISupportsGet<buffer_vector_type>& operator >> (ISupportsGet<buffer_vector_type>& lhs, buffer_vector_type& rhs) {
-        auto ops = message_conversion_getter_policy<buffer_vector_type, ISupportsGet<buffer_vector_type>>();
+    ICanGet<buffer_vector_type>& operator >> (ICanGet<buffer_vector_type>& lhs, buffer_vector_type& rhs) {
+        auto ops = message_conversion_getter_policy<buffer_vector_type, ICanGet<buffer_vector_type>>();
         rhs = ops.Get(lhs);
         return lhs;
     }
 
-    ISupportsAppend<buffer_vector_type>& operator<<(ISupportsAppend<buffer_vector_type>& lhs, const std::string& rhs) {
-        auto ops = message_conversion_appender_policy<std::string, ISupportsAppend<buffer_vector_type>>();
+    ICanAppend<buffer_vector_type>& operator<<(ICanAppend<buffer_vector_type>& lhs, const std::string& rhs) {
+        auto ops = message_conversion_appender_policy<std::string, ICanAppend<buffer_vector_type>>();
         ops.Append(lhs, rhs);
         return lhs;
     }
 
-    ISupportsGet<buffer_vector_type>& operator >> (ISupportsGet<buffer_vector_type>& lhs, std::string& rhs) {
-        auto ops = message_conversion_getter_policy<std::string, ISupportsGet<buffer_vector_type>>();
+    ICanGet<buffer_vector_type>& operator >> (ICanGet<buffer_vector_type>& lhs, std::string& rhs) {
+        auto ops = message_conversion_getter_policy<std::string, ICanGet<buffer_vector_type>>();
         rhs = ops.Get(lhs);
         return lhs;
     }

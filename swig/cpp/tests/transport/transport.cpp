@@ -208,13 +208,13 @@ TEST_CASE("Test the transport using C++ wrappers", Catch::Tags(constants::prefix
 
         REQUIRE_NOTHROW(recvp = make_unique<binary_message>(nullptr));
         REQUIRE_NOTHROW(repp->try_receive(recvp.get()));
-        REQUIRE_THAT(recvp->body()->Get(), Equals(ping_buf));
+        REQUIRE_THAT(recvp->GetBody()->Get(), Equals(ping_buf));
 
-        REQUIRE_NOTHROW(recvp->body()->TrimLeft(ping.length()));
+        REQUIRE_NOTHROW(recvp->GetBody()->TrimLeft(ping.length()));
         REQUIRE_NOTHROW(*recvp << acknowledge);
         REQUIRE_NOTHROW(repp->send(recvp.get()));
         REQUIRE_NOTHROW(reqp->try_receive(sendp.get()));
-        REQUIRE_THAT(sendp->body()->Get(), Equals(acknowledge_buf));
+        REQUIRE_THAT(sendp->GetBody()->Get(), Equals(acknowledge_buf));
 
         REQUIRE_NOTHROW(pp = make_unique<message_pipe>(sendp.get()));
         REQUIRE(pp->HasOne() == true);
@@ -257,7 +257,7 @@ TEST_CASE("Test the transport using C++ wrappers", Catch::Tags(constants::prefix
         REQUIRE_NOTHROW(recvp = make_unique<binary_message>(nullptr));
         REQUIRE_NOTHROW(repp->try_receive(recvp.get()));
         // Heaven help us if this fails: expect report to be truncated due to excessive size.
-        REQUIRE_THAT(recvp->body()->Get(), Equals(data));
+        REQUIRE_THAT(recvp->GetBody()->Get(), Equals(data));
 
         REQUIRE_NOTHROW(twos_compliment_buffer(data));
         REQUIRE_NOTHROW(recvp = make_unique<binary_message>());
@@ -266,7 +266,7 @@ TEST_CASE("Test the transport using C++ wrappers", Catch::Tags(constants::prefix
         REQUIRE_NOTHROW(sendp = make_unique<binary_message>(nullptr));
         REQUIRE_NOTHROW(reqp->try_receive(sendp.get()));
         // Ditto excessive size truncation.
-        REQUIRE_THAT(sendp->body()->Get(), Equals(data));
+        REQUIRE_THAT(sendp->GetBody()->Get(), Equals(data));
     }
 }
 
@@ -378,16 +378,16 @@ TEST_CASE("Test the transport in C style", Catch::Tags(constants::prefix_tags
         REQUIRE(::nng_recvmsg(rep, &msgp, 0) == 0);
         REQUIRE(msgp);
         REQUIRE_NOTHROW(recvp->retain(msgp));
-        REQUIRE_THAT(recvp->body()->Get(), Equals(ping_buf));
+        REQUIRE_THAT(recvp->GetBody()->Get(), Equals(ping_buf));
 
-        REQUIRE_NOTHROW(recvp->body()->TrimRight(ping.size()));
+        REQUIRE_NOTHROW(recvp->GetBody()->TrimRight(ping.size()));
         REQUIRE_NOTHROW(*recvp << acknowledge);
         REQUIRE(::nng_sendmsg(rep, recvp->cede_message(), 0) == 0);
         msgp = nullptr;
         REQUIRE(::nng_recvmsg(req, &msgp, 0) == 0);
         REQUIRE(msgp);
         REQUIRE_NOTHROW(sendp->retain(msgp));
-        REQUIRE_THAT(sendp->body()->Get(), Equals(acknowledge_buf));
+        REQUIRE_THAT(sendp->GetBody()->Get(), Equals(acknowledge_buf));
 
         REQUIRE_NOTHROW(p = ::nng_msg_get_pipe(sendp->get_message()));
         REQUIRE(p);

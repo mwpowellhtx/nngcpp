@@ -12,7 +12,7 @@
 
 #include "../core/types.h"
 
-#include "message_base.h"
+#include "message_part.h"
 
 #include "messaging_api_base.hpp"
 
@@ -25,19 +25,7 @@ namespace nng {
 #endif //NNGCPP_BINARY_MESSAGE_H
 
     // TODO: TBD: potentially handling these as a string-based as well...
-    class _HeaderMessagePart
-        : public _MessagePart
-        , public ISupportsGet<buffer_vector_type>
-        , public ISupportsAppend<uint32_t>
-        , public ISupportsAppend<const buffer_vector_type&>
-        , public ISupportsAppend<const std::string&>
-        , public ISupportsPrepend<uint32_t>
-        , public ISupportsPrepend<const buffer_vector_type&>
-        , public ISupportsPrepend<const std::string&>
-        , public ISupportsTrimLeft<size_type>
-        , public ISupportsTrimLeft<uint32_t*>
-        , public ISupportsTrimRight<size_type>
-        , public ISupportsTrimRight<uint32_t*> {
+    class _HeaderMessagePart : public _MessagePart {
     protected:
 
         template<class Body_, class Header_> friend class _BasicMessage;
@@ -47,6 +35,8 @@ namespace nng {
     public:
 
         virtual ~_HeaderMessagePart();
+
+        virtual bool HasOne() const override;
 
         // TODO: TBD: we could leverage the base class type definitions; hwoever, the SWIG exposure forces us to be explicit here, unfortunately
         virtual bool TryGet(buffer_vector_type const* resultp) override;
@@ -58,17 +48,17 @@ namespace nng {
         // TODO: TBD: so if header is truly "read-only" then it is debatable whether "clear" should be exposed via header...
         virtual void Clear() override;
 
-        virtual void Append(uint32_t val) override;
-
         virtual void Append(const buffer_vector_type& buf) override;
 
         virtual void Append(const std::string& s) override;
 
-        virtual void Prepend(uint32_t val) override;
+        virtual void Append(uint32_t val) override;
 
         virtual void Prepend(const buffer_vector_type& buf) override;
 
         virtual void Prepend(const std::string& s) override;
+
+        virtual void Prepend(uint32_t val) override;
 
         virtual void TrimLeft(size_type sz) override;
 

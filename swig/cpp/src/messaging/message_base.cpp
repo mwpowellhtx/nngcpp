@@ -1,10 +1,6 @@
 #include "message_base.h"
 #include "../core/invocation.hpp"
 
-#define THROW_BIN_MSG_BODY_INV_OP(basep) \
-            if (!basep) \
-                throw nng::exceptions::invalid_operation("binary message body cannot exist apart from a parent message")
-
 namespace nng {
 
     using std::placeholders::_1;
@@ -16,21 +12,21 @@ namespace nng {
     }
 
     _MessageBase::_MessageBase()
-        : IHaveOne(), ISupportsClear(), supports_getting_msg()
+        : IHaveOne(), IClearable(), supports_getting_msg()
         , _msgp(nullptr) {
 
         allocate();
     }
 
     _MessageBase::_MessageBase(size_type sz)
-        : IHaveOne(), ISupportsClear(), supports_getting_msg()
+        : IHaveOne(), IClearable(), supports_getting_msg()
         , _msgp(nullptr) {
 
         allocate(sz);
     }
 
     _MessageBase::_MessageBase(msg_type* msgp)
-        : IHaveOne(), ISupportsClear(), supports_getting_msg()
+        : IHaveOne(), IClearable(), supports_getting_msg()
         , _msgp(msgp) {
     }
 
@@ -90,23 +86,5 @@ namespace nng {
     void _MessageBase::retain(msg_type* msgp) {
         free();
         _msgp = msgp;
-    }
-
-    _MessagePart::_MessagePart(_MessageBase* basep)
-        : IHaveOne(), ISupportsClear(), supports_getting_msg()
-        , _basep(basep) {
-        THROW_BIN_MSG_BODY_INV_OP(_basep);
-    }
-
-    _MessagePart::~_MessagePart() {
-        _basep = nullptr;
-    }
-
-    msg_type* _MessagePart::get_message() const {
-        return nng::get_msgp(_basep);
-    }
-
-    bool _MessagePart::HasOne() const {
-        return get_message() != nullptr;
     }
 }

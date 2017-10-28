@@ -104,7 +104,7 @@ TEST_CASE("Can write (append) to and read (get) from binary message using string
 
 // I dislike declarations via MACRO, but in this case I will make an exception.
 #define NNGCPP_TESTS_EXPOSE_BINARY_MESSAGE_BODY(bm, bmb) \
-    auto* bmb = bm.body(); \
+    auto* bmb = bm.GetBody(); \
     REQUIRE(bmb != nullptr)
 
 TEST_CASE("Can write (append) to and read (get) from binary message body using byte vector"

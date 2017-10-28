@@ -71,7 +71,7 @@ TEST_CASE("Verify default message part", Catch::Tags("header"
         SECTION("Message part can be obtained from parent") {
 
             binary_message_header* headerp;
-            REQUIRE_NOTHROW(headerp = bmp->header());
+            REQUIRE_NOTHROW(headerp = bmp->GetHeader());
             REQUIRE(headerp);
             REQUIRE(headerp->HasOne() == bmp->HasOne());
             REQUIRE(headerp->GetSize() == 0);
@@ -118,7 +118,7 @@ TEST_CASE("Message part operates correctly", Catch::Tags("header"
 
             binary_message_header_fixture* partp;
 
-            REQUIRE_NOTHROW(partp = bmp->header());
+            REQUIRE_NOTHROW(partp = bmp->GetHeader());
             REQUIRE(partp);
 
             SECTION("Appending a string throws an exception") {

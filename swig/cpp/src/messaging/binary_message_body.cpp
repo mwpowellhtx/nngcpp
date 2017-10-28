@@ -23,6 +23,11 @@ namespace nng {
     _BodyMessagePart::~_BodyMessagePart() {
     }
 
+    bool _BodyMessagePart::HasOne() const {
+        //return _MessagePart::HasOne();
+        return get_message() != nullptr;
+    }
+
     size_type _BodyMessagePart::GetSize() {
         auto result = static_cast<size_type>(0);
         if (!HasOne()) { return result; }
@@ -32,7 +37,7 @@ namespace nng {
     }
 
     const buffer_vector_type _BodyMessagePart::Get() {
-        return ISupportsGetType::Get();
+        return ICanGetType::Get();
     }
 
     bool _BodyMessagePart::TryGet(buffer_vector_type const* resultp) {

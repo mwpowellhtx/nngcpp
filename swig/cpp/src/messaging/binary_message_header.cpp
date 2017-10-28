@@ -29,6 +29,11 @@ namespace nng {
     _HeaderMessagePart::~_HeaderMessagePart() {
     }
 
+    bool _HeaderMessagePart::HasOne() const {
+        //return _MessagePart::HasOne();
+        return get_message() != nullptr;
+    }
+
     size_type _HeaderMessagePart::GetSize() {
         const auto msgp = get_message();
         const auto op = bind(&::nng_msg_header_len, msgp);
@@ -36,7 +41,7 @@ namespace nng {
     }
 
     const buffer_vector_type _HeaderMessagePart::Get() {
-        return ISupportsGetType::Get();
+        return ICanGetType::Get();
     }
 
     // TODO: TBD: this is fairly redundant with body: there has got to be a better way to capture this as a cross cutting concern...

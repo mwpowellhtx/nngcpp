@@ -86,8 +86,8 @@ TEST_CASE("Binary messages work", "[binary_message][messaging][cxx]") {
 
                 NNGCPP_TESTS_INIT_SMART_PTR(bmp, std::make_unique<binary_message_fixture>());
 
-                REQUIRE(bmp->body() != nullptr);
-                REQUIRE(bmp->header() != nullptr);
+                REQUIRE(bmp->GetBody() != nullptr);
+                REQUIRE(bmp->GetHeader() != nullptr);
                 REQUIRE(bmp->HasOne() == true);
                 REQUIRE(bmp->get_message() != nullptr);
 
@@ -104,8 +104,8 @@ TEST_CASE("Binary messages work", "[binary_message][messaging][cxx]") {
 
                 NNGCPP_TESTS_INIT_SMART_PTR(bmp, std::make_unique<binary_message_fixture>(msgp));
 
-                REQUIRE(bmp->body() != nullptr);
-                REQUIRE(bmp->header() != nullptr);
+                REQUIRE(bmp->GetBody() != nullptr);
+                REQUIRE(bmp->GetHeader() != nullptr);
                 REQUIRE(bmp->HasOne() == true);
                 REQUIRE(bmp->get_message() == msgp);
 
