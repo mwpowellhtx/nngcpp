@@ -31,17 +31,19 @@ namespace nng {
         invocation::with_default_error_handling(_getopt, name.c_str(), valp, &sz);
     }
 
-    void _OptionReader::get(const std::string& name, std::string& val, size_type& sz) {
-        val.resize(sz);
-        get(name, val);
+    std::string _OptionReader::GetText(const std::string& name) {
+        // TODO: TBD: for lack of a better definition for the moment...
+        size_type sz = _MAX_PATH;
+        return GetText(name, &sz);
     }
 
-    void _OptionReader::get(const std::string& name, std::string& val) {
-        auto sz = val.size();
-        invocation::with_default_error_handling(_getopt, name.c_str(), &val[0], &sz);
+    std::string _OptionReader::GetText(const std::string& name, size_type* const szp) {
+        std::string s;
+        s.resize(*szp);
+        invocation::with_default_error_handling(_getopt, name.c_str(), &s[0], szp);
         /* So we do use the string trimming algorithms after all...
         Which the in-place is sufficient, no need to use the copying version. */
-        trx::trim(val);
+        return trx::trimcp(s);
     }
 
     void _OptionReader::get(const std::string& name, address& val) {
@@ -49,21 +51,26 @@ namespace nng {
         invocation::with_default_error_handling(_getopt, name.c_str(), val.get(), &sz);
     }
 
-    void _OptionReader::get_int(const std::string& name, int& val) {
+    int _OptionReader::GetInt32(const std::string& name) {
+        int val;
         invocation::with_default_error_handling(_getopt_int, name.c_str(), &val);
+        return val;
     }
 
-    void _OptionReader::get_sz(const std::string& name, size_type& val) {
-        invocation::with_default_error_handling(_getopt_sz, name.c_str(), &val);
+    size_type _OptionReader::GetSize(const std::string& name) {
+        size_type result;
+        invocation::with_default_error_handling(_getopt_sz, name.c_str(), &result);
+        return result;
     }
 
-    void _OptionReader::get(const std::string& name, duration_type& val) {
-        duration_rep_type x;
-        get_milliseconds(name, x);
-        val = duration_type(x);
+    duration_type _OptionReader::GetDuration(const std::string& name) {
+        auto x = GetMilliseconds(name);
+        return duration_type(x);
     }
 
-    void _OptionReader::get_milliseconds(const std::string& name, duration_rep_type& val) {
-        invocation::with_default_error_handling(_getopt_duration, name.c_str(), &val);
+    duration_rep_type _OptionReader::GetMilliseconds(const std::string& name) {
+        duration_rep_type result;
+        invocation::with_default_error_handling(_getopt_duration, name.c_str(), &result);
+        return result;
     }
 }

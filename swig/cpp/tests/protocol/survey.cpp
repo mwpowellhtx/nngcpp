@@ -73,7 +73,7 @@ TEST_CASE("Survey pattern using C++ wrapper", Catch::Tags("surveyor", "responden
 
 		SECTION("Survey without responder times out") {
 
-            REQUIRE_NOTHROW(surp->GetOptions()->set(O::surveyor_survey_time_duration, 50ms));
+            REQUIRE_NOTHROW(surp->GetOptions()->set(O::surveyor_survey_duration, 50ms));
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
             REQUIRE_NOTHROW(surp->send(bmp.get()));
@@ -123,7 +123,7 @@ TEST_CASE("Survey pattern using C++ wrapper", Catch::Tags("surveyor", "responden
 
         //	nng_socket sock;
 
-        REQUIRE_NOTHROW(surp->GetOptions()->set(O::surveyor_survey_time_duration, 50ms));
+        REQUIRE_NOTHROW(surp->GetOptions()->set(O::surveyor_survey_duration, 50ms));
 
         REQUIRE_NOTHROW(surp->listen(test_addr));
         REQUIRE_NOTHROW(resp->dial(test_addr));

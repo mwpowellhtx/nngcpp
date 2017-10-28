@@ -66,15 +66,16 @@ namespace nng {
 
         virtual void get(const std::string& name, void* valp, size_type& szp);
 
-        virtual void get(const std::string& name, std::string& val, size_type& sz);
-        virtual void get(const std::string& name, std::string& val);
+        virtual std::string GetText(const std::string& name);
+        virtual std::string GetText(const std::string& name, size_type* const szp);
+
         virtual void get(const std::string& name, address& val);
 
-        virtual void get_int(const std::string& name, int& val);
-        virtual void get_sz(const std::string& name, size_type& val);
+        virtual int32_t GetInt32(const std::string& name);
+        virtual size_type GetSize(const std::string& name);
 
-        virtual void get(const std::string& name, duration_type& val);
-        virtual void get_milliseconds(const std::string& name, duration_rep_type& val);
+        virtual duration_type GetDuration(const std::string& name);
+        virtual duration_rep_type GetMilliseconds(const std::string& name);
     };
 
     typedef _OptionReader options_reader;

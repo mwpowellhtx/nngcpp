@@ -533,7 +533,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
 
                 // TODO: TBD: ditto options unit tests...
                 REQUIRE_NOTHROW(serverp1->GetOptions()->set_int(O::max_ttl, expected));
-                REQUIRE_NOTHROW(serverp1->GetOptions()->get_int(O::max_ttl, ttl));
+                REQUIRE_NOTHROW(ttl = serverp1->GetOptions()->GetInt32(O::max_ttl));
                 REQUIRE(ttl == expected);
 
                 SECTION("Bad TTL bounces") {
@@ -595,11 +595,11 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
         SECTION("Polyamorous cooked mode works") {
 
             // TODO: TBD: so all these hoops opening up this case need to be part of the narrower scope options unit test
-            REQUIRE_NOTHROW(serverp1->GetOptions()->get_int(O::pair1_polyamorous, actual_opt));
+            REQUIRE_NOTHROW(actual_opt = serverp1->GetOptions()->GetInt32(O::pair1_polyamorous));
             REQUIRE(actual_opt == 0);
 
             REQUIRE_NOTHROW(serverp1->GetOptions()->set_int(O::pair1_polyamorous, 1));
-            REQUIRE_NOTHROW(serverp1->GetOptions()->get_int(O::pair1_polyamorous, actual_opt));
+            REQUIRE_NOTHROW(actual_opt = serverp1->GetOptions()->GetInt32(O::pair1_polyamorous));
             REQUIRE(actual_opt == 1);
 
             REQUIRE_NOTHROW(serverp1->listen(addr));
@@ -682,17 +682,17 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
         SECTION("Polyamorous raw mode works") {
 
             // TODO: TBD: here we go again, doing hoop jumping that really belongs in its own unit tests for options...
-            REQUIRE_NOTHROW(serverp1->GetOptions()->get_int(O::pair1_polyamorous, actual_opt));
+            REQUIRE_NOTHROW(actual_opt = serverp1->GetOptions()->GetInt32(O::pair1_polyamorous));
             REQUIRE(actual_opt == 0);
 
             REQUIRE_NOTHROW(serverp1->GetOptions()->set_int(O::pair1_polyamorous, 1));
-            REQUIRE_NOTHROW(serverp1->GetOptions()->get_int(O::pair1_polyamorous, actual_opt));
+            REQUIRE_NOTHROW(actual_opt = serverp1->GetOptions()->GetInt32(O::pair1_polyamorous));
             REQUIRE(actual_opt == 1);
 
             // TODO: It probably serves a purpose on one level; but if we test it in its own unit test, we can just set it and be done with it, with confidence.
             actual_opt = 0;
             REQUIRE_NOTHROW(serverp1->GetOptions()->set_int(O::raw, 1));
-            REQUIRE_NOTHROW(serverp1->GetOptions()->get_int(O::raw, actual_opt));
+            REQUIRE_NOTHROW(actual_opt = serverp1->GetOptions()->GetInt32(O::raw));
             REQUIRE(actual_opt == 1);
 
             REQUIRE_NOTHROW(serverp1->listen(addr));

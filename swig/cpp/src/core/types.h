@@ -12,6 +12,8 @@ namespace nng {
 #ifdef USING_SWIG
 
     // Do this in order to workaround a SWIG concern not seeing the standard definition for ::uint32_t
+    typedef int int32_t;
+
     typedef unsigned char uint8_t;
     typedef unsigned int uint32_t;
 
@@ -22,6 +24,8 @@ namespace nng {
 #else // USING_SWIG
 
     // TODO: TBD: unless perchance there is a way of telling SWIG what ALL of our include directories ought to be?
+    typedef ::int32_t int32_t;
+
     typedef ::uint8_t uint8_t;
     typedef ::uint32_t uint32_t;
 

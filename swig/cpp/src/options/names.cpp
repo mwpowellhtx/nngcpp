@@ -6,7 +6,7 @@
 namespace nng {
 
     using std::string;
-    using O = OptionNames;
+    using O = _OptionNames;
 
     const string O::socket_name = NNG_OPT_SOCKNAME;
     const string O::compat_domain = NNG_OPT_DOMAIN;
@@ -25,11 +25,11 @@ namespace nng {
     const string O::protocol = NNG_OPT_PROTOCOL;
     const string O::transport = NNG_OPT_TRANSPORT;
     const string O::max_recv_sz = NNG_OPT_RECVMAXSZ;
-    const string O::min_reconnect_time_duration = NNG_OPT_RECONNMINT;
-    const string O::max_reconnect_time_duration = NNG_OPT_RECONNMAXT;
+    const string O::min_reconnect_duration = NNG_OPT_RECONNMINT;
+    const string O::max_reconnect_duration = NNG_OPT_RECONNMAXT;
     const string O::pair1_polyamorous = NNG_OPT_PAIR1_POLY;
-    const string O::req_resend_time_duration = NNG_OPT_REQ_RESENDTIME;
+    const string O::req_resend_duration = NNG_OPT_REQ_RESENDTIME;
     const string O::sub_subscribe = NNG_OPT_SUB_SUBSCRIBE;
     const string O::sub_unsubscribe = NNG_OPT_SUB_UNSUBSCRIBE;
-    const string O::surveyor_survey_time_duration = NNG_OPT_SURVEYOR_SURVEYTIME;
+    const string O::surveyor_survey_duration = NNG_OPT_SURVEYOR_SURVEYTIME;
 }

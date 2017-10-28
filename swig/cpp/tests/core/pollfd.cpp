@@ -74,12 +74,12 @@ TEST_CASE("Poll FDs", "[pollfd]") {
         SECTION("We can get a Receive File Descriptor") {
             int fd;
 
-            REQUIRE_NOTHROW(s1->GetOptions()->get_int(_opt_::recv_fd, fd));
+            REQUIRE_NOTHROW(fd = s1->GetOptions()->GetInt32(_opt_::recv_fd));
             REQUIRE(fd != inv_sock);
 
             SECTION("And it is always the same File Descriptor") {
                 int fd2;
-                REQUIRE_NOTHROW(s1->GetOptions()->get_int(_opt_::recv_fd, fd2));
+                REQUIRE_NOTHROW(fd2 = s1->GetOptions()->GetInt32(_opt_::recv_fd));
                 REQUIRE(fd2 == fd);
             }
 
@@ -104,7 +104,7 @@ TEST_CASE("Poll FDs", "[pollfd]") {
             std::size_t sz;
 
             sz = sizeof(fd);
-            REQUIRE_NOTHROW(s1->GetOptions()->get_int(_opt_::send_fd, fd));
+            REQUIRE_NOTHROW(fd = s1->GetOptions()->GetInt32(_opt_::send_fd));
             REQUIRE_NOTHROW(s1->GetOptions()->get(_opt_::send_fd, &fd, sz));
             REQUIRE(fd != inv_sock);
 
@@ -138,7 +138,7 @@ TEST_CASE("Poll FDs", "[pollfd]") {
             sz = sizeof(fd);
             // TODO: TBD: ditto working interim answer...
             REQUIRE_THROWS_AS_MATCHING(s3->GetOptions()->get(_opt_::send_fd, &fd, sz), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
-            REQUIRE_THROWS_AS_MATCHING(s3->GetOptions()->get_int(_opt_::send_fd, fd), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
+            REQUIRE_THROWS_AS_MATCHING(s3->GetOptions()->GetInt32(_opt_::send_fd), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
 
             REQUIRE_NOTHROW(s3.reset());
             REQUIRE(s3 == nullptr);
@@ -155,7 +155,7 @@ TEST_CASE("Poll FDs", "[pollfd]") {
             sz = sizeof(fd);
             // TODO: TBD: this works as an interim measure, although the ResultBuilder needs a little help to better comprehend the result.
             REQUIRE_THROWS_AS_MATCHING(s3->GetOptions()->get(_opt_::recv_fd, &fd, sz), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
-            REQUIRE_THROWS_AS_MATCHING(s3->GetOptions()->get_int(_opt_::recv_fd, fd), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
+            REQUIRE_THROWS_AS_MATCHING(s3->GetOptions()->GetInt32(_opt_::recv_fd), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
 
             REQUIRE_NOTHROW(s3.reset());
             REQUIRE(s3 == nullptr);

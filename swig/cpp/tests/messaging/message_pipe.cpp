@@ -139,7 +139,7 @@ TEST_CASE("Message pipe subordinates properly", Catch::Tags("message", "pipe"
             REQUIRE(mpp->HasOne() == true);
 
             // And check these operations as well.
-            REQUIRE_NOTHROW(mpp->GetOptions()->get_int(O::recv_buf, actual));
+            REQUIRE_NOTHROW(actual = mpp->GetOptions()->GetInt32(O::recv_buf));
             REQUIRE(actual == expected_recv_buf);
 
             REQUIRE_NOTHROW(mpp->Close());
@@ -149,7 +149,7 @@ TEST_CASE("Message pipe subordinates properly", Catch::Tags("message", "pipe"
 
             REQUIRE_NOTHROW(recvp.reset());
 
-            REQUIRE_NOTHROW(mpp->GetOptions()->get_int(O::recv_buf, actual));
+            REQUIRE_NOTHROW(actual = mpp->GetOptions()->GetInt32(O::recv_buf));
             REQUIRE(actual == expected_recv_buf);
 
             REQUIRE_NOTHROW(mpp->Close());
@@ -159,7 +159,7 @@ TEST_CASE("Message pipe subordinates properly", Catch::Tags("message", "pipe"
 
             REQUIRE_NOTHROW(sp2.reset());
             // Operations on the Message Pipe following Channel (Socket) closure are no longer valid.
-            REQUIRE_THROWS_AS_MATCHING(mpp->GetOptions()->get_int(O::recv_buf, actual), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
+            REQUIRE_THROWS_AS_MATCHING(actual = mpp->GetOptions()->GetInt32(O::recv_buf), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
 
             SECTION("And closes transparently") {
                 /* However, we should be able to "Destroy" the resource, which effectively
@@ -172,7 +172,7 @@ TEST_CASE("Message pipe subordinates properly", Catch::Tags("message", "pipe"
             REQUIRE_NOTHROW(sendp = make_unique<binary_message>());
             REQUIRE_NOTHROW(mpp->set(sendp.get()));
             // Remember the Pipe was associated with the Receive Channel, so we expect that Option.
-            REQUIRE_NOTHROW(mpp->GetOptions()->get_int(O::recv_buf, actual));
+            REQUIRE_NOTHROW(actual = mpp->GetOptions()->GetInt32(O::recv_buf));
             REQUIRE(actual == expected_recv_buf);
         }
 

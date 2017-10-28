@@ -221,7 +221,7 @@ TEST_CASE("Test the transport using C++ wrappers", Catch::Tags(constants::prefix
 
         // TODO: TBD: this bit is borderline message pipe unit testing and that's about it...
         REQUIRE_NOTHROW(actual_addr.resize(NNG_MAXADDRLEN));
-        REQUIRE_NOTHROW(pp->GetOptions()->get(O::url, actual_addr));
+        REQUIRE_NOTHROW(actual_addr = pp->GetOptions()->GetText(O::url));
         REQUIRE(actual_addr == addr);
     }
 

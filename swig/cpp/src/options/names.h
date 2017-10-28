@@ -5,10 +5,10 @@
 
 namespace nng {
 
-    struct OptionNames {
+    struct _OptionNames {
     private:
 
-        OptionNames();
+        _OptionNames();
 
     public:
 
@@ -30,16 +30,16 @@ namespace nng {
         static const std::string protocol;
         static const std::string transport;
         static const std::string max_recv_sz;
-        static const std::string min_reconnect_time_duration;
-        static const std::string max_reconnect_time_duration;
+        static const std::string min_reconnect_duration;
+        static const std::string max_reconnect_duration;
         static const std::string pair1_polyamorous;
         static const std::string sub_subscribe;
         static const std::string sub_unsubscribe;
-        static const std::string req_resend_time_duration;
-        static const std::string surveyor_survey_time_duration;
+        static const std::string req_resend_duration;
+        static const std::string surveyor_survey_duration;
     };
 
-    typedef OptionNames option_names;
+    typedef _OptionNames option_names;
 }
 
 #endif // NNGCPP_OPTIONS_NAMES_H
