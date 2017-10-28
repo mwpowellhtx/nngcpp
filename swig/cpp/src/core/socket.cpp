@@ -25,6 +25,10 @@ namespace nng {
         Close();
     }
 
+    socket::options_type* const socket::GetOptions() {
+        return support_options_type::GetOptions();
+    }
+
     void socket::configure_options(nng_type sid) {
 
         auto op = GetOptions();
