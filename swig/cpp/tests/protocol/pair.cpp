@@ -311,7 +311,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
         REQUIRE_NOTHROW(clientp1->GetOptions()->set(O::recv_timeout_duration, receive_timeout));
         REQUIRE_NOTHROW(clientp2->GetOptions()->set(O::recv_timeout_duration, receive_timeout));
 
-        REQUIRE_NOTHROW(serverp1->GetOptions()->get(O::recv_timeout_duration, timeout_duration));
+        REQUIRE_NOTHROW(timeout_duration = serverp1->GetOptions()->GetDuration(O::recv_timeout_duration));
         // TODO: TBD: looking forward to full Catch v2; including CHRONO comprehension.
         REQUIRE(timeout_duration == 300ms);
 

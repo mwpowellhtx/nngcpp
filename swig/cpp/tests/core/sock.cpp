@@ -447,9 +447,7 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
                     REQUIRE_THROWS_AS_MATCHING(l.GetOptions()->GetSize(O::max_recv_sz), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
                     REQUIRE_THROWS_AS_MATCHING(l.GetOptions()->GetInt32(O::raw), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
 
-                    duration_type timeout;
-
-                    REQUIRE_THROWS_AS_MATCHING(l.GetOptions()->get(O::linger_duration, timeout), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
+                    REQUIRE_THROWS_AS_MATCHING(l.GetOptions()->GetDuration(O::linger_duration), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
                 }
 
                 SECTION("Cannot access absent Dialer Endpoint options") {
@@ -468,9 +466,7 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
                     REQUIRE_THROWS_AS_MATCHING(d.GetOptions()->GetSize(O::max_recv_sz), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
                     REQUIRE_THROWS_AS_MATCHING(d.GetOptions()->GetInt32(O::raw), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
 
-                    duration_type timeout;
-
-                    REQUIRE_THROWS_AS_MATCHING(d.GetOptions()->get(O::linger_duration, timeout), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
+                    REQUIRE_THROWS_AS_MATCHING(d.GetOptions()->GetDuration(O::linger_duration), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
                 }
 
                 SECTION("We can send and receive messages") {
