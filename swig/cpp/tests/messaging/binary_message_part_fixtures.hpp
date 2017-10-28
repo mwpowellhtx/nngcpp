@@ -19,7 +19,7 @@
 namespace nng {
 
 #ifndef NNGCPP_BINARY_MESSAGE_H
-    template<class Body_, class Header_> class basic_binary_message;
+    template<class Body_, class Header_> class _BasicMessage;
 #endif // NNGCPP_BINARY_MESSAGE_H
 
     template<class Base_>
@@ -61,21 +61,21 @@ namespace nng {
             base_type::TrimLeft(sz);
         }
 
-        virtual void TrimLeft(uint32_t& val) override {
-            base_type::TrimLeft(val);
+        virtual void TrimLeft(uint32_t* resultp) override {
+            base_type::TrimLeft(resultp);
         }
 
         virtual void TrimRight(size_type sz = 0) override {
             base_type::TrimRight(sz);
         }
 
-        virtual void TrimRight(uint32_t& val) override {
-            base_type::TrimRight(val);
+        virtual void TrimRight(uint32_t* resultp) override {
+            base_type::TrimRight(resultp);
         }
 
     protected:
 
-        template<class Body_, class Header_> friend class basic_binary_message;
+        template<class Body_, class Header_> friend class _BasicMessage;
     };
 
     template<class Part_>
@@ -85,7 +85,7 @@ namespace nng {
         const auto actual_has_message = part.has_message();
         REQUIRE(actual_has_message == expected_has_message);
 
-        const auto actual_size = part.get_size();
+        const auto actual_size = part.GetSize();
         REQUIRE(actual_size == 0);
     }
 }

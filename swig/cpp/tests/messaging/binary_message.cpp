@@ -48,12 +48,12 @@ namespace nng {
         }
     };
 
-    struct binary_message_fixture : public binary_message {
+    struct binary_message_fixture : public _Message {
 
-        binary_message_fixture() : binary_message() {
+        binary_message_fixture() : _Message() {
         }
 
-        binary_message_fixture(msg_type* msgp) : binary_message(msgp) {
+        binary_message_fixture(msg_type* msgp) : _Message(msgp) {
         }
 
         virtual void free() override {

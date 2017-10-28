@@ -19,7 +19,7 @@ namespace nng {
 
     binary_message& operator >> (binary_message& lhs, buffer_vector_type& rhs) {
         auto ops = message_conversion_getter_policy<buffer_vector_type, binary_message>();
-        rhs = ops.get(lhs);
+        rhs = ops.Get(lhs);
         return lhs;
     }
 
@@ -31,7 +31,7 @@ namespace nng {
 
     binary_message& operator >> (binary_message& lhs, std::string& rhs) {
         auto ops = message_conversion_getter_policy<std::string, binary_message>();
-        rhs = ops.get(lhs);
+        rhs = ops.Get(lhs);
         return lhs;
     }
 
@@ -43,7 +43,7 @@ namespace nng {
 
     ISupportsGet<buffer_vector_type>& operator >> (ISupportsGet<buffer_vector_type>& lhs, buffer_vector_type& rhs) {
         auto ops = message_conversion_getter_policy<buffer_vector_type, ISupportsGet<buffer_vector_type>>();
-        rhs = ops.get(lhs);
+        rhs = ops.Get(lhs);
         return lhs;
     }
 
@@ -55,7 +55,7 @@ namespace nng {
 
     ISupportsGet<buffer_vector_type>& operator >> (ISupportsGet<buffer_vector_type>& lhs, std::string& rhs) {
         auto ops = message_conversion_getter_policy<std::string, ISupportsGet<buffer_vector_type>>();
-        rhs = ops.get(lhs);
+        rhs = ops.Get(lhs);
         return lhs;
     }
 }

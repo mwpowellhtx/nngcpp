@@ -360,7 +360,7 @@ namespace nng {
 
         virtual ~address();
 
-        size_type get_size() const;
+        size_type GetSize() const;
 
         sockaddr_type* get();
 

@@ -88,8 +88,8 @@ TEST_CASE("Verify default message part", Catch::Tags("body"
             REQUIRE_NOTHROW(partp = bmp->body());
             REQUIRE(partp);
             REQUIRE(partp->HasOne() == bmp->HasOne());
-            REQUIRE(partp->get_size() == 0);
-            REQUIRE_THAT(partp->get(), Equals(default_data));
+            REQUIRE(partp->GetSize() == 0);
+            REQUIRE_THAT(partp->Get(), Equals(default_data));
         }
 
         SECTION("Parent message is properly reset") {
@@ -124,20 +124,20 @@ TEST_CASE("Message part operates correctly", Catch::Tags("body"
             SECTION("Can append a string") {
 
                 REQUIRE_NOTHROW(partp->Append(this_is_a_test));
-                REQUIRE(partp->get_size() == this_is_a_test.length());
+                REQUIRE(partp->GetSize() == this_is_a_test.length());
 
                 SECTION("Get is correct") {
-                    REQUIRE_THAT(partp->get(), Equals(this_is_a_test_buf));
+                    REQUIRE_THAT(partp->Get(), Equals(this_is_a_test_buf));
                 }
 
                 SECTION("Right Trim is correct") {
 
                     REQUIRE_NOTHROW(partp->TrimRight(_a_test.length()));
-                    REQUIRE_THAT(partp->get(), Equals(this_is_buf));
+                    REQUIRE_THAT(partp->Get(), Equals(this_is_buf));
 
                     SECTION("Left Trim is correct") {
                         REQUIRE_NOTHROW(partp->TrimLeft(this_.length()));
-                        REQUIRE_THAT(partp->get(), Equals(it_is_what_it_is_buf));
+                        REQUIRE_THAT(partp->Get(), Equals(it_is_what_it_is_buf));
                     }
                 }
             }
@@ -145,20 +145,20 @@ TEST_CASE("Message part operates correctly", Catch::Tags("body"
             SECTION("Can append a byte vector") {
 
                 REQUIRE_NOTHROW(partp->Append(mathematics_is_cool));
-                REQUIRE(partp->get_size() == mathematics_is_cool.length());
+                REQUIRE(partp->GetSize() == mathematics_is_cool.length());
 
                 SECTION("Get is correct") {
-                    REQUIRE_THAT(partp->get(), Equals(mathematics_is_cool_buf));
+                    REQUIRE_THAT(partp->Get(), Equals(mathematics_is_cool_buf));
                 }
 
                 SECTION("Right Trim is correct") {
 
                     REQUIRE_NOTHROW(partp->TrimRight(_cool.length()));
-                    REQUIRE_THAT(partp->get(), Equals(mathematics_is_buf));
+                    REQUIRE_THAT(partp->Get(), Equals(mathematics_is_buf));
 
                     SECTION("Left Trim is correct") {
                         REQUIRE_NOTHROW(partp->TrimLeft(mathematics_.length()));
-                        REQUIRE_THAT(partp->get(), Equals(it_is_what_it_is_buf));
+                        REQUIRE_THAT(partp->Get(), Equals(it_is_what_it_is_buf));
                     }
                 }
             }
@@ -169,7 +169,7 @@ TEST_CASE("Message part operates correctly", Catch::Tags("body"
                 REQUIRE_NOTHROW(partp->Append(efgh_value));
 
                 SECTION("Get is correct") {
-                    REQUIRE_THAT(partp->get(), Equals(abcdefgh_value_buf));
+                    REQUIRE_THAT(partp->Get(), Equals(abcdefgh_value_buf));
                 }
 
                 uint32_t value = 0;
@@ -177,15 +177,15 @@ TEST_CASE("Message part operates correctly", Catch::Tags("body"
                 CHECK(!value);
 
                 SECTION("Left Trim is correct") {
-                    REQUIRE_NOTHROW(partp->TrimLeft(value));
+                    REQUIRE_NOTHROW(partp->TrimLeft(&value));
                     REQUIRE(value == abcd_value);
-                    REQUIRE_THAT(partp->get(), Equals(efgh_value_buf));
+                    REQUIRE_THAT(partp->Get(), Equals(efgh_value_buf));
                 }
 
                 SECTION("Right Trim is correct") {
-                    REQUIRE_NOTHROW(partp->TrimRight(value));
+                    REQUIRE_NOTHROW(partp->TrimRight(&value));
                     REQUIRE(value == efgh_value);
-                    REQUIRE_THAT(partp->get(), Equals(abcd_value_buf));
+                    REQUIRE_THAT(partp->Get(), Equals(abcd_value_buf));
                 }
             }
 
@@ -196,7 +196,7 @@ TEST_CASE("Message part operates correctly", Catch::Tags("body"
                 REQUIRE_NOTHROW(partp->Prepend(abcd_value));
 
                 SECTION("Get is correct") {
-                    REQUIRE_THAT(partp->get(), Equals(abcdefgh_value_buf));
+                    REQUIRE_THAT(partp->Get(), Equals(abcdefgh_value_buf));
                 }
 
                 uint32_t value = 0;
@@ -204,15 +204,15 @@ TEST_CASE("Message part operates correctly", Catch::Tags("body"
                 CHECK(!value);
 
                 SECTION("Left Trim is correct") {
-                    REQUIRE_NOTHROW(partp->TrimLeft(value));
+                    REQUIRE_NOTHROW(partp->TrimLeft(&value));
                     REQUIRE(value == abcd_value);
-                    REQUIRE_THAT(partp->get(), Equals(efgh_value_buf));
+                    REQUIRE_THAT(partp->Get(), Equals(efgh_value_buf));
                 }
 
                 SECTION("Right Trim is correct") {
-                    REQUIRE_NOTHROW(partp->TrimRight(value));
+                    REQUIRE_NOTHROW(partp->TrimRight(&value));
                     REQUIRE(value == efgh_value);
-                    REQUIRE_THAT(partp->get(), Equals(abcd_value_buf));
+                    REQUIRE_THAT(partp->Get(), Equals(abcd_value_buf));
                 }
             }
         }

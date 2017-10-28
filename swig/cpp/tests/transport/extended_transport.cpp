@@ -64,7 +64,7 @@ TEST_CASE("Check some properties", "[check][properties][nng][cxx][bonus]") {
 
         REQUIRE_NOTHROW(rep->try_receive(recvp.get()));
         REQUIRE(recvp->HasOne() == true);
-        REQUIRE_THAT(recvp->body()->get(), Equals(props_buf));
+        REQUIRE_THAT(recvp->body()->Get(), Equals(props_buf));
 
         SECTION("Now test the properties") {
 
@@ -132,7 +132,7 @@ TEST_CASE("Check some properties in C style", "[check][properties][nng][c][bonus
         REQUIRE(::nng_recvmsg(rep, &msgp, 0) == 0);
         REQUIRE_NOTHROW(recvp->retain(msgp));
         REQUIRE(recvp->HasOne() == true);
-        REQUIRE_THAT(recvp->body()->get(), Equals(props_buf));
+        REQUIRE_THAT(recvp->body()->Get(), Equals(props_buf));
 
         SECTION("Now test the properties") {
 

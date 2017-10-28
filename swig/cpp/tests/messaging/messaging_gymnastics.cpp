@@ -39,10 +39,10 @@ TEST_CASE("Run some gymnastic conversion scenarios", Catch::Tags(
     }
 }
 
-/* If we want more in depth surface testing, look at binary_message tests. Short
-of a full on verification, howevre, we do require that a message is allocated. */
+/* If we want more in depth surface testing, look at _Message tests. Short of
+a full on verification, howevre, we do require that a message is allocated. */
 #define NNGCPP_TESTS_INITIALIZE_BINARY_MESSAGE(m) \
-    nng::binary_message m
+    nng::_Message m
 
 TEST_CASE("Can write (append) to and read (get) from binary message using byte vector"
     , Catch::Tags("vector", "write", "append", "read", "get", "binary", "message"
@@ -60,7 +60,7 @@ TEST_CASE("Can write (append) to and read (get) from binary message using byte v
         REQUIRE_NOTHROW(bm << hello_buf);
 
         // Do a quick smoke test.
-        REQUIRE(bm.get_size() == hello_buf.size());
+        REQUIRE(bm.GetSize() == hello_buf.size());
 
         SECTION("Can read (get) from") {
 
@@ -89,7 +89,7 @@ TEST_CASE("Can write (append) to and read (get) from binary message using string
         REQUIRE_NOTHROW(bm << hello);
 
         // Do a quick smoke test.
-        REQUIRE(bm.get_size() == hello.length());
+        REQUIRE(bm.GetSize() == hello.length());
 
         SECTION("Can read (get) from") {
 
@@ -127,7 +127,7 @@ TEST_CASE("Can write (append) to and read (get) from binary message body using b
         REQUIRE_NOTHROW(bm << hello_buf);
 
         // Do a quick smoke test.
-        REQUIRE(mapip->get_size() == hello_buf.size());
+        REQUIRE(mapip->GetSize() == hello_buf.size());
 
         SECTION("Can read (get) from") {
 
@@ -158,7 +158,7 @@ TEST_CASE("Can write (append) to and read (get) from binary message body using s
         REQUIRE_NOTHROW(bm << hello);
 
         // Do a quick smoke test.
-        REQUIRE(mapip->get_size() == hello.length());
+        REQUIRE(mapip->GetSize() == hello.length());
 
         SECTION("Can read (get) from") {
 

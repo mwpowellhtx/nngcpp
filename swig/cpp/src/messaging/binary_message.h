@@ -18,7 +18,7 @@ namespace nng {
 
     // TODO: TBD: of course they are all "binary" messages close to the wire; however, we may shim a string-based API around this one...
     template<class Body_, class Header_>
-    class basic_binary_message : public _MessageBase {
+    class _BasicMessage : public _MessageBase {
     public:
 
         typedef Header_ header_type;
@@ -33,24 +33,24 @@ namespace nng {
 
     protected:
 
-        basic_binary_message()
+        _BasicMessage()
             : _MessageBase()
             , _header(this), _body(this) {
         }
 
-        basic_binary_message(size_type sz)
+        _BasicMessage(size_type sz)
             : _MessageBase(sz)
             , _header(this), _body(this) {
         }
 
-        basic_binary_message(msg_type* msgp)
+        _BasicMessage(msg_type* msgp)
             : _MessageBase(msgp)
             , _header(this), _body(this) {
         }
 
     public:
 
-        virtual ~basic_binary_message() {
+        virtual ~_BasicMessage() {
         }
 
         virtual header_type* const header() {
@@ -63,10 +63,10 @@ namespace nng {
             return &_body;
         }
 
-        virtual size_type get_size() {
+        virtual size_type GetSize() {
             // Should be both (Header.Size + Body.Size).
             on_one_required();
-            return _header.get_size() + _body.get_size();
+            return _header.GetSize() + _body.GetSize();
         }
 
         virtual void Clear() override {
@@ -77,7 +77,7 @@ namespace nng {
 
         virtual operator std::string() {
             std::string s;
-            const auto buf = body()->get();
+            const auto buf = body()->Get();
             for (auto it = buf.begin(); it != buf.end(); it++) {
                 s.push_back(((std::string::value_type*)*it)[0]);
             }
@@ -86,17 +86,21 @@ namespace nng {
     };
 
     // TODO: TBD: any reason to define a full on class derivation? perhaps for SWIG purposes? or just type-define it?
-    class binary_message : public basic_binary_message<binary_message_body, binary_message_header> {
+    class _Message : public _BasicMessage<_BodyMessagePart, _HeaderMessagePart> {
     public:
 
-        binary_message();
+        _Message();
 
-        binary_message(size_type sz);
+        _Message(size_type sz);
 
-        binary_message(msg_type* msgp);
+        _Message(msg_type* msgp);
 
-        virtual ~binary_message();
+        _Message(const _Message& other);
+
+        virtual ~_Message();
     };
+
+    typedef _Message binary_message;
 }
 
 #endif // NNGCPP_BINARY_MESSAGE_H

@@ -29,32 +29,37 @@ namespace nng {
     _HeaderMessagePart::~_HeaderMessagePart() {
     }
 
-    size_type _HeaderMessagePart::get_size() {
+    size_type _HeaderMessagePart::GetSize() {
         const auto msgp = get_message();
         const auto op = bind(&::nng_msg_header_len, msgp);
         return msgp == nullptr ? 0 : op();
     }
 
+    const buffer_vector_type _HeaderMessagePart::Get() {
+        return ISupportsGetType::Get();
+    }
+
     // TODO: TBD: this is fairly redundant with body: there has got to be a better way to capture this as a cross cutting concern...
-    bool _HeaderMessagePart::try_get(std::vector<uint8_t>& value) {
+    bool _HeaderMessagePart::TryGet(buffer_vector_type const* resultp) {
 
         if (!HasOne()) { return false; }
 
-        typedef message_getter_try_get_policy<std::vector<uint8_t>, void*> policy_type;
+        typedef message_getter_try_get_policy<buffer_vector_type*, void*> policy_type;
+        using PolTy = policy_type;
 
+        const auto sz = GetSize();
         const auto get_ = bind(&::nng_msg_header, _1);
 
-        const auto convert_ = [&](const void* x, std::vector<uint8_t>& y) {
-            if (x == nullptr) { return false; }
-            const auto sz = get_size();
-            const auto* const src = (const std::vector<uint8_t>::value_type* const)x;
+        const auto convert_ = [sz](PolTy::intermediate_type xp, PolTy::result_type yp) {
+            if (xp == nullptr) { return false; }
+            auto* const src = (const buffer_vector_type::value_type*)xp;
             for (size_type i = 0; i < sz; i++) {
-                y.push_back((src + i)[0]);
+                yp->push_back((src + i)[0]);
             }
-            return y.size() > 0;
+            return yp->size() > 0;
         };
 
-        return policy_type::try_get(value, get_message(), get_, convert_);
+        return policy_type::TryGet(const_cast<PolTy::result_type>(resultp), get_message(), get_, convert_);
     }
 
     void _HeaderMessagePart::Clear() {
@@ -69,7 +74,7 @@ namespace nng {
         invocation::with_default_error_handling(op, val);
     }
 
-    void _HeaderMessagePart::Append(const std::vector<uint8_t>& buf) {
+    void _HeaderMessagePart::Append(const buffer_vector_type& buf) {
         THROW_API_IS_READ_ONLY();
     }
 
@@ -83,7 +88,7 @@ namespace nng {
         invocation::with_default_error_handling(op, val);
     }
 
-    void _HeaderMessagePart::Prepend(const std::vector<uint8_t>& buf) {
+    void _HeaderMessagePart::Prepend(const buffer_vector_type& buf) {
         THROW_API_IS_READ_ONLY();
     }
 
@@ -91,32 +96,32 @@ namespace nng {
         THROW_API_IS_READ_ONLY();
     }
 
-    void _HeaderMessagePart::TrimLeft(uint32_t& val) {
+    void _HeaderMessagePart::TrimLeft(uint32_t* resultp) {
         if (!HasOne()) { return; }
         const auto op = bind(&::nng_msg_header_trim_u32, get_message(), _1);
-        invocation::with_default_error_handling(op, &val);
+        invocation::with_default_error_handling(op, resultp);
     }
 
     void _HeaderMessagePart::TrimLeft(size_type sz) {
         THROW_API_IS_READ_ONLY();
     }
 
-    void _HeaderMessagePart::TrimRight(uint32_t& val) {
+    void _HeaderMessagePart::TrimRight(uint32_t* resultp) {
         if (!HasOne()) { return; }
         const auto op = bind(&::nng_msg_header_chop_u32, get_message(), _1);
-        invocation::with_default_error_handling(op, &val);
+        invocation::with_default_error_handling(op, resultp);
     }
 
     void _HeaderMessagePart::TrimRight(size_type sz) {
         THROW_API_IS_READ_ONLY();
     }
 
-    //void _HeaderMessagePart::Append(const message_base::std::vector<uint8_t>& buf) {
+    //void _HeaderMessagePart::Append(const message_base::buffer_vector_type& buf) {
     //    static const auto op = std::bind(&::nng_msg_header_append, _1, _2, _3);
     //    do_type_based_op(op, _msgp, buf);
     //}
 
-    //void _HeaderMessagePart::Prepend(const message_base::std::vector<uint8_t>& buf) {
+    //void _HeaderMessagePart::Prepend(const message_base::buffer_vector_type& buf) {
     //    static const auto op = std::bind(&::nng_msg_header_insert, _1, _2, _3);
     //    do_type_based_op(op, _msgp, buf);
     //}

@@ -91,7 +91,7 @@ namespace nng {
     }
 
     void options_reader::get(const std::string& name, address& val) {
-        auto sz = val.get_size();
+        auto sz = val.GetSize();
         invocation::with_default_error_handling(_getopt, name.c_str(), val.get(), &sz);
     }
 

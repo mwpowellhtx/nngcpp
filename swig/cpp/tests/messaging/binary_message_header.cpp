@@ -74,8 +74,8 @@ TEST_CASE("Verify default message part", Catch::Tags("header"
             REQUIRE_NOTHROW(headerp = bmp->header());
             REQUIRE(headerp);
             REQUIRE(headerp->HasOne() == bmp->HasOne());
-            REQUIRE(headerp->get_size() == 0);
-            REQUIRE_THAT(headerp->get(), Equals(default_data));
+            REQUIRE(headerp->GetSize() == 0);
+            REQUIRE_THAT(headerp->Get(), Equals(default_data));
         }
 
         SECTION("Parent message is properly reset") {
@@ -89,10 +89,10 @@ namespace nng {
     typedef binary_message_part_fixture<binary_message_header> binary_message_header_fixture;
 
     // TODO: TBD: any reason to define a full on class derivation? perhaps for SWIG purposes? or just type-define it?
-    class binary_message_fixture : public basic_binary_message<binary_message_body, binary_message_header_fixture> {
+    class binary_message_fixture : public _BasicMessage<binary_message_body, binary_message_header_fixture> {
     public:
 
-        binary_message_fixture() : basic_binary_message() {}
+        binary_message_fixture() : _BasicMessage() {}
 
         virtual ~binary_message_fixture() {}
     };
@@ -146,28 +146,28 @@ TEST_CASE("Message part operates correctly", Catch::Tags("header"
                 REQUIRE_NOTHROW(partp->Append(reversed));
                 REQUIRE_NOTHROW(partp->Prepend(value));
                 REQUIRE_NOTHROW(partp->Append(value));
-                REQUIRE_THAT(partp->get(), Equals(appended_data));
+                REQUIRE_THAT(partp->Get(), Equals(appended_data));
 
                 uint32_t trimmed = 0;
                 CHECK(!trimmed);
 
                 SECTION("Should support Left Trim of a 32-bit integer") {
 
-                    REQUIRE_NOTHROW(partp->TrimLeft(trimmed));
+                    REQUIRE_NOTHROW(partp->TrimLeft(&trimmed));
                     REQUIRE(trimmed == value);
-                    REQUIRE_THAT(partp->get(), Equals(remaining_after_ltrim));
+                    REQUIRE_THAT(partp->Get(), Equals(remaining_after_ltrim));
 
                     SECTION("Should also support Right Trim of a 32-bit integer") {
 
-                        REQUIRE_NOTHROW(partp->TrimRight(trimmed));
+                        REQUIRE_NOTHROW(partp->TrimRight(&trimmed));
                         REQUIRE(trimmed == value);
-                        REQUIRE_THAT(partp->get(), Equals(remaining_after_rtrim));
+                        REQUIRE_THAT(partp->Get(), Equals(remaining_after_rtrim));
 
                         SECTION("One final 32-bit integer Trim") {
 
-                            REQUIRE_NOTHROW(partp->TrimLeft(trimmed));
+                            REQUIRE_NOTHROW(partp->TrimLeft(&trimmed));
                             REQUIRE(trimmed == reversed);
-                            REQUIRE_THAT(partp->get(), Equals(__empty_buf));
+                            REQUIRE_THAT(partp->Get(), Equals(__empty_buf));
                         }
                     }
                 }

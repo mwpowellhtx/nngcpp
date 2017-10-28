@@ -102,7 +102,7 @@ TEST_CASE("Bus pattern using C++ wrappers", Catch::Tags("bus"
                 REQUIRE_NOTHROW(*bmp << _99bits);
                 REQUIRE_NOTHROW(busp2->send(bmp.get()));
                 REQUIRE_NOTHROW(busp1->try_receive(bmp.get()));
-                REQUIRE_THAT(bmp->body()->get(), Equals(_99bits_buf));
+                REQUIRE_THAT(bmp->body()->Get(), Equals(_99bits_buf));
 
                 REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
                 REQUIRE_THROWS_AS_MATCHING(busp3->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
@@ -116,13 +116,13 @@ TEST_CASE("Bus pattern using C++ wrappers", Catch::Tags("bus"
                 REQUIRE_NOTHROW(busp2->try_receive(bmp.get()));
                 // Will compare with the second received message.
                 const auto* const msgp1 = bmp->get_message();
-                REQUIRE_THAT(bmp->body()->get(), Equals(onthe_buf));
+                REQUIRE_THAT(bmp->body()->Get(), Equals(onthe_buf));
 
                 REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
                 REQUIRE_NOTHROW(busp3->try_receive(bmp.get()));
                 // To demonstrate this is an entirely new message received.
                 const auto* const msgp2 = bmp->get_message();
-                REQUIRE_THAT(bmp->body()->get(), Equals(onthe_buf));
+                REQUIRE_THAT(bmp->body()->Get(), Equals(onthe_buf));
                 REQUIRE(msgp1 != msgp2);
             }
 		}

@@ -149,7 +149,7 @@ TEST_CASE("Request/reply pattern using C++ wrapper", Catch::Tags("req", "rep"
             REQUIRE(pingp->HasOne() == false);
             REQUIRE_NOTHROW(repp->try_receive(pongp.get()));
             REQUIRE(pongp->HasOne() == true);
-            REQUIRE_THAT(pongp->body()->get(), Equals(ping_buf));
+            REQUIRE_THAT(pongp->body()->Get(), Equals(ping_buf));
 
             // Interesting, now use the Trim API.
             REQUIRE_NOTHROW(pongp->body()->TrimLeft(ping.length()));
@@ -157,7 +157,7 @@ TEST_CASE("Request/reply pattern using C++ wrapper", Catch::Tags("req", "rep"
             REQUIRE_NOTHROW(repp->send(pongp.get()));
             // Here we are using the above assertion to our advantage.
             REQUIRE_NOTHROW(reqp->try_receive(pingp.get()));
-            REQUIRE_THAT(pingp->body()->get(), Equals(pong_buf));
+            REQUIRE_THAT(pingp->body()->Get(), Equals(pong_buf));
 		}
 	}
 
@@ -190,6 +190,6 @@ TEST_CASE("Request/reply pattern using C++ wrapper", Catch::Tags("req", "rep"
         REQUIRE_NOTHROW(repp->send(cmdp.get()));
         REQUIRE_NOTHROW(reqp->try_receive(cmdp.get()));
 
-        REQUIRE_THAT(cmdp->body()->get(), Equals(def_buf));
+        REQUIRE_THAT(cmdp->body()->Get(), Equals(def_buf));
 	}
 }

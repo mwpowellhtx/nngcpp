@@ -21,26 +21,26 @@
 namespace nng {
 
 #ifndef NNGCPP_BINARY_MESSAGE_H
-    template<class Body_, class Header_> class basic_binary_message;
+    template<class Body_, class Header_> class _BasicMessage;
 #endif //NNGCPP_BINARY_MESSAGE_H
 
     // TODO: TBD: potentially handling these as a string-based as well...
     class _HeaderMessagePart
         : public _MessagePart
-        , public ISupportsGet<std::vector<uint8_t>>
+        , public ISupportsGet<buffer_vector_type>
         , public ISupportsAppend<uint32_t>
-        , public ISupportsAppend<const std::vector<uint8_t>&>
+        , public ISupportsAppend<const buffer_vector_type&>
         , public ISupportsAppend<const std::string&>
         , public ISupportsPrepend<uint32_t>
-        , public ISupportsPrepend<const std::vector<uint8_t>&>
+        , public ISupportsPrepend<const buffer_vector_type&>
         , public ISupportsPrepend<const std::string&>
         , public ISupportsTrimLeft<size_type>
-        , public ISupportsTrimLeft<uint32_t&>
+        , public ISupportsTrimLeft<uint32_t*>
         , public ISupportsTrimRight<size_type>
-        , public ISupportsTrimRight<uint32_t&> {
+        , public ISupportsTrimRight<uint32_t*> {
     protected:
 
-        template<class Body_, class Header_> friend class basic_binary_message;
+        template<class Body_, class Header_> friend class _BasicMessage;
 
         _HeaderMessagePart(_MessageBase* const msgp);
 
@@ -48,32 +48,35 @@ namespace nng {
 
         virtual ~_HeaderMessagePart();
 
-        virtual bool try_get(std::vector<uint8_t>& value) override;
+        // TODO: TBD: we could leverage the base class type definitions; hwoever, the SWIG exposure forces us to be explicit here, unfortunately
+        virtual bool TryGet(buffer_vector_type const* resultp) override;
 
-        virtual size_type get_size() override;
+        virtual const buffer_vector_type Get() override;
+
+        virtual size_type GetSize() override;
 
         // TODO: TBD: so if header is truly "read-only" then it is debatable whether "clear" should be exposed via header...
         virtual void Clear() override;
 
         virtual void Append(uint32_t val) override;
 
-        virtual void Append(const std::vector<uint8_t>& buf) override;
+        virtual void Append(const buffer_vector_type& buf) override;
 
         virtual void Append(const std::string& s) override;
 
         virtual void Prepend(uint32_t val) override;
 
-        virtual void Prepend(const std::vector<uint8_t>& buf) override;
+        virtual void Prepend(const buffer_vector_type& buf) override;
 
         virtual void Prepend(const std::string& s) override;
 
-        virtual void TrimLeft(uint32_t& val) override;
-
         virtual void TrimLeft(size_type sz) override;
 
-        virtual void TrimRight(uint32_t& val) override;
+        virtual void TrimLeft(uint32_t* resultp) override;
 
         virtual void TrimRight(size_type sz) override;
+
+        virtual void TrimRight(uint32_t* resultp) override;
     };
 
     typedef _HeaderMessagePart binary_message_header;

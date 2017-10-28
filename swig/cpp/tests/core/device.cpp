@@ -115,14 +115,14 @@ TEST_CASE("Test that device functions properly", "[device]") {
             SECTION("Device can send and receive") {
 
                 // No need to vet "message free" at the end of this on account of message dtor.
-                binary_message bm;
+                _Message bm;
 
                 SECTION("Device can send") {
 
                     REQUIRE_NOTHROW(bm << alpha);
                     REQUIRE_NOTHROW(e1.send(&bm));
                     REQUIRE_NOTHROW(e2.try_receive(&bm));
-                    REQUIRE_THAT(bm.body()->get(), Equals(alpha_buf));
+                    REQUIRE_THAT(bm.body()->Get(), Equals(alpha_buf));
                 }
 
                 SECTION("Device can receive") {
@@ -130,7 +130,7 @@ TEST_CASE("Test that device functions properly", "[device]") {
                     REQUIRE_NOTHROW(bm << omega);
                     REQUIRE_NOTHROW(e2.send(&bm));
                     REQUIRE_NOTHROW(e1.try_receive(&bm));
-                    REQUIRE_THAT(bm.body()->get(), Equals(omega_buf));
+                    REQUIRE_THAT(bm.body()->Get(), Equals(omega_buf));
                 }
             }
 		}

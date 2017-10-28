@@ -513,7 +513,7 @@ namespace nng {
         return view() != nullptr;
     }
 
-    size_type address::get_size() const {
+    size_type address::GetSize() const {
         return sizeof(_sa);
     }
 

@@ -125,13 +125,13 @@ namespace nng {
     }
 
     // TODO: TBD: really, these should probably be more an effect of engaging the Socket with the AIO service.
-    void basic_async_service::retain_message(binary_message* const bmp) const {
+    void basic_async_service::retain_message(_Message* const bmp) const {
         if (!bmp) { return; }
         // Similarly with Socket send/receive, Message Cedes ownership to the AIO.
         invocation::with_void_return_value(_set_msg, bmp->cede_message());
     }
 
-    void basic_async_service::cede_message(binary_message* const bmp) const {
+    void basic_async_service::cede_message(_Message* const bmp) const {
         msg_type* msgp = nullptr;
         // Ditto re: Ceding/resuming ownership.
         invocation::with_result(_get_msg, &msgp);

@@ -2,11 +2,19 @@
 
 namespace nng {
 
-    binary_message::binary_message() : basic_binary_message() {}
+    _Message::_Message() : _BasicMessage() {}
 
-    binary_message::binary_message(size_type sz) : basic_binary_message(sz) {}
+    _Message::_Message(size_type sz) : _BasicMessage(sz) {}
 
-    binary_message::binary_message(msg_type* msgp) : basic_binary_message(msgp) {}
+    _Message::_Message(msg_type* msgp) : _BasicMessage(msgp) {}
 
-    binary_message::~binary_message() {}
+    _Message::_Message(const  _Message& other) : _BasicMessage() {
+        // We do not want to alter the given Other...
+        auto op_ = const_cast<_Message*>(&other);
+        // But yet we still need to thread the needle.
+        header()->Append(op_->header()->Get());
+        body()->Append(op_->body()->Get());
+    }
+
+    _Message::~_Message() {}
 }

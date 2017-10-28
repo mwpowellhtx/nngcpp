@@ -18,7 +18,7 @@ namespace nng {
 #endif // NNGCPP_SOCKET_H
 
 #ifndef NNGCPP_BINARY_MESSAGE_H
-    class binary_message;
+    class _Message;
 #endif // NNGCPP_BINARY_MESSAGE_H
 
     class basic_async_service : public IHaveOne, public ICanClose {
@@ -90,9 +90,9 @@ namespace nng {
 
         virtual void set_timeout(duration_rep_type val);
 
-        virtual void retain_message(binary_message* const bmp) const;
+        virtual void retain_message(_Message* const bmp) const;
 
-        virtual void cede_message(binary_message* const bmp) const;
+        virtual void cede_message(_Message* const bmp) const;
 
     private:
 
