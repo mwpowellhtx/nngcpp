@@ -5,7 +5,7 @@ namespace nng {
     endpoint::endpoint()
         : IHaveOne()
         , ICanClose()
-        , supports_options() {
+        , ISupportOptions() {
     }
 
     endpoint::~endpoint() {

@@ -7,7 +7,7 @@
 #include "sender.h"
 #include "receiver.h"
 #include "messenger.h"
-#include "options.h"
+#include "../options/options.h"
 
 #include "having_one.hpp"
 #include "can_close.hpp"
@@ -31,7 +31,7 @@ namespace nng {
         , public sender
         , public receiver
         , public messenger
-        , public supports_options<options_reader_writer> {
+        , public ISupportOptions<options_reader_writer> {
     public:
 
         typedef ::nng_socket nng_type;

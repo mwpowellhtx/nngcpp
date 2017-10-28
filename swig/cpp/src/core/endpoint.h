@@ -5,7 +5,7 @@
 
 #include "having_one.hpp"
 #include "can_close.hpp"
-#include "options.h"
+#include "../options/options.h"
 
 namespace nng {
 
@@ -13,7 +13,7 @@ namespace nng {
     class endpoint
         : public IHaveOne
         , public ICanClose
-        , public supports_options<options_reader_writer> {
+        , public ISupportOptions<options_reader_writer> {
 
     protected:
 

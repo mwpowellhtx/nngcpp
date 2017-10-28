@@ -11,11 +11,11 @@
 #include "enums.h"
 #include "listener.h"
 #include "messenger.h"
-#include "options.h"
 #include "receiver.h"
 #include "sender.h"
 #include "session.h"
 #include "socket.h"
+#include "../options/options.h"
 
 #include "exceptions.hpp"
 

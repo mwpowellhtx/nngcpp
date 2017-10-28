@@ -6,8 +6,7 @@
 
 #include "../core/having_one.hpp"
 #include "../core/can_close.hpp"
-
-#include "../core/options.h"
+#include "../options/options.h"
 
 #include <functional>
 #include <algorithm>
@@ -27,7 +26,7 @@ namespace nng {
     class message_pipe
         : public IHaveOne
         , public ICanClose
-        , public supports_options<options_reader>
+        , public ISupportOptions<options_reader>
         , public std::equal_to<message_pipe> {
     public:
 

@@ -10,7 +10,7 @@ namespace nng {
     using std::bind;
 
     message_pipe::message_pipe(msg_type* const msgp)
-        : IHaveOne(), ICanClose(), supports_options(), equal_to()
+        : IHaveOne(), ICanClose(), ISupportOptions(), equal_to()
         , pid(0), _msgp(msgp)
         , __getter(bind(&::nng_msg_get_pipe, _msgp))
         , __setter(), __closer() {

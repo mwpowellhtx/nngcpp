@@ -5,10 +5,10 @@
 #include "../protocol/protocol.h"
 
 #include "address.h"
-#include "options.h"
 #include "listener.h"
 #include "dialer.h"
 #include "device.h"
+#include "../options/options.h"
 
 #include <memory>
 #include <vector>

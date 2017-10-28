@@ -30,6 +30,16 @@
 set (NNGCPP_CPP_SRCS
     nngcpp.h
     algorithms/string_algo.hpp
+    options/ISupportOptions.hpp
+    options/names.cpp
+    options/names.h
+    options/reader.cpp
+    options/reader.h
+    options/writer.cpp
+    options/writer.h
+    options/reader_writer.cpp
+    options/reader_writer.h
+    options/options.h
     core/having_one.hpp
     core/can_close.hpp
     core/invocation.hpp
@@ -50,8 +60,6 @@ set (NNGCPP_CPP_SRCS
     core/listener.h
     core/messenger.cpp
     core/messenger.h
-    core/options.cpp
-    core/options.h
     core/receiver.cpp
     core/receiver.h
     core/sender.cpp
