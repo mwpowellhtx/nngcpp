@@ -47,7 +47,7 @@ namespace nng {
 
     void dialer::configure_options(nng_type did) {
 
-        auto op = options();
+        auto op = GetOptions();
 
         op->set_getters(
             bind(&::nng_dialer_getopt, did, _1, _2, _3)

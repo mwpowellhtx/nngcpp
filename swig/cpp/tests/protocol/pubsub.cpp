@@ -201,28 +201,28 @@ TEST_CASE("Publisher/subscriber pattern using C++ wrapper", Catch::Tags("pub", "
 
         SECTION("Subscriber can subscribe") {
 
-            REQUIRE_NOTHROW(subp->options()->set(O::sub_subscribe, abc));
-            REQUIRE_NOTHROW(subp->options()->set(O::sub_subscribe, __empty));
+            REQUIRE_NOTHROW(subp->GetOptions()->set(O::sub_subscribe, abc));
+            REQUIRE_NOTHROW(subp->GetOptions()->set(O::sub_subscribe, __empty));
 
             SECTION("Unsubscribe works") {
 
-                REQUIRE_NOTHROW(subp->options()->set(O::sub_unsubscribe, abc));
-                REQUIRE_NOTHROW(subp->options()->set(O::sub_unsubscribe, __empty));
+                REQUIRE_NOTHROW(subp->GetOptions()->set(O::sub_unsubscribe, abc));
+                REQUIRE_NOTHROW(subp->GetOptions()->set(O::sub_unsubscribe, __empty));
 
-                REQUIRE_THROWS_AS_MATCHING(subp->options()->set(O::sub_unsubscribe, __empty), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
-                REQUIRE_THROWS_AS_MATCHING(subp->options()->set(O::sub_unsubscribe, hello), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
+                REQUIRE_THROWS_AS_MATCHING(subp->GetOptions()->set(O::sub_unsubscribe, __empty), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
+                REQUIRE_THROWS_AS_MATCHING(subp->GetOptions()->set(O::sub_unsubscribe, hello), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
             }
         }
 
         SECTION("Publisher cannot subscribe") {
 
-            REQUIRE_THROWS_AS_MATCHING(pubp->options()->set(O::sub_subscribe, __empty), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
+            REQUIRE_THROWS_AS_MATCHING(pubp->GetOptions()->set(O::sub_subscribe, __empty), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
         }
 
         SECTION("Subscriber can receive from publisher") {
 
-            REQUIRE_NOTHROW(subp->options()->set(O::sub_subscribe, topics::some));
-            REQUIRE_NOTHROW(subp->options()->set(O::recv_timeout_duration, 90ms));
+            REQUIRE_NOTHROW(subp->GetOptions()->set(O::sub_subscribe, topics::some));
+            REQUIRE_NOTHROW(subp->GetOptions()->set(O::recv_timeout_duration, 90ms));
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
             REQUIRE_NOTHROW(*bmp << topics::some_like_it_hot);
@@ -245,7 +245,7 @@ TEST_CASE("Publisher/subscriber pattern using C++ wrapper", Catch::Tags("pub", "
 
         SECTION("Subscribers without subsciptions do not receive") {
 
-            REQUIRE_NOTHROW(subp->options()->set(O::recv_timeout_duration, 90ms));
+            REQUIRE_NOTHROW(subp->GetOptions()->set(O::recv_timeout_duration, 90ms));
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
             REQUIRE_NOTHROW(*bmp << topics::some_do_not_like_it);
@@ -255,8 +255,8 @@ TEST_CASE("Publisher/subscriber pattern using C++ wrapper", Catch::Tags("pub", "
 
         SECTION("Subscribers in raw receive") {
 
-            REQUIRE_NOTHROW(subp->options()->set(O::recv_timeout_duration, 90ms));
-            REQUIRE_NOTHROW(subp->options()->set_int(O::raw, 1));
+            REQUIRE_NOTHROW(subp->GetOptions()->set(O::recv_timeout_duration, 90ms));
+            REQUIRE_NOTHROW(subp->GetOptions()->set_int(O::raw, 1));
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
             REQUIRE_NOTHROW(*bmp << topics::some_like_it_raw);

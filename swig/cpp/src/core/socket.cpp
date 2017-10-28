@@ -27,7 +27,7 @@ namespace nng {
 
     void socket::configure_options(nng_type sid) {
 
-        auto op = options();
+        auto op = GetOptions();
 
         op->set_getters(
             bind(&::nng_getopt, sid, _1, _2, _3)

@@ -199,7 +199,7 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
 
             RUN_TIMED_SECTION_MILLISECONDS(timeout, [&]() {
 
-                REQUIRE_NOTHROW(s1->options()->set(O::recv_timeout_duration, timeout));
+                REQUIRE_NOTHROW(s1->GetOptions()->set(O::recv_timeout_duration, timeout));
 
                 unique_ptr<binary_message> bmp;
 
@@ -225,7 +225,7 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
 
             RUN_TIMED_SECTION_MILLISECONDS(timeout, [&]() {
 
-                REQUIRE_NOTHROW(s1->options()->set(O::send_timeout_duration, timeout));
+                REQUIRE_NOTHROW(s1->GetOptions()->set(O::send_timeout_duration, timeout));
                 // TODO: TBD: this will work for now as a rough cut Exception match...
                 REQUIRE_THROWS_AS_MATCHING(s1->send(&empty_buf), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
 
@@ -238,14 +238,14 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
             const auto v = static_cast<int64_t>(0);
             size_type  sz;
 
-            REQUIRE_NOTHROW(s1->options()->set(O::send_timeout_duration, timeout));
+            REQUIRE_NOTHROW(s1->GetOptions()->set(O::send_timeout_duration, timeout));
 
             SECTION("Read-only options handled properly") {
 
                 // TODO: TBD: this will work for now as a rough cut Exception match...
-                REQUIRE_THROWS_AS_MATCHING(s1->options()->set_int(O::recv_fd, 0), nng_exception, THROWS_NNG_EXCEPTION(ec_ereadonly));
-                REQUIRE_THROWS_AS_MATCHING(s1->options()->set_int(O::send_fd, 0), nng_exception, THROWS_NNG_EXCEPTION(ec_ereadonly));
-                REQUIRE_THROWS_AS_MATCHING(s1->options()->set(O::local_addr, "a"), nng_exception, THROWS_NNG_EXCEPTION(ec_ereadonly));
+                REQUIRE_THROWS_AS_MATCHING(s1->GetOptions()->set_int(O::recv_fd, 0), nng_exception, THROWS_NNG_EXCEPTION(ec_ereadonly));
+                REQUIRE_THROWS_AS_MATCHING(s1->GetOptions()->set_int(O::send_fd, 0), nng_exception, THROWS_NNG_EXCEPTION(ec_ereadonly));
+                REQUIRE_THROWS_AS_MATCHING(s1->GetOptions()->set(O::local_addr, "a"), nng_exception, THROWS_NNG_EXCEPTION(ec_ereadonly));
             }
 
             SECTION("Url option works") {
@@ -259,20 +259,20 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
                 string url;
 
                 url.resize(max_addr_length);
-                REQUIRE_NOTHROW(lp->options()->get(O::url, url));
+                REQUIRE_NOTHROW(lp->GetOptions()->get(O::url, url));
                 REQUIRE_THAT(url, Equals(url1_addr, CaseSensitive::Yes));
 
                 // TODO: TBD: this will work for now as a rough cut Exception match...
-                REQUIRE_THROWS_AS_MATCHING(lp->options()->set(O::url, url), nng_exception, THROWS_NNG_EXCEPTION(ec_ereadonly));
+                REQUIRE_THROWS_AS_MATCHING(lp->GetOptions()->set(O::url, url), nng_exception, THROWS_NNG_EXCEPTION(ec_ereadonly));
 
                 (url = "").resize(max_addr_length);
-                REQUIRE_NOTHROW(dp->options()->get(O::url, url));
+                REQUIRE_NOTHROW(dp->GetOptions()->get(O::url, url));
                 // Check length as a smoke test, followed by string equality.
                 REQUIRE(url.length() == url2_addr.length());
                 REQUIRE_THAT(url, Equals(url2_addr, CaseSensitive::Yes));
 
                 // TODO: TBD: this will work for now as a rough cut Exception match...
-                REQUIRE_THROWS_AS_MATCHING(dp->options()->set(O::url, url), nng_exception, THROWS_NNG_EXCEPTION(ec_ereadonly));
+                REQUIRE_THROWS_AS_MATCHING(dp->GetOptions()->set(O::url, url), nng_exception, THROWS_NNG_EXCEPTION(ec_ereadonly));
             }
 
             SECTION("Bogus Urls not supported") {
@@ -366,8 +366,8 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
 
                         size_t actual;
                         const size_t value = 4321, expected = value;
-                        REQUIRE_NOTHROW(dp->options()->set_sz(O::max_recv_sz, value));
-                        REQUIRE_NOTHROW(dp->options()->get_sz(O::max_recv_sz, actual));
+                        REQUIRE_NOTHROW(dp->GetOptions()->set_sz(O::max_recv_sz, value));
+                        REQUIRE_NOTHROW(dp->GetOptions()->get_sz(O::max_recv_sz, actual));
                         REQUIRE(actual == expected);
                     }
 
@@ -375,14 +375,14 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
 
                         // Not appropriate for dialer.
                         // TODO: TBD: this will work for now as a rough cut Exception match...
-                        REQUIRE_THROWS_AS_MATCHING(dp->options()->set_int(O::raw, 1), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
-                        REQUIRE_THROWS_AS_MATCHING(dp->options()->set_milliseconds(O::min_reconnect_time_duration, 1), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
+                        REQUIRE_THROWS_AS_MATCHING(dp->GetOptions()->set_int(O::raw, 1), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
+                        REQUIRE_THROWS_AS_MATCHING(dp->GetOptions()->set_milliseconds(O::min_reconnect_time_duration, 1), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
                     }
 
                     SECTION("Bad size checks") {
 
                         // TODO: TBD: this will work for now as a rough cut Exception match...
-                        REQUIRE_THROWS_AS_MATCHING(dp->options()->set(O::max_recv_sz, "a", 1), nng_exception, THROWS_NNG_EXCEPTION(ec_einval));
+                        REQUIRE_THROWS_AS_MATCHING(dp->GetOptions()->set(O::max_recv_sz, "a", 1), nng_exception, THROWS_NNG_EXCEPTION(ec_einval));
                     }
                     //// TODO: TBD: the NNG testing tested for confusion between dialer and listener ID, API, etc; however, that really isn't possible under the C++ paradigm. it is a "use case" that has been designed out of the picture.
                     //SECTION("Cannot listen") {
@@ -404,8 +404,8 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
 
                         size_t actual;
                         const size_t value = 4321, expected = value;
-                        REQUIRE_NOTHROW(lp->options()->set_sz(O::max_recv_sz, value));
-                        REQUIRE_NOTHROW(lp->options()->get_sz(O::max_recv_sz, actual));
+                        REQUIRE_NOTHROW(lp->GetOptions()->set_sz(O::max_recv_sz, value));
+                        REQUIRE_NOTHROW(lp->GetOptions()->get_sz(O::max_recv_sz, actual));
                         REQUIRE(actual == expected);
                     }
 
@@ -413,14 +413,14 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
 
                         // Not appropriate for dialer.
                         // TODO: TBD: this will work for now as a rough cut Exception match...
-                        REQUIRE_THROWS_AS_MATCHING(lp->options()->set_int(O::raw, 1), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
-                        REQUIRE_THROWS_AS_MATCHING(lp->options()->set_milliseconds(O::min_reconnect_time_duration, 1), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
+                        REQUIRE_THROWS_AS_MATCHING(lp->GetOptions()->set_int(O::raw, 1), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
+                        REQUIRE_THROWS_AS_MATCHING(lp->GetOptions()->set_milliseconds(O::min_reconnect_time_duration, 1), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
                     }
 
                     SECTION("Bad size checks") {
 
                         // TODO: TBD: this will work for now as a rough cut Exception match...
-                        REQUIRE_THROWS_AS_MATCHING(lp->options()->set(O::max_recv_sz, "a", 1), nng_exception, THROWS_NNG_EXCEPTION(ec_einval));
+                        REQUIRE_THROWS_AS_MATCHING(lp->GetOptions()->set(O::max_recv_sz, "a", 1), nng_exception, THROWS_NNG_EXCEPTION(ec_einval));
                     }
 
                     // TODO: ditto dialer unit testing above: dialer cannot listen; listener cannot dial, this is a design decision not a test decision.
@@ -437,19 +437,19 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
 
                     // TODO: TBD: a lot of gets here, but only one set?
                     // TODO: TBD: this will work for now as a rough cut Exception match...
-                    REQUIRE_THROWS_AS_MATCHING(l.options()->set_sz(O::max_recv_sz, 0), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
+                    REQUIRE_THROWS_AS_MATCHING(l.GetOptions()->set_sz(O::max_recv_sz, 0), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
 
                     int value;
                     size_type sz = 1;
 
                     // TODO: TBD: this will work for now as a rough cut Exception match...
-                    REQUIRE_THROWS_AS_MATCHING(l.options()->get(O::raw, (void*)&value, sz), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
-                    REQUIRE_THROWS_AS_MATCHING(l.options()->get_sz(O::max_recv_sz, sz), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
-                    REQUIRE_THROWS_AS_MATCHING(l.options()->get_int(O::raw, value), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
+                    REQUIRE_THROWS_AS_MATCHING(l.GetOptions()->get(O::raw, (void*)&value, sz), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
+                    REQUIRE_THROWS_AS_MATCHING(l.GetOptions()->get_sz(O::max_recv_sz, sz), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
+                    REQUIRE_THROWS_AS_MATCHING(l.GetOptions()->get_int(O::raw, value), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
 
                     duration_type timeout;
 
-                    REQUIRE_THROWS_AS_MATCHING(l.options()->get(O::linger_duration, timeout), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
+                    REQUIRE_THROWS_AS_MATCHING(l.GetOptions()->get(O::linger_duration, timeout), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
                 }
 
                 SECTION("Cannot access absent Dialer Endpoint options") {
@@ -459,18 +459,18 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
 
                     // TODO: TBD: a lot of gets here, but only one set?
                     // TODO: TBD: this will work for now as a rough cut Exception match...
-                    REQUIRE_THROWS_AS_MATCHING(d.options()->set_sz(O::max_recv_sz, 0), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
+                    REQUIRE_THROWS_AS_MATCHING(d.GetOptions()->set_sz(O::max_recv_sz, 0), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
 
                     int value;
                     size_t sz = 1;
 
-                    REQUIRE_THROWS_AS_MATCHING(d.options()->get(O::raw, (void*)&value, sz), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
-                    REQUIRE_THROWS_AS_MATCHING(d.options()->get_sz(O::max_recv_sz, sz), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
-                    REQUIRE_THROWS_AS_MATCHING(d.options()->get_int(O::raw, value), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
+                    REQUIRE_THROWS_AS_MATCHING(d.GetOptions()->get(O::raw, (void*)&value, sz), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
+                    REQUIRE_THROWS_AS_MATCHING(d.GetOptions()->get_sz(O::max_recv_sz, sz), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
+                    REQUIRE_THROWS_AS_MATCHING(d.GetOptions()->get_int(O::raw, value), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
 
                     duration_type timeout;
 
-                    REQUIRE_THROWS_AS_MATCHING(d.options()->get(O::linger_duration, timeout), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
+                    REQUIRE_THROWS_AS_MATCHING(d.GetOptions()->get(O::linger_duration, timeout), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
                 }
 
                 SECTION("We can send and receive messages") {
@@ -482,17 +482,17 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
 
                     REQUIRE_NOTHROW(s2 = _session_.create_pair_socket());
 
-                    REQUIRE_NOTHROW(s1->options()->set_int(O::recv_buf, 1));
-                    REQUIRE_NOTHROW(s1->options()->get_int(O::recv_buf, length));
+                    REQUIRE_NOTHROW(s1->GetOptions()->set_int(O::recv_buf, 1));
+                    REQUIRE_NOTHROW(s1->GetOptions()->get_int(O::recv_buf, length));
                     REQUIRE(length == 1);
 
-                    REQUIRE_NOTHROW(s1->options()->set_int(O::send_buf, 1));
-                    REQUIRE_NOTHROW(s2->options()->set_int(O::send_buf, 1));
+                    REQUIRE_NOTHROW(s1->GetOptions()->set_int(O::send_buf, 1));
+                    REQUIRE_NOTHROW(s2->GetOptions()->set_int(O::send_buf, 1));
 
-                    REQUIRE_NOTHROW(s1->options()->set(O::send_timeout_duration, timeout));
-                    REQUIRE_NOTHROW(s1->options()->set(O::recv_timeout_duration, timeout));
-                    REQUIRE_NOTHROW(s2->options()->set(O::send_timeout_duration, timeout));
-                    REQUIRE_NOTHROW(s2->options()->set(O::recv_timeout_duration, timeout));
+                    REQUIRE_NOTHROW(s1->GetOptions()->set(O::send_timeout_duration, timeout));
+                    REQUIRE_NOTHROW(s1->GetOptions()->set(O::recv_timeout_duration, timeout));
+                    REQUIRE_NOTHROW(s2->GetOptions()->set(O::send_timeout_duration, timeout));
+                    REQUIRE_NOTHROW(s2->GetOptions()->set(O::recv_timeout_duration, timeout));
 
                     REQUIRE_NOTHROW(s1->listen(t1_addr));
                     REQUIRE_NOTHROW(s2->dial(t1_addr));

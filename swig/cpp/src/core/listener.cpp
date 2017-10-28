@@ -47,7 +47,7 @@ namespace nng {
 
     void listener::configure_options(nng_type lid) {
 
-        auto op = options();
+        auto op = GetOptions();
 
         op->set_getters(
             bind(&::nng_listener_getopt, lid, _1, _2, _3)

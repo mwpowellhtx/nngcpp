@@ -84,9 +84,9 @@ TEST_CASE("Bus pattern using C++ wrappers", Catch::Tags("bus"
 
         const auto receive_timeout = 50ms;
 
-        REQUIRE_NOTHROW(busp1->options()->set(O::recv_timeout_duration, receive_timeout));
-        REQUIRE_NOTHROW(busp2->options()->set(O::recv_timeout_duration, receive_timeout));
-        REQUIRE_NOTHROW(busp3->options()->set(O::recv_timeout_duration, receive_timeout));
+        REQUIRE_NOTHROW(busp1->GetOptions()->set(O::recv_timeout_duration, receive_timeout));
+        REQUIRE_NOTHROW(busp2->GetOptions()->set(O::recv_timeout_duration, receive_timeout));
+        REQUIRE_NOTHROW(busp3->GetOptions()->set(O::recv_timeout_duration, receive_timeout));
 
         SECTION("Messages delivered") {
 

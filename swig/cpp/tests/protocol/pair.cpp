@@ -307,11 +307,11 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
 
         const auto receive_timeout = 300ms;
 
-        REQUIRE_NOTHROW(serverp1->options()->set(O::recv_timeout_duration, receive_timeout));
-        REQUIRE_NOTHROW(clientp1->options()->set(O::recv_timeout_duration, receive_timeout));
-        REQUIRE_NOTHROW(clientp2->options()->set(O::recv_timeout_duration, receive_timeout));
+        REQUIRE_NOTHROW(serverp1->GetOptions()->set(O::recv_timeout_duration, receive_timeout));
+        REQUIRE_NOTHROW(clientp1->GetOptions()->set(O::recv_timeout_duration, receive_timeout));
+        REQUIRE_NOTHROW(clientp2->GetOptions()->set(O::recv_timeout_duration, receive_timeout));
 
-        REQUIRE_NOTHROW(serverp1->options()->get(O::recv_timeout_duration, timeout_duration));
+        REQUIRE_NOTHROW(serverp1->GetOptions()->get(O::recv_timeout_duration, timeout_duration));
         // TODO: TBD: looking forward to full Catch v2; including CHRONO comprehension.
         REQUIRE(timeout_duration == 300ms);
 
@@ -362,18 +362,18 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
             REQUIRE_NOTHROW(clientp1->dial(addr));
             SLEEP_FOR(100ms);
 
-            REQUIRE_THROWS_AS_MATCHING(serverp1->options()->set_int(O::raw, 1), nng_exception, THROWS_NNG_EXCEPTION(ec_estate));
-            REQUIRE_THROWS_AS_MATCHING(clientp1->options()->set_int(O::raw, 1), nng_exception, THROWS_NNG_EXCEPTION(ec_estate));
+            REQUIRE_THROWS_AS_MATCHING(serverp1->GetOptions()->set_int(O::raw, 1), nng_exception, THROWS_NNG_EXCEPTION(ec_estate));
+            REQUIRE_THROWS_AS_MATCHING(clientp1->GetOptions()->set_int(O::raw, 1), nng_exception, THROWS_NNG_EXCEPTION(ec_estate));
         }
 
         SECTION("Polyamorous mode is best effort") {
 
-            REQUIRE_NOTHROW(serverp1->options()->set_int(O::pair1_polyamorous, 1));
-            REQUIRE_NOTHROW(serverp1->options()->set_int(O::recv_buf, 1));
-            REQUIRE_NOTHROW(serverp1->options()->set_int(O::send_buf, 1));
-            REQUIRE_NOTHROW(clientp1->options()->set_int(O::recv_buf, 1));
-            REQUIRE_NOTHROW(clientp1->options()->set_int(O::recv_buf, 1));
-            REQUIRE_NOTHROW(serverp1->options()->set(O::send_timeout_duration, 100ms));
+            REQUIRE_NOTHROW(serverp1->GetOptions()->set_int(O::pair1_polyamorous, 1));
+            REQUIRE_NOTHROW(serverp1->GetOptions()->set_int(O::recv_buf, 1));
+            REQUIRE_NOTHROW(serverp1->GetOptions()->set_int(O::send_buf, 1));
+            REQUIRE_NOTHROW(clientp1->GetOptions()->set_int(O::recv_buf, 1));
+            REQUIRE_NOTHROW(clientp1->GetOptions()->set_int(O::recv_buf, 1));
+            REQUIRE_NOTHROW(serverp1->GetOptions()->set(O::send_timeout_duration, 100ms));
 
             REQUIRE_NOTHROW(serverp1->listen(addr));
             REQUIRE_NOTHROW(clientp1->dial(addr));
@@ -396,10 +396,10 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
 
         SECTION("Monogamous mode exerts backpressure") {
 
-            REQUIRE_NOTHROW(serverp1->options()->set_int(O::recv_buf, 1));
-            REQUIRE_NOTHROW(serverp1->options()->set_int(O::send_buf, 1));
-            REQUIRE_NOTHROW(clientp1->options()->set_int(O::recv_buf, 1));
-            REQUIRE_NOTHROW(serverp1->options()->set(O::send_timeout_duration, 30ms));
+            REQUIRE_NOTHROW(serverp1->GetOptions()->set_int(O::recv_buf, 1));
+            REQUIRE_NOTHROW(serverp1->GetOptions()->set_int(O::send_buf, 1));
+            REQUIRE_NOTHROW(clientp1->GetOptions()->set_int(O::recv_buf, 1));
+            REQUIRE_NOTHROW(serverp1->GetOptions()->set(O::send_timeout_duration, 30ms));
 
             REQUIRE_NOTHROW(serverp1->listen(addr));
             REQUIRE_NOTHROW(clientp1->dial(addr));
@@ -435,14 +435,14 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
             REQUIRE_NOTHROW(clientp1->dial(addr));
             SLEEP_FOR(100ms);
 
-            REQUIRE_THROWS_AS_MATCHING(serverp1->options()->set_int(O::pair1_polyamorous, 1), nng_exception, THROWS_NNG_EXCEPTION(ec_estate));
+            REQUIRE_THROWS_AS_MATCHING(serverp1->GetOptions()->set_int(O::pair1_polyamorous, 1), nng_exception, THROWS_NNG_EXCEPTION(ec_estate));
         }
 
         SECTION("Monogamous raw mode works") {
 
-            REQUIRE_NOTHROW(serverp1->options()->set_int(O::raw, 1));
-            REQUIRE_NOTHROW(clientp1->options()->set_int(O::raw, 1));
-            REQUIRE_NOTHROW(clientp2->options()->set_int(O::raw, 1));
+            REQUIRE_NOTHROW(serverp1->GetOptions()->set_int(O::raw, 1));
+            REQUIRE_NOTHROW(clientp1->GetOptions()->set_int(O::raw, 1));
+            REQUIRE_NOTHROW(clientp2->GetOptions()->set_int(O::raw, 1));
 
             REQUIRE_NOTHROW(serverp1->listen(addr));
             REQUIRE_NOTHROW(clientp1->dial(addr));
@@ -532,8 +532,8 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
                 ttl = 0;
 
                 // TODO: TBD: ditto options unit tests...
-                REQUIRE_NOTHROW(serverp1->options()->set_int(O::max_ttl, expected));
-                REQUIRE_NOTHROW(serverp1->options()->get_int(O::max_ttl, ttl));
+                REQUIRE_NOTHROW(serverp1->GetOptions()->set_int(O::max_ttl, expected));
+                REQUIRE_NOTHROW(serverp1->GetOptions()->get_int(O::max_ttl, ttl));
                 REQUIRE(ttl == expected);
 
                 SECTION("Bad TTL bounces") {
@@ -557,7 +557,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
                 }
 
                 SECTION("Large TTL passes") {
-                    REQUIRE_NOTHROW(serverp1->options()->set_int(O::max_ttl, ttl = max_ttl));
+                    REQUIRE_NOTHROW(serverp1->GetOptions()->set_int(O::max_ttl, ttl = max_ttl));
                     REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
                     // TODO: TBD: ditto narrowly focused unit tests...
                     const int expected_api = 1234;
@@ -574,7 +574,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
                 }
 
                 SECTION("Max TTL fails") {
-                    REQUIRE_NOTHROW(serverp1->options()->set_int(O::max_ttl, ttl = max_ttl));
+                    REQUIRE_NOTHROW(serverp1->GetOptions()->set_int(O::max_ttl, ttl = max_ttl));
                     REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
                     REQUIRE_NOTHROW(bmp->GetHeader()->Append(ttl));
                     REQUIRE_NOTHROW(clientp1->send(bmp.get()));
@@ -585,21 +585,21 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
         SECTION("We cannot set insane TTLs") {
 
             // TODO: TBD: really should be part of an options-oriented unit test...
-            REQUIRE_THROWS_AS_MATCHING(serverp1->options()->set_int(O::max_ttl, ttl = 0), nng_exception, THROWS_NNG_EXCEPTION(ec_einval));
-            REQUIRE_THROWS_AS_MATCHING(serverp1->options()->set_int(O::max_ttl, ttl = 1000), nng_exception, THROWS_NNG_EXCEPTION(ec_einval));
+            REQUIRE_THROWS_AS_MATCHING(serverp1->GetOptions()->set_int(O::max_ttl, ttl = 0), nng_exception, THROWS_NNG_EXCEPTION(ec_einval));
+            REQUIRE_THROWS_AS_MATCHING(serverp1->GetOptions()->set_int(O::max_ttl, ttl = 1000), nng_exception, THROWS_NNG_EXCEPTION(ec_einval));
             // TODO: TBD: still a candidate for unit tests.
             // Note the subtle difference in set call.
-            REQUIRE_THROWS_AS_MATCHING(serverp1->options()->set(O::max_ttl, &(ttl = 8), 1), nng_exception, THROWS_NNG_EXCEPTION(ec_einval));
+            REQUIRE_THROWS_AS_MATCHING(serverp1->GetOptions()->set(O::max_ttl, &(ttl = 8), 1), nng_exception, THROWS_NNG_EXCEPTION(ec_einval));
         }
 
         SECTION("Polyamorous cooked mode works") {
 
             // TODO: TBD: so all these hoops opening up this case need to be part of the narrower scope options unit test
-            REQUIRE_NOTHROW(serverp1->options()->get_int(O::pair1_polyamorous, actual_opt));
+            REQUIRE_NOTHROW(serverp1->GetOptions()->get_int(O::pair1_polyamorous, actual_opt));
             REQUIRE(actual_opt == 0);
 
-            REQUIRE_NOTHROW(serverp1->options()->set_int(O::pair1_polyamorous, 1));
-            REQUIRE_NOTHROW(serverp1->options()->get_int(O::pair1_polyamorous, actual_opt));
+            REQUIRE_NOTHROW(serverp1->GetOptions()->set_int(O::pair1_polyamorous, 1));
+            REQUIRE_NOTHROW(serverp1->GetOptions()->get_int(O::pair1_polyamorous, actual_opt));
             REQUIRE(actual_opt == 1);
 
             REQUIRE_NOTHROW(serverp1->listen(addr));
@@ -654,7 +654,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
 
         SECTION("Polyamorous default works") {
 
-            REQUIRE_NOTHROW(serverp1->options()->set_int(O::pair1_polyamorous, 1));
+            REQUIRE_NOTHROW(serverp1->GetOptions()->set_int(O::pair1_polyamorous, 1));
 
             REQUIRE_NOTHROW(serverp1->listen(addr));
             REQUIRE_NOTHROW(clientp1->dial(addr));
@@ -682,17 +682,17 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
         SECTION("Polyamorous raw mode works") {
 
             // TODO: TBD: here we go again, doing hoop jumping that really belongs in its own unit tests for options...
-            REQUIRE_NOTHROW(serverp1->options()->get_int(O::pair1_polyamorous, actual_opt));
+            REQUIRE_NOTHROW(serverp1->GetOptions()->get_int(O::pair1_polyamorous, actual_opt));
             REQUIRE(actual_opt == 0);
 
-            REQUIRE_NOTHROW(serverp1->options()->set_int(O::pair1_polyamorous, 1));
-            REQUIRE_NOTHROW(serverp1->options()->get_int(O::pair1_polyamorous, actual_opt));
+            REQUIRE_NOTHROW(serverp1->GetOptions()->set_int(O::pair1_polyamorous, 1));
+            REQUIRE_NOTHROW(serverp1->GetOptions()->get_int(O::pair1_polyamorous, actual_opt));
             REQUIRE(actual_opt == 1);
 
             // TODO: It probably serves a purpose on one level; but if we test it in its own unit test, we can just set it and be done with it, with confidence.
             actual_opt = 0;
-            REQUIRE_NOTHROW(serverp1->options()->set_int(O::raw, 1));
-            REQUIRE_NOTHROW(serverp1->options()->get_int(O::raw, actual_opt));
+            REQUIRE_NOTHROW(serverp1->GetOptions()->set_int(O::raw, 1));
+            REQUIRE_NOTHROW(serverp1->GetOptions()->get_int(O::raw, actual_opt));
             REQUIRE(actual_opt == 1);
 
             REQUIRE_NOTHROW(serverp1->listen(addr));

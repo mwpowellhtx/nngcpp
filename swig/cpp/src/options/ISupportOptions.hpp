@@ -20,7 +20,7 @@ namespace nng {
 
         virtual ~ISupportOptions() {}
 
-        virtual options_type* const options() {
+        virtual options_type* const GetOptions() {
             return &_options;
         }
     };

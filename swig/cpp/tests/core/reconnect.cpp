@@ -203,8 +203,8 @@ TEST_CASE("NNG C++ wrapper reconnect works", Catch::Tags(
 
         const auto reconnect_time = 10ms;
 
-        REQUIRE_NOTHROW(pull->options()->set(_opt_::min_reconnect_time_duration, reconnect_time));
-        REQUIRE_NOTHROW(pull->options()->set(_opt_::max_reconnect_time_duration, reconnect_time));
+        REQUIRE_NOTHROW(pull->GetOptions()->set(_opt_::min_reconnect_time_duration, reconnect_time));
+        REQUIRE_NOTHROW(pull->GetOptions()->set(_opt_::max_reconnect_time_duration, reconnect_time));
 
         SECTION("Dialing before listening works") {
 

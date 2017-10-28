@@ -62,7 +62,7 @@ namespace nng {
         __setter = bind(&::nng_msg_set_pipe, msgp, pid);
         __closer = bind(&::nng_pipe_close, pid);
 
-        auto op = options();
+        auto op = GetOptions();
 
         op->set_getters(
             bind(&::nng_pipe_getopt, pid, _1, _2, _3)

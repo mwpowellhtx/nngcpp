@@ -76,10 +76,10 @@ TEST_CASE("Request/reply pattern using C++ wrapper", Catch::Tags("req", "rep"
 		SECTION("Request resend time option works") {
 
             // Set the timeout.
-            REQUIRE_NOTHROW(reqp->options()->set(O::req_resend_time_duration, 10ms));
+            REQUIRE_NOTHROW(reqp->GetOptions()->set(O::req_resend_time_duration, 10ms));
             // TODO: TBD: it is unit tests like this that really deserve a more focused unit test on just options alone...
             // Check invalid size.
-            REQUIRE_THROWS_AS_MATCHING(reqp->options()->set(O::req_resend_time_duration, __empty), nng_exception, THROWS_NNG_EXCEPTION(ec_einval));
+            REQUIRE_THROWS_AS_MATCHING(reqp->GetOptions()->set(O::req_resend_time_duration, __empty), nng_exception, THROWS_NNG_EXCEPTION(ec_einval));
 		}
 
 		SECTION("Receive socket without send socket fails") {
@@ -119,7 +119,7 @@ TEST_CASE("Request/reply pattern using C++ wrapper", Catch::Tags("req", "rep"
 		}
 
 		SECTION("Cannot set resend time option") {
-            REQUIRE_THROWS_AS_MATCHING(repp->options()->set(O::req_resend_time_duration, 1ms), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
+            REQUIRE_THROWS_AS_MATCHING(repp->GetOptions()->set(O::req_resend_time_duration, 1ms), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
 		}
 
         SECTION("Socket can close") {
@@ -168,8 +168,8 @@ TEST_CASE("Request/reply pattern using C++ wrapper", Catch::Tags("req", "rep"
         REQUIRE_NOTHROW(reqp = make_unique<latest_req_socket>());
         REQUIRE_NOTHROW(repp = make_unique<latest_rep_socket>());
 
-        REQUIRE_NOTHROW(reqp->options()->set(O::req_resend_time_duration, 100ms));
-        REQUIRE_NOTHROW(reqp->options()->set_int(O::send_buf, 16));
+        REQUIRE_NOTHROW(reqp->GetOptions()->set(O::req_resend_time_duration, 100ms));
+        REQUIRE_NOTHROW(reqp->GetOptions()->set_int(O::send_buf, 16));
 
         REQUIRE_NOTHROW(repp->listen(test_addr));
         REQUIRE_NOTHROW(reqp->dial(test_addr));
