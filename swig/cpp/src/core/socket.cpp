@@ -35,15 +35,15 @@ namespace nng {
 
         op->set_getters(
             bind(&::nng_getopt, sid, _1, _2, _3)
-            , bind(::nng_getopt_int, sid, _1, _2)
-            , bind(::nng_getopt_size, sid, _1, _2)
+            , bind(&::nng_getopt_int, sid, _1, _2)
+            , bind(&::nng_getopt_size, sid, _1, _2)
             , bind(&::nng_getopt_ms, sid, _1, _2)
         );
 
         op->set_setters(
             bind(&::nng_setopt, sid, _1, _2, _3)
-            , bind(::nng_setopt_int, sid, _1, _2)
-            , bind(::nng_setopt_size, sid, _1, _2)
+            , bind(&::nng_setopt_int, sid, _1, _2)
+            , bind(&::nng_setopt_size, sid, _1, _2)
             , bind(&::nng_setopt_ms, sid, _1, _2)
         );
     }

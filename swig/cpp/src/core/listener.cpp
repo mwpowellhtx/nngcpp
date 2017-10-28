@@ -56,8 +56,8 @@ namespace nng {
         op->set_getters(
             bind(&::nng_listener_getopt, lid, _1, _2, _3)
             , bind(&::nng_listener_getopt_int, lid, _1, _2)
-            , bind(::nng_listener_getopt_size, lid, _1, _2)
-            , bind(::nng_listener_getopt_ms, lid, _1, _2)
+            , bind(&::nng_listener_getopt_size, lid, _1, _2)
+            , bind(&::nng_listener_getopt_ms, lid, _1, _2)
         );
 
         op->set_setters(
