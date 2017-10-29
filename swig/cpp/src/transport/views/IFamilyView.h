@@ -45,6 +45,8 @@ namespace nng {
 
     protected:
 
+        typedef IAddrFamilyViewBase __family_view_base;
+
         typedef sockaddr_t sockaddr_type;
 
         sockaddr_type* const _sap;
@@ -84,8 +86,7 @@ namespace nng {
 
     template<class Detail_>
     struct IAddrFamilyView
-        : public IAddrFamilyViewBase
-        , public std::equal_to<Detail_> {
+        : public IAddrFamilyViewBase {
 
         typedef Detail_ detail_type;
 
@@ -103,8 +104,7 @@ namespace nng {
 
         virtual detail_type* get_detail() const = 0;
 
-        virtual bool operator==(const detail_type& other) = 0;
-        virtual bool operator!=(const detail_type& other) = 0;
+        virtual bool Equals(detail_type* const ap, detail_type* const bp) const = 0;
     };
 
 #ifndef NNGCPP_ADDRESS_H

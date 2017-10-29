@@ -35,6 +35,10 @@ namespace nng {
     typedef struct sockaddr_in6_t sockaddr_udp6_t;
     typedef struct sockaddr_in6_t sockaddr_tcp6_t;
 
+    struct sockaddr_unspec_t {
+        nng::uint16_t sa_family;
+    };
+
     struct sockaddr_in_t {
         nng::uint16_t sa_family;
         nng::uint16_t sa_port;
