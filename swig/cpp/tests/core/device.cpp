@@ -91,8 +91,8 @@ TEST_CASE("Test that device functions properly", "[device]") {
             latest_pair_socket p1, p2;
 
             // TODO: TBD: in the grand scheme of things, I'm not really sure what purpose these two assertions are serving...
-            REQUIRE_NOTHROW(p1.GetOptions()->set_int(O::raw, 1));
-            REQUIRE_NOTHROW(p2.GetOptions()->set_int(O::raw, 1));
+            REQUIRE_NOTHROW(p1.GetOptions()->SetInt32(O::raw, 1));
+            REQUIRE_NOTHROW(p2.GetOptions()->SetInt32(O::raw, 1));
 
             REQUIRE_NOTHROW(fixture.install(&p1, &p2, true));
             REQUIRE(fixture.is_installed() == true);

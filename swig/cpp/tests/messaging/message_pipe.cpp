@@ -101,7 +101,7 @@ TEST_CASE("Message pipe subordinates properly", Catch::Tags("message", "pipe"
 
         const int expected_recv_buf = 3;
         // Which sets us up to verify some Message Pipe expectations afterwards.
-        REQUIRE_NOTHROW(sp2->GetOptions()->set_int(O::recv_buf, expected_recv_buf));
+        REQUIRE_NOTHROW(sp2->GetOptions()->SetInt32(O::recv_buf, expected_recv_buf));
 
         // Using nominal defaults.
         REQUIRE_NOTHROW(sp1->listen(test_addr));

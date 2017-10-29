@@ -33,7 +33,7 @@ namespace nng {
         invocation::with_default_error_handling(_setopt, name.c_str(), s.c_str(), s.length());
     }
 
-    void _OptionWriter::set_int(const std::string& name, int val) {
+    void _OptionWriter::SetInt32(const std::string& name, int32_t val) {
         invocation::with_default_error_handling(_setopt_int, name.c_str(), val);
     }
 

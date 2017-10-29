@@ -274,15 +274,15 @@ TEST_CASE("Load balancing works", Catch::Tags("load", "balancing", "pipeline"
 
     const int default_buffer_size = 4;
 
-    REQUIRE_NOTHROW(pushsp->GetOptions()->set_int(O::recv_buf, default_buffer_size));
-    REQUIRE_NOTHROW(pullsp1->GetOptions()->set_int(O::recv_buf, default_buffer_size));
-    REQUIRE_NOTHROW(pullsp2->GetOptions()->set_int(O::recv_buf, default_buffer_size));
-    REQUIRE_NOTHROW(pullsp3->GetOptions()->set_int(O::recv_buf, default_buffer_size));
+    REQUIRE_NOTHROW(pushsp->GetOptions()->SetInt32(O::recv_buf, default_buffer_size));
+    REQUIRE_NOTHROW(pullsp1->GetOptions()->SetInt32(O::recv_buf, default_buffer_size));
+    REQUIRE_NOTHROW(pullsp2->GetOptions()->SetInt32(O::recv_buf, default_buffer_size));
+    REQUIRE_NOTHROW(pullsp3->GetOptions()->SetInt32(O::recv_buf, default_buffer_size));
 
-    REQUIRE_NOTHROW(pushsp->GetOptions()->set_int(O::send_buf, default_buffer_size));
-    REQUIRE_NOTHROW(pullsp1->GetOptions()->set_int(O::send_buf, default_buffer_size));
-    REQUIRE_NOTHROW(pullsp2->GetOptions()->set_int(O::send_buf, default_buffer_size));
-    REQUIRE_NOTHROW(pullsp3->GetOptions()->set_int(O::send_buf, default_buffer_size));
+    REQUIRE_NOTHROW(pushsp->GetOptions()->SetInt32(O::send_buf, default_buffer_size));
+    REQUIRE_NOTHROW(pullsp1->GetOptions()->SetInt32(O::send_buf, default_buffer_size));
+    REQUIRE_NOTHROW(pullsp2->GetOptions()->SetInt32(O::send_buf, default_buffer_size));
+    REQUIRE_NOTHROW(pullsp3->GetOptions()->SetInt32(O::send_buf, default_buffer_size));
 
     unique_ptr<binary_message> abcsp, defsp;
 

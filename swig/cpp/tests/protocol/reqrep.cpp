@@ -169,7 +169,7 @@ TEST_CASE("Request/reply pattern using C++ wrapper", Catch::Tags("req", "rep"
         REQUIRE_NOTHROW(repp = make_unique<latest_rep_socket>());
 
         REQUIRE_NOTHROW(reqp->GetOptions()->set(O::req_resend_duration, 100ms));
-        REQUIRE_NOTHROW(reqp->GetOptions()->set_int(O::send_buf, 16));
+        REQUIRE_NOTHROW(reqp->GetOptions()->SetInt32(O::send_buf, 16));
 
         REQUIRE_NOTHROW(repp->listen(test_addr));
         REQUIRE_NOTHROW(reqp->dial(test_addr));

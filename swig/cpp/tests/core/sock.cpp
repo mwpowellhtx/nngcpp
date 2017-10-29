@@ -243,8 +243,8 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
             SECTION("Read-only options handled properly") {
 
                 // TODO: TBD: this will work for now as a rough cut Exception match...
-                REQUIRE_THROWS_AS_MATCHING(s1->GetOptions()->set_int(O::recv_fd, 0), nng_exception, THROWS_NNG_EXCEPTION(ec_ereadonly));
-                REQUIRE_THROWS_AS_MATCHING(s1->GetOptions()->set_int(O::send_fd, 0), nng_exception, THROWS_NNG_EXCEPTION(ec_ereadonly));
+                REQUIRE_THROWS_AS_MATCHING(s1->GetOptions()->SetInt32(O::recv_fd, 0), nng_exception, THROWS_NNG_EXCEPTION(ec_ereadonly));
+                REQUIRE_THROWS_AS_MATCHING(s1->GetOptions()->SetInt32(O::send_fd, 0), nng_exception, THROWS_NNG_EXCEPTION(ec_ereadonly));
                 REQUIRE_THROWS_AS_MATCHING(s1->GetOptions()->SetString(O::local_addr, "a"), nng_exception, THROWS_NNG_EXCEPTION(ec_ereadonly));
             }
 
@@ -375,7 +375,7 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
 
                         // Not appropriate for dialer.
                         // TODO: TBD: this will work for now as a rough cut Exception match...
-                        REQUIRE_THROWS_AS_MATCHING(dp->GetOptions()->set_int(O::raw, 1), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
+                        REQUIRE_THROWS_AS_MATCHING(dp->GetOptions()->SetInt32(O::raw, 1), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
                         REQUIRE_THROWS_AS_MATCHING(dp->GetOptions()->set_milliseconds(O::min_reconnect_duration, 1), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
                     }
 
@@ -413,7 +413,7 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
 
                         // Not appropriate for dialer.
                         // TODO: TBD: this will work for now as a rough cut Exception match...
-                        REQUIRE_THROWS_AS_MATCHING(lp->GetOptions()->set_int(O::raw, 1), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
+                        REQUIRE_THROWS_AS_MATCHING(lp->GetOptions()->SetInt32(O::raw, 1), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
                         REQUIRE_THROWS_AS_MATCHING(lp->GetOptions()->set_milliseconds(O::min_reconnect_duration, 1), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
                     }
 
@@ -478,12 +478,12 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
 
                     REQUIRE_NOTHROW(s2 = _session_.create_pair_socket());
 
-                    REQUIRE_NOTHROW(s1->GetOptions()->set_int(O::recv_buf, 1));
+                    REQUIRE_NOTHROW(s1->GetOptions()->SetInt32(O::recv_buf, 1));
                     REQUIRE_NOTHROW(length = s1->GetOptions()->GetInt32(O::recv_buf));
                     REQUIRE(length == 1);
 
-                    REQUIRE_NOTHROW(s1->GetOptions()->set_int(O::send_buf, 1));
-                    REQUIRE_NOTHROW(s2->GetOptions()->set_int(O::send_buf, 1));
+                    REQUIRE_NOTHROW(s1->GetOptions()->SetInt32(O::send_buf, 1));
+                    REQUIRE_NOTHROW(s2->GetOptions()->SetInt32(O::send_buf, 1));
 
                     REQUIRE_NOTHROW(s1->GetOptions()->set(O::send_timeout_duration, timeout));
                     REQUIRE_NOTHROW(s1->GetOptions()->set(O::recv_timeout_duration, timeout));

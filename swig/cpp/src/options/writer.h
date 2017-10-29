@@ -58,7 +58,7 @@ namespace nng {
         virtual void set(const std::string& name, const void* valp, size_type sz);
         virtual void SetString(const std::string& name, const std::string& s);
 
-        virtual void set_int(const std::string& name, int val);
+        virtual void SetInt32(const std::string& name, int32_t val);
         virtual void set_sz(const std::string& name, size_type val);
 
         virtual void set(const std::string& name, const duration_type& val);

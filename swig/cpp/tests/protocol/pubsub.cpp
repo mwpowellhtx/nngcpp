@@ -256,7 +256,7 @@ TEST_CASE("Publisher/subscriber pattern using C++ wrapper", Catch::Tags("pub", "
         SECTION("Subscribers in raw receive") {
 
             REQUIRE_NOTHROW(subp->GetOptions()->set(O::recv_timeout_duration, 90ms));
-            REQUIRE_NOTHROW(subp->GetOptions()->set_int(O::raw, 1));
+            REQUIRE_NOTHROW(subp->GetOptions()->SetInt32(O::raw, 1));
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
             REQUIRE_NOTHROW(*bmp << topics::some_like_it_raw);
