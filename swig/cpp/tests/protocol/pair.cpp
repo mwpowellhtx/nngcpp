@@ -282,6 +282,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
     using namespace constants;
     using namespace Catch::Matchers;
     using O = option_names;
+    using nng::int32_t;
     using nng::uint32_t;
 
     uint32_t hops;
