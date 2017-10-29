@@ -70,10 +70,8 @@ void init(const std::string& addr) {
 
 namespace nng {
 
-    const IAddrFamilyViewBase::in6_addr_vector_type expected_loopback_long_addr
-        = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1 };
-
-    const IAddrFamilyViewBase::in6_addr_vector_type expected_loopback_short_addr = { 1 };
+    const IPv6AddrVector expected_loopback_long_addr = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1 };
+    const IPv6AddrVector expected_loopback_short_addr = { 1 };
 
     using O = option_names;
 
@@ -119,11 +117,11 @@ namespace nng {
         _SockAddr a;
 
         REQUIRE_NOTHROW(pp->GetOptions()->get(O::local_addr, a));
-        REQUIRE(a.get_family() == af_inet6);
+        REQUIRE(a.GetFamily() == af_inet6);
         auto vp = a.view();
-        REQUIRE(vp->get_family() == a.get_family());
-        REQUIRE_THAT(vp->get_in6_addr(), Equals(expected_loopback_short_addr));
-        REQUIRE(vp->get_port() == expected_port);
+        REQUIRE(vp->GetFamily() == a.GetFamily());
+        REQUIRE_THAT(vp->GetIPv6Addr(), Equals(expected_loopback_short_addr));
+        REQUIRE(vp->__GetPort() == expected_port);
     }
 
     template<>
@@ -136,10 +134,10 @@ namespace nng {
         _SockAddr a;
 
         REQUIRE_NOTHROW(pp->GetOptions()->get(O::remote_addr, a));
-        REQUIRE(a.get_family() == af_inet6);
+        REQUIRE(a.GetFamily() == af_inet6);
         auto vp = a.view();
-        REQUIRE(vp->get_family() == a.get_family());
-        REQUIRE_THAT(vp->get_in6_addr(), Equals(expected_loopback_short_addr));
-        REQUIRE(vp->get_port() != 0);
+        REQUIRE(vp->GetFamily() == a.GetFamily());
+        REQUIRE_THAT(vp->GetIPv6Addr(), Equals(expected_loopback_short_addr));
+        REQUIRE(vp->__GetPort() != 0);
     }
 }

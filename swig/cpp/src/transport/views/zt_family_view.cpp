@@ -41,8 +41,4 @@ namespace nng {
     bool _ZeroTierFamilyView::operator!=(const IAddrFamilyViewBase& other) {
         return !operator==(other);
     }
-
-    _SockAddrFamilyType _ZeroTierFamilyView::get_family() const {
-        return static_cast<_SockAddrFamilyType>(get_detail()->sa_family);
-    }
 }

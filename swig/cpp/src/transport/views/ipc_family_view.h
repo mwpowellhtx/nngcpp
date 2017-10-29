@@ -7,8 +7,6 @@ namespace nng {
 
     struct _IpcFamilyView : public IAddrFamilyView<sockaddr_ipc_t> {
 
-        virtual _SockAddrFamilyType get_family() const override;
-
         virtual ~_IpcFamilyView();
 
         virtual bool operator==(const IAddrFamilyViewBase& other) override;

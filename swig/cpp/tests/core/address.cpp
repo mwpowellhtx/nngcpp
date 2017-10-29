@@ -43,11 +43,11 @@ namespace nng {
         }
 
         uint16_t get_family_value() const {
-            return static_cast<uint16_t>(get_family());
+            return static_cast<uint16_t>(GetFamily());
         }
 
         void set_family_value(uint16_t value) {
-            set_family(static_cast<_SockAddrFamilyType>(value));
+            set_family(static_cast<SocketAddressFamily>(value));
         }
     };
 }
@@ -73,7 +73,7 @@ namespace nng {
 
     const uint16_t expected_port = 0xab;
 
-    const IAddrFamilyViewBase::in6_addr_vector_type expected_ipv6_addr = {
+    const IPv6AddrVector expected_ipv6_addr = {
         0x01, 0x12, 0x23, 0x34, /**/ 0x45, 0x56, 0x67, 0x78,
         0x89, 0x9a, 0xab, 0xbc, /**/ 0xcd, 0xde, 0xef, 0xf0,
     };
@@ -85,21 +85,21 @@ namespace nng {
     address_test max_fv_tests{
         [](_SockAddrFixture* afp, const uint16_t fv) {
         auto vp = afp->view();
-        REQUIRE_THROWS_AS(vp->set_port(0), not_implemented);
-        REQUIRE_THROWS_AS(vp->set_addr(0), not_implemented);
-        REQUIRE_THROWS_AS(vp->set_in6_addr({}), not_implemented);
-        REQUIRE_THROWS_AS(vp->set_in6_addr16({}), not_implemented);
-        REQUIRE_THROWS_AS(vp->set_in6_addr32({}), not_implemented);
+        REQUIRE_THROWS_AS(vp->__SetPort(0), not_implemented);
+        REQUIRE_THROWS_AS(vp->SetIPv4Addr(0), not_implemented);
+        REQUIRE_THROWS_AS(vp->SetIPv6Addr({}), not_implemented);
+        REQUIRE_THROWS_AS(vp->SetIPv6Addr16({}), not_implemented);
+        REQUIRE_THROWS_AS(vp->SetIPv6Addr32({}), not_implemented);
     }
         , [](IAddrFamilyViewBase* const vp, const uint16_t fv) {
         // In this case Family and Jewel should not agree.
-        REQUIRE(vp->get_jewel() == af_unspec);
-        REQUIRE(vp->get_family() == numeric_limits<uint16_t>::max());
-        REQUIRE_THROWS_AS(vp->get_addr(), not_implemented);
-        REQUIRE_THROWS_AS(vp->get_in6_addr(), not_implemented);
-        REQUIRE_THROWS_AS(vp->get_in6_addr16(), not_implemented);
-        REQUIRE_THROWS_AS(vp->get_in6_addr32(), not_implemented);
-        REQUIRE_THROWS_AS(vp->get_port(), not_implemented);
+        REQUIRE(vp->GetJewel() == af_unspec);
+        REQUIRE(vp->GetFamily() == numeric_limits<uint16_t>::max());
+        REQUIRE_THROWS_AS(vp->GetIPv4Addr(), not_implemented);
+        REQUIRE_THROWS_AS(vp->GetIPv6Addr(), not_implemented);
+        REQUIRE_THROWS_AS(vp->GetIPv6Addr16(), not_implemented);
+        REQUIRE_THROWS_AS(vp->GetIPv6Addr32(), not_implemented);
+        REQUIRE_THROWS_AS(vp->__GetPort(), not_implemented);
     }
     };
 
@@ -107,62 +107,62 @@ namespace nng {
     address_test unspec_tests{
         [](_SockAddrFixture* afp, const uint16_t fv) {
         auto vp = afp->view();
-        REQUIRE_THROWS_AS(vp->set_port(0), not_implemented);
-        REQUIRE_THROWS_AS(vp->set_addr(0), not_implemented);
-        REQUIRE_THROWS_AS(vp->set_in6_addr({}), not_implemented);
-        REQUIRE_THROWS_AS(vp->set_in6_addr16({}), not_implemented);
-        REQUIRE_THROWS_AS(vp->set_in6_addr32({}), not_implemented);
+        REQUIRE_THROWS_AS(vp->__SetPort(0), not_implemented);
+        REQUIRE_THROWS_AS(vp->SetIPv4Addr(0), not_implemented);
+        REQUIRE_THROWS_AS(vp->SetIPv6Addr({}), not_implemented);
+        REQUIRE_THROWS_AS(vp->SetIPv6Addr16({}), not_implemented);
+        REQUIRE_THROWS_AS(vp->SetIPv6Addr32({}), not_implemented);
     }
         , [](IAddrFamilyViewBase* const vp, const uint16_t fv) {
-        REQUIRE(vp->get_jewel() == af_unspec);
-        REQUIRE(vp->get_family() == vp->get_jewel());
-        REQUIRE_THROWS_AS(vp->get_addr(), not_implemented);
-        REQUIRE_THROWS_AS(vp->get_in6_addr(), not_implemented);
-        REQUIRE_THROWS_AS(vp->get_in6_addr16(), not_implemented);
-        REQUIRE_THROWS_AS(vp->get_in6_addr32(), not_implemented);
-        REQUIRE_THROWS_AS(vp->get_port(), not_implemented);
+        REQUIRE(vp->GetJewel() == af_unspec);
+        REQUIRE(vp->GetFamily() == vp->GetJewel());
+        REQUIRE_THROWS_AS(vp->GetIPv4Addr(), not_implemented);
+        REQUIRE_THROWS_AS(vp->GetIPv6Addr(), not_implemented);
+        REQUIRE_THROWS_AS(vp->GetIPv6Addr16(), not_implemented);
+        REQUIRE_THROWS_AS(vp->GetIPv6Addr32(), not_implemented);
+        REQUIRE_THROWS_AS(vp->__GetPort(), not_implemented);
     }
     };
 
     address_test inproc_tests{
         [](_SockAddrFixture* afp, const uint16_t fv) {
         auto vp = afp->view();
-        REQUIRE_THROWS_AS(vp->set_port(0), not_implemented);
-        REQUIRE_THROWS_AS(vp->set_addr(0), not_implemented);
-        REQUIRE_THROWS_AS(vp->set_in6_addr({}), not_implemented);
-        REQUIRE_THROWS_AS(vp->set_in6_addr16({}), not_implemented);
-        REQUIRE_THROWS_AS(vp->set_in6_addr32({}), not_implemented);
+        REQUIRE_THROWS_AS(vp->__SetPort(0), not_implemented);
+        REQUIRE_THROWS_AS(vp->SetIPv4Addr(0), not_implemented);
+        REQUIRE_THROWS_AS(vp->SetIPv6Addr({}), not_implemented);
+        REQUIRE_THROWS_AS(vp->SetIPv6Addr16({}), not_implemented);
+        REQUIRE_THROWS_AS(vp->SetIPv6Addr32({}), not_implemented);
     }
         , [](IAddrFamilyViewBase* const vp, const uint16_t fv) {
-        REQUIRE(vp->get_jewel() == af_inproc);
-        REQUIRE(vp->get_family() == vp->get_jewel());
+        REQUIRE(vp->GetJewel() == af_inproc);
+        REQUIRE(vp->GetFamily() == vp->GetJewel());
         REQUIRE(dynamic_cast<_InprocFamilyView*>(vp));
-        REQUIRE_THROWS_AS(vp->get_addr(), not_implemented);
-        REQUIRE_THROWS_AS(vp->get_in6_addr(), not_implemented);
-        REQUIRE_THROWS_AS(vp->get_in6_addr16(), not_implemented);
-        REQUIRE_THROWS_AS(vp->get_in6_addr32(), not_implemented);
-        REQUIRE_THROWS_AS(vp->get_port(), not_implemented);
+        REQUIRE_THROWS_AS(vp->GetIPv4Addr(), not_implemented);
+        REQUIRE_THROWS_AS(vp->GetIPv6Addr(), not_implemented);
+        REQUIRE_THROWS_AS(vp->GetIPv6Addr16(), not_implemented);
+        REQUIRE_THROWS_AS(vp->GetIPv6Addr32(), not_implemented);
+        REQUIRE_THROWS_AS(vp->__GetPort(), not_implemented);
     }
     };
 
     address_test ipc_tests{
         [](_SockAddrFixture* afp, const uint16_t fv) {
         auto vp = afp->view();
-        REQUIRE_THROWS_AS(vp->set_port(0), not_implemented);
-        REQUIRE_THROWS_AS(vp->set_addr(0), not_implemented);
-        REQUIRE_THROWS_AS(vp->set_in6_addr({}), not_implemented);
-        REQUIRE_THROWS_AS(vp->set_in6_addr16({}), not_implemented);
-        REQUIRE_THROWS_AS(vp->set_in6_addr32({}), not_implemented);
+        REQUIRE_THROWS_AS(vp->__SetPort(0), not_implemented);
+        REQUIRE_THROWS_AS(vp->SetIPv4Addr(0), not_implemented);
+        REQUIRE_THROWS_AS(vp->SetIPv6Addr({}), not_implemented);
+        REQUIRE_THROWS_AS(vp->SetIPv6Addr16({}), not_implemented);
+        REQUIRE_THROWS_AS(vp->SetIPv6Addr32({}), not_implemented);
     }
         , [](IAddrFamilyViewBase* const vp, const uint16_t fv) {
-        REQUIRE(vp->get_jewel() == af_ipc);
-        REQUIRE(vp->get_family() == vp->get_jewel());
+        REQUIRE(vp->GetJewel() == af_ipc);
+        REQUIRE(vp->GetFamily() == vp->GetJewel());
         REQUIRE(dynamic_cast<_IpcFamilyView*>(vp));
-        REQUIRE_THROWS_AS(vp->get_addr(), not_implemented);
-        REQUIRE_THROWS_AS(vp->get_in6_addr(), not_implemented);
-        REQUIRE_THROWS_AS(vp->get_in6_addr16(), not_implemented);
-        REQUIRE_THROWS_AS(vp->get_in6_addr32(), not_implemented);
-        REQUIRE_THROWS_AS(vp->get_port(), not_implemented);
+        REQUIRE_THROWS_AS(vp->GetIPv4Addr(), not_implemented);
+        REQUIRE_THROWS_AS(vp->GetIPv6Addr(), not_implemented);
+        REQUIRE_THROWS_AS(vp->GetIPv6Addr16(), not_implemented);
+        REQUIRE_THROWS_AS(vp->GetIPv6Addr32(), not_implemented);
+        REQUIRE_THROWS_AS(vp->__GetPort(), not_implemented);
     }
     };
 
@@ -170,24 +170,24 @@ namespace nng {
         [](_SockAddrFixture* afp, const uint16_t fv) {
         auto vp = dynamic_cast<_InetFamilyView*>(afp->view());
         REQUIRE(vp);
-        REQUIRE(!vp->get_port());
-        REQUIRE(!vp->get_addr());
-        REQUIRE_THROWS_AS(vp->set_in6_addr({}), not_implemented);
-        REQUIRE_THROWS_AS(vp->set_in6_addr16({}), not_implemented);
-        REQUIRE_THROWS_AS(vp->set_in6_addr32({}), not_implemented);
-        REQUIRE_NOTHROW(vp->set_port(expected_port));
-        REQUIRE_NOTHROW(vp->set_addr(INADDR_LOOPBACK));
+        REQUIRE(!vp->__GetPort());
+        REQUIRE(!vp->GetIPv4Addr());
+        REQUIRE_THROWS_AS(vp->SetIPv6Addr({}), not_implemented);
+        REQUIRE_THROWS_AS(vp->SetIPv6Addr16({}), not_implemented);
+        REQUIRE_THROWS_AS(vp->SetIPv6Addr32({}), not_implemented);
+        REQUIRE_NOTHROW(vp->__SetPort(expected_port));
+        REQUIRE_NOTHROW(vp->SetIPv4Addr(INADDR_LOOPBACK));
     },
         [](IAddrFamilyViewBase* const vp, const uint16_t fv) {
-        REQUIRE(vp->get_jewel() == af_inet);
-        REQUIRE(vp->get_family() == vp->get_jewel());
-        REQUIRE_THROWS_AS(vp->get_in6_addr(), not_implemented);
-        REQUIRE_THROWS_AS(vp->get_in6_addr16(), not_implemented);
-        REQUIRE_THROWS_AS(vp->get_in6_addr32(), not_implemented);
+        REQUIRE(vp->GetJewel() == af_inet);
+        REQUIRE(vp->GetFamily() == vp->GetJewel());
+        REQUIRE_THROWS_AS(vp->GetIPv6Addr(), not_implemented);
+        REQUIRE_THROWS_AS(vp->GetIPv6Addr16(), not_implemented);
+        REQUIRE_THROWS_AS(vp->GetIPv6Addr32(), not_implemented);
         auto vp2 = dynamic_cast<_InetFamilyView*>(vp);
         REQUIRE(vp2);
-        REQUIRE(vp2->get_addr() == INADDR_LOOPBACK);
-        REQUIRE(vp2->get_port() == expected_port);
+        REQUIRE(vp2->GetIPv4Addr() == INADDR_LOOPBACK);
+        REQUIRE(vp2->__GetPort() == expected_port);
     }
     };
 
@@ -195,48 +195,48 @@ namespace nng {
         [](_SockAddrFixture* afp, const uint16_t fv) {
         auto vp = dynamic_cast<_Inet6FamilyView*>(afp->view());
         REQUIRE(vp);
-        REQUIRE_THROWS_AS(vp->set_addr(0), not_implemented);
-        REQUIRE(!vp->get_port());
+        REQUIRE_THROWS_AS(vp->SetIPv4Addr(0), not_implemented);
+        REQUIRE(!vp->__GetPort());
         // TODO: TBD: https://en.wikipedia.org/wiki/IPv6 / https://en.wikipedia.org/wiki/IPv6_address
         // TODO: TBD: NNG IPv6 representation not ready for prime time yet, I think it needs a little work in the address representation
         // https://github.com/nanomsg/nng/issues/119
-        REQUIRE_NOTHROW(vp->set_port(expected_port));
-        REQUIRE_NOTHROW(vp->set_in6_addr(expected_ipv6_addr));
+        REQUIRE_NOTHROW(vp->__SetPort(expected_port));
+        REQUIRE_NOTHROW(vp->SetIPv6Addr(expected_ipv6_addr));
         // TODO: TBD: these should be implemented one way or another...
-        CHECK_THROWS_AS(vp->set_in6_addr16({}), not_implemented);
-        CHECK_THROWS_AS(vp->set_in6_addr32({}), not_implemented);
+        CHECK_THROWS_AS(vp->SetIPv6Addr16({}), not_implemented);
+        CHECK_THROWS_AS(vp->SetIPv6Addr32({}), not_implemented);
     },
         [](IAddrFamilyViewBase* const vp, const uint16_t fv) {
-        REQUIRE(vp->get_jewel() == af_inet6);
-        REQUIRE(vp->get_family() == vp->get_jewel());
-        REQUIRE_THROWS_AS(vp->get_addr(), not_implemented);
+        REQUIRE(vp->GetJewel() == af_inet6);
+        REQUIRE(vp->GetFamily() == vp->GetJewel());
+        REQUIRE_THROWS_AS(vp->GetIPv4Addr(), not_implemented);
         REQUIRE(dynamic_cast<_Inet6FamilyView*>(vp));
-        REQUIRE_NOTHROW(vp->get_in6_addr());
+        REQUIRE_NOTHROW(vp->GetIPv6Addr());
         // TODO: TBD: ditto the arrange/implementation...
-        CHECK_THROWS_AS(vp->get_in6_addr16(), not_implemented);
-        CHECK_THROWS_AS(vp->get_in6_addr32(), not_implemented);
-        REQUIRE_NOTHROW(vp->get_port());
+        CHECK_THROWS_AS(vp->GetIPv6Addr16(), not_implemented);
+        CHECK_THROWS_AS(vp->GetIPv6Addr32(), not_implemented);
+        REQUIRE_NOTHROW(vp->__GetPort());
     }
     };
 
     address_test zt_tests{
         [](_SockAddrFixture* afp, const uint16_t fv) {
         auto vp = afp->view();
-        REQUIRE_THROWS_AS(vp->set_port(0), not_implemented);
-        REQUIRE_THROWS_AS(vp->set_addr(0), not_implemented);
-        REQUIRE_THROWS_AS(vp->set_in6_addr({}), not_implemented);
-        REQUIRE_THROWS_AS(vp->set_in6_addr16({}), not_implemented);
-        REQUIRE_THROWS_AS(vp->set_in6_addr32({}), not_implemented);
+        REQUIRE_THROWS_AS(vp->__SetPort(0), not_implemented);
+        REQUIRE_THROWS_AS(vp->SetIPv4Addr(0), not_implemented);
+        REQUIRE_THROWS_AS(vp->SetIPv6Addr({}), not_implemented);
+        REQUIRE_THROWS_AS(vp->SetIPv6Addr16({}), not_implemented);
+        REQUIRE_THROWS_AS(vp->SetIPv6Addr32({}), not_implemented);
     },
         [](IAddrFamilyViewBase* const vp, const uint16_t fv) {
-        REQUIRE(vp->get_jewel() == af_zt);
-        REQUIRE(vp->get_family() == vp->get_jewel());
+        REQUIRE(vp->GetJewel() == af_zt);
+        REQUIRE(vp->GetFamily() == vp->GetJewel());
         REQUIRE(dynamic_cast<_ZeroTierFamilyView*>(vp));
-        REQUIRE_THROWS_AS(vp->get_addr(), not_implemented);
-        REQUIRE_THROWS_AS(vp->get_in6_addr(), not_implemented);
-        REQUIRE_THROWS_AS(vp->get_in6_addr16(), not_implemented);
-        REQUIRE_THROWS_AS(vp->get_in6_addr32(), not_implemented);
-        REQUIRE_THROWS_AS(vp->get_port(), not_implemented);
+        REQUIRE_THROWS_AS(vp->GetIPv4Addr(), not_implemented);
+        REQUIRE_THROWS_AS(vp->GetIPv6Addr(), not_implemented);
+        REQUIRE_THROWS_AS(vp->GetIPv6Addr16(), not_implemented);
+        REQUIRE_THROWS_AS(vp->GetIPv6Addr32(), not_implemented);
+        REQUIRE_THROWS_AS(vp->__GetPort(), not_implemented);
     }
     };
 }
@@ -303,11 +303,11 @@ TEST_CASE("Tests that socket addresses are handled correctly", Catch::Tags(
 
     SECTION("Preparing to verify view transitions") {
 
-        typedef multimap<_SockAddrFamilyType, _SockAddrFamilyType> transitions_map;
+        typedef multimap<SocketAddressFamily, SocketAddressFamily> transitions_map;
 
         transitions_map transitions;
 
-        vector<_SockAddrFamilyType> values = { af_unspec, af_inproc, af_ipc, af_inet, af_inet6, af_zt };
+        vector<SocketAddressFamily> values = { af_unspec, af_inproc, af_ipc, af_inet, af_inet6, af_zt };
 
         auto _values_begin = values.begin();
         auto _values_end = values.end();
@@ -325,8 +325,8 @@ TEST_CASE("Tests that socket addresses are handled correctly", Catch::Tags(
 
         SECTION("Verify that view transitions can occur seamlessly") {
 
-            const auto __verify = [&af, &previous_vp](const _SockAddrFamilyType x) {
-                const auto y = af.get_family();
+            const auto __verify = [&af, &previous_vp](const SocketAddressFamily x) {
+                const auto y = af.GetFamily();
                 if (x == y) { return; }
                 INFO("Transitioning from '" + _SockAddr::name_of(y)
                     + "' to '" + _SockAddr::name_of(x) + "'");
@@ -334,7 +334,7 @@ TEST_CASE("Tests that socket addresses are handled correctly", Catch::Tags(
                 IAddrFamilyViewBase* vp;
                 REQUIRE_NOTHROW(vp = af.view());
                 REQUIRE(vp);
-                REQUIRE(vp->get_jewel() == x);
+                REQUIRE(vp->GetJewel() == x);
                 // The View itself looks okay, but did it really change?
                 REQUIRE(vp != previous_vp);
                 // And hold on to the Previous View Pointer for comparison.

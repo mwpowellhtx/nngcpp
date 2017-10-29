@@ -7,8 +7,6 @@ namespace nng {
 
     struct _Inet6FamilyView : public IAddrFamilyView<sockaddr_in6_t> {
 
-        virtual _SockAddrFamilyType get_family() const override;
-
         virtual ~_Inet6FamilyView();
 
         virtual bool operator==(const IAddrFamilyViewBase& other) override;
@@ -27,16 +25,16 @@ namespace nng {
 
     public:
 
-        virtual in6_addr_vector_type get_in6_addr() const override;
-        virtual in6_addr16_vector_type get_in6_addr16() const override;
-        virtual in6_addr32_vector_type get_in6_addr32() const override;
+        virtual IPv6AddrVector GetIPv6Addr() const override;
+        virtual IPv6AddrUInt16Vector GetIPv6Addr16() const override;
+        virtual IPv6AddrUInt32Vector GetIPv6Addr32() const override;
 
-        virtual void set_in6_addr(in6_addr_vector_type value) override;
-        virtual void set_in6_addr16(in6_addr16_vector_type value) override;
-        virtual void set_in6_addr32(in6_addr32_vector_type value) override;
+        virtual void SetIPv6Addr(IPv6AddrVector value) override;
+        virtual void SetIPv6Addr16(IPv6AddrUInt16Vector value) override;
+        virtual void SetIPv6Addr32(IPv6AddrUInt32Vector value) override;
 
-        virtual nng::uint16_t get_port() const override;
-        virtual void set_port(const nng::uint16_t value) override;
+        virtual nng::uint16_t __GetPort() const override;
+        virtual void __SetPort(const nng::uint16_t value) override;
     };
 }
 

@@ -78,11 +78,11 @@ namespace nng {
         _SockAddr a;
 
         REQUIRE_NOTHROW(pp->GetOptions()->get(O::local_addr, a));
-        REQUIRE(a.get_family() == af_inet);
+        REQUIRE(a.GetFamily() == af_inet);
         auto vp = a.view();
-        REQUIRE(vp->get_family() == a.get_family());
-        REQUIRE(vp->get_addr() == INADDR_LOOPBACK);
-        REQUIRE(vp->get_port() == expected_port);
+        REQUIRE(vp->GetFamily() == a.GetFamily());
+        REQUIRE(vp->GetIPv4Addr() == INADDR_LOOPBACK);
+        REQUIRE(vp->__GetPort() == expected_port);
     }
 
     template<>
@@ -93,11 +93,11 @@ namespace nng {
         _SockAddr a;
 
         REQUIRE_NOTHROW(pp->GetOptions()->get(O::remote_addr, a));
-        REQUIRE(a.get_family() == af_inet);
+        REQUIRE(a.GetFamily() == af_inet);
         auto vp = a.view();
-        REQUIRE(vp->get_family() == a.get_family());
-        REQUIRE(vp->get_addr() == INADDR_LOOPBACK);
-        REQUIRE(vp->get_port() != 0);
+        REQUIRE(vp->GetFamily() == a.GetFamily());
+        REQUIRE(vp->GetIPv4Addr() == INADDR_LOOPBACK);
+        REQUIRE(vp->__GetPort() != 0);
     }
 }
 
@@ -143,7 +143,7 @@ TEST_CASE("We can bind to wildcards", Catch::Tags(constants::prefix_tags
     WARN("Listening to address: '" + addr + "'");
     REQUIRE_NOTHROW(sp1->listen(addr));
 
-    REQUIRE_NOTHROW(addr = calc.get_addr(loopback_addr_base));
+    REQUIRE_NOTHROW(addr = calc.GetIPv4Addr(loopback_addr_base));
     WARN("Dialing address: '" + addr + "'");
     REQUIRE_NOTHROW(sp2->dial(addr));
 }

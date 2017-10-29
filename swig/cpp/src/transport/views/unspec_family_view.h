@@ -7,8 +7,6 @@ namespace nng {
 
     struct _UnspecFamilyView : public IAddrFamilyViewBase {
 
-        virtual _SockAddrFamilyType get_family() const override;
-
         virtual ~_UnspecFamilyView();
 
         virtual bool HasOne() const override;

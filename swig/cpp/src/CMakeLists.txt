@@ -40,6 +40,7 @@ set (NNGCPP_CPP_SRCS
     options/reader_writer.cpp
     options/reader_writer.h
     options/options.h
+    core/equatable.hpp
     core/having_one.hpp
     core/can_close.hpp
     core/invocation.hpp

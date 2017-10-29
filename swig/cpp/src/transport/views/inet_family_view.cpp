@@ -47,23 +47,19 @@ namespace nng {
         return !operator==(other);
     }
 
-    _SockAddrFamilyType _InetFamilyView::get_family() const {
-        return static_cast<_SockAddrFamilyType>(get_detail()->sa_family);
-    }
-
-    uint32_t _InetFamilyView::get_addr() const {
+    uint32_t _InetFamilyView::GetIPv4Addr() const {
         return ::ntohl(get_detail()->sa_addr);
     }
 
-    void _InetFamilyView::set_addr(const uint32_t value) {
+    void _InetFamilyView::SetIPv4Addr(const uint32_t value) {
         get_detail()->sa_addr = ::htonl(value);
     }
 
-    uint16_t _InetFamilyView::get_port() const {
+    uint16_t _InetFamilyView::__GetPort() const {
         return ::ntohs(get_detail()->sa_port);
     }
 
-    void _InetFamilyView::set_port(const uint16_t value) {
+    void _InetFamilyView::__SetPort(const uint16_t value) {
         get_detail()->sa_port = ::htons(value);
     }
 }

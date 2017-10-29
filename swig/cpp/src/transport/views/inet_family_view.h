@@ -7,8 +7,6 @@ namespace nng {
 
     struct _InetFamilyView : public IAddrFamilyView<sockaddr_in_t> {
 
-        virtual _SockAddrFamilyType get_family() const override;
-
         virtual ~_InetFamilyView();
 
         virtual bool operator==(const IAddrFamilyViewBase& other) override;
@@ -27,11 +25,11 @@ namespace nng {
 
     public:
 
-        virtual nng::uint32_t get_addr() const override;
-        virtual void set_addr(const nng::uint32_t value) override;
+        virtual nng::uint32_t GetIPv4Addr() const override;
+        virtual void SetIPv4Addr(const nng::uint32_t value) override;
 
-        virtual nng::uint16_t get_port() const override;
-        virtual void set_port(const nng::uint16_t value) override;
+        virtual nng::uint16_t __GetPort() const override;
+        virtual void __SetPort(const nng::uint16_t value) override;
     };
 }
 

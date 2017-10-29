@@ -17,7 +17,7 @@
 
 namespace nng {
 
-    template<_SockAddrFamilyType Val_>
+    template<SocketAddressFamily Val_>
     const std::string sockaddr_family_name<Val_>::name = "";
 
     const std::string sockaddr_family_name<af_unspec>::name = SOCKADDR_FAMILY_TO_STRING(af_unspec);
@@ -74,7 +74,7 @@ namespace nng {
         // Should be safe to do this regardless of the state of the union.
         const auto actual_jewel = _sa.s_un.s_family;
 
-        if (_view != nullptr && _view->get_jewel() == actual_jewel) {
+        if (_view != nullptr && _view->GetJewel() == actual_jewel) {
             return;
         }
 
@@ -122,18 +122,18 @@ namespace nng {
         return &_sa;
     }
 
-    _SockAddrFamilyType _SockAddr::get_family() const {
-        return static_cast<_SockAddrFamilyType>(_sa.s_un.s_family);
+    SocketAddressFamily _SockAddr::GetFamily() const {
+        return static_cast<SocketAddressFamily>(_sa.s_un.s_family);
     }
 
-    void _SockAddr::set_family(const _SockAddrFamilyType value) {
+    void _SockAddr::set_family(const SocketAddressFamily value) {
         _sa.s_un.s_family = value;
     }
 
     bool _SockAddr::operator==(const _SockAddr& other) {
 
         // Return early when the Families are different.
-        if (get_family() != other.get_family()) { return false; }
+        if (GetFamily() != other.GetFamily()) { return false; }
 
         // We must cast the constness out of the other for this operation.
         auto otherp = const_cast<_SockAddr*>(&other);
@@ -150,7 +150,7 @@ namespace nng {
         _SockAddr addr;
         addr.set_family(af_inet);
         auto vp = addr.view();
-        vp->set_addr(INADDR_LOOPBACK);
+        vp->SetIPv4Addr(INADDR_LOOPBACK);
         return addr;
     }
 
@@ -158,10 +158,9 @@ namespace nng {
         _SockAddr addr;
         addr.set_family(af_inet6);
         auto vp = addr.view();
-        typedef IAddrFamilyViewBase::in6_addr_vector_type vector_type;
         // IPv6 loopback is quite simple: 0000:0000:0000:0000:0000:0000:0000:0001, or simply ::1.
-        vector_type value = { 1 };
-        for (vector_type::const_iterator it = value.cbegin(); it != value.cend(); ++it) {
+        IPv6AddrVector value = { 1 };
+        for (IPv6AddrVector::const_iterator it = value.cbegin(); it != value.cend(); ++it) {
 
             const auto delta = it - value.cbegin();
             const auto i = sizeof(addr._sa.s_un.s_in6.sa_addr) - delta - 1;

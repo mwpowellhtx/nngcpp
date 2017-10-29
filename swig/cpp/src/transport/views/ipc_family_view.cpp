@@ -38,8 +38,4 @@ namespace nng {
     bool _IpcFamilyView::operator!=(const IAddrFamilyViewBase& other) {
         return !operator==(other);
     }
-
-    _SockAddrFamilyType _IpcFamilyView::get_family() const {
-        return static_cast<_SockAddrFamilyType>(get_detail()->sa_family);
-    }
 }

@@ -10,45 +10,45 @@
 
 namespace nng {
 
-    template<_SockAddrFamilyType Val_>
+    template<SocketAddressFamily Val_>
     struct sockaddr_family_name
-        : std::integral_constant<_SockAddrFamilyType, Val_> {
+        : std::integral_constant<SocketAddressFamily, Val_> {
         static const std::string name;
     };
 
     template<>
     struct sockaddr_family_name<af_unspec>
-        : std::integral_constant<_SockAddrFamilyType, af_unspec> {
+        : std::integral_constant<SocketAddressFamily, af_unspec> {
         static const std::string name;
     };
 
     template<>
     struct sockaddr_family_name<af_inproc>
-        : std::integral_constant<_SockAddrFamilyType, af_inproc> {
+        : std::integral_constant<SocketAddressFamily, af_inproc> {
         static const std::string name;
     };
 
     template<>
     struct sockaddr_family_name<af_ipc>
-        : std::integral_constant<_SockAddrFamilyType, af_ipc> {
+        : std::integral_constant<SocketAddressFamily, af_ipc> {
         static const std::string name;
     };
 
     template<>
     struct sockaddr_family_name<af_inet>
-        : std::integral_constant<_SockAddrFamilyType, af_inet> {
+        : std::integral_constant<SocketAddressFamily, af_inet> {
         static const std::string name;
     };
 
     template<>
     struct sockaddr_family_name<af_inet6>
-        : std::integral_constant<_SockAddrFamilyType, af_inet6> {
+        : std::integral_constant<SocketAddressFamily, af_inet6> {
         static const std::string name;
     };
 
     template<>
     struct sockaddr_family_name<af_zt>
-        : std::integral_constant<_SockAddrFamilyType, af_zt> {
+        : std::integral_constant<SocketAddressFamily, af_zt> {
         static const std::string name;
     };
 
@@ -94,9 +94,9 @@ namespace nng {
 
         sockaddr_type* get();
 
-        _SockAddrFamilyType get_family() const;
+        SocketAddressFamily GetFamily() const;
 
-        void set_family(const _SockAddrFamilyType value);
+        void set_family(const SocketAddressFamily value);
 
         IAddrFamilyViewBase* const view() const;
 

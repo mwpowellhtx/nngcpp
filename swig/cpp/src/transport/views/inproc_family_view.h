@@ -7,8 +7,6 @@ namespace nng {
 
     struct _InprocFamilyView : public IAddrFamilyView<sockaddr_inproc_t> {
 
-        virtual _SockAddrFamilyType get_family() const override;
-
         virtual ~_InprocFamilyView();
 
         virtual bool operator==(const IAddrFamilyViewBase& other) override;

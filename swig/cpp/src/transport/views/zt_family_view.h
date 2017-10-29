@@ -7,8 +7,6 @@ namespace nng {
 
     struct _ZeroTierFamilyView : public IAddrFamilyView<sockaddr_zt_t> {
 
-        virtual _SockAddrFamilyType get_family() const override;
-
         virtual ~_ZeroTierFamilyView();
 
         virtual bool operator==(const IAddrFamilyViewBase& other) override;

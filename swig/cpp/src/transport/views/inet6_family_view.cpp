@@ -16,17 +16,17 @@ namespace nng {
     };
 
     template<>
-    struct in6_addr_expected_size<IAddrFamilyViewBase::in6_addr_vector_type>
+    struct in6_addr_expected_size<IPv6AddrVector>
         : std::integral_constant<std::size_t, 16> {
     };
 
     template<>
-    struct in6_addr_expected_size<IAddrFamilyViewBase::in6_addr16_vector_type>
+    struct in6_addr_expected_size<IPv6AddrUInt16Vector>
         : std::integral_constant<std::size_t, 8> {
     };
 
     template<>
-    struct in6_addr_expected_size<IAddrFamilyViewBase::in6_addr32_vector_type>
+    struct in6_addr_expected_size<IPv6AddrUInt32Vector>
         : std::integral_constant<std::size_t, 4> {
     };
 
@@ -35,10 +35,6 @@ namespace nng {
     }
 
     _Inet6FamilyView::~_Inet6FamilyView() {
-    }
-
-    _SockAddrFamilyType _Inet6FamilyView::get_family() const {
-        return static_cast<_SockAddrFamilyType>(get_detail()->sa_family);
     }
 
     _Inet6FamilyView::detail_type* _Inet6FamilyView::get_detail() const {
@@ -73,20 +69,20 @@ namespace nng {
         return !operator==(other);
     }
 
-    _Inet6FamilyView::in6_addr_vector_type _Inet6FamilyView::get_in6_addr() const {
-        return IAddrFamilyViewBase::get_in6_addr();
+    IPv6AddrVector _Inet6FamilyView::GetIPv6Addr() const {
+        return IAddrFamilyViewBase::GetIPv6Addr();
     }
 
-    _Inet6FamilyView::in6_addr16_vector_type _Inet6FamilyView::get_in6_addr16() const {
-        return IAddrFamilyViewBase::get_in6_addr16();
+    IPv6AddrUInt16Vector _Inet6FamilyView::GetIPv6Addr16() const {
+        return IAddrFamilyViewBase::GetIPv6Addr16();
     }
 
-    _Inet6FamilyView::in6_addr32_vector_type _Inet6FamilyView::get_in6_addr32() const {
-        return IAddrFamilyViewBase::get_in6_addr32();
+    IPv6AddrUInt32Vector _Inet6FamilyView::GetIPv6Addr32() const {
+        return IAddrFamilyViewBase::GetIPv6Addr32();
     }
 
-    void _Inet6FamilyView::set_in6_addr(in6_addr_vector_type value) {
-        if (value.size() <= in6_addr_expected_size<in6_addr_vector_type>::value) {
+    void _Inet6FamilyView::SetIPv6Addr(IPv6AddrVector value) {
+        if (value.size() <= in6_addr_expected_size<IPv6AddrVector>::value) {
             return;
         }
         // TODO: TBD: see notes around address unit testing re: IPv6 representation and NNG's representation
@@ -98,10 +94,10 @@ namespace nng {
         }
     }
 
-    void _Inet6FamilyView::set_in6_addr16(in6_addr16_vector_type value) {
-        IAddrFamilyViewBase::set_in6_addr16(value);
+    void _Inet6FamilyView::SetIPv6Addr16(IPv6AddrUInt16Vector value) {
+        IAddrFamilyViewBase::SetIPv6Addr16(value);
         // TODO: TBD: ditto address view NNG struct versus wrapper work...
-        if (value.size() <= in6_addr_expected_size<in6_addr16_vector_type>::value) {
+        if (value.size() <= in6_addr_expected_size<IPv6AddrUInt16Vector>::value) {
             return;
         }
         //// TODO: TBD: see notes around address unit testing re: IPv6 representation and NNG's representation
@@ -113,10 +109,10 @@ namespace nng {
         //}
     }
 
-    void _Inet6FamilyView::set_in6_addr32(in6_addr32_vector_type value) {
-        IAddrFamilyViewBase::set_in6_addr32(value);
+    void _Inet6FamilyView::SetIPv6Addr32(IPv6AddrUInt32Vector value) {
+        IAddrFamilyViewBase::SetIPv6Addr32(value);
         // TODO: TBD: ditto address view NNG struct versus wrapper work...
-        if (value.size() <= in6_addr_expected_size<in6_addr32_vector_type>::value) {
+        if (value.size() <= in6_addr_expected_size<IPv6AddrUInt32Vector>::value) {
             return;
         }
         std::is_abstract<bool>::value;
@@ -129,11 +125,11 @@ namespace nng {
         //}
     }
 
-    uint16_t _Inet6FamilyView::get_port() const {
+    uint16_t _Inet6FamilyView::__GetPort() const {
         return ::ntohs(get_detail()->sa_port);
     }
 
-    void _Inet6FamilyView::set_port(const uint16_t value) {
+    void _Inet6FamilyView::__SetPort(const uint16_t value) {
         get_detail()->sa_port = ::htons(value);
     }
 }
