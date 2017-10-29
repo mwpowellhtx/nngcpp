@@ -5,7 +5,9 @@
 
 #include "having_one.hpp"
 #include "can_close.hpp"
-#include "../options/options.h"
+
+#include "../options/reader_writer.h"
+#include "../options/ISupportOptions.hpp"
 
 namespace nng {
 

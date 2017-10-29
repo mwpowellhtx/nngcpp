@@ -26,7 +26,7 @@ namespace nng {
     }
 
     socket::options_type* const socket::GetOptions() {
-        return support_options_type::GetOptions();
+        return interface_type::GetOptions();
     }
 
     void socket::configure_options(nng_type sid) {

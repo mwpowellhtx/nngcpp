@@ -12,6 +12,6 @@ namespace nng {
     }
 
     endpoint::options_type* const endpoint::GetOptions() {
-        return support_options_type::GetOptions();
+        return interface_type::GetOptions();
     }
 }
