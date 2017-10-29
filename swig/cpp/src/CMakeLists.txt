@@ -48,8 +48,6 @@ set (NNGCPP_CPP_SRCS
     core/async.h
     core/enums.h
     core/enums.cpp
-    core/address.cpp
-    core/address.h
     core/device.cpp
     core/device.h
     core/dialer.cpp
@@ -100,6 +98,24 @@ set (NNGCPP_CPP_SRCS
     messaging/messaging_api_base.hpp
     messaging/messaging_gymnastics.cpp
     messaging/messaging_gymnastics.h
+    transport/sockaddr.h
+    transport/address.cpp
+    transport/address.h
+    transport/views/views.h
+    transport/views/IFamilyView.cpp
+    transport/views/IFamilyView.h
+    transport/views/unspec_family_view.cpp
+    transport/views/unspec_family_view.h
+    transport/views/inproc_family_view.cpp
+    transport/views/inproc_family_view.h
+    transport/views/ipc_family_view.cpp
+    transport/views/ipc_family_view.h
+    transport/views/inet_family_view.cpp
+    transport/views/inet_family_view.h
+    transport/views/inet6_family_view.cpp
+    transport/views/inet6_family_view.h
+    transport/views/zt_family_view.cpp
+    transport/views/zt_family_view.h
     protocol/protocol.h
     protocol/bus/bus.cpp
     protocol/bus/bus.h

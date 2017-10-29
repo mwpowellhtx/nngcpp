@@ -75,7 +75,7 @@ namespace nng {
         , listener* const lp, dialer* const dp, uint16_t expected_port) {
 
         // TODO: TBD: call address socket_address instead... would be more specific.
-        address a;
+        _SockAddr a;
 
         REQUIRE_NOTHROW(pp->GetOptions()->get(O::local_addr, a));
         REQUIRE(a.get_family() == af_inet);
@@ -90,7 +90,7 @@ namespace nng {
         , listener* const lp, dialer* const dp, uint16_t expected_port) {
 
         // TODO: TBD: call address socket_address instead... would be more specific.
-        address a;
+        _SockAddr a;
 
         REQUIRE_NOTHROW(pp->GetOptions()->get(O::remote_addr, a));
         REQUIRE(a.get_family() == af_inet);

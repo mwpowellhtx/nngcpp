@@ -3,12 +3,11 @@
 
 #include "../messaging/messaging.h"
 #include "../protocol/protocol.h"
+#include "../transport/address.h"
 
-#include "address.h"
 #include "listener.h"
 #include "dialer.h"
 #include "device.h"
-#include "../options/options.h"
 
 #include <memory>
 #include <vector>

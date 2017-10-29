@@ -45,7 +45,7 @@ namespace nng {
             /* The Udp is for internal use. We do not need to know for public
             consumption. But we do use it here in the unit testing. */
             ::nni_plat_udp* udpp = nullptr;
-            auto loopback = address::in6_loopback();
+            auto loopback = _SockAddr::in6_loopback();
             // TODO: TBD: so the only reason why we do this is to back-support the NNG structure.
             ::nng_sockaddr sa;
             std::memcpy(&sa, loopback.get(), sizeof(sa));
@@ -70,10 +70,10 @@ void init(const std::string& addr) {
 
 namespace nng {
 
-    const family_view_base::in6_addr_vector_type expected_loopback_long_addr
+    const IAddrFamilyViewBase::in6_addr_vector_type expected_loopback_long_addr
         = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1 };
 
-    const family_view_base::in6_addr_vector_type expected_loopback_short_addr = { 1 };
+    const IAddrFamilyViewBase::in6_addr_vector_type expected_loopback_short_addr = { 1 };
 
     using O = option_names;
 
@@ -116,7 +116,7 @@ namespace nng {
         using namespace Catch::Matchers;
 
         // TODO: TBD: call address socket_address instead... would be more specific.
-        address a;
+        _SockAddr a;
 
         REQUIRE_NOTHROW(pp->GetOptions()->get(O::local_addr, a));
         REQUIRE(a.get_family() == af_inet6);
@@ -133,7 +133,7 @@ namespace nng {
         using namespace Catch::Matchers;
 
         // TODO: TBD: call address socket_address instead... would be more specific.
-        address a;
+        _SockAddr a;
 
         REQUIRE_NOTHROW(pp->GetOptions()->get(O::remote_addr, a));
         REQUIRE(a.get_family() == af_inet6);

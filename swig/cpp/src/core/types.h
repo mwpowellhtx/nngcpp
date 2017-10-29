@@ -1,8 +1,11 @@
 #ifndef NNGCPP_TYPES_H
 #define NNGCPP_TYPES_H
 
-#define NNG_ONLY
-#include <nngcpp.h>
+#ifdef UNIT_TESTING
+#include <nng.h>
+#else // UNIT_TESTING
+#include <nng/nng.h>
+#endif // UNIT_TESTING
 
 #include <cstddef>
 #include <chrono>
@@ -15,7 +18,9 @@ namespace nng {
     typedef int int32_t;
 
     typedef unsigned char uint8_t;
+    typedef unsigned short uint16_t;
     typedef unsigned int uint32_t;
+    typedef unsigned long long uint64_t;
 
     typedef unsigned long long size_type;
 
@@ -27,7 +32,9 @@ namespace nng {
     typedef ::int32_t int32_t;
 
     typedef ::uint8_t uint8_t;
+    typedef ::uint16_t uint16_t;
     typedef ::uint32_t uint32_t;
+    typedef ::uint64_t uint64_t;
 
     typedef std::size_t size_type;
 

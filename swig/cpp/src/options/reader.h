@@ -9,7 +9,7 @@
 namespace nng {
 
 #ifndef NNGCPP_ADDRESS_H
-    class address;
+    class _SockAddr;
 #endif // NNGCPP_ADDRESS_H
 
 #ifndef NNGCPP_SOCKET_H
@@ -75,7 +75,7 @@ namespace nng {
         virtual std::string GetText(const std::string& name);
         virtual std::string GetText(const std::string& name, size_type* const szp);
 
-        virtual void get(const std::string& name, address& val);
+        virtual void get(const std::string& name, _SockAddr& val);
 
         virtual int32_t GetInt32(const std::string& name);
         virtual size_type GetSize(const std::string& name);

@@ -22,7 +22,7 @@ namespace nng {
         return reader_type::GetText(name, szp);
     }
 
-    void _OptionReaderWriter::get(const std::string& name, address& val) {
+    void _OptionReaderWriter::get(const std::string& name, _SockAddr& val) {
         reader_type::get(name, val);
     }
 

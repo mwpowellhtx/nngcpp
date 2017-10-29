@@ -4,7 +4,6 @@
 #define NNGCPP_CORE_NAMESPACE nng
 
 // TODO: TBD: may not necessarily need/want ALL of these includes
-#include "address.h"
 #include "device.h"
 #include "dialer.h"
 #include "endpoint.h"
@@ -16,6 +15,7 @@
 #include "session.h"
 #include "socket.h"
 #include "../options/options.h"
+#include "../transport/address.h"
 
 #include "exceptions.hpp"
 

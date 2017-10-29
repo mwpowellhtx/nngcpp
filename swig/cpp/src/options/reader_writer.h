@@ -31,7 +31,7 @@ namespace nng {
         virtual std::string GetText(const std::string& name) override;
         virtual std::string GetText(const std::string& name, size_type* const szp) override;
 
-        virtual void get(const std::string& name, address& val) override;
+        virtual void get(const std::string& name, _SockAddr& val) override;
 
         virtual int32_t GetInt32(const std::string& name) override;
         virtual size_type GetSize(const std::string& name) override;

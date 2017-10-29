@@ -1,5 +1,5 @@
 #include "reader.h"
-#include "../core/address.h"
+#include "../transport/address.h"
 #include "../core/invocation.hpp"
 #include "../algorithms/string_algo.hpp"
 
@@ -46,7 +46,7 @@ namespace nng {
         return trx::trimcp(s);
     }
 
-    void _OptionReader::get(const std::string& name, address& val) {
+    void _OptionReader::get(const std::string& name, _SockAddr& val) {
         auto sz = val.GetSize();
         invocation::with_default_error_handling(_getopt, name.c_str(), val.get(), &sz);
     }
