@@ -61,8 +61,8 @@ namespace nng {
         virtual void SetInt32(const std::string& name, int32_t val);
         virtual void SetSize(const std::string& name, size_type val);
 
-        virtual void set(const std::string& name, const duration_type& val);
-        virtual void set_milliseconds(const std::string& name, duration_rep_type val);
+        virtual void SetDuration(const std::string& name, const duration_type& val);
+        virtual void SetMilliseconds(const std::string& name, duration_rep_type val);
     };
 
     typedef _OptionWriter options_writer;

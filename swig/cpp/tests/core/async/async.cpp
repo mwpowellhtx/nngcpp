@@ -115,7 +115,7 @@ TEST_CASE("Asynchronous operations using C++ wrapper", Catch::Tags(
         }
 
         SECTION("Default timeout works") {
-            REQUIRE_NOTHROW(sp->GetOptions()->set(O::recv_timeout_duration, nominal_timeout));
+            REQUIRE_NOTHROW(sp->GetOptions()->SetDuration(O::recv_timeout_duration, nominal_timeout));
             REQUIRE_NOTHROW(sp->receive_async(axp.get()));
             wait_for_done_and_success(ec_etimedout);
         }

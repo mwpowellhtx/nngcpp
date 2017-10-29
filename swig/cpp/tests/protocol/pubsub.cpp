@@ -222,7 +222,7 @@ TEST_CASE("Publisher/subscriber pattern using C++ wrapper", Catch::Tags("pub", "
         SECTION("Subscriber can receive from publisher") {
 
             REQUIRE_NOTHROW(subp->GetOptions()->SetString(O::sub_subscribe, topics::some));
-            REQUIRE_NOTHROW(subp->GetOptions()->set(O::recv_timeout_duration, 90ms));
+            REQUIRE_NOTHROW(subp->GetOptions()->SetDuration(O::recv_timeout_duration, 90ms));
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
             REQUIRE_NOTHROW(*bmp << topics::some_like_it_hot);
@@ -245,7 +245,7 @@ TEST_CASE("Publisher/subscriber pattern using C++ wrapper", Catch::Tags("pub", "
 
         SECTION("Subscribers without subsciptions do not receive") {
 
-            REQUIRE_NOTHROW(subp->GetOptions()->set(O::recv_timeout_duration, 90ms));
+            REQUIRE_NOTHROW(subp->GetOptions()->SetDuration(O::recv_timeout_duration, 90ms));
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
             REQUIRE_NOTHROW(*bmp << topics::some_do_not_like_it);
@@ -255,7 +255,7 @@ TEST_CASE("Publisher/subscriber pattern using C++ wrapper", Catch::Tags("pub", "
 
         SECTION("Subscribers in raw receive") {
 
-            REQUIRE_NOTHROW(subp->GetOptions()->set(O::recv_timeout_duration, 90ms));
+            REQUIRE_NOTHROW(subp->GetOptions()->SetDuration(O::recv_timeout_duration, 90ms));
             REQUIRE_NOTHROW(subp->GetOptions()->SetInt32(O::raw, 1));
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());

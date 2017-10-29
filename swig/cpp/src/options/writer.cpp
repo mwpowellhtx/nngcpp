@@ -41,11 +41,11 @@ namespace nng {
         invocation::with_default_error_handling(_setopt_sz, name.c_str(), val);
     }
 
-    void _OptionWriter::set(const std::string& name, const duration_type& val) {
-        set_milliseconds(name, val.count());
+    void _OptionWriter::SetDuration(const std::string& name, const duration_type& val) {
+        SetMilliseconds(name, val.count());
     }
 
-    void _OptionWriter::set_milliseconds(const std::string& name, duration_rep_type val) {
+    void _OptionWriter::SetMilliseconds(const std::string& name, duration_rep_type val) {
         invocation::with_default_error_handling(_setopt_duration, name.c_str(), val);
     }
 }

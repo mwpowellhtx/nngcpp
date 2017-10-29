@@ -199,7 +199,7 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
 
             RUN_TIMED_SECTION_MILLISECONDS(timeout, [&]() {
 
-                REQUIRE_NOTHROW(s1->GetOptions()->set(O::recv_timeout_duration, timeout));
+                REQUIRE_NOTHROW(s1->GetOptions()->SetDuration(O::recv_timeout_duration, timeout));
 
                 unique_ptr<binary_message> bmp;
 
@@ -225,7 +225,7 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
 
             RUN_TIMED_SECTION_MILLISECONDS(timeout, [&]() {
 
-                REQUIRE_NOTHROW(s1->GetOptions()->set(O::send_timeout_duration, timeout));
+                REQUIRE_NOTHROW(s1->GetOptions()->SetDuration(O::send_timeout_duration, timeout));
                 // TODO: TBD: this will work for now as a rough cut Exception match...
                 REQUIRE_THROWS_AS_MATCHING(s1->send(&empty_buf), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
 
@@ -238,7 +238,7 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
             const auto v = static_cast<int64_t>(0);
             size_type  sz;
 
-            REQUIRE_NOTHROW(s1->GetOptions()->set(O::send_timeout_duration, timeout));
+            REQUIRE_NOTHROW(s1->GetOptions()->SetDuration(O::send_timeout_duration, timeout));
 
             SECTION("Read-only options handled properly") {
 
@@ -376,7 +376,7 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
                         // Not appropriate for dialer.
                         // TODO: TBD: this will work for now as a rough cut Exception match...
                         REQUIRE_THROWS_AS_MATCHING(dp->GetOptions()->SetInt32(O::raw, 1), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
-                        REQUIRE_THROWS_AS_MATCHING(dp->GetOptions()->set_milliseconds(O::min_reconnect_duration, 1), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
+                        REQUIRE_THROWS_AS_MATCHING(dp->GetOptions()->SetMilliseconds(O::min_reconnect_duration, 1), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
                     }
 
                     SECTION("Bad size checks") {
@@ -414,7 +414,7 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
                         // Not appropriate for dialer.
                         // TODO: TBD: this will work for now as a rough cut Exception match...
                         REQUIRE_THROWS_AS_MATCHING(lp->GetOptions()->SetInt32(O::raw, 1), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
-                        REQUIRE_THROWS_AS_MATCHING(lp->GetOptions()->set_milliseconds(O::min_reconnect_duration, 1), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
+                        REQUIRE_THROWS_AS_MATCHING(lp->GetOptions()->SetMilliseconds(O::min_reconnect_duration, 1), nng_exception, THROWS_NNG_EXCEPTION(ec_enotsup));
                     }
 
                     SECTION("Bad size checks") {
@@ -485,10 +485,10 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
                     REQUIRE_NOTHROW(s1->GetOptions()->SetInt32(O::send_buf, 1));
                     REQUIRE_NOTHROW(s2->GetOptions()->SetInt32(O::send_buf, 1));
 
-                    REQUIRE_NOTHROW(s1->GetOptions()->set(O::send_timeout_duration, timeout));
-                    REQUIRE_NOTHROW(s1->GetOptions()->set(O::recv_timeout_duration, timeout));
-                    REQUIRE_NOTHROW(s2->GetOptions()->set(O::send_timeout_duration, timeout));
-                    REQUIRE_NOTHROW(s2->GetOptions()->set(O::recv_timeout_duration, timeout));
+                    REQUIRE_NOTHROW(s1->GetOptions()->SetDuration(O::send_timeout_duration, timeout));
+                    REQUIRE_NOTHROW(s1->GetOptions()->SetDuration(O::recv_timeout_duration, timeout));
+                    REQUIRE_NOTHROW(s2->GetOptions()->SetDuration(O::send_timeout_duration, timeout));
+                    REQUIRE_NOTHROW(s2->GetOptions()->SetDuration(O::recv_timeout_duration, timeout));
 
                     REQUIRE_NOTHROW(s1->listen(t1_addr));
                     REQUIRE_NOTHROW(s2->dial(t1_addr));

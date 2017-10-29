@@ -107,8 +107,8 @@ TEST_CASE("Test that device functions properly", "[device]") {
 
             const auto timeout = 1000ms;
 
-            REQUIRE_NOTHROW(e1.GetOptions()->set(O::recv_timeout_duration, timeout));
-            REQUIRE_NOTHROW(e2.GetOptions()->set(O::recv_timeout_duration, timeout));
+            REQUIRE_NOTHROW(e1.GetOptions()->SetDuration(O::recv_timeout_duration, timeout));
+            REQUIRE_NOTHROW(e2.GetOptions()->SetDuration(O::recv_timeout_duration, timeout));
 
             SLEEP_FOR(100ms);
 

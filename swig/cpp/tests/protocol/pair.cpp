@@ -308,9 +308,9 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
 
         const auto receive_timeout = 300ms;
 
-        REQUIRE_NOTHROW(serverp1->GetOptions()->set(O::recv_timeout_duration, receive_timeout));
-        REQUIRE_NOTHROW(clientp1->GetOptions()->set(O::recv_timeout_duration, receive_timeout));
-        REQUIRE_NOTHROW(clientp2->GetOptions()->set(O::recv_timeout_duration, receive_timeout));
+        REQUIRE_NOTHROW(serverp1->GetOptions()->SetDuration(O::recv_timeout_duration, receive_timeout));
+        REQUIRE_NOTHROW(clientp1->GetOptions()->SetDuration(O::recv_timeout_duration, receive_timeout));
+        REQUIRE_NOTHROW(clientp2->GetOptions()->SetDuration(O::recv_timeout_duration, receive_timeout));
 
         REQUIRE_NOTHROW(timeout_duration = serverp1->GetOptions()->GetDuration(O::recv_timeout_duration));
         // TODO: TBD: looking forward to full Catch v2; including CHRONO comprehension.
@@ -374,7 +374,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
             REQUIRE_NOTHROW(serverp1->GetOptions()->SetInt32(O::send_buf, 1));
             REQUIRE_NOTHROW(clientp1->GetOptions()->SetInt32(O::recv_buf, 1));
             REQUIRE_NOTHROW(clientp1->GetOptions()->SetInt32(O::recv_buf, 1));
-            REQUIRE_NOTHROW(serverp1->GetOptions()->set(O::send_timeout_duration, 100ms));
+            REQUIRE_NOTHROW(serverp1->GetOptions()->SetDuration(O::send_timeout_duration, 100ms));
 
             REQUIRE_NOTHROW(serverp1->listen(addr));
             REQUIRE_NOTHROW(clientp1->dial(addr));
@@ -400,7 +400,7 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
             REQUIRE_NOTHROW(serverp1->GetOptions()->SetInt32(O::recv_buf, 1));
             REQUIRE_NOTHROW(serverp1->GetOptions()->SetInt32(O::send_buf, 1));
             REQUIRE_NOTHROW(clientp1->GetOptions()->SetInt32(O::recv_buf, 1));
-            REQUIRE_NOTHROW(serverp1->GetOptions()->set(O::send_timeout_duration, 30ms));
+            REQUIRE_NOTHROW(serverp1->GetOptions()->SetDuration(O::send_timeout_duration, 30ms));
 
             REQUIRE_NOTHROW(serverp1->listen(addr));
             REQUIRE_NOTHROW(clientp1->dial(addr));
