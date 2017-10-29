@@ -56,7 +56,7 @@ namespace nng {
         virtual ~_OptionWriter();
 
         virtual void set(const std::string& name, const void* valp, size_type sz);
-        virtual void set(const std::string& name, const std::string& val);
+        virtual void SetString(const std::string& name, const std::string& s);
 
         virtual void set_int(const std::string& name, int val);
         virtual void set_sz(const std::string& name, size_type val);

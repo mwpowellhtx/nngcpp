@@ -29,8 +29,8 @@ namespace nng {
         invocation::with_default_error_handling(_setopt, name.c_str(), valp, sz);
     }
 
-    void _OptionWriter::set(const std::string& name, const std::string& val) {
-        invocation::with_default_error_handling(_setopt, name.c_str(), val.c_str(), val.length());
+    void _OptionWriter::SetString(const std::string& name, const std::string& s) {
+        invocation::with_default_error_handling(_setopt, name.c_str(), s.c_str(), s.length());
     }
 
     void _OptionWriter::set_int(const std::string& name, int val) {

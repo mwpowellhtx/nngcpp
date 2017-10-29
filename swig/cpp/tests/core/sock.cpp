@@ -245,7 +245,7 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
                 // TODO: TBD: this will work for now as a rough cut Exception match...
                 REQUIRE_THROWS_AS_MATCHING(s1->GetOptions()->set_int(O::recv_fd, 0), nng_exception, THROWS_NNG_EXCEPTION(ec_ereadonly));
                 REQUIRE_THROWS_AS_MATCHING(s1->GetOptions()->set_int(O::send_fd, 0), nng_exception, THROWS_NNG_EXCEPTION(ec_ereadonly));
-                REQUIRE_THROWS_AS_MATCHING(s1->GetOptions()->set(O::local_addr, "a"), nng_exception, THROWS_NNG_EXCEPTION(ec_ereadonly));
+                REQUIRE_THROWS_AS_MATCHING(s1->GetOptions()->SetString(O::local_addr, "a"), nng_exception, THROWS_NNG_EXCEPTION(ec_ereadonly));
             }
 
             SECTION("Url option works") {
@@ -263,7 +263,7 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
                 REQUIRE_THAT(url, Equals(url1_addr, CaseSensitive::Yes));
 
                 // TODO: TBD: this will work for now as a rough cut Exception match...
-                REQUIRE_THROWS_AS_MATCHING(lp->GetOptions()->set(O::url, url), nng_exception, THROWS_NNG_EXCEPTION(ec_ereadonly));
+                REQUIRE_THROWS_AS_MATCHING(lp->GetOptions()->SetString(O::url, url), nng_exception, THROWS_NNG_EXCEPTION(ec_ereadonly));
 
                 (url = "").resize(max_addr_length);
                 REQUIRE_NOTHROW(url = dp->GetOptions()->GetText(O::url));
@@ -272,7 +272,7 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
                 REQUIRE_THAT(url, Equals(url2_addr, CaseSensitive::Yes));
 
                 // TODO: TBD: this will work for now as a rough cut Exception match...
-                REQUIRE_THROWS_AS_MATCHING(dp->GetOptions()->set(O::url, url), nng_exception, THROWS_NNG_EXCEPTION(ec_ereadonly));
+                REQUIRE_THROWS_AS_MATCHING(dp->GetOptions()->SetString(O::url, url), nng_exception, THROWS_NNG_EXCEPTION(ec_ereadonly));
             }
 
             SECTION("Bogus Urls not supported") {

@@ -79,7 +79,7 @@ TEST_CASE("Request/reply pattern using C++ wrapper", Catch::Tags("req", "rep"
             REQUIRE_NOTHROW(reqp->GetOptions()->set(O::req_resend_duration, 10ms));
             // TODO: TBD: it is unit tests like this that really deserve a more focused unit test on just options alone...
             // Check invalid size.
-            REQUIRE_THROWS_AS_MATCHING(reqp->GetOptions()->set(O::req_resend_duration, __empty), nng_exception, THROWS_NNG_EXCEPTION(ec_einval));
+            REQUIRE_THROWS_AS_MATCHING(reqp->GetOptions()->SetString(O::req_resend_duration, __empty), nng_exception, THROWS_NNG_EXCEPTION(ec_einval));
 		}
 
 		SECTION("Receive socket without send socket fails") {
