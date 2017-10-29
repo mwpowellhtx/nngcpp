@@ -366,7 +366,7 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
 
                         size_t actual;
                         const size_t value = 4321, expected = value;
-                        REQUIRE_NOTHROW(dp->GetOptions()->set_sz(O::max_recv_sz, value));
+                        REQUIRE_NOTHROW(dp->GetOptions()->SetSize(O::max_recv_sz, value));
                         REQUIRE_NOTHROW(actual = dp->GetOptions()->GetSize(O::max_recv_sz));
                         REQUIRE(actual == expected);
                     }
@@ -404,7 +404,7 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
 
                         size_t actual;
                         const size_t value = 4321, expected = value;
-                        REQUIRE_NOTHROW(lp->GetOptions()->set_sz(O::max_recv_sz, value));
+                        REQUIRE_NOTHROW(lp->GetOptions()->SetSize(O::max_recv_sz, value));
                         REQUIRE_NOTHROW(actual = lp->GetOptions()->GetSize(O::max_recv_sz));
                         REQUIRE(actual == expected);
                     }
@@ -437,7 +437,7 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
 
                     // TODO: TBD: a lot of gets here, but only one set?
                     // TODO: TBD: this will work for now as a rough cut Exception match...
-                    REQUIRE_THROWS_AS_MATCHING(l.GetOptions()->set_sz(O::max_recv_sz, 0), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
+                    REQUIRE_THROWS_AS_MATCHING(l.GetOptions()->SetSize(O::max_recv_sz, 0), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
 
                     int value;
                     size_type sz = 1;
@@ -457,7 +457,7 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
 
                     // TODO: TBD: a lot of gets here, but only one set?
                     // TODO: TBD: this will work for now as a rough cut Exception match...
-                    REQUIRE_THROWS_AS_MATCHING(d.GetOptions()->set_sz(O::max_recv_sz, 0), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
+                    REQUIRE_THROWS_AS_MATCHING(d.GetOptions()->SetSize(O::max_recv_sz, 0), nng_exception, THROWS_NNG_EXCEPTION(ec_enoent));
 
                     int value;
                     size_t sz = 1;

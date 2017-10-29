@@ -37,7 +37,7 @@ namespace nng {
         invocation::with_default_error_handling(_setopt_int, name.c_str(), val);
     }
 
-    void _OptionWriter::set_sz(const std::string& name, size_type val) {
+    void _OptionWriter::SetSize(const std::string& name, size_type val) {
         invocation::with_default_error_handling(_setopt_sz, name.c_str(), val);
     }
 
