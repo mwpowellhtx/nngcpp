@@ -7,7 +7,7 @@
 #include "can_close.hpp"
 
 #include "../options/reader_writer.h"
-#include "../options/ISupportOptions.hpp"
+#include "../options/IHaveOptions.hpp"
 
 namespace nng {
 
@@ -15,7 +15,7 @@ namespace nng {
     class endpoint
         : public IHaveOne
         , public ICanClose
-        , public ISupportOptions<_OptionReaderWriter> {
+        , public IHaveOptions<_OptionReaderWriter> {
 
     protected:
 

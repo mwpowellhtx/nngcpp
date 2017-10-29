@@ -28,6 +28,10 @@ namespace nng {
     class message_pipe;
 #endif // NNGCPP_DIALER_H
 
+#ifndef NNGCPP_OPTIONS_HAVE_OPTIONS_HPP
+    template<class Options_> struct IHaveOptions;
+#endif // NNGCPP_OPTIONS_HAVE_OPTIONS_HPP
+
     class _OptionReader {
     public:
 
@@ -52,15 +56,17 @@ namespace nng {
         friend class dialer;
         friend class message_pipe;
 
+        template<class Options_> friend struct IHaveOptions;
+
         // TODO: TBD: making them public against my better judgment; however friendship web is getting kind of sticky IMHO...
         void set_getters(const getopt_func& getopt
             , const getopt_int_func& getopt_int
             , const getopt_sz_func& getopt_sz
             , const getopt_duration_func& getopt_duration);
 
-    public:
-
         _OptionReader();
+
+    public:
 
         virtual ~_OptionReader();
 

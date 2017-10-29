@@ -10,7 +10,7 @@ namespace nng {
     using std::bind;
 
     message_pipe::message_pipe(msg_type* const msgp)
-        : IHaveOne(), ICanClose(), ISupportOptions(), equal_to()
+        : IHaveOne(), ICanClose(), IHaveOptions(), equal_to()
         , pid(0), _msgp(msgp)
         , __getter(bind(&::nng_msg_get_pipe, _msgp))
         , __setter(), __closer() {
@@ -29,7 +29,7 @@ namespace nng {
     }
 
     message_pipe::options_type* const message_pipe::GetOptions() {
-        return interface_type::GetOptions();
+        return have_options_type::GetOptions();
     }
 
     void message_pipe::Close() {

@@ -20,6 +20,10 @@ namespace nng {
     class dialer;
 #endif // NNGCPP_DIALER_H
 
+#ifndef NNGCPP_OPTIONS_HAVE_OPTIONS_HPP
+    template<class Options_> struct IHaveOptions;
+#endif // NNGCPP_OPTIONS_HAVE_OPTIONS_HPP
+
     class _OptionWriter {
     public:
 
@@ -43,15 +47,17 @@ namespace nng {
         friend class listener;
         friend class dialer;
 
+        template<class Options_> friend struct IHaveOptions;
+
         // TODO: TBD: ditto sticky friendship web...
         void set_setters(const setopt_func& setopt
             , const setopt_int_func& setopt_int
             , const setopt_sz_func& setopt_sz
             , const setopt_duration_func& setopt_duration);
 
-    public:
-
         _OptionWriter();
+
+    public:
 
         virtual ~_OptionWriter();
 

@@ -30,7 +30,7 @@
 set (NNGCPP_CPP_SRCS
     nngcpp.h
     algorithms/string_algo.hpp
-    options/ISupportOptions.hpp
+    options/IHaveOptions.hpp
     options/names.cpp
     options/names.h
     options/reader.cpp

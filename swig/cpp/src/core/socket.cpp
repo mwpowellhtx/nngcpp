@@ -14,7 +14,7 @@ namespace nng {
     using std::bind;
 
     socket::socket(const nng_ctor_func& nng_ctor)
-        : IHaveOne(), sender(), receiver(), messenger(), ISupportOptions()
+        : IHaveOne(), sender(), receiver(), messenger(), IHaveOptions()
         , sid(0) {
 
         invocation::with_default_error_handling(nng_ctor, &sid);
@@ -26,7 +26,7 @@ namespace nng {
     }
 
     socket::options_type* const socket::GetOptions() {
-        return interface_type::GetOptions();
+        return have_options_type::GetOptions();
     }
 
     void socket::configure_options(nng_type sid) {

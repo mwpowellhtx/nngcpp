@@ -6,15 +6,23 @@
 
 namespace nng {
 
+#ifndef NNGCPP_OPTIONS_HAVE_OPTIONS_HPP
+    template<class Options_> struct IHaveOptions;
+#endif // NNGCPP_OPTIONS_HAVE_OPTIONS_HPP
+
     class _OptionReaderWriter : public _OptionReader, public _OptionWriter {
     private:
 
         typedef _OptionReader reader_type;
         typedef _OptionWriter writer_type;
 
-    public:
+    protected:
+
+        template<class Options_> friend struct IHaveOptions;
 
         _OptionReaderWriter();
+
+    public:
 
         virtual ~_OptionReaderWriter();
 

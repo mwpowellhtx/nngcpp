@@ -5,13 +5,13 @@ namespace nng {
     endpoint::endpoint()
         : IHaveOne()
         , ICanClose()
-        , ISupportOptions() {
+        , IHaveOptions() {
     }
 
     endpoint::~endpoint() {
     }
 
     endpoint::options_type* const endpoint::GetOptions() {
-        return interface_type::GetOptions();
+        return have_options_type::GetOptions();
     }
 }

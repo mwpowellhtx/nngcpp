@@ -26,7 +26,7 @@ namespace nng {
     class message_pipe
         : public IHaveOne
         , public ICanClose
-        , public ISupportOptions<_OptionReader>
+        , public IHaveOptions<_OptionReader>
         , public std::equal_to<message_pipe> {
     public:
 

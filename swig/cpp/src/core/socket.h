@@ -31,7 +31,7 @@ namespace nng {
         , public sender
         , public receiver
         , public messenger
-        , public ISupportOptions<_OptionReaderWriter> {
+        , public IHaveOptions<_OptionReaderWriter> {
     public:
 
         typedef ::nng_socket nng_type;
