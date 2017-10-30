@@ -37,23 +37,23 @@ namespace nng {
     _Inet6FamilyView::~_Inet6FamilyView() {
     }
 
+    bool _Inet6FamilyView::HasOne() const {
+        return __family_view_base::HasOne();
+    }
+
     _Inet6FamilyView::detail_type* _Inet6FamilyView::get_detail() const {
         return &_sap->s_un.s_in6;
     }
 
-    bool _Inet6FamilyView::operator==(const detail_type& other) {
-        const auto detailp = get_detail();
-        return std::memcmp(&detailp->sa_addr, &other.sa_addr, 16) == 0
-            && detailp->sa_port == other.sa_port;
+    bool _Inet6FamilyView::Equals(detail_type* const ap, detail_type* const bp) const {
+        return ap == bp || (
+            std::memcmp(&ap->sa_addr, &bp->sa_addr, 16) == 0
+            && ap->sa_port == bp->sa_port
+            );
     }
 
-    bool _Inet6FamilyView::operator!=(const detail_type& other) {
-        return !operator==(other);
-    }
-
-    bool _Inet6FamilyView::operator==(const IAddrFamilyViewBase& other) {
-
-        if (!IAddrFamilyViewBase::operator==(other)) { return false; }
+    bool _Inet6FamilyView::Equals(const IAddrFamilyViewBase& other) const {
+        if (!__family_view_base::Equals(other)) { return false; }
 
         // We are expecting Views to be Truly Aligned.
         auto op = dynamic_cast<_Inet6FamilyView*>(
@@ -62,11 +62,15 @@ namespace nng {
 
         if (!op) { return false; }
 
-        return operator==(*op->get_detail());
+        return Equals(get_detail(), op->get_detail());
+    }
+
+    bool _Inet6FamilyView::operator==(const IAddrFamilyViewBase& other) {
+        return Equals(other);
     }
 
     bool _Inet6FamilyView::operator!=(const IAddrFamilyViewBase& other) {
-        return !operator==(other);
+        return !Equals(other);
     }
 
     IPv6AddrVector _Inet6FamilyView::GetIPv6Addr() const {
@@ -131,5 +135,13 @@ namespace nng {
 
     void _Inet6FamilyView::__SetPort(const uint16_t value) {
         get_detail()->sa_port = ::htons(value);
+    }
+
+    nng::uint32_t _Inet6FamilyView::GetIPv4Addr() const {
+        return __family_view_base::GetIPv4Addr();
+    }
+
+    void _Inet6FamilyView::SetIPv4Addr(const nng::uint32_t value) {
+        __family_view_base::SetIPv4Addr(value);
     }
 }

@@ -3,7 +3,7 @@
 namespace nng {
 
     _UnspecFamilyView::_UnspecFamilyView(sockaddr_type* const sap)
-        : IAddrFamilyViewBase(sap, af_unspec) {
+        : IAddrFamilyView(sap, af_unspec) {
     }
 
     _UnspecFamilyView::~_UnspecFamilyView() {

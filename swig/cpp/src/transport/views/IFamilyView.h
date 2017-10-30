@@ -104,7 +104,9 @@ namespace nng {
 
         virtual detail_type* get_detail() const = 0;
 
-        virtual bool Equals(detail_type* const ap, detail_type* const bp) const = 0;
+        virtual bool Equals(detail_type* const ap, detail_type* const bp) const {
+            return false;
+        }
     };
 
 #ifndef NNGCPP_ADDRESS_H

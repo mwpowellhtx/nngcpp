@@ -9,8 +9,7 @@ namespace nng {
 
         virtual ~_Inet6FamilyView();
 
-        virtual bool operator==(const IAddrFamilyViewBase& other) override;
-        virtual bool operator!=(const IAddrFamilyViewBase& other) override;
+        virtual bool HasOne() const override;
 
     protected:
 
@@ -20,10 +19,16 @@ namespace nng {
 
         virtual detail_type* get_detail() const override;
 
-        virtual bool operator==(const detail_type& other) override;
-        virtual bool operator!=(const detail_type& other) override;
+    private:
+
+        virtual bool Equals(detail_type* const ap, detail_type* const bp) const override;
 
     public:
+
+        virtual bool Equals(const IAddrFamilyViewBase& other) const override;
+
+        virtual bool operator==(const IAddrFamilyViewBase& other) override;
+        virtual bool operator!=(const IAddrFamilyViewBase& other) override;
 
         virtual IPv6AddrVector GetIPv6Addr() const override;
         virtual IPv6AddrUInt16Vector GetIPv6Addr16() const override;
@@ -35,6 +40,11 @@ namespace nng {
 
         virtual nng::uint16_t __GetPort() const override;
         virtual void __SetPort(const nng::uint16_t value) override;
+
+    public:
+
+        virtual nng::uint32_t GetIPv4Addr() const override;
+        virtual void SetIPv4Addr(const nng::uint32_t value) override;
     };
 }
 
