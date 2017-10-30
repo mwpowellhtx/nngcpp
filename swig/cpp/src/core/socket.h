@@ -57,7 +57,7 @@ namespace nng {
 
         virtual ~socket();
 
-        _OptionReaderWriter* const GetOptions() override;
+        virtual _OptionReaderWriter* const GetOptions() override;
 
         // TODO: TBD: may want to comprehend nng's NNG_MAXADDRLEN at some level... expose as a static constant, for instance, bare minimum
         void listen(const std::string& addr, flag_type flags = flag_none);

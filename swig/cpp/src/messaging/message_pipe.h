@@ -62,7 +62,7 @@ namespace nng {
 
         virtual ~message_pipe();
 
-        _OptionReader* const GetOptions() override;
+        virtual _OptionReader* const GetOptions() override;
 
         virtual bool HasOne() const override;
 
