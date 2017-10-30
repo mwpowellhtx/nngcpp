@@ -12,7 +12,7 @@ namespace nng {
     class socket;
 #endif // NNGCPP_SOCKET_H
 
-    class dialer : public endpoint {
+    class dialer : public _EndPoint {
     public:
 
         typedef ::nng_dialer nng_type;

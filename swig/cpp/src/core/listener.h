@@ -12,7 +12,7 @@ namespace nng {
     class socket;
 #endif // NNGCPP_SOCKET_H
 
-    class listener : public endpoint {
+    class listener : public _EndPoint {
     public:
 
         typedef ::nng_listener nng_type;

@@ -10,11 +10,11 @@ namespace nng {
     using std::bind;
 
     // TODO: TBD: ditto "listener" ...
-    dialer::dialer() : endpoint(), did(0) {
+    dialer::dialer() : _EndPoint(), did(0) {
         configure_options(did);
     }
 
-    dialer::dialer(const socket* const sp, const std::string& addr) : endpoint(), did(0) {
+    dialer::dialer(const socket* const sp, const std::string& addr) : _EndPoint(), did(0) {
 
         const auto& op = bind(&::nng_dialer_create, &did, sp->sid, _1);
         invocation::with_default_error_handling(op, addr.c_str());
@@ -26,7 +26,7 @@ namespace nng {
     }
 
     dialer::options_type* const dialer::GetOptions() {
-        return endpoint::GetOptions();
+        return _EndPoint::GetOptions();
     }
 
     void dialer::start(flag_type flags) {

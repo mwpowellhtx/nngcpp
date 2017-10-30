@@ -10,11 +10,11 @@ namespace nng {
     using std::bind;
 
     // TODO: TBD: is "listener" its own thing? or simply another kind of "socket"? i.e. perhaps a receive-only socket, as the name would suggest
-    listener::listener() : endpoint(), lid(0) {
+    listener::listener() : _EndPoint(), lid(0) {
         configure_options(lid);
     }
 
-    listener::listener(const socket* const sp, const std::string& addr) : endpoint(), lid(0) {
+    listener::listener(const socket* const sp, const std::string& addr) : _EndPoint(), lid(0) {
 
         const auto op = bind(&::nng_listener_create, &lid, sp->sid, _1);
         invocation::with_default_error_handling(op, addr.c_str());
@@ -26,7 +26,7 @@ namespace nng {
     }
 
     listener::options_type* const listener::GetOptions() {
-        return endpoint::GetOptions();
+        return _EndPoint::GetOptions();
     }
 
     void listener::start(flag_type flags) {

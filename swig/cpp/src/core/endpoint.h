@@ -12,18 +12,18 @@
 namespace nng {
 
     // TODO: TBD: carries along with it information about ::nng_pipe ... just a matter of how to present it to the C++ (or SWIG) community...
-    class endpoint
+    class _EndPoint
         : public IHaveOne
         , public ICanClose
         , public IHaveOptions<_OptionReaderWriter> {
 
     protected:
 
-        endpoint();
+        _EndPoint();
 
     public:
 
-        virtual ~endpoint();
+        virtual ~_EndPoint();
 
         virtual void start(flag_type flags = flag_none) = 0;
 
