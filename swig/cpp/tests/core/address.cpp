@@ -26,32 +26,6 @@
 #include <limits>
 #include <map>
 
-namespace nng {
-
-    using nng::uint16_t;
-
-    class _SockAddrFixture : public _SockAddr {
-    public:
-
-        _SockAddrFixture() : _SockAddr() {
-        }
-
-        _SockAddrFixture(const _SockAddrFixture& other) : _SockAddr(other) {
-        }
-
-        virtual ~_SockAddrFixture() {
-        }
-
-        uint16_t get_family_value() const {
-            return static_cast<uint16_t>(GetFamily());
-        }
-
-        void set_family_value(uint16_t value) {
-            SetFamily(static_cast<SocketAddressFamily>(value));
-        }
-    };
-}
-
 #define AF_AS_STRING(x) nng::sockaddr_family_name<x>::name
 
 namespace nng {
@@ -59,10 +33,11 @@ namespace nng {
     using namespace std;
     using namespace nng::exceptions;
     using namespace Catch::Matchers;
+    using nng::uint16_t;
 
     struct address_test {
 
-        typedef std::function<void(_SockAddrFixture* afp, const uint16_t fv)> arrange_func;
+        typedef std::function<void(_SockAddr* afp, const uint16_t fv)> arrange_func;
 
         typedef std::function<void(IAddrFamilyViewBase* const vp, const uint16_t fv)> assert_func;
 
@@ -83,7 +58,7 @@ namespace nng {
     any of them fail. */
 
     address_test max_fv_tests{
-        [](_SockAddrFixture* afp, const uint16_t fv) {
+        [](_SockAddr* afp, const uint16_t fv) {
         auto vp = afp->GetView();
         REQUIRE_THROWS_AS(vp->__SetPort(0), not_implemented);
         REQUIRE_THROWS_AS(vp->SetIPv4Addr(0), not_implemented);
@@ -105,7 +80,7 @@ namespace nng {
 
     // TODO: TBD: may also introduce a "no arrangement" baseline; outcomes should be aligned with UNSPEC, I believe.
     address_test unspec_tests{
-        [](_SockAddrFixture* afp, const uint16_t fv) {
+        [](_SockAddr* afp, const uint16_t fv) {
         auto vp = afp->GetView();
         REQUIRE_THROWS_AS(vp->__SetPort(0), not_implemented);
         REQUIRE_THROWS_AS(vp->SetIPv4Addr(0), not_implemented);
@@ -125,7 +100,7 @@ namespace nng {
     };
 
     address_test inproc_tests{
-        [](_SockAddrFixture* afp, const uint16_t fv) {
+        [](_SockAddr* afp, const uint16_t fv) {
         auto vp = afp->GetView();
         REQUIRE_THROWS_AS(vp->__SetPort(0), not_implemented);
         REQUIRE_THROWS_AS(vp->SetIPv4Addr(0), not_implemented);
@@ -146,7 +121,7 @@ namespace nng {
     };
 
     address_test ipc_tests{
-        [](_SockAddrFixture* afp, const uint16_t fv) {
+        [](_SockAddr* afp, const uint16_t fv) {
         auto vp = afp->GetView();
         REQUIRE_THROWS_AS(vp->__SetPort(0), not_implemented);
         REQUIRE_THROWS_AS(vp->SetIPv4Addr(0), not_implemented);
@@ -167,7 +142,7 @@ namespace nng {
     };
 
     address_test inet_tests{
-        [](_SockAddrFixture* afp, const uint16_t fv) {
+        [](_SockAddr* afp, const uint16_t fv) {
         auto vp = dynamic_cast<_InetFamilyView*>(afp->GetView());
         REQUIRE(vp);
         REQUIRE(!vp->__GetPort());
@@ -192,7 +167,7 @@ namespace nng {
     };
 
     address_test inet6_tests{
-        [](_SockAddrFixture* afp, const uint16_t fv) {
+        [](_SockAddr* afp, const uint16_t fv) {
         auto vp = dynamic_cast<_Inet6FamilyView*>(afp->GetView());
         REQUIRE(vp);
         REQUIRE_THROWS_AS(vp->SetIPv4Addr(0), not_implemented);
@@ -220,7 +195,7 @@ namespace nng {
     };
 
     address_test zt_tests{
-        [](_SockAddrFixture* afp, const uint16_t fv) {
+        [](_SockAddr* afp, const uint16_t fv) {
         auto vp = afp->GetView();
         REQUIRE_THROWS_AS(vp->__SetPort(0), not_implemented);
         REQUIRE_THROWS_AS(vp->SetIPv4Addr(0), not_implemented);
@@ -250,7 +225,7 @@ TEST_CASE("Tests that socket addresses are handled correctly", Catch::Tags(
     using namespace Catch::Matchers;
     using nng::uint16_t;
 
-    _SockAddrFixture af;
+    _SockAddr af;
     IAddrFamilyViewBase* vp1 = nullptr;
 
     const uint16_t default_fv = 0;
@@ -290,7 +265,7 @@ TEST_CASE("Tests that socket addresses are handled correctly", Catch::Tags(
 
                 address_test* const testsp = args.second;
 
-                REQUIRE_NOTHROW(af.set_family_value(fv));
+                REQUIRE_NOTHROW(af.SetFamily(fv));
 
                 testsp->arrange(&af, fv);
 
