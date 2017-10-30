@@ -6,7 +6,6 @@
 #include "enums.h"
 #include "ISender.h"
 #include "IReceiver.h"
-#include "messenger.h"
 #include "../options/options.h"
 
 #include "IHaveOne.hpp"
@@ -27,7 +26,6 @@ namespace nng {
         , public ICanClose
         , public ISender
         , public IReceiver
-        , public messenger
         , public IHaveOptions<_OptionReaderWriter> {
     public:
 

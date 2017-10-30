@@ -61,8 +61,6 @@ set (NNGCPP_CPP_SRCS
     core/endpoint.h
     core/listener.cpp
     core/listener.h
-    core/messenger.cpp
-    core/messenger.h
     core/session.cpp
     core/session.h
     core/socket.cpp

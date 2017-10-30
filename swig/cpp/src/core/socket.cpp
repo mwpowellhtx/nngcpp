@@ -1,5 +1,4 @@
 #include "socket.h"
-#include "messenger.h"
 #include "listener.h"
 #include "dialer.h"
 #include "invocation.hpp"
@@ -14,7 +13,7 @@ namespace nng {
     using std::bind;
 
     socket::socket(const nng_ctor_func& nng_ctor)
-        : IHaveOne(), ICanClose(), ISender(), IReceiver(), messenger(), IHaveOptions()
+        : IHaveOne(), ICanClose(), ISender(), IReceiver(), IHaveOptions()
         , sid(0) {
 
         invocation::with_default_error_handling(nng_ctor, &sid);

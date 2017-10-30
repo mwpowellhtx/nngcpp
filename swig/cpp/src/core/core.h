@@ -9,7 +9,6 @@
 #include "endpoint.h"
 #include "enums.h"
 #include "listener.h"
-#include "messenger.h"
 #include "IReceiver.h"
 #include "ISender.h"
 #include "session.h"
