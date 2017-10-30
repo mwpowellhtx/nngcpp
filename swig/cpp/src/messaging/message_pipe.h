@@ -5,7 +5,7 @@
 #include <nngcpp.h>
 
 #include "../core/IHaveOne.hpp"
-#include "../core/can_close.hpp"
+#include "../core/ICanClose.hpp"
 #include "../options/options.h"
 
 #include <functional>

@@ -7,7 +7,7 @@
 #include "../types.h"
 
 #include "../IHaveOne.hpp"
-#include "../can_close.hpp"
+#include "../ICanClose.hpp"
 
 #include <functional>
 

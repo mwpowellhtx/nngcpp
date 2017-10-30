@@ -10,7 +10,7 @@
 #include "../options/options.h"
 
 #include "IHaveOne.hpp"
-#include "can_close.hpp"
+#include "ICanClose.hpp"
 
 // nng should be in the include path.
 #include <functional>

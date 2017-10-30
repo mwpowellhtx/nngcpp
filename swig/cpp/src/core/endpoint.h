@@ -4,7 +4,7 @@
 #include "enums.h"
 
 #include "IHaveOne.hpp"
-#include "can_close.hpp"
+#include "ICanClose.hpp"
 
 #include "../options/reader_writer.h"
 #include "../options/IHaveOptions.hpp"
