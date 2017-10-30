@@ -60,6 +60,7 @@ namespace nng {
     typedef struct sockaddr_t {
         union {
             nng::uint16_t s_family;
+            sockaddr_unspec_t s_unspec;
             sockaddr_path_t s_path;
             sockaddr_inproc_t s_inproc;
             sockaddr_in6_t s_in6;

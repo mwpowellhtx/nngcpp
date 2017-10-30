@@ -52,14 +52,6 @@ namespace nng {
         return !Equals(other);
     }
 
-    bool _InetFamilyView::operator==(const IAddrFamilyViewBase& other) {
-
-    }
-
-    bool _InetFamilyView::operator!=(const IAddrFamilyViewBase& other) {
-        return !operator==(other);
-    }
-
     uint32_t _InetFamilyView::GetIPv4Addr() const {
         return ::ntohl(get_detail()->sa_addr);
     }

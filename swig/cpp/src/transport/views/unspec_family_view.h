@@ -17,6 +17,8 @@ namespace nng {
 
         _UnspecFamilyView(sockaddr_type* const sap);
 
+        virtual detail_type* get_detail() const override;
+
     public:
 
         virtual bool Equals(const IAddrFamilyViewBase& other) const override;

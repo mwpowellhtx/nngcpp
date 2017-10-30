@@ -13,6 +13,10 @@ namespace nng {
         return false;
     }
 
+    _UnspecFamilyView::detail_type* _UnspecFamilyView::get_detail() const {
+        return &_sap->s_un.s_unspec;
+    }
+
     // Fill in the gaps, even calling to base functionality, in order for SWIG to see them properly.
     bool _UnspecFamilyView::Equals(const IAddrFamilyViewBase& other) const {
         return __family_view_base::Equals(other);
