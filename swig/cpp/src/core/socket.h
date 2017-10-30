@@ -9,7 +9,7 @@
 #include "messenger.h"
 #include "../options/options.h"
 
-#include "having_one.hpp"
+#include "IHaveOne.hpp"
 #include "can_close.hpp"
 
 // nng should be in the include path.

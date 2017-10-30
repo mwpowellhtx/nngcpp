@@ -6,7 +6,7 @@
 
 #include "../types.h"
 
-#include "../having_one.hpp"
+#include "../IHaveOne.hpp"
 #include "../can_close.hpp"
 
 #include <functional>

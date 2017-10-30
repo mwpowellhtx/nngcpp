@@ -41,7 +41,7 @@ set (NNGCPP_CPP_SRCS
     options/reader_writer.h
     options/options.h
     core/IEquatable.hpp
-    core/having_one.hpp
+    core/IHaveOne.hpp
     core/can_close.hpp
     core/invocation.hpp
     core/types.h

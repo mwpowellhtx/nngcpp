@@ -2,7 +2,7 @@
 #define NNGCPP_MESSAGE_BASE_H
 
 #include "../core/types.h"
-#include "../core/having_one.hpp"
+#include "../core/IHaveOne.hpp"
 
 #include <cstddef>
 #include <cstdint>

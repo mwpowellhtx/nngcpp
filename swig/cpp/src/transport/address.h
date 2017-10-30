@@ -4,7 +4,7 @@
 #include "views/views.h"
 
 #include "../core/IEquatable.hpp"
-#include "../core/having_one.hpp"
+#include "../core/IHaveOne.hpp"
 
 #include <cstddef>
 #include <memory>

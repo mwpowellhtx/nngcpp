@@ -4,7 +4,7 @@
 #define NNG_ONLY
 #include <nngcpp.h>
 
-#include "../core/having_one.hpp"
+#include "../core/IHaveOne.hpp"
 #include "../core/can_close.hpp"
 #include "../options/options.h"
 
