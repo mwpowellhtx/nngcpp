@@ -4,7 +4,7 @@
 #include "../sockaddr.h"
 
 #include "../../core/having_one.hpp"
-#include "../../core/equatable.hpp"
+#include "../../core/IEquatable.hpp"
 
 #include <cstddef>
 #include <vector>

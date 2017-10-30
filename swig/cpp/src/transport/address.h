@@ -3,7 +3,7 @@
 
 #include "views/views.h"
 
-#include "../core/equatable.hpp"
+#include "../core/IEquatable.hpp"
 #include "../core/having_one.hpp"
 
 #include <cstddef>
