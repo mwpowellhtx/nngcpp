@@ -14,7 +14,7 @@ namespace nng {
     using std::bind;
 
     socket::socket(const nng_ctor_func& nng_ctor)
-        : IHaveOne(), sender(), receiver(), messenger(), IHaveOptions()
+        : IHaveOne(), ICanClose(), ISender(), IReceiver(), messenger(), IHaveOptions()
         , sid(0) {
 
         invocation::with_default_error_handling(nng_ctor, &sid);

@@ -43,6 +43,10 @@ set (NNGCPP_CPP_SRCS
     core/ICanClose.hpp
     core/IEquatable.hpp
     core/IHaveOne.hpp
+    core/IReceiver.cpp
+    core/IReceiver.h
+    core/ISender.cpp
+    core/ISender.h
     core/invocation.hpp
     core/types.h
     core/core.h
@@ -59,10 +63,6 @@ set (NNGCPP_CPP_SRCS
     core/listener.h
     core/messenger.cpp
     core/messenger.h
-    core/receiver.cpp
-    core/receiver.h
-    core/sender.cpp
-    core/sender.h
     core/session.cpp
     core/session.h
     core/socket.cpp

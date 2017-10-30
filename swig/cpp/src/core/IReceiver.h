@@ -15,12 +15,14 @@
 
 namespace nng {
 
-    class receiver {
+    class IReceiver {
     protected:
 
-        receiver();
+        IReceiver();
 
     public:
+
+        virtual ~IReceiver();
 
         // TODO: TBD: this one may get somewhat involved...
         virtual std::unique_ptr<binary_message> receive(flag_type flags = flag_none) = 0;

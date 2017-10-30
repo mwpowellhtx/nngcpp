@@ -14,12 +14,14 @@
 
 namespace nng {
 
-    class sender {
+    class ISender {
     protected:
 
-        sender();
+        ISender();
 
     public:
+
+        virtual ~ISender();
 
         virtual void send(binary_message* const bmp, flag_type flags = flag_none) = 0;
 

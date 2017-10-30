@@ -4,8 +4,8 @@
 #include "types.h"
 
 #include "enums.h"
-#include "sender.h"
-#include "receiver.h"
+#include "ISender.h"
+#include "IReceiver.h"
 #include "messenger.h"
 #include "../options/options.h"
 
@@ -25,8 +25,8 @@ namespace nng {
     class socket
         : public IHaveOne
         , public ICanClose
-        , public sender
-        , public receiver
+        , public ISender
+        , public IReceiver
         , public messenger
         , public IHaveOptions<_OptionReaderWriter> {
     public:
