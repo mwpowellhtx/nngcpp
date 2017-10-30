@@ -9,10 +9,10 @@
 namespace nng {
 
     // Flags.
-    enum flag_type {
+    enum flag_type : nng::int32_t {
         flag_none = 0,
-        flag_alloc = ::NNG_FLAG_ALLOC,
-        flag_nonblock = ::NNG_FLAG_NONBLOCK
+        flag_alloc, // = ::NNG_FLAG_ALLOC,
+        flag_nonblock, // = ::NNG_FLAG_NONBLOCK
     };
 
     enum duration_ms : int32_t {
