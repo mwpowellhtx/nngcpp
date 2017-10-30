@@ -40,7 +40,7 @@ namespace nng {
 
         virtual ~address_calculator();
 
-        std::string GetIPv4Addr(const std::string& base_addr, int delta = 0);
+        std::string get_addr(const std::string& base_addr, int delta = 0);
         std::string get_next_addr(const std::string& base_addr, int delta = 1);
         std::string get_prev_addr(const std::string& base_addr, int delta = -1);
 
@@ -50,7 +50,7 @@ namespace nng {
 
         std::string _port_delim;
 
-        uint16_t GetPort(int delta);
+        uint16_t get_port(int delta);
 
     public:
 

@@ -37,7 +37,7 @@ namespace nng {
     address_calculator::~address_calculator() {
     }
 
-    uint16_t address_calculator::GetPort(int delta) {
+    uint16_t address_calculator::get_port(int delta) {
         return port += delta;
     }
 
@@ -45,18 +45,18 @@ namespace nng {
         return port;
     }
 
-    std::string address_calculator::GetIPv4Addr(const std::string& base_addr, int delta) {
+    std::string address_calculator::get_addr(const std::string& base_addr, int delta) {
         std::ostringstream os;
-        os << base_addr << _port_delim << GetPort(delta);
+        os << base_addr << _port_delim << get_port(delta);
         return os.str();
     }
 
     std::string address_calculator::get_next_addr(const std::string& base_addr, int delta) {
-        return GetIPv4Addr(base_addr, std::abs(delta));
+        return get_addr(base_addr, std::abs(delta));
     }
 
     std::string address_calculator::get_prev_addr(const std::string& base_addr, int delta) {
-        return GetIPv4Addr(base_addr, -std::abs(delta));
+        return get_addr(base_addr, -std::abs(delta));
     }
 
     // TODO: TBD: could expose this, but random generators are a dime a dozen...

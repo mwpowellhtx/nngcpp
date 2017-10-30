@@ -3,14 +3,16 @@
 
 namespace nng {
 
-    _OptionWriter::_OptionWriter()
+    _BasicOptionWriter::_BasicOptionWriter()
         : _setopt()
         , _setopt_int()
         , _setopt_sz()
         , _setopt_duration() {
     }
 
-    void _OptionWriter::set_setters(const setopt_func& setopt
+    _BasicOptionWriter::~_BasicOptionWriter() {}
+
+    void _BasicOptionWriter::set_setters(const setopt_func& setopt
         , const setopt_int_func& setopt_int
         , const setopt_sz_func& setopt_sz
         , const setopt_duration_func& setopt_duration) {
@@ -20,6 +22,10 @@ namespace nng {
         const_cast<setopt_int_func&>(_setopt_int) = setopt_int;
         const_cast<setopt_sz_func&>(_setopt_sz) = setopt_sz;
         const_cast<setopt_duration_func&>(_setopt_duration) = setopt_duration;
+    }
+
+    _OptionWriter::_OptionWriter()
+        : _BasicOptionWriter() {
     }
 
     _OptionWriter::~_OptionWriter() {

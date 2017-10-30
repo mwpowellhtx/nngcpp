@@ -92,6 +92,8 @@ namespace nng {
 
         virtual ~_SockAddr();
 
+        _SockAddr& operator=(const _SockAddr& other);
+
         size_type GetSize() const;
 
         sockaddr_type* get();

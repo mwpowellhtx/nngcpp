@@ -42,10 +42,15 @@ namespace nng {
     }
 
     _SockAddr::_SockAddr(const _SockAddr& other) : _sa(), _view() {
-        std::memcpy(&_sa, &other._sa, sizeof(_sa));
+        (*this) = other;
     }
 
     _SockAddr::~_SockAddr() {
+    }
+
+    _SockAddr& _SockAddr::operator=(const _SockAddr& other) {
+        std::memcpy(&_sa, &other._sa, sizeof(_sa));
+        return *this;
     }
 
     std::string _SockAddr::GetFamilyNameOf(uint16_t value) {

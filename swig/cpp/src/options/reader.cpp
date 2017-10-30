@@ -5,14 +5,16 @@
 
 namespace nng {
 
-    _OptionReader::_OptionReader()
+    _BasicOptionReader::_BasicOptionReader()
         : _getopt()
         , _getopt_int()
         , _getopt_sz()
         , _getopt_duration() {
     }
 
-    void _OptionReader::set_getters(const getopt_func& getopt
+    _BasicOptionReader::~_BasicOptionReader() {}
+
+    void _BasicOptionReader::set_getters(const getopt_func& getopt
         , const getopt_int_func& getopt_int
         , const getopt_sz_func& getopt_sz
         , const getopt_duration_func& getopt_duration) {
@@ -22,6 +24,10 @@ namespace nng {
         const_cast<getopt_int_func&>(_getopt_int) = getopt_int;
         const_cast<getopt_sz_func&>(_getopt_sz) = getopt_sz;
         const_cast<getopt_duration_func&>(_getopt_duration) = getopt_duration;
+    }
+
+    _OptionReader::_OptionReader()
+        : _BasicOptionReader() {
     }
 
     _OptionReader::~_OptionReader() {
@@ -34,21 +40,16 @@ namespace nng {
     std::string _OptionReader::GetText(const std::string& name) {
         // TODO: TBD: for lack of a better definition for the moment...
         size_type sz = _MAX_PATH;
-        return GetText(name, &sz);
+        return GetText(name, sz);
     }
 
-    std::string _OptionReader::GetText(const std::string& name, size_type* const szp) {
+    std::string _OptionReader::GetText(const std::string& name, size_type& sz) {
         std::string s;
-        s.resize(*szp);
-        invocation::with_default_error_handling(_getopt, name.c_str(), &s[0], szp);
+        s.resize(sz);
+        invocation::with_default_error_handling(_getopt, name.c_str(), &s[0], &sz);
         /* So we do use the string trimming algorithms after all...
         Which the in-place is sufficient, no need to use the copying version. */
         return trx::trimcp(s);
-    }
-
-    void _OptionReader::get(const std::string& name, _SockAddr& val) {
-        auto sz = val.GetSize();
-        invocation::with_default_error_handling(_getopt, name.c_str(), val.get(), &sz);
     }
 
     int _OptionReader::GetInt32(const std::string& name) {
@@ -71,6 +72,13 @@ namespace nng {
     duration_rep_type _OptionReader::GetMilliseconds(const std::string& name) {
         duration_rep_type result;
         invocation::with_default_error_handling(_getopt_duration, name.c_str(), &result);
+        return result;
+    }
+
+    _SockAddr _OptionReader::GetSocketAddress(const std::string& name) {
+        _SockAddr result;
+        auto sz = result.GetSize();
+        invocation::with_default_error_handling(_getopt, name.c_str(), result.get(), &sz);
         return result;
     }
 }

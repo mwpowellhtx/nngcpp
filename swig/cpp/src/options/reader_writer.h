@@ -10,12 +10,9 @@ namespace nng {
     template<class Options_> struct IHaveOptions;
 #endif // NNGCPP_OPTIONS_HAVE_OPTIONS_HPP
 
-    class _OptionReaderWriter : public _OptionReader, public _OptionWriter {
-    private:
-
-        typedef _OptionReader reader_type;
-        typedef _OptionWriter writer_type;
-
+    class _OptionReaderWriter
+        : public _BasicOptionReader
+        , public _BasicOptionWriter {
     protected:
 
         template<class Options_> friend struct IHaveOptions;
@@ -26,18 +23,18 @@ namespace nng {
 
         virtual ~_OptionReaderWriter();
 
-        virtual void get(const std::string& name, void* valp, size_type& szp) override;
+        virtual void get(const std::string& name, void* valp, size_type& sz) override;
 
         virtual std::string GetText(const std::string& name) override;
-        virtual std::string GetText(const std::string& name, size_type* const szp) override;
-
-        virtual void get(const std::string& name, _SockAddr& val) override;
+        virtual std::string GetText(const std::string& name, size_type& sz) override;
 
         virtual int32_t GetInt32(const std::string& name) override;
         virtual size_type GetSize(const std::string& name) override;
 
         virtual duration_type GetDuration(const std::string& name) override;
         virtual duration_rep_type GetMilliseconds(const std::string& name) override;
+
+        virtual _SockAddr GetSocketAddress(const std::string& name) override;
 
         virtual void set(const std::string& name, const void* valp, size_type sz) override;
         virtual void SetString(const std::string& name, const std::string& s) override;

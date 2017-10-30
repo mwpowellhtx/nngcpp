@@ -116,7 +116,7 @@ namespace nng {
         // TODO: TBD: call address socket_address instead... would be more specific.
         _SockAddr a;
 
-        REQUIRE_NOTHROW(pp->GetOptions()->get(O::local_addr, a));
+        REQUIRE_NOTHROW(a = pp->GetOptions()->GetSocketAddress(O::local_addr));
         REQUIRE(a.GetFamily() == af_inet6);
         auto vp = a.GetView();
         REQUIRE(vp->GetFamily() == a.GetFamily());
@@ -133,7 +133,7 @@ namespace nng {
         // TODO: TBD: call address socket_address instead... would be more specific.
         _SockAddr a;
 
-        REQUIRE_NOTHROW(pp->GetOptions()->get(O::remote_addr, a));
+        REQUIRE_NOTHROW(a = pp->GetOptions()->GetSocketAddress(O::remote_addr));
         REQUIRE(a.GetFamily() == af_inet6);
         auto vp = a.GetView();
         REQUIRE(vp->GetFamily() == a.GetFamily());

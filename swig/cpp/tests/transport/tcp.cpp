@@ -77,7 +77,7 @@ namespace nng {
         // TODO: TBD: call address socket_address instead... would be more specific.
         _SockAddr a;
 
-        REQUIRE_NOTHROW(pp->GetOptions()->get(O::local_addr, a));
+        REQUIRE_NOTHROW(a = pp->GetOptions()->GetSocketAddress(O::local_addr));
         REQUIRE(a.GetFamily() == af_inet);
         auto vp = a.GetView();
         REQUIRE(vp->GetFamily() == a.GetFamily());
@@ -92,7 +92,7 @@ namespace nng {
         // TODO: TBD: call address socket_address instead... would be more specific.
         _SockAddr a;
 
-        REQUIRE_NOTHROW(pp->GetOptions()->get(O::remote_addr, a));
+        REQUIRE_NOTHROW(a = pp->GetOptions()->GetSocketAddress(O::remote_addr));
         REQUIRE(a.GetFamily() == af_inet);
         auto vp = a.GetView();
         REQUIRE(vp->GetFamily() == a.GetFamily());
@@ -143,7 +143,7 @@ TEST_CASE("We can bind to wildcards", Catch::Tags(constants::prefix_tags
     WARN("Listening to address: '" + addr + "'");
     REQUIRE_NOTHROW(sp1->listen(addr));
 
-    REQUIRE_NOTHROW(addr = calc.GetIPv4Addr(loopback_addr_base));
+    REQUIRE_NOTHROW(addr = calc.get_addr(loopback_addr_base));
     WARN("Dialing address: '" + addr + "'");
     REQUIRE_NOTHROW(sp2->dial(addr));
 }
