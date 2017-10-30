@@ -18,9 +18,6 @@
 
 namespace nng {
 
-    protocol_type to_protocol_type(int value);
-    int to_int(const protocol_type value);
-
     class listener;
     class dialer;
     struct device_path;
@@ -37,6 +34,10 @@ namespace nng {
         typedef ::nng_socket nng_type;
 
     private:
+
+        typedef std::function<nng::uint16_t()> get_protocol_func;
+
+        static protocol_type __get_protocol(const get_protocol_func& op);
 
         friend class listener;
         friend class dialer;

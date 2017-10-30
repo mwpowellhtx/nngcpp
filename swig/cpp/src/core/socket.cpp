@@ -179,19 +179,18 @@ namespace nng {
         invocation::with_void_return_value(op);
     }
 
-    protocol_type to_protocol_type(int value) {
+    protocol_type socket::__get_protocol(const get_protocol_func& op) {
+        const auto value = op();
         return static_cast<protocol_type>(value);
     }
 
-    int to_int(const protocol_type value) {
-        return static_cast<int>(value);
-    }
-
     protocol_type socket::get_protocol() const {
-        return to_protocol_type(::nng_protocol(sid));
+        const auto& op = bind(&::nng_protocol, sid);
+        return __get_protocol(op);
     }
 
     protocol_type socket::get_peer() const {
-        return to_protocol_type(::nng_peer(sid));
+        const auto& op = bind(&::nng_peer, sid);
+        return __get_protocol(op);
     }
 }
