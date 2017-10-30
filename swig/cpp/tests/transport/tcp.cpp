@@ -79,7 +79,7 @@ namespace nng {
 
         REQUIRE_NOTHROW(pp->GetOptions()->get(O::local_addr, a));
         REQUIRE(a.GetFamily() == af_inet);
-        auto vp = a.view();
+        auto vp = a.GetView();
         REQUIRE(vp->GetFamily() == a.GetFamily());
         REQUIRE(vp->GetIPv4Addr() == INADDR_LOOPBACK);
         REQUIRE(vp->__GetPort() == expected_port);
@@ -94,7 +94,7 @@ namespace nng {
 
         REQUIRE_NOTHROW(pp->GetOptions()->get(O::remote_addr, a));
         REQUIRE(a.GetFamily() == af_inet);
-        auto vp = a.view();
+        auto vp = a.GetView();
         REQUIRE(vp->GetFamily() == a.GetFamily());
         REQUIRE(vp->GetIPv4Addr() == INADDR_LOOPBACK);
         REQUIRE(vp->__GetPort() != 0);

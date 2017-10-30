@@ -45,7 +45,7 @@ namespace nng {
             /* The Udp is for internal use. We do not need to know for public
             consumption. But we do use it here in the unit testing. */
             ::nni_plat_udp* udpp = nullptr;
-            auto loopback = _SockAddr::in6_loopback();
+            auto loopback = _SockAddr::GetIPv6Loopback();
             // TODO: TBD: so the only reason why we do this is to back-support the NNG structure.
             ::nng_sockaddr sa;
             std::memcpy(&sa, loopback.get(), sizeof(sa));
@@ -118,7 +118,7 @@ namespace nng {
 
         REQUIRE_NOTHROW(pp->GetOptions()->get(O::local_addr, a));
         REQUIRE(a.GetFamily() == af_inet6);
-        auto vp = a.view();
+        auto vp = a.GetView();
         REQUIRE(vp->GetFamily() == a.GetFamily());
         REQUIRE_THAT(vp->GetIPv6Addr(), Equals(expected_loopback_short_addr));
         REQUIRE(vp->__GetPort() == expected_port);
@@ -135,7 +135,7 @@ namespace nng {
 
         REQUIRE_NOTHROW(pp->GetOptions()->get(O::remote_addr, a));
         REQUIRE(a.GetFamily() == af_inet6);
-        auto vp = a.view();
+        auto vp = a.GetView();
         REQUIRE(vp->GetFamily() == a.GetFamily());
         REQUIRE_THAT(vp->GetIPv6Addr(), Equals(expected_loopback_short_addr));
         REQUIRE(vp->__GetPort() != 0);

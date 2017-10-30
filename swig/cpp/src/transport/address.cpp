@@ -48,7 +48,7 @@ namespace nng {
     _SockAddr::~_SockAddr() {
     }
 
-    std::string _SockAddr::name_of(uint16_t value) {
+    std::string _SockAddr::GetFamilyNameOf(uint16_t value) {
         switch (value) {
         case af_inproc: return sockaddr_family_name<af_inproc>::name;
         case af_ipc: return sockaddr_family_name<af_ipc>::name;
@@ -105,13 +105,13 @@ namespace nng {
         }
     }
 
-    IAddrFamilyViewBase* const _SockAddr::view() const {
+    IAddrFamilyViewBase* const _SockAddr::GetView() const {
         align_view(*this);
         return _view.get();
     }
 
     bool _SockAddr::HasOne() const {
-        return view() != nullptr;
+        return GetView() != nullptr;
     }
 
     size_type _SockAddr::GetSize() const {
@@ -122,16 +122,15 @@ namespace nng {
         return &_sa;
     }
 
-    SocketAddressFamily _SockAddr::GetFamily() const {
-        return static_cast<SocketAddressFamily>(_sa.s_un.s_family);
+    nng::uint16_t _SockAddr::GetFamily() const {
+        return _sa.s_un.s_family;
     }
 
-    void _SockAddr::set_family(const SocketAddressFamily value) {
+    void _SockAddr::SetFamily(const nng::uint16_t value) {
         _sa.s_un.s_family = value;
     }
 
-    bool _SockAddr::operator==(const _SockAddr& other) {
-
+    bool _SockAddr::Equals(const _SockAddr& other) const {
         // Return early when the Families are different.
         if (GetFamily() != other.GetFamily()) { return false; }
 
@@ -139,25 +138,29 @@ namespace nng {
         auto otherp = const_cast<_SockAddr*>(&other);
 
         // We must take this Long Way Round on account of NNG treating the misaligned data as indeterminate.
-        return view()->operator==(*(otherp->view()));
+        return GetView()->Equals(*other.GetView());
+    }
+
+    bool _SockAddr::operator==(const _SockAddr& other) {
+        return Equals(other);
     }
 
     bool _SockAddr::operator!=(const _SockAddr& other) {
-        return !operator==(other);
+        return !Equals(other);
     }
 
-    _SockAddr _SockAddr::in_loopback() {
+    _SockAddr _SockAddr::GetIPv4Loopback() {
         _SockAddr addr;
-        addr.set_family(af_inet);
-        auto vp = addr.view();
+        addr.SetFamily(af_inet);
+        auto vp = addr.GetView();
         vp->SetIPv4Addr(INADDR_LOOPBACK);
         return addr;
     }
 
-    _SockAddr _SockAddr::in6_loopback() {
+    _SockAddr _SockAddr::GetIPv6Loopback() {
         _SockAddr addr;
-        addr.set_family(af_inet6);
-        auto vp = addr.view();
+        addr.SetFamily(af_inet6);
+        auto vp = addr.GetView();
         // IPv6 loopback is quite simple: 0000:0000:0000:0000:0000:0000:0000:0001, or simply ::1.
         IPv6AddrVector value = { 1 };
         for (IPv6AddrVector::const_iterator it = value.cbegin(); it != value.cend(); ++it) {

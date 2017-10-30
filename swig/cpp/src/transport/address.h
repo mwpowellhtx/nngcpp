@@ -3,6 +3,7 @@
 
 #include "views/views.h"
 
+#include "../core/equatable.hpp"
 #include "../core/having_one.hpp"
 
 #include <cstddef>
@@ -68,6 +69,7 @@ namespace nng {
 
     class _SockAddr
         : public IHaveOne
+        , public IEquatable<_SockAddr>
         , public std::equal_to<_SockAddr> {
     public:
 
@@ -94,23 +96,25 @@ namespace nng {
 
         sockaddr_type* get();
 
-        SocketAddressFamily GetFamily() const;
+        nng::uint16_t GetFamily() const;
 
-        void set_family(const SocketAddressFamily value);
+        void SetFamily(const nng::uint16_t value);
 
-        IAddrFamilyViewBase* const view() const;
+        IAddrFamilyViewBase* const GetView() const;
 
         virtual bool HasOne() const override;
+
+        virtual bool Equals(const _SockAddr& other) const;
 
         bool operator==(const _SockAddr& other);
 
         bool operator!=(const _SockAddr& other);
 
-        static _SockAddr in_loopback();
+        static _SockAddr GetIPv4Loopback();
 
-        static _SockAddr in6_loopback();
+        static _SockAddr GetIPv6Loopback();
 
-        static std::string name_of(nng::uint16_t value);
+        static std::string GetFamilyNameOf(nng::uint16_t value);
     };
 }
 

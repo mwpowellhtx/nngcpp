@@ -47,7 +47,7 @@ namespace nng {
         }
 
         void set_family_value(uint16_t value) {
-            set_family(static_cast<SocketAddressFamily>(value));
+            SetFamily(static_cast<SocketAddressFamily>(value));
         }
     };
 }
@@ -84,7 +84,7 @@ namespace nng {
 
     address_test max_fv_tests{
         [](_SockAddrFixture* afp, const uint16_t fv) {
-        auto vp = afp->view();
+        auto vp = afp->GetView();
         REQUIRE_THROWS_AS(vp->__SetPort(0), not_implemented);
         REQUIRE_THROWS_AS(vp->SetIPv4Addr(0), not_implemented);
         REQUIRE_THROWS_AS(vp->SetIPv6Addr({}), not_implemented);
@@ -106,7 +106,7 @@ namespace nng {
     // TODO: TBD: may also introduce a "no arrangement" baseline; outcomes should be aligned with UNSPEC, I believe.
     address_test unspec_tests{
         [](_SockAddrFixture* afp, const uint16_t fv) {
-        auto vp = afp->view();
+        auto vp = afp->GetView();
         REQUIRE_THROWS_AS(vp->__SetPort(0), not_implemented);
         REQUIRE_THROWS_AS(vp->SetIPv4Addr(0), not_implemented);
         REQUIRE_THROWS_AS(vp->SetIPv6Addr({}), not_implemented);
@@ -126,7 +126,7 @@ namespace nng {
 
     address_test inproc_tests{
         [](_SockAddrFixture* afp, const uint16_t fv) {
-        auto vp = afp->view();
+        auto vp = afp->GetView();
         REQUIRE_THROWS_AS(vp->__SetPort(0), not_implemented);
         REQUIRE_THROWS_AS(vp->SetIPv4Addr(0), not_implemented);
         REQUIRE_THROWS_AS(vp->SetIPv6Addr({}), not_implemented);
@@ -147,7 +147,7 @@ namespace nng {
 
     address_test ipc_tests{
         [](_SockAddrFixture* afp, const uint16_t fv) {
-        auto vp = afp->view();
+        auto vp = afp->GetView();
         REQUIRE_THROWS_AS(vp->__SetPort(0), not_implemented);
         REQUIRE_THROWS_AS(vp->SetIPv4Addr(0), not_implemented);
         REQUIRE_THROWS_AS(vp->SetIPv6Addr({}), not_implemented);
@@ -168,7 +168,7 @@ namespace nng {
 
     address_test inet_tests{
         [](_SockAddrFixture* afp, const uint16_t fv) {
-        auto vp = dynamic_cast<_InetFamilyView*>(afp->view());
+        auto vp = dynamic_cast<_InetFamilyView*>(afp->GetView());
         REQUIRE(vp);
         REQUIRE(!vp->__GetPort());
         REQUIRE(!vp->GetIPv4Addr());
@@ -193,7 +193,7 @@ namespace nng {
 
     address_test inet6_tests{
         [](_SockAddrFixture* afp, const uint16_t fv) {
-        auto vp = dynamic_cast<_Inet6FamilyView*>(afp->view());
+        auto vp = dynamic_cast<_Inet6FamilyView*>(afp->GetView());
         REQUIRE(vp);
         REQUIRE_THROWS_AS(vp->SetIPv4Addr(0), not_implemented);
         REQUIRE(!vp->__GetPort());
@@ -221,7 +221,7 @@ namespace nng {
 
     address_test zt_tests{
         [](_SockAddrFixture* afp, const uint16_t fv) {
-        auto vp = afp->view();
+        auto vp = afp->GetView();
         REQUIRE_THROWS_AS(vp->__SetPort(0), not_implemented);
         REQUIRE_THROWS_AS(vp->SetIPv4Addr(0), not_implemented);
         REQUIRE_THROWS_AS(vp->SetIPv6Addr({}), not_implemented);
@@ -286,7 +286,7 @@ TEST_CASE("Tests that socket addresses are handled correctly", Catch::Tags(
             // Really for use with the socket address type.
             uint16_t fv = args.first;
 
-            SECTION("Verify address for family value: '" + _SockAddr::name_of(fv) + "'") {
+            SECTION("Verify address for family value: '" + _SockAddr::GetFamilyNameOf(fv) + "'") {
 
                 address_test* const testsp = args.second;
 
@@ -294,7 +294,7 @@ TEST_CASE("Tests that socket addresses are handled correctly", Catch::Tags(
 
                 testsp->arrange(&af, fv);
 
-                IAddrFamilyViewBase* const vp = af.view();
+                IAddrFamilyViewBase* const vp = af.GetView();
                 REQUIRE(vp);
                 testsp->assert(vp, fv);
             }
@@ -319,7 +319,7 @@ TEST_CASE("Tests that socket addresses are handled correctly", Catch::Tags(
             }
         }
 
-        auto previous_vp = af.view();
+        auto previous_vp = af.GetView();
 
         REQUIRE(previous_vp);
 
@@ -328,11 +328,11 @@ TEST_CASE("Tests that socket addresses are handled correctly", Catch::Tags(
             const auto __verify = [&af, &previous_vp](const SocketAddressFamily x) {
                 const auto y = af.GetFamily();
                 if (x == y) { return; }
-                INFO("Transitioning from '" + _SockAddr::name_of(y)
-                    + "' to '" + _SockAddr::name_of(x) + "'");
-                REQUIRE_NOTHROW(af.set_family(x));
+                INFO("Transitioning from '" + _SockAddr::GetFamilyNameOf(y)
+                    + "' to '" + _SockAddr::GetFamilyNameOf(x) + "'");
+                REQUIRE_NOTHROW(af.SetFamily(x));
                 IAddrFamilyViewBase* vp;
-                REQUIRE_NOTHROW(vp = af.view());
+                REQUIRE_NOTHROW(vp = af.GetView());
                 REQUIRE(vp);
                 REQUIRE(vp->GetJewel() == x);
                 // The View itself looks okay, but did it really change?
