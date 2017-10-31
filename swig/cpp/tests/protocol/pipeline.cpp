@@ -185,9 +185,9 @@ TEST_CASE("We can create a linked push/pull pair", Catch::Tags("linked"
     /* Avoid a startup race that the sender be the dialer. Otherwise, you need a
     delay since the server accept is really asynchronous and immediately returns. */
 
-    REQUIRE_NOTHROW(pullsp->listen(test_addr));
-    REQUIRE_NOTHROW(pushsp->dial(test_addr));
-    REQUIRE_NOTHROW(whatsp->dial(test_addr));
+    REQUIRE_NOTHROW(pullsp->Listen(test_addr));
+    REQUIRE_NOTHROW(pushsp->Dial(test_addr));
+    REQUIRE_NOTHROW(whatsp->Dial(test_addr));
 
     REQUIRE_NOTHROW(whatsp.reset());
 
@@ -266,10 +266,10 @@ TEST_CASE("Load balancing works", Catch::Tags("load", "balancing", "pipeline"
     REQUIRE_NOTHROW(pullsp2->GetOptions()->SetDuration(O::recv_timeout_duration, receive_timeout));
     REQUIRE_NOTHROW(pullsp3->GetOptions()->SetDuration(O::recv_timeout_duration, receive_timeout));
 
-    REQUIRE_NOTHROW(pushsp->listen(test_addr));
-    REQUIRE_NOTHROW(pullsp1->dial(test_addr));
-    REQUIRE_NOTHROW(pullsp2->dial(test_addr));
-    REQUIRE_NOTHROW(pullsp3->dial(test_addr));
+    REQUIRE_NOTHROW(pushsp->Listen(test_addr));
+    REQUIRE_NOTHROW(pullsp1->Dial(test_addr));
+    REQUIRE_NOTHROW(pullsp2->Dial(test_addr));
+    REQUIRE_NOTHROW(pullsp3->Dial(test_addr));
     REQUIRE_NOTHROW(pullsp3->shutdown());
 
     /* So pullsp3 may not be done accepting yet, but pullsp1 and pullsp2 definitely

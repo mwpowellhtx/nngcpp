@@ -120,7 +120,7 @@ TEST_CASE("We cannot connect to wildcards", Catch::Tags(constants::prefix_tags
     REQUIRE_NOTHROW(addr = calc.get_next_addr(wildcard_addr_base));
 
     WARN("Dialing address: '" + addr + "'");
-    REQUIRE_THROWS_AS_MATCHING(sp->dial(addr), nng_exception, THROWS_NNG_EXCEPTION(ec_eaddrinval));
+    REQUIRE_THROWS_AS_MATCHING(sp->Dial(addr), nng_exception, THROWS_NNG_EXCEPTION(ec_eaddrinval));
 }
 
 TEST_CASE("We can bind to wildcards", Catch::Tags(constants::prefix_tags
@@ -141,9 +141,9 @@ TEST_CASE("We can bind to wildcards", Catch::Tags(constants::prefix_tags
 
     REQUIRE_NOTHROW(addr = calc.get_next_addr(wildcard_addr_base));
     WARN("Listening to address: '" + addr + "'");
-    REQUIRE_NOTHROW(sp1->listen(addr));
+    REQUIRE_NOTHROW(sp1->Listen(addr));
 
     REQUIRE_NOTHROW(addr = calc.get_addr(loopback_addr_base));
     WARN("Dialing address: '" + addr + "'");
-    REQUIRE_NOTHROW(sp2->dial(addr));
+    REQUIRE_NOTHROW(sp2->Dial(addr));
 }

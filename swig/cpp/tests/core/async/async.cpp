@@ -48,8 +48,8 @@ TEST_CASE("Asynchronous operations using C++ wrapper", Catch::Tags(
         REQUIRE_NOTHROW(sp1 = make_unique<latest_pair_socket>());
         REQUIRE_NOTHROW(sp2 = make_unique<latest_pair_socket>());
 
-        REQUIRE_NOTHROW(sp1->listen(aio_addr));
-        REQUIRE_NOTHROW(sp2->dial(aio_addr));
+        REQUIRE_NOTHROW(sp1->Listen(aio_addr));
+        REQUIRE_NOTHROW(sp2->Dial(aio_addr));
 
         SECTION("Asynchronous send and receive works") {
 

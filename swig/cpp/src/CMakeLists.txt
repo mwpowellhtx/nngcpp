@@ -41,6 +41,10 @@ set (NNGCPP_CPP_SRCS
     options/reader_writer.h
     options/options.h
     core/ICanClose.hpp
+    core/ICanDial.cpp
+    core/ICanDial.h
+    core/ICanListen.cpp
+    core/ICanListen.h
     core/IEquatable.hpp
     core/IHaveOne.hpp
     core/IProtocol.cpp

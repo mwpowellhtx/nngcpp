@@ -173,8 +173,8 @@ TEST_CASE("Publisher/subscriber pattern using C++ wrapper", Catch::Tags("pub", "
         creates a problem for our tests, since we can wind up trying to push data before
         the pipe is fully registered due to the accept running asynchronously. */
 
-        REQUIRE_NOTHROW(subp->listen(test_addr));
-        REQUIRE_NOTHROW(pubp->dial(test_addr));
+        REQUIRE_NOTHROW(subp->Listen(test_addr));
+        REQUIRE_NOTHROW(pubp->Dial(test_addr));
         SLEEP_FOR(20ms); // Time for connecting threads.
 
         SECTION("Subscriber can subscribe") {

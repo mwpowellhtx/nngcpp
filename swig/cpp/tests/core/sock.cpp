@@ -158,7 +158,7 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
                     auto dp = _session_.create_dialer_ep();
                     REQUIRE(dp != nullptr);
                     // TODO: TBD: this will work for now as a rough cut Exception match...
-                    REQUIRE_THROWS_AS_MATCHING(s1->dial(closed_addr, dp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_eclosed));
+                    REQUIRE_THROWS_AS_MATCHING(s1->Dial(closed_addr, dp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_eclosed));
                     REQUIRE_NOTHROW(_session_.remove_dialer_ep(dp.get()));
                 }
 
@@ -167,7 +167,7 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
                     auto lp = _session_.create_listener_ep();
                     REQUIRE(lp != nullptr);
                     // TODO: TBD: this will work for now as a rough cut Exception match...
-                    REQUIRE_THROWS_AS_MATCHING(s1->listen(closed_addr, lp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_eclosed));
+                    REQUIRE_THROWS_AS_MATCHING(s1->Listen(closed_addr, lp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_eclosed));
                     REQUIRE_NOTHROW(_session_.remove_listener_ep(lp.get()));
                 }
             }
@@ -273,12 +273,12 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
             SECTION("Dialing sync can get refused") {
 
                 // TODO: TBD: this will work for now as a rough cut Exception match...
-                REQUIRE_THROWS_AS_MATCHING(s1->dial(no_addr), nng_exception, THROWS_NNG_EXCEPTION(ec_econnrefused));
+                REQUIRE_THROWS_AS_MATCHING(s1->Dial(no_addr), nng_exception, THROWS_NNG_EXCEPTION(ec_econnrefused));
             }
 
             SECTION("Dialing async does not get refused") {
 
-                REQUIRE_NOTHROW(s1->dial(asy_addr, flag_nonblock));
+                REQUIRE_NOTHROW(s1->Dial(asy_addr, flag_nonblock));
 
                 SECTION("And connects late") {
 
@@ -286,7 +286,7 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
 
                     REQUIRE_NOTHROW(s2 = _session_.create_pair_socket());
 
-                    REQUIRE_NOTHROW(s2->listen(asy_addr));
+                    REQUIRE_NOTHROW(s2->Listen(asy_addr));
 
                     // TODO: TBD: had to increase this from 100ms; and then, I'm not sure that was enough, or there might actually be something blocking
                     this_thread::sleep_for(1000ms);
@@ -310,12 +310,12 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
 
                     auto lp = _session_.create_listener_ep();
 
-                    REQUIRE_NOTHROW(s1->listen(here_addr, lp.get()));
+                    REQUIRE_NOTHROW(s1->Listen(here_addr, lp.get()));
 
                     SECTION("Second Listen fails with " STRINGIFY(ec_eaddrinuse)) {
 
                         // TODO: TBD: this will work for now as a rough cut Exception match...
-                        REQUIRE_THROWS_AS_MATCHING(s1->listen(here_addr), nng_exception, THROWS_NNG_EXCEPTION(ec_eaddrinuse));
+                        REQUIRE_THROWS_AS_MATCHING(s1->Listen(here_addr), nng_exception, THROWS_NNG_EXCEPTION(ec_eaddrinuse));
                     }
 
                     SECTION("We cannot try to Start a Listener again") {
@@ -330,7 +330,7 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
 
                         REQUIRE_NOTHROW(s2 = _session_.create_pair_socket());
 
-                        REQUIRE_NOTHROW(s2->dial(here_addr));
+                        REQUIRE_NOTHROW(s2->Dial(here_addr));
 
                         REQUIRE_NOTHROW(_session_.remove_pair_socket(s2.get()));
                     }
@@ -470,8 +470,8 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
                     REQUIRE_NOTHROW(s2->GetOptions()->SetDuration(O::send_timeout_duration, timeout));
                     REQUIRE_NOTHROW(s2->GetOptions()->SetDuration(O::recv_timeout_duration, timeout));
 
-                    REQUIRE_NOTHROW(s1->listen(t1_addr));
-                    REQUIRE_NOTHROW(s2->dial(t1_addr));
+                    REQUIRE_NOTHROW(s1->Listen(t1_addr));
+                    REQUIRE_NOTHROW(s2->Dial(t1_addr));
 
                     size_t sz = 4;
                     const auto expected = data_buf;

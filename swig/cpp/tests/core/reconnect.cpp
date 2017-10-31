@@ -208,9 +208,9 @@ TEST_CASE("NNG C++ wrapper reconnect works", Catch::Tags(
 
         SECTION("Dialing before listening works") {
 
-            REQUIRE_NOTHROW(push->dial(test_addr, flag_nonblock));
+            REQUIRE_NOTHROW(push->Dial(test_addr, flag_nonblock));
             this_thread::sleep_for(100ms);
-            REQUIRE_NOTHROW(pull->listen(test_addr));
+            REQUIRE_NOTHROW(pull->Listen(test_addr));
 
             /* 'Frame' in this case is loosely speaking. We do not care about exposing the NNG msg structure,
             per se. Rather, we should simply be able to "frame" buffers or strings, accordingly. */
@@ -235,19 +235,19 @@ TEST_CASE("NNG C++ wrapper reconnect works", Catch::Tags(
 
         SECTION("Reconnection works") {
 
-            REQUIRE_NOTHROW(push->dial(test_addr, flag_nonblock));
+            REQUIRE_NOTHROW(push->Dial(test_addr, flag_nonblock));
 
             {
                 // We do not need to see the Listener beyond this block.
                 auto lp = std::make_unique<listener>();
-                REQUIRE_NOTHROW(pull->listen(test_addr, lp.get()));
+                REQUIRE_NOTHROW(pull->Listen(test_addr, lp.get()));
                 this_thread::sleep_for(100ms);
                 // No need to burden "session" with this one, either.
                 REQUIRE_NOTHROW(lp.reset());
             }
 
             // Then re-listen to the address.
-            REQUIRE_NOTHROW(pull->listen(test_addr));
+            REQUIRE_NOTHROW(pull->Listen(test_addr));
 
             // TODO: TBD: we may provide comprehension of nng_pipe from a nngcpp POV, but I'm not sure the complexity of nng_msg how that is different from a simple send/receive?
             SECTION("They still exchange frames") {

@@ -11,6 +11,8 @@
 
 #include "IHaveOne.hpp"
 #include "ICanClose.hpp"
+#include "ICanListen.h"
+#include "ICanDial.h"
 
 #include "exceptions.hpp"
 
@@ -30,6 +32,8 @@ namespace nng {
         : public IHaveOne
         , public IProtocol
         , public ICanClose
+        , public ICanListen
+        , public ICanDial
         , public ISender
         , public IReceiver
         , public IHaveOptions<_OptionReaderWriter> {
@@ -62,11 +66,11 @@ namespace nng {
         virtual _OptionReaderWriter* const GetOptions() override;
 
         // TODO: TBD: may want to comprehend nng's NNG_MAXADDRLEN at some level... expose as a static constant, for instance, bare minimum
-        void listen(const std::string& addr, flag_type flags = flag_none);
-        void listen(const std::string& addr, _Listener* const lp, flag_type flags = flag_none);
+        virtual void Listen(const std::string& addr, flag_type flags = flag_none) override;
+        virtual void Listen(const std::string& addr, _Listener* const lp, flag_type flags = flag_none) override;
 
-        void dial(const std::string& addr, flag_type flags = flag_none);
-        void dial(const std::string& addr, _Dialer* const dp, flag_type flags = flag_none);
+        virtual void Dial(const std::string& addr, flag_type flags = flag_none) override;
+        virtual void Dial(const std::string& addr, _Dialer* const dp, flag_type flags = flag_none) override;
 
         void Close();
         void shutdown();

@@ -154,14 +154,14 @@ TEST_CASE("Survey pattern using C++ wrapper", Catch::Tags("surveyor", "responden
 
         REQUIRE_NOTHROW(surp->GetOptions()->SetDuration(O::surveyor_survey_duration, 50ms));
 
-        REQUIRE_NOTHROW(surp->listen(test_addr));
-        REQUIRE_NOTHROW(resp->dial(test_addr));
+        REQUIRE_NOTHROW(surp->Listen(test_addr));
+        REQUIRE_NOTHROW(resp->Dial(test_addr));
 
         /* We dial another socket as that will force the earlier dial to have completed FULLY
         This is a hack that only works because our listen logic is single threaded. */
 
         // TODO: TBD: this is somewhat different from other tests in which there were sleeps. what about waiting for "events"?
-        REQUIRE_NOTHROW(sockp->dial(test_addr));
+        REQUIRE_NOTHROW(sockp->Dial(test_addr));
         REQUIRE_NOTHROW(sockp.reset());
 
         REQUIRE_NOTHROW(bmp = make_unique<binary_message>());

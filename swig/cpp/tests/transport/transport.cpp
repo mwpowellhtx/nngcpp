@@ -148,8 +148,8 @@ TEST_CASE("Test the transport using C++ wrappers", Catch::Tags(constants::prefix
 
         dialer d;
 
-        REQUIRE_THROWS_AS_MATCHING(reqp->dial(addr, &d), nng_exception, THROWS_NNG_EXCEPTION(ec_econnrefused));
-        REQUIRE_THROWS_AS_MATCHING(repp->dial(addr, &d), nng_exception, THROWS_NNG_EXCEPTION(ec_econnrefused));
+        REQUIRE_THROWS_AS_MATCHING(reqp->Dial(addr, &d), nng_exception, THROWS_NNG_EXCEPTION(ec_econnrefused));
+        REQUIRE_THROWS_AS_MATCHING(repp->Dial(addr, &d), nng_exception, THROWS_NNG_EXCEPTION(ec_econnrefused));
     }
 
     SECTION("Duplicate listeners rejected") {
@@ -159,11 +159,11 @@ TEST_CASE("Test the transport using C++ wrappers", Catch::Tags(constants::prefix
         // Smart pointers is overkill for these sections.
         listener l1, l2;
 
-        REQUIRE_NOTHROW(repp->listen(addr, &l1));
+        REQUIRE_NOTHROW(repp->Listen(addr, &l1));
         REQUIRE(l1.HasOne() == true);
 
         // Leaving the first Listener open and available.
-        REQUIRE_THROWS_AS_MATCHING(reqp->listen(addr, &l2), nng_exception, THROWS_NNG_EXCEPTION(ec_eaddrinuse));
+        REQUIRE_THROWS_AS_MATCHING(reqp->Listen(addr, &l2), nng_exception, THROWS_NNG_EXCEPTION(ec_eaddrinuse));
         REQUIRE(l2.HasOne() == false);
     }
 
@@ -175,10 +175,10 @@ TEST_CASE("Test the transport using C++ wrappers", Catch::Tags(constants::prefix
         listener l;
         dialer d;
 
-        REQUIRE_NOTHROW(repp->listen(addr, &l));
+        REQUIRE_NOTHROW(repp->Listen(addr, &l));
         REQUIRE(l.HasOne() == true);
 
-        REQUIRE_NOTHROW(reqp->dial(addr, &d));
+        REQUIRE_NOTHROW(reqp->Dial(addr, &d));
         REQUIRE(d.HasOne() == true);
     }
 
@@ -194,9 +194,9 @@ TEST_CASE("Test the transport using C++ wrappers", Catch::Tags(constants::prefix
 
         string actual_addr;
 
-        REQUIRE_NOTHROW(repp->listen(addr, &l));
+        REQUIRE_NOTHROW(repp->Listen(addr, &l));
         REQUIRE(l.HasOne() == true);
-        REQUIRE_NOTHROW(reqp->dial(addr, &d));
+        REQUIRE_NOTHROW(reqp->Dial(addr, &d));
         REQUIRE(d.HasOne() == true);
 
         // Sleep so listener catches up, may be running slightly behind.
@@ -242,10 +242,10 @@ TEST_CASE("Test the transport using C++ wrappers", Catch::Tags(constants::prefix
 
         REQUIRE_NOTHROW(init_random_buffer(data, sz));
 
-        REQUIRE_NOTHROW(repp->listen(addr, &l));
+        REQUIRE_NOTHROW(repp->Listen(addr, &l));
         REQUIRE(l.HasOne() == true);
 
-        REQUIRE_NOTHROW(reqp->dial(addr, &d));
+        REQUIRE_NOTHROW(reqp->Dial(addr, &d));
         REQUIRE(d.HasOne() == true);
 
         // Wait for listener to catch up since it may be slightly behind.

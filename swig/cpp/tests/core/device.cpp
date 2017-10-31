@@ -97,13 +97,13 @@ TEST_CASE("Test that device functions properly", "[device]") {
             REQUIRE_NOTHROW(fixture.install(&p1, &p2, true));
             REQUIRE(fixture.is_installed() == true);
 
-            REQUIRE_NOTHROW(p1.listen(dev1_addr));
-            REQUIRE_NOTHROW(p2.listen(dev2_addr));
+            REQUIRE_NOTHROW(p1.Listen(dev1_addr));
+            REQUIRE_NOTHROW(p2.Listen(dev2_addr));
 
             latest_pair_socket e1, e2;
 
-            REQUIRE_NOTHROW(e1.dial(dev1_addr));
-            REQUIRE_NOTHROW(e2.dial(dev2_addr));
+            REQUIRE_NOTHROW(e1.Dial(dev1_addr));
+            REQUIRE_NOTHROW(e2.Dial(dev2_addr));
 
             const auto timeout = 1000ms;
 

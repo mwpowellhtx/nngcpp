@@ -52,9 +52,9 @@ TEST_CASE("Check some properties", "[check][properties][nng][cxx][bonus]") {
         REQUIRE_NOTHROW(sendp = make_unique<binary_message>());
         REQUIRE_NOTHROW(recvp = make_unique<binary_message>(nullptr));
 
-        REQUIRE_NOTHROW(rep->listen(addr, &l));
+        REQUIRE_NOTHROW(rep->Listen(addr, &l));
         REQUIRE(l.HasOne() == true);
-        REQUIRE_NOTHROW(req->dial(addr, &d));
+        REQUIRE_NOTHROW(req->Dial(addr, &d));
         REQUIRE(d.HasOne() == true);
         SLEEP_FOR(20ms); // Allow listener to catch up from being slightly behind.
 

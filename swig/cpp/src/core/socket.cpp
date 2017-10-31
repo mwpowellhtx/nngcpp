@@ -13,7 +13,8 @@ namespace nng {
     using std::bind;
 
     _Socket::_Socket(const nng_ctor_func& nng_ctor)
-        : IHaveOne(), IProtocol(), ICanClose(), ISender(), IReceiver(), IHaveOptions()
+        : IHaveOne(), IProtocol(), ICanClose(), ICanListen()
+        , ICanDial(), ISender(), IReceiver(), IHaveOptions()
         , sid(0) {
 
         invocation::with_default_error_handling(nng_ctor, &sid);
@@ -75,24 +76,24 @@ namespace nng {
     }
 
     // TODO: TBD: ditto ec handling...
-    void _Socket::listen(const std::string& addr, flag_type flags) {
+    void _Socket::Listen(const std::string& addr, flag_type flags) {
         const auto& op = bind(&::nng_listen, sid, _1, _2, _3);
         invocation::with_default_error_handling(op, addr.c_str(), nullptr, static_cast<int>(flags));
     }
 
-    void _Socket::listen(const std::string& addr, _Listener* const lp, flag_type flags) {
+    void _Socket::Listen(const std::string& addr, _Listener* const lp, flag_type flags) {
         const auto& op = bind(&::nng_listen, sid, _1, _2, _3);
         invocation::with_default_error_handling(op, addr.c_str()
             , lp ? &(lp->lid) : nullptr, static_cast<int>(flags));
         if (lp) { lp->on_listened(); }
     }
 
-    void _Socket::dial(const std::string& addr, flag_type flags) {
+    void _Socket::Dial(const std::string& addr, flag_type flags) {
         const auto& op = bind(&::nng_dial, sid, _1, _2, _3);
         invocation::with_default_error_handling(op, addr.c_str(), nullptr, flags);
     }
 
-    void _Socket::dial(const std::string& addr, _Dialer* const dp, flag_type flags) {
+    void _Socket::Dial(const std::string& addr, _Dialer* const dp, flag_type flags) {
         const auto& op = bind(&::nng_dial, sid, _1, _2, _3);
         invocation::with_default_error_handling(op, addr.c_str()
             , dp ? &(dp->did) : nullptr, static_cast<int>(flags));

@@ -321,8 +321,8 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
 
         SECTION("Monogamous cooked mode works") {
 
-            REQUIRE_NOTHROW(serverp1->listen(addr));
-            REQUIRE_NOTHROW(clientp1->dial(addr));
+            REQUIRE_NOTHROW(serverp1->Listen(addr));
+            REQUIRE_NOTHROW(clientp1->Dial(addr));
             SLEEP_FOR(20ms);
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
@@ -340,10 +340,10 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
 
         SECTION("Monogamous mode ignores new connections") {
 
-            REQUIRE_NOTHROW(serverp1->listen(addr));
-            REQUIRE_NOTHROW(clientp1->dial(addr));
+            REQUIRE_NOTHROW(serverp1->Listen(addr));
+            REQUIRE_NOTHROW(clientp1->Dial(addr));
             SLEEP_FOR(100ms);
-            REQUIRE_NOTHROW(clientp2->dial(addr));
+            REQUIRE_NOTHROW(clientp2->Dial(addr));
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
             REQUIRE_NOTHROW(*bmp << one);
@@ -359,8 +359,8 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
 
         SECTION("Cannot set raw mode after connected") {
 
-            REQUIRE_NOTHROW(serverp1->listen(addr));
-            REQUIRE_NOTHROW(clientp1->dial(addr));
+            REQUIRE_NOTHROW(serverp1->Listen(addr));
+            REQUIRE_NOTHROW(clientp1->Dial(addr));
             SLEEP_FOR(100ms);
 
             REQUIRE_THROWS_AS_MATCHING(serverp1->GetOptions()->SetInt32(O::raw, 1), nng_exception, THROWS_NNG_EXCEPTION(ec_estate));
@@ -376,8 +376,8 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
             REQUIRE_NOTHROW(clientp1->GetOptions()->SetInt32(O::recv_buf, 1));
             REQUIRE_NOTHROW(serverp1->GetOptions()->SetDuration(O::send_timeout_duration, 100ms));
 
-            REQUIRE_NOTHROW(serverp1->listen(addr));
-            REQUIRE_NOTHROW(clientp1->dial(addr));
+            REQUIRE_NOTHROW(serverp1->Listen(addr));
+            REQUIRE_NOTHROW(clientp1->Dial(addr));
             SLEEP_FOR(20ms);
 
             int i;
@@ -402,8 +402,8 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
             REQUIRE_NOTHROW(clientp1->GetOptions()->SetInt32(O::recv_buf, 1));
             REQUIRE_NOTHROW(serverp1->GetOptions()->SetDuration(O::send_timeout_duration, 30ms));
 
-            REQUIRE_NOTHROW(serverp1->listen(addr));
-            REQUIRE_NOTHROW(clientp1->dial(addr));
+            REQUIRE_NOTHROW(serverp1->Listen(addr));
+            REQUIRE_NOTHROW(clientp1->Dial(addr));
             SLEEP_FOR(20ms);
 
             /* We choose to allow some buffering. In reality the buffer size
@@ -432,8 +432,8 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
 
         SECTION("Cannot set polyamorous mode after connect") {
 
-            REQUIRE_NOTHROW(serverp1->listen(addr));
-            REQUIRE_NOTHROW(clientp1->dial(addr));
+            REQUIRE_NOTHROW(serverp1->Listen(addr));
+            REQUIRE_NOTHROW(clientp1->Dial(addr));
             SLEEP_FOR(100ms);
 
             REQUIRE_THROWS_AS_MATCHING(serverp1->GetOptions()->SetInt32(O::pair1_polyamorous, 1), nng_exception, THROWS_NNG_EXCEPTION(ec_estate));
@@ -445,8 +445,8 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
             REQUIRE_NOTHROW(clientp1->GetOptions()->SetInt32(O::raw, 1));
             REQUIRE_NOTHROW(clientp2->GetOptions()->SetInt32(O::raw, 1));
 
-            REQUIRE_NOTHROW(serverp1->listen(addr));
-            REQUIRE_NOTHROW(clientp1->dial(addr));
+            REQUIRE_NOTHROW(serverp1->Listen(addr));
+            REQUIRE_NOTHROW(clientp1->Dial(addr));
             SLEEP_FOR(20ms);
 
             SECTION("Send and receive work") {
@@ -603,9 +603,9 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
             REQUIRE_NOTHROW(actual_opt = serverp1->GetOptions()->GetInt32(O::pair1_polyamorous));
             REQUIRE(actual_opt == 1);
 
-            REQUIRE_NOTHROW(serverp1->listen(addr));
-            REQUIRE_NOTHROW(clientp1->dial(addr));
-            REQUIRE_NOTHROW(clientp2->dial(addr));
+            REQUIRE_NOTHROW(serverp1->Listen(addr));
+            REQUIRE_NOTHROW(clientp1->Dial(addr));
+            REQUIRE_NOTHROW(clientp2->Dial(addr));
             SLEEP_FOR(20ms);
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
@@ -657,10 +657,10 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
 
             REQUIRE_NOTHROW(serverp1->GetOptions()->SetInt32(O::pair1_polyamorous, 1));
 
-            REQUIRE_NOTHROW(serverp1->listen(addr));
-            REQUIRE_NOTHROW(clientp1->dial(addr));
+            REQUIRE_NOTHROW(serverp1->Listen(addr));
+            REQUIRE_NOTHROW(clientp1->Dial(addr));
             SLEEP_FOR(100ms);
-            REQUIRE_NOTHROW(clientp2->dial(addr));
+            REQUIRE_NOTHROW(clientp2->Dial(addr));
             SLEEP_FOR(20ms);
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
@@ -696,9 +696,9 @@ TEST_CASE("Pair v1 protocol works using C++ wrapper", Catch::Tags("pair"
             REQUIRE_NOTHROW(actual_opt = serverp1->GetOptions()->GetInt32(O::raw));
             REQUIRE(actual_opt == 1);
 
-            REQUIRE_NOTHROW(serverp1->listen(addr));
-            REQUIRE_NOTHROW(clientp1->dial(addr));
-            REQUIRE_NOTHROW(clientp2->dial(addr));
+            REQUIRE_NOTHROW(serverp1->Listen(addr));
+            REQUIRE_NOTHROW(clientp1->Dial(addr));
+            REQUIRE_NOTHROW(clientp2->Dial(addr));
             SLEEP_FOR(20ms);
 
             SECTION("Send and receive both work") {

@@ -99,9 +99,9 @@ TEST_CASE("Bus pattern using C++ wrappers", Catch::Tags("bus"
         REQUIRE(busp2 != nullptr);
         REQUIRE(busp3 != nullptr);
 
-        REQUIRE_NOTHROW(busp1->listen(test_addr));
-        REQUIRE_NOTHROW(busp2->dial(test_addr));
-        REQUIRE_NOTHROW(busp3->dial(test_addr));
+        REQUIRE_NOTHROW(busp1->Listen(test_addr));
+        REQUIRE_NOTHROW(busp2->Dial(test_addr));
+        REQUIRE_NOTHROW(busp3->Dial(test_addr));
 
         const auto receive_timeout = 50ms;
 

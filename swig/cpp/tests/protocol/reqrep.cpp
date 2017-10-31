@@ -163,8 +163,8 @@ TEST_CASE("Request/reply pattern using C++ wrapper", Catch::Tags("req", "rep"
         REQUIRE_NOTHROW(reqp = make_unique<latest_req_socket>());
         REQUIRE_NOTHROW(repp = make_unique<latest_rep_socket>());
 
-        REQUIRE_NOTHROW(repp->listen(test_addr));
-        REQUIRE_NOTHROW(reqp->dial(test_addr));
+        REQUIRE_NOTHROW(repp->Listen(test_addr));
+        REQUIRE_NOTHROW(reqp->Dial(test_addr));
 
 		SECTION("They can request/reply exchange") {
 
@@ -199,8 +199,8 @@ TEST_CASE("Request/reply pattern using C++ wrapper", Catch::Tags("req", "rep"
         REQUIRE_NOTHROW(reqp->GetOptions()->SetDuration(O::req_resend_duration, 100ms));
         REQUIRE_NOTHROW(reqp->GetOptions()->SetInt32(O::send_buf, 16));
 
-        REQUIRE_NOTHROW(repp->listen(test_addr));
-        REQUIRE_NOTHROW(reqp->dial(test_addr));
+        REQUIRE_NOTHROW(repp->Listen(test_addr));
+        REQUIRE_NOTHROW(reqp->Dial(test_addr));
 
         REQUIRE_NOTHROW(abcp = make_unique<binary_message>());
         REQUIRE_NOTHROW(*abcp << abc);

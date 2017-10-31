@@ -104,8 +104,8 @@ TEST_CASE("Message pipe subordinates properly", Catch::Tags("message", "pipe"
         REQUIRE_NOTHROW(sp2->GetOptions()->SetInt32(O::recv_buf, expected_recv_buf));
 
         // Using nominal defaults.
-        REQUIRE_NOTHROW(sp1->listen(test_addr));
-        REQUIRE_NOTHROW(sp2->dial(test_addr));
+        REQUIRE_NOTHROW(sp1->Listen(test_addr));
+        REQUIRE_NOTHROW(sp2->Dial(test_addr));
         // Allow for the listener to catch up.
         SLEEP_FOR(50ms);
 

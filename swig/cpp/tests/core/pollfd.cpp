@@ -65,10 +65,10 @@ TEST_CASE("Poll FDs", "[pollfd]") {
         const auto inv_sock = INVALID_SOCKET;
 
         // Should be ~= ::nng_listen(s, addr, listenerp, 0) == 0
-        REQUIRE_NOTHROW(s1->listen(addr));
+        REQUIRE_NOTHROW(s1->Listen(addr));
         this_thread::sleep_for(50ms);
 
-        REQUIRE_NOTHROW(s2->dial(addr));
+        REQUIRE_NOTHROW(s2->Dial(addr));
         this_thread::sleep_for(50ms);
 
         SECTION("We can get a Receive File Descriptor") {
