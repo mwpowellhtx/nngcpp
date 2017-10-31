@@ -4,6 +4,8 @@
 #define NNG_ONLY
 #include <nngcpp.h>
 
+#include "types.h"
+
 #include <cstddef>
 
 namespace nng {
