@@ -270,7 +270,7 @@ TEST_CASE("Load balancing works", Catch::Tags("load", "balancing", "pipeline"
     REQUIRE_NOTHROW(pullsp1->Dial(test_addr));
     REQUIRE_NOTHROW(pullsp2->Dial(test_addr));
     REQUIRE_NOTHROW(pullsp3->Dial(test_addr));
-    REQUIRE_NOTHROW(pullsp3->shutdown());
+    REQUIRE_NOTHROW(pullsp3->Shutdown());
 
     /* So pullsp3 may not be done accepting yet, but pullsp1 and pullsp2 definitely
     are. Otherwise the server could not have reached accept. The accept logic is

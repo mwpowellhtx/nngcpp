@@ -12,9 +12,8 @@ namespace nng {
     using std::placeholders::_3;
     using std::bind;
 
-    _Socket::_Socket(const nng_ctor_func& nng_ctor)
-        : IHaveOne(), IProtocol(), ICanClose(), ICanListen()
-        , ICanDial(), ISender(), IReceiver(), IHaveOptions()
+    _Socket::_Socket(const nng_ctor_func& nng_ctor) : IHaveOne(), IProtocol(), ICanClose()
+        , ICanShutdown(), ICanListen(), ICanDial(), ISender(), IReceiver(), IHaveOptions()
         , sid(0) {
 
         invocation::with_default_error_handling(nng_ctor, &sid);
@@ -64,7 +63,7 @@ namespace nng {
         configure_options(sid = 0);
     }
 
-    void _Socket::shutdown() {
+    void _Socket::Shutdown() {
         // Shutdown is its own operation apart from Closed.
         const auto op = bind(&::nng_shutdown, sid);
         invocation::with_default_error_handling(op);

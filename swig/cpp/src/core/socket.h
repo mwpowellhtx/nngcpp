@@ -11,8 +11,9 @@
 
 #include "IHaveOne.hpp"
 #include "ICanClose.hpp"
-#include "ICanListen.h"
-#include "ICanDial.h"
+#include "ICanShutdown.hpp"
+#include "ICanListen.hpp"
+#include "ICanDial.hpp"
 
 #include "exceptions.hpp"
 
@@ -32,6 +33,7 @@ namespace nng {
         : public IHaveOne
         , public IProtocol
         , public ICanClose
+        , public ICanShutdown
         , public ICanListen
         , public ICanDial
         , public ISender
@@ -72,8 +74,8 @@ namespace nng {
         virtual void Dial(const std::string& addr, flag_type flags = flag_none) override;
         virtual void Dial(const std::string& addr, _Dialer* const dp, flag_type flags = flag_none) override;
 
-        void Close();
-        void shutdown();
+        virtual void Close() override;
+        virtual void Shutdown() override;
 
         virtual bool HasOne() const override;
 

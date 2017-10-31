@@ -117,9 +117,9 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
 
         SECTION("And we can shut it down") {
 
-            REQUIRE_NOTHROW(s1->shutdown());
+            REQUIRE_NOTHROW(s1->Shutdown());
             // TODO: TBD: this will work for now as a rough cut Exception match...
-            REQUIRE_THROWS_AS_MATCHING(s1->shutdown(), nng_exception, THROWS_NNG_EXCEPTION(ec_eclosed));
+            REQUIRE_THROWS_AS_MATCHING(s1->Shutdown(), nng_exception, THROWS_NNG_EXCEPTION(ec_eclosed));
 
             SECTION("It cannot receive") {
 
