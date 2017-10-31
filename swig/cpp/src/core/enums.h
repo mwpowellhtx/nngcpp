@@ -11,11 +11,14 @@
 namespace nng {
 
     // Flags.
-    enum flag_type : nng::int32_t {
-        flag_none = 0,
-        flag_alloc, // = ::NNG_FLAG_ALLOC,
-        flag_nonblock, // = ::NNG_FLAG_NONBLOCK
+    enum SocketFlag : nng::int32_t {
+        flag_none = 0x0,
+        flag_alloc = 0x1, // = ::NNG_FLAG_ALLOC,
+        flag_nonblock = 0x2, // = ::NNG_FLAG_NONBLOCK
     };
+
+    // TODO: TBD: type define it for now. will remove later on...
+    typedef SocketFlag flag_type;
 
     enum duration_ms : int32_t {
         dur_zero = NNG_DURATION_ZERO,
