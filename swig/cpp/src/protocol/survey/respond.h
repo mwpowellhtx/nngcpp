@@ -9,7 +9,7 @@ namespace nng {
 
         namespace v0 {
             
-            class respond_socket : public socket {
+            class respond_socket : public _Socket {
                 public:
 
                     respond_socket();

@@ -55,7 +55,7 @@ namespace nng {
         return __create(_dialer_eps);
     }
 
-    std::shared_ptr<dialer> session::create_dialer_ep(const socket& s, const std::string& addr) {
+    std::shared_ptr<dialer> session::create_dialer_ep(const _Socket& s, const std::string& addr) {
         return __create(_dialer_eps, s, addr);
     }
 
@@ -63,7 +63,7 @@ namespace nng {
         return __create(_listener_eps);
     }
 
-    std::shared_ptr<listener> session::create_listener_ep(const socket& s, const std::string& addr) {
+    std::shared_ptr<listener> session::create_listener_ep(const _Socket& s, const std::string& addr) {
         return __create(_listener_eps, s, addr);
     }
 
@@ -117,7 +117,7 @@ namespace nng {
         return __create(_rep_sockets);
     }
 
-    std::shared_ptr<device> session::create_device(socket* const asockp, socket* const bsockp, bool shouldCloseSockets) {
+    std::shared_ptr<device> session::create_device(_Socket* const asockp, _Socket* const bsockp, bool shouldCloseSockets) {
         return __create(_devices, asockp, bsockp, shouldCloseSockets);
     }
 

@@ -221,12 +221,12 @@ TEST_CASE("NNG C++ wrapper reconnect works", Catch::Tags(
                 this_thread::sleep_for(100ms);
                 // And with a little C++ operator overloading help:
                 REQUIRE_NOTHROW(*bmp << hello);
-                REQUIRE_NOTHROW(push->send(bmp.get()));
+                REQUIRE_NOTHROW(push->Send(bmp.get()));
                 /* Ditto message passing semantics. The Send() operation effectively
                 nullifies the internal message. */
                 REQUIRE(bmp->HasOne() == false);
 
-                REQUIRE_NOTHROW(pull->try_receive(bmp.get()));
+                REQUIRE_NOTHROW(pull->TryReceive(bmp.get()));
                 REQUIRE(bmp->HasOne() == true);
                 // Just verify that the message matches the buffer.
                 REQUIRE_THAT(bmp->GetBody()->Get(), Equals(hello_buf));
@@ -256,11 +256,11 @@ TEST_CASE("NNG C++ wrapper reconnect works", Catch::Tags(
 
                 this_thread::sleep_for(100ms);
                 REQUIRE_NOTHROW(*bmp << hello);
-                REQUIRE_NOTHROW(push->send(bmp.get()));
+                REQUIRE_NOTHROW(push->Send(bmp.get()));
                 REQUIRE(bmp->HasOne() == false);
 
                 // See notes above. Sending transfers ownership of the internal message to NNG.
-                REQUIRE_NOTHROW(pull->try_receive(bmp.get()));
+                REQUIRE_NOTHROW(pull->TryReceive(bmp.get()));
                 REQUIRE(bmp->HasOne() == true);
                 // Just verify that the message matches the buffer.
                 REQUIRE_THAT(bmp->GetBody()->Get(), Equals(hello_buf));
@@ -286,10 +286,10 @@ TEST_CASE("NNG C++ wrapper reconnect works", Catch::Tags(
                     auto bmp2 = std::make_unique<binary_message>();
                     REQUIRE_NOTHROW(*bmp2 << again);
                     // TODO: TBD: send/no-message -> receive/message is a pattern that deserves its own focused unit test...
-                    REQUIRE_NOTHROW(push->send(bmp2.get()));
+                    REQUIRE_NOTHROW(push->Send(bmp2.get()));
                     REQUIRE(bmp2->HasOne() == false);
 
-                    REQUIRE_NOTHROW(pull->try_receive(bmp2.get()));
+                    REQUIRE_NOTHROW(pull->TryReceive(bmp2.get()));
                     REQUIRE(bmp2->HasOne() == true);
                     // Just verify that the message matches the buffer.
                     REQUIRE_THAT(bmp2->GetBody()->Get(), Equals(again_buf));

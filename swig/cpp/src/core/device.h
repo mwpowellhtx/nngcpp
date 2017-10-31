@@ -10,11 +10,11 @@ namespace nng {
 
     // TODO: TBD: should perhaps not expose device_path as an external resource, much less to SWIG
     struct device_path {
-        socket* const _asockp;
-        socket* const _bsockp;
+        _Socket* const _asockp;
+        _Socket* const _bsockp;
         bool _shouldClose;
 
-        device_path(socket* const asockp, socket* const bsockp, bool shouldClose);
+        device_path(_Socket* const asockp, _Socket* const bsockp, bool shouldClose);
 
         virtual ~device_path();
     };
@@ -28,7 +28,7 @@ namespace nng {
 
         public:
 
-            device(socket* const asockp, socket* const bsockp, bool shouldCloseSockets);
+            device(_Socket* const asockp, _Socket* const bsockp, bool shouldCloseSockets);
 
             virtual ~device();
     };

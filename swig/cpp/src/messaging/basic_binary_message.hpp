@@ -8,7 +8,7 @@
 namespace nng {
 
 #ifndef NNGCPP_SOCKET_H
-    class socket;
+    class _Socket;
 #endif // NNGCPP_SOCKET_H
 
     // TODO: TBD: of course they are all "binary" messages close to the wire; however, we may shim a string-based API around this one...
@@ -21,7 +21,7 @@ namespace nng {
 
     private:
 
-        friend class socket;
+        friend class _Socket;
 
         header_type _header;
         body_type _body;

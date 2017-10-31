@@ -14,7 +14,7 @@ namespace nng {
         configure_options(lid);
     }
 
-    _Listener::_Listener(const socket& s, const std::string& addr) : _EndPoint(), lid(0) {
+    _Listener::_Listener(const _Socket& s, const std::string& addr) : _EndPoint(), lid(0) {
 
         const auto op = bind(&::nng_listener_create, &lid, s.sid, _1);
         invocation::with_default_error_handling(op, addr.c_str());

@@ -128,7 +128,7 @@ TEST_CASE("Request/reply pattern using C++ wrapper", Catch::Tags("req", "rep"
             // TODO: TBD: really needs its own unit tests for the operation alone: verify in the binary message tests...
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>(static_cast<::nng_msg*>(nullptr)));
 
-            REQUIRE_THROWS_AS_MATCHING(reqp->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_estate));
+            REQUIRE_THROWS_AS_MATCHING(reqp->TryReceive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_estate));
 		}
 
         SECTION("Socket can close") {
@@ -143,7 +143,7 @@ TEST_CASE("Request/reply pattern using C++ wrapper", Catch::Tags("req", "rep"
 
 		SECTION("Send without receive fails") {
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
-            REQUIRE_THROWS_AS_MATCHING(repp->send(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_estate));
+            REQUIRE_THROWS_AS_MATCHING(repp->Send(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_estate));
 		}
 
 		SECTION("Cannot set resend time option") {
@@ -172,19 +172,19 @@ TEST_CASE("Request/reply pattern using C++ wrapper", Catch::Tags("req", "rep"
             REQUIRE_NOTHROW(pongp = make_unique<binary_message>((::nng_msg*)nullptr));
 
             REQUIRE_NOTHROW(*pingp << ping);
-            REQUIRE_NOTHROW(reqp->send(pingp.get()));
+            REQUIRE_NOTHROW(reqp->Send(pingp.get()));
             // We will use this state to our advantage later on.
             REQUIRE(pingp->HasOne() == false);
-            REQUIRE_NOTHROW(repp->try_receive(pongp.get()));
+            REQUIRE_NOTHROW(repp->TryReceive(pongp.get()));
             REQUIRE(pongp->HasOne() == true);
             REQUIRE_THAT(pongp->GetBody()->Get(), Equals(ping_buf));
 
             // Interesting, now use the Trim API.
             REQUIRE_NOTHROW(pongp->GetBody()->TrimLeft(ping.length()));
             REQUIRE_NOTHROW(*pongp << pong);
-            REQUIRE_NOTHROW(repp->send(pongp.get()));
+            REQUIRE_NOTHROW(repp->Send(pongp.get()));
             // Here we are using the above assertion to our advantage.
-            REQUIRE_NOTHROW(reqp->try_receive(pingp.get()));
+            REQUIRE_NOTHROW(reqp->TryReceive(pingp.get()));
             REQUIRE_THAT(pingp->GetBody()->Get(), Equals(pong_buf));
 		}
 	}
@@ -208,15 +208,15 @@ TEST_CASE("Request/reply pattern using C++ wrapper", Catch::Tags("req", "rep"
         REQUIRE_NOTHROW(*defp << def);
         REQUIRE_NOTHROW(cmdp = make_unique<binary_message>(nullptr));
 
-        REQUIRE_NOTHROW(reqp->send(abcp.get()));
-        REQUIRE_NOTHROW(reqp->send(defp.get()));
-        REQUIRE_NOTHROW(repp->try_receive(cmdp.get()));
+        REQUIRE_NOTHROW(reqp->Send(abcp.get()));
+        REQUIRE_NOTHROW(reqp->Send(defp.get()));
+        REQUIRE_NOTHROW(repp->TryReceive(cmdp.get()));
         REQUIRE_NOTHROW(cmdp->HasOne() == true);
 
-        REQUIRE_NOTHROW(repp->send(cmdp.get()));
-        REQUIRE_NOTHROW(repp->try_receive(cmdp.get()));
-        REQUIRE_NOTHROW(repp->send(cmdp.get()));
-        REQUIRE_NOTHROW(reqp->try_receive(cmdp.get()));
+        REQUIRE_NOTHROW(repp->Send(cmdp.get()));
+        REQUIRE_NOTHROW(repp->TryReceive(cmdp.get()));
+        REQUIRE_NOTHROW(repp->Send(cmdp.get()));
+        REQUIRE_NOTHROW(reqp->TryReceive(cmdp.get()));
 
         REQUIRE_THAT(cmdp->GetBody()->Get(), Equals(def_buf));
 	}

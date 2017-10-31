@@ -114,33 +114,33 @@ TEST_CASE("Bus pattern using C++ wrappers", Catch::Tags("bus"
             auto bmp = make_unique<binary_message>();
 
             // This is just a poor man's sleep.
-            REQUIRE_THROWS_AS_MATCHING(busp1->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
-            REQUIRE_THROWS_AS_MATCHING(busp2->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
-            REQUIRE_THROWS_AS_MATCHING(busp3->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
+            REQUIRE_THROWS_AS_MATCHING(busp1->TryReceive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
+            REQUIRE_THROWS_AS_MATCHING(busp2->TryReceive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
+            REQUIRE_THROWS_AS_MATCHING(busp3->TryReceive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
 
             SECTION("Bus2 delivers message to Bus1, Bus3 times out") {
 
                 REQUIRE_NOTHROW(*bmp << _99bits);
-                REQUIRE_NOTHROW(busp2->send(bmp.get()));
-                REQUIRE_NOTHROW(busp1->try_receive(bmp.get()));
+                REQUIRE_NOTHROW(busp2->Send(bmp.get()));
+                REQUIRE_NOTHROW(busp1->TryReceive(bmp.get()));
                 REQUIRE_THAT(bmp->GetBody()->Get(), Equals(_99bits_buf));
 
                 REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
-                REQUIRE_THROWS_AS_MATCHING(busp3->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
+                REQUIRE_THROWS_AS_MATCHING(busp3->TryReceive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
             }
 
             SECTION ("Bus1 delivers message to both Bus2 and Bus3") {
 
                 REQUIRE_NOTHROW(*bmp << onthe);
-                REQUIRE_NOTHROW(busp1->send(bmp.get()));
+                REQUIRE_NOTHROW(busp1->Send(bmp.get()));
 
-                REQUIRE_NOTHROW(busp2->try_receive(bmp.get()));
+                REQUIRE_NOTHROW(busp2->TryReceive(bmp.get()));
                 // Will compare with the second received message.
                 const auto* const msgp1 = bmp->get_message();
                 REQUIRE_THAT(bmp->GetBody()->Get(), Equals(onthe_buf));
 
                 REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
-                REQUIRE_NOTHROW(busp3->try_receive(bmp.get()));
+                REQUIRE_NOTHROW(busp3->TryReceive(bmp.get()));
                 // To demonstrate this is an entirely new message received.
                 const auto* const msgp2 = bmp->get_message();
                 REQUIRE_THAT(bmp->GetBody()->Get(), Equals(onthe_buf));

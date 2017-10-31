@@ -1,7 +1,4 @@
 #include "pull.h"
-#include "../../core/exceptions.hpp"
-
-#define THROW_PULL_SOCKET_INV_OP() throw nng::exceptions::invalid_operation("pull sockets cannot send")
 
 namespace nng {
     namespace protocol {
@@ -11,22 +8,26 @@ namespace nng {
             using std::bind;
 
             // While we could use nng_pull_open, I think it is sufficient to just use the versioned symbol.
-            pull_socket::pull_socket() : socket(bind(&(::nng_pull0_open), _1)) {
+            pull_socket::pull_socket() : _Socket(bind(&(::nng_pull0_open), _1)) {
             }
 
             pull_socket::~pull_socket() {
             }
 
-            void pull_socket::send(binary_message* const bmp, flag_type flags) {
-                THROW_PULL_SOCKET_INV_OP();
+            void pull_socket::Send(binary_message* const bmp, flag_type flags) {
+                THROW_SOCKET_INV_OP(Pullers, Send);
             }
 
-            void pull_socket::send(const buffer_vector_type* const bufp, flag_type flags) {
-                THROW_PULL_SOCKET_INV_OP();
+            void pull_socket::Send(const buffer_vector_type* const bufp, flag_type flags) {
+                THROW_SOCKET_INV_OP(Pullers, Send);
             }
 
-            void pull_socket::send(const buffer_vector_type* const bufp, size_type sz, flag_type flags) {
-                THROW_PULL_SOCKET_INV_OP();
+            void pull_socket::Send(const buffer_vector_type* const bufp, size_type sz, flag_type flags) {
+                THROW_SOCKET_INV_OP(Pullers, Send);
+            }
+
+            void pull_socket::SendAsync(const basic_async_service* const svcp) {
+                THROW_SOCKET_INV_OP(Pullers, SendAsync);
             }
         }
     }

@@ -4,7 +4,7 @@
 namespace nng {
 
 #ifndef NNGCPP_SOCKET_H
-    class socket;
+    class _Socket;
 #endif // NNGCPP_SOCKET_H
 
     template<class Options_>
@@ -19,7 +19,7 @@ namespace nng {
 
     protected:
 
-        friend class socket;
+        friend class _Socket;
 
         IHaveOptions() : _options() {}
 

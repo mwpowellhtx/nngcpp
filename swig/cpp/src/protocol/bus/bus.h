@@ -5,13 +5,11 @@
 
 namespace nng {
 
-    class socket;
-
     namespace protocol {
 
         namespace v0 {
 
-            class bus_socket : public socket {
+            class bus_socket : public _Socket {
             public:
 
                 bus_socket();

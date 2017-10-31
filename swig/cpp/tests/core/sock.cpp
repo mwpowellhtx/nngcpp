@@ -128,13 +128,13 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
 
                 // TODO: TBD: was using flag_alloc
                 // TODO: TBD: this will work for now as a rough cut Exception match...
-                REQUIRE_THROWS_AS_MATCHING(s1->try_receive(&buf, sz), nng_exception, THROWS_NNG_EXCEPTION(ec_eclosed));
+                REQUIRE_THROWS_AS_MATCHING(s1->TryReceive(&buf, sz), nng_exception, THROWS_NNG_EXCEPTION(ec_eclosed));
             }
 
             SECTION("It cannot send") {
 
                 // TODO: TBD: this will work for now as a rough cut Exception match...
-                REQUIRE_THROWS_AS_MATCHING(s1->send(&empty_buf), nng_exception, THROWS_NNG_EXCEPTION(ec_eclosed));
+                REQUIRE_THROWS_AS_MATCHING(s1->Send(&empty_buf), nng_exception, THROWS_NNG_EXCEPTION(ec_eclosed));
             }
 
             SECTION("Cannot create Endpoints based on Socket") {
@@ -184,7 +184,7 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
                 unique_ptr<binary_message> bmp;
 
                 REQUIRE_NOTHROW(bmp = make_unique<binary_message>((::nng_msg*)nullptr));
-                REQUIRE_THROWS_AS_MATCHING(s1->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
+                REQUIRE_THROWS_AS_MATCHING(s1->TryReceive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
                 REQUIRE(bmp->HasOne() == false);
             });
         }
@@ -194,7 +194,7 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
             buffer_vector_type buf;
             size_type sz = 0;
             // TODO: TBD: this will work for now as a rough cut Exception match...
-            REQUIRE_THROWS_AS_MATCHING(s1->try_receive(&buf, sz, flag_nonblock), nng_exception, THROWS_NNG_EXCEPTION(ec_eagain));
+            REQUIRE_THROWS_AS_MATCHING(s1->TryReceive(&buf, sz, flag_nonblock), nng_exception, THROWS_NNG_EXCEPTION(ec_eagain));
             REQUIRE_THAT(buf, Equals(empty_buf));
         }
 
@@ -207,7 +207,7 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
 
                 REQUIRE_NOTHROW(s1->GetOptions()->SetDuration(O::send_timeout_duration, timeout));
                 // TODO: TBD: this will work for now as a rough cut Exception match...
-                REQUIRE_THROWS_AS_MATCHING(s1->send(&empty_buf), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
+                REQUIRE_THROWS_AS_MATCHING(s1->Send(&empty_buf), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
 
             });
         }
@@ -291,7 +291,7 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
                     // TODO: TBD: had to increase this from 100ms; and then, I'm not sure that was enough, or there might actually be something blocking
                     this_thread::sleep_for(1000ms);
 
-                    REQUIRE_NOTHROW(s1->send(&data_buf, data_buf.size()));
+                    REQUIRE_NOTHROW(s1->Send(&data_buf, data_buf.size()));
 
                     /* This is a departure from the original unit testing in which allocation was expected,
                     i.e. was being called with flags = flag_alloc. In this case, we fully expect the client
@@ -299,7 +299,7 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
 
                     sz = 4;
                     buffer_vector_type buf;
-                    REQUIRE_NOTHROW(s2->try_receive(&buf, sz));
+                    REQUIRE_NOTHROW(s2->TryReceive(&buf, sz));
                     REQUIRE(buf.size() == sz);
                     REQUIRE_THAT(buf, Equals(data_buf));
 
@@ -476,12 +476,12 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
                     size_t sz = 4;
                     const auto expected = data_buf;
 
-                    REQUIRE_NOTHROW(s1->send(&data_buf, sz));
+                    REQUIRE_NOTHROW(s1->Send(&data_buf, sz));
 
                     buffer_vector_type actual;
                     actual.resize(sz);
 
-                    REQUIRE_NOTHROW(s2->try_receive(&actual, sz));
+                    REQUIRE_NOTHROW(s2->TryReceive(&actual, sz));
 
                     //REQUIRE(actual.size() == sz);
                     REQUIRE_THAT(actual, Equals(expected));

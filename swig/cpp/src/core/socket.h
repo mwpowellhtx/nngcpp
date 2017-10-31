@@ -12,6 +12,10 @@
 #include "IHaveOne.hpp"
 #include "ICanClose.hpp"
 
+#include "exceptions.hpp"
+
+#define THROW_SOCKET_INV_OP(s, op) throw nng::exceptions::invalid_operation(#s " cannot " #op)
+
 // nng should be in the include path.
 #include <functional>
 #include <string>
@@ -22,7 +26,7 @@ namespace nng {
     class _Dialer;
     struct device_path;
 
-    class socket
+    class _Socket
         : public IHaveOne
         , public IProtocol
         , public ICanClose
@@ -49,11 +53,11 @@ namespace nng {
 
         typedef std::function<int(nng_type* const)> nng_ctor_func;
 
-        socket(const nng_ctor_func& nng_ctor);
+        _Socket(const nng_ctor_func& nng_ctor);
 
     public:
 
-        virtual ~socket();
+        virtual ~_Socket();
 
         virtual _OptionReaderWriter* const GetOptions() override;
 
@@ -69,20 +73,20 @@ namespace nng {
 
         virtual bool HasOne() const override;
 
-        virtual void send(binary_message* const bmp, flag_type flags = flag_none) override;
+        virtual void Send(binary_message* const bmp, flag_type flags = flag_none) override;
 
-        virtual void send(const buffer_vector_type* const bufp, flag_type flags = flag_none) override;
-        virtual void send(const buffer_vector_type* const bufp, size_type sz, flag_type flags = flag_none) override;
+        virtual void Send(const buffer_vector_type* const bufp, flag_type flags = flag_none) override;
+        virtual void Send(const buffer_vector_type* const bufp, size_type sz, flag_type flags = flag_none) override;
 
-        virtual void send_async(const basic_async_service* const svcp) override;
+        virtual void SendAsync(const basic_async_service* const svcp) override;
 
-        virtual std::unique_ptr<binary_message> receive(flag_type flags = flag_none) override;
-        virtual bool try_receive(binary_message* const bmp, flag_type flags = flag_none) override;
+        virtual std::unique_ptr<binary_message> Receive(flag_type flags = flag_none) override;
+        virtual bool TryReceive(binary_message* const bmp, flag_type flags = flag_none) override;
 
-        virtual buffer_vector_type receive(size_type& sz, flag_type flags = flag_none) override;
-        virtual bool try_receive(buffer_vector_type* const bufp, size_type& sz, flag_type flags = flag_none) override;
+        virtual buffer_vector_type Receive(size_type& sz, flag_type flags = flag_none) override;
+        virtual bool TryReceive(buffer_vector_type* const bufp, size_type& sz, flag_type flags = flag_none) override;
 
-        virtual void receive_async(basic_async_service* const svcp) override;
+        virtual void ReceiveAsync(basic_async_service* const svcp) override;
     };
 }
 

@@ -44,10 +44,10 @@ namespace nng {
 
             // TODO: TBD: for now leave it as-is; eventually convert from (const socket&) to (const socket* const) ...
             std::shared_ptr<dialer> create_dialer_ep();
-            std::shared_ptr<dialer> create_dialer_ep(const socket& s, const std::string& addr);
+            std::shared_ptr<dialer> create_dialer_ep(const _Socket& s, const std::string& addr);
 
             std::shared_ptr<listener> create_listener_ep();
-            std::shared_ptr<listener> create_listener_ep(const socket& s, const std::string& addr);
+            std::shared_ptr<listener> create_listener_ep(const _Socket& s, const std::string& addr);
 
             void remove_dialer_ep(const dialer* const dp);
             void remove_listener_ep(const listener* const lp);
@@ -67,7 +67,7 @@ namespace nng {
             std::shared_ptr<protocol::latest_rep_socket> create_rep_socket();
             void remove_rep_socket(const protocol::latest_rep_socket* const rp);
 
-            std::shared_ptr<device> create_device(socket* const asockp, socket* const bsockp, bool shouldCloseSockets);
+            std::shared_ptr<device> create_device(_Socket* const asockp, _Socket* const bsockp, bool shouldCloseSockets);
             void remove_device(const device* const dp);
 
             std::shared_ptr<binary_message> create_message();

@@ -70,10 +70,10 @@ TEST_CASE("Asynchronous operations using C++ wrapper", Catch::Tags(
             REQUIRE(tx_count == 0);
             REQUIRE(rx_count == 0);
 
-            REQUIRE_NOTHROW(sp2->receive_async(async_rxp.get()));
+            REQUIRE_NOTHROW(sp2->ReceiveAsync(async_rxp.get()));
 
             REQUIRE_NOTHROW(async_txp->retain_message(bmp.get()));
-            REQUIRE_NOTHROW(sp1->send_async(async_txp.get()));
+            REQUIRE_NOTHROW(sp1->SendAsync(async_txp.get()));
 
             REQUIRE_NOTHROW(async_rxp->wait());
 
@@ -110,25 +110,25 @@ TEST_CASE("Asynchronous operations using C++ wrapper", Catch::Tags(
         SECTION("Explicit timeout works") {
 
             REQUIRE_NOTHROW(axp->set(nominal_timeout));
-            REQUIRE_NOTHROW(sp->receive_async(axp.get()));
+            REQUIRE_NOTHROW(sp->ReceiveAsync(axp.get()));
             wait_for_done_and_success(ec_etimedout);
         }
 
         SECTION("Default timeout works") {
             REQUIRE_NOTHROW(sp->GetOptions()->SetDuration(O::recv_timeout_duration, nominal_timeout));
-            REQUIRE_NOTHROW(sp->receive_async(axp.get()));
+            REQUIRE_NOTHROW(sp->ReceiveAsync(axp.get()));
             wait_for_done_and_success(ec_etimedout);
         }
 
         SECTION("Zero timeout works") {
             REQUIRE_NOTHROW(axp->set_timeout(dur_zero));
-            REQUIRE_NOTHROW(sp->receive_async(axp.get()));
+            REQUIRE_NOTHROW(sp->ReceiveAsync(axp.get()));
             wait_for_done_and_success(ec_etimedout);
         }
 
         SECTION("Cancellation works") {
             REQUIRE_NOTHROW(axp->set_timeout(dur_infinite));
-            REQUIRE_NOTHROW(sp->receive_async(axp.get()));
+            REQUIRE_NOTHROW(sp->ReceiveAsync(axp.get()));
             REQUIRE_NOTHROW(axp->cancel());
             wait_for_done_and_success(ec_ecanceled);
         }

@@ -22,36 +22,44 @@ namespace nng {
         template<class Socket_>
         struct with_send_and_protocols : public with_protocols<Socket_> {
 
-            virtual void send(binary_message* const bmp, flag_type flags = flag_none) override {
-                Socket_::send(bmp, flags);
+            virtual void Send(binary_message* const bmp, flag_type flags = flag_none) override {
+                Socket_::Send(bmp, flags);
             }
 
-            virtual void send(const buffer_vector_type* const bufp, flag_type flags = flag_none) override {
-                Socket_::send(bufp, flags);
+            virtual void Send(const buffer_vector_type* const bufp, flag_type flags = flag_none) override {
+                Socket_::Send(bufp, flags);
             }
 
-            virtual void send(const buffer_vector_type* const bufp, size_type sz, flag_type flags = flag_none) override {
-                Socket_::send(bufp, sz, flags);
+            virtual void Send(const buffer_vector_type* const bufp, size_type sz, flag_type flags = flag_none) override {
+                Socket_::Send(bufp, sz, flags);
+            }
+
+            virtual void SendAsync(const basic_async_service* const svcp) override {
+                Socket_::SendAsync(svcp);
             }
         };
 
         template<class Socket_>
         struct with_recv_and_protocols : public with_protocols<Socket_> {
 
-            virtual std::unique_ptr<binary_message> receive(flag_type flags = flag_none) override {
-                return Socket_::receive(flags);
+            virtual std::unique_ptr<binary_message> Receive(flag_type flags = flag_none) override {
+                return Socket_::Receive(flags);
             }
 
-            virtual bool try_receive(binary_message* const bmp, flag_type flags = flag_none) override {
-                return Socket_::try_receive(bmp, flags);
+            virtual bool TryReceive(binary_message* const bmp, flag_type flags = flag_none) override {
+                return Socket_::TryReceive(bmp, flags);
             }
 
-            virtual buffer_vector_type receive(size_type& sz, flag_type flags = flag_none) override {
-                return Socket_::receive(sz, flags);
+            virtual buffer_vector_type Receive(size_type& sz, flag_type flags = flag_none) override {
+                return Socket_::Receive(sz, flags);
             }
 
-            virtual bool try_receive(buffer_vector_type* const bufp, size_type& sz, flag_type flags = flag_none) override {
-                return Socket_::try_receive(bufp, sz, flags);
+            virtual bool TryReceive(buffer_vector_type* const bufp, size_type& sz, flag_type flags = flag_none) override {
+                return Socket_::TryReceive(bufp, sz, flags);
+            }
+
+            virtual void ReceiveAsync(basic_async_service* const svcp) {
+                Socket_::ReceiveAsync(svcp);
             }
         };
     }

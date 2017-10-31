@@ -9,7 +9,7 @@ namespace nng {
 
         namespace v0 {
             
-            class survey_socket : public socket {
+            class survey_socket : public _Socket {
                 public:
 
                     survey_socket();

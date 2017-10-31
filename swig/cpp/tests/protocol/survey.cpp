@@ -110,7 +110,7 @@ TEST_CASE("Survey pattern using C++ wrapper", Catch::Tags("surveyor", "responden
 		SECTION("Receive without survey fails") {
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>(nullptr));
-            REQUIRE_THROWS_AS_MATCHING(surp->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_estate));
+            REQUIRE_THROWS_AS_MATCHING(surp->TryReceive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_estate));
 		}
 
 		SECTION("Survey without responder times out") {
@@ -118,8 +118,8 @@ TEST_CASE("Survey pattern using C++ wrapper", Catch::Tags("surveyor", "responden
             REQUIRE_NOTHROW(surp->GetOptions()->SetDuration(O::surveyor_survey_duration, 50ms));
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
-            REQUIRE_NOTHROW(surp->send(bmp.get()));
-            REQUIRE_THROWS_AS_MATCHING(surp->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
+            REQUIRE_NOTHROW(surp->Send(bmp.get()));
+            REQUIRE_THROWS_AS_MATCHING(surp->TryReceive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
 		}
 
         SECTION("Socket can close") {
@@ -134,7 +134,7 @@ TEST_CASE("Survey pattern using C++ wrapper", Catch::Tags("surveyor", "responden
         SECTION("Send fails with no suveyor") {
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
-            REQUIRE_THROWS_AS_MATCHING(resp->send(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_estate));
+            REQUIRE_THROWS_AS_MATCHING(resp->Send(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_estate));
         }
 
         SECTION("Socket can close") {
@@ -171,25 +171,25 @@ TEST_CASE("Survey pattern using C++ wrapper", Catch::Tags("surveyor", "responden
 
             // ...
             REQUIRE_NOTHROW(*bmp << abc);
-            REQUIRE_NOTHROW(surp->send(bmp.get()));
-            REQUIRE_NOTHROW(resp->try_receive(bmp.get()));
+            REQUIRE_NOTHROW(surp->Send(bmp.get()));
+            REQUIRE_NOTHROW(resp->TryReceive(bmp.get()));
             REQUIRE_THAT(bmp->GetBody()->Get(), Equals(abc_buf));
 
             REQUIRE_NOTHROW(bmp->GetBody()->TrimLeft(abc.length()));
             REQUIRE_NOTHROW(*bmp << def);
-            REQUIRE_NOTHROW(resp->send(bmp.get()));
-            REQUIRE_NOTHROW(surp->try_receive(bmp.get()));
+            REQUIRE_NOTHROW(resp->Send(bmp.get()));
+            REQUIRE_NOTHROW(surp->TryReceive(bmp.get()));
             REQUIRE_THAT(bmp->GetBody()->Get(), Equals(def_buf));
 
             REQUIRE_NOTHROW(bmp->retain(nullptr));
-            REQUIRE_THROWS_AS_MATCHING(surp->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
+            REQUIRE_THROWS_AS_MATCHING(surp->TryReceive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
 
 			SECTION("And goes to non-survey state") {
 
                 REQUIRE_NOTHROW(surp->GetOptions()->SetDuration(O::recv_timeout_duration, 200ms));
 
                 // ...
-                REQUIRE_THROWS_AS_MATCHING(surp->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_estate));
+                REQUIRE_THROWS_AS_MATCHING(surp->TryReceive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_estate));
 			}
 		}
 	}

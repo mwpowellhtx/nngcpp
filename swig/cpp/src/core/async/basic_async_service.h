@@ -14,7 +14,7 @@
 namespace nng {
 
 #ifndef NNGCPP_SOCKET_H
-    class socket;
+    class _Socket;
 #endif // NNGCPP_SOCKET_H
 
 #ifndef NNGCPP_BINARY_MESSAGE_H
@@ -23,7 +23,7 @@ namespace nng {
 
     class basic_async_service : public IHaveOne, public ICanClose {
 
-        friend class socket;
+        friend class _Socket;
 
         typedef ::nng_aio aio_type;
 

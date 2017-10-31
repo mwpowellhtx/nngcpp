@@ -107,19 +107,20 @@ TEST_CASE("Rule out the possibility of invalid operations", Catch::Tags("pipelin
 
         push_socket_fixture push;
 
-        REQUIRE_THROWS_AS(push.receive(), invalid_operation);
-        REQUIRE_THROWS_AS(push.try_receive(bmp), invalid_operation);
-        REQUIRE_THROWS_AS(push.receive(sz), invalid_operation);
-        REQUIRE_THROWS_AS(push.try_receive(bufp, sz), invalid_operation);
+        // TODO: TBD: add send/receive async verification...
+        REQUIRE_THROWS_AS(push.Receive(), invalid_operation);
+        REQUIRE_THROWS_AS(push.TryReceive(bmp), invalid_operation);
+        REQUIRE_THROWS_AS(push.Receive(sz), invalid_operation);
+        REQUIRE_THROWS_AS(push.TryReceive(bufp, sz), invalid_operation);
     }
 
     SECTION("Pull sockets cannot send messages") {
 
         pull_socket_fixture pull;
 
-        REQUIRE_THROWS_AS(pull.send(bufp), invalid_operation);
-        REQUIRE_THROWS_AS(pull.send(bmp), invalid_operation);
-        REQUIRE_THROWS_AS(pull.send(bufp, sz), invalid_operation);
+        REQUIRE_THROWS_AS(pull.Send(bufp), invalid_operation);
+        REQUIRE_THROWS_AS(pull.Send(bmp), invalid_operation);
+        REQUIRE_THROWS_AS(pull.Send(bufp, sz), invalid_operation);
     }
 }
 
@@ -197,8 +198,8 @@ TEST_CASE("We can create a linked push/pull pair", Catch::Tags("linked"
         _Message bm;
 
         REQUIRE_NOTHROW(bm << hello);
-        REQUIRE_NOTHROW(pushsp->send(&bm));
-        REQUIRE_NOTHROW(pullsp->try_receive(&bm));
+        REQUIRE_NOTHROW(pushsp->Send(&bm));
+        REQUIRE_NOTHROW(pullsp->TryReceive(&bm));
         REQUIRE_THAT(bm.GetBody()->Get(), Equals(hello_buf));
     }
 
@@ -277,20 +278,20 @@ TEST_CASE("Load balancing works", Catch::Tags("load", "balancing", "pipeline"
 
     this_thread::sleep_for(100ms);
 
-    REQUIRE_NOTHROW(pushsp->send(abcsp.get()));
-    REQUIRE_NOTHROW(pushsp->send(defsp.get()));
+    REQUIRE_NOTHROW(pushsp->Send(abcsp.get()));
+    REQUIRE_NOTHROW(pushsp->Send(defsp.get()));
 
-    REQUIRE_NOTHROW(pullsp1->try_receive(abcsp.get()));
+    REQUIRE_NOTHROW(pullsp1->TryReceive(abcsp.get()));
     REQUIRE_THAT(abcsp->GetBody()->Get(), Equals(abc_buf));
-    REQUIRE_NOTHROW(pullsp2->try_receive(defsp.get()));
+    REQUIRE_NOTHROW(pullsp2->TryReceive(defsp.get()));
     REQUIRE_THAT(defsp->GetBody()->Get(), Equals(def_buf));
 
     // Yes, re-make the binary messages.
     REQUIRE_NOTHROW(abcsp = make_unique<binary_message>());
     REQUIRE_NOTHROW(defsp = make_unique<binary_message>());
 
-    REQUIRE_THROWS_AS_MATCHING(pullsp1->try_receive(abcsp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
-    REQUIRE_THROWS_AS_MATCHING(pullsp2->try_receive(defsp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
+    REQUIRE_THROWS_AS_MATCHING(pullsp1->TryReceive(abcsp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
+    REQUIRE_THROWS_AS_MATCHING(pullsp2->TryReceive(defsp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
 
     SECTION("Can close sockets") {
         REQUIRE_NOTHROW(pushsp.reset());

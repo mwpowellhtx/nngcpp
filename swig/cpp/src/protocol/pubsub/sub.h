@@ -9,7 +9,7 @@ namespace nng {
 
         namespace v0 {
             
-            class sub_socket : public socket {
+            class sub_socket : public _Socket {
             public:
 
                 sub_socket();
@@ -18,10 +18,12 @@ namespace nng {
 
             protected:
 
-                virtual void send(binary_message* const bmp, flag_type flags = flag_none) override;
+                virtual void Send(binary_message* const bmp, flag_type flags = flag_none) override;
 
-                virtual void send(const buffer_vector_type* const bufp, flag_type flags = flag_none) override;
-                virtual void send(const buffer_vector_type* const bufp, size_type sz, flag_type flags = flag_none) override;
+                virtual void Send(const buffer_vector_type* const bufp, flag_type flags = flag_none) override;
+                virtual void Send(const buffer_vector_type* const bufp, size_type sz, flag_type flags = flag_none) override;
+
+                virtual void SendAsync(const basic_async_service* const svcp) override;
             };
         }
 

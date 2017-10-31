@@ -9,7 +9,7 @@
 namespace nng {
 
 #ifndef NNGCPP_SOCKET_H
-    class socket;
+    class _Socket;
 #endif // NNGCPP_SOCKET_H
 
 #ifndef NNGCPP_ADDRESS_H
@@ -56,7 +56,7 @@ namespace nng {
 
     protected:
 
-        friend class socket;
+        friend class _Socket;
         friend class _Listener;
         friend class _Dialer;
         friend class message_pipe;

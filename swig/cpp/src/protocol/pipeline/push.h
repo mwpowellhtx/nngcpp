@@ -9,7 +9,7 @@ namespace nng {
 
         namespace v0 {
             
-            class push_socket : public socket {
+            class push_socket : public _Socket {
             public:
 
                 push_socket();
@@ -18,11 +18,13 @@ namespace nng {
 
             protected:
 
-                virtual std::unique_ptr<binary_message> receive(flag_type flags = flag_none) override;
-                virtual bool try_receive(binary_message* const bmp, flag_type flags = flag_none) override;
+                virtual std::unique_ptr<binary_message> Receive(flag_type flags = flag_none) override;
+                virtual bool TryReceive(binary_message* const bmp, flag_type flags = flag_none) override;
 
-                virtual buffer_vector_type receive(size_type& sz, flag_type flags = flag_none) override;
-                virtual bool try_receive(buffer_vector_type* const bufp, size_type& sz, flag_type flags = flag_none) override;
+                virtual buffer_vector_type Receive(size_type& sz, flag_type flags = flag_none) override;
+                virtual bool TryReceive(buffer_vector_type* const bufp, size_type& sz, flag_type flags = flag_none) override;
+
+                virtual void ReceiveAsync(basic_async_service* const svcp) override;
             };
         }
 

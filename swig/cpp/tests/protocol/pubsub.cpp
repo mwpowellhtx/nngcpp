@@ -134,10 +134,11 @@ TEST_CASE("Publisher/subscriber pattern using C++ wrapper", Catch::Tags("pub", "
 
         SECTION("Receive throws invalid operation exception") {
 
-            REQUIRE_THROWS_AS(pubp->receive(), invalid_operation);
-            REQUIRE_THROWS_AS(pubp->receive(sz), invalid_operation);
-            REQUIRE_THROWS_AS(pubp->try_receive(bmp.get()), invalid_operation);
-            REQUIRE_THROWS_AS(pubp->try_receive(&buf, sz), invalid_operation);
+            // TODO: TBD: add send/receive async verification...
+            REQUIRE_THROWS_AS(pubp->Receive(), invalid_operation);
+            REQUIRE_THROWS_AS(pubp->Receive(sz), invalid_operation);
+            REQUIRE_THROWS_AS(pubp->TryReceive(bmp.get()), invalid_operation);
+            REQUIRE_THROWS_AS(pubp->TryReceive(&buf, sz), invalid_operation);
         }
 
         SECTION("Socket can close") {
@@ -152,9 +153,9 @@ TEST_CASE("Publisher/subscriber pattern using C++ wrapper", Catch::Tags("pub", "
 
         SECTION("Send throws invalid operation exception") {
 
-            REQUIRE_THROWS_AS(subp->send(bmp.get()), invalid_operation);
-            REQUIRE_THROWS_AS(subp->send(&buf), invalid_operation);
-            REQUIRE_THROWS_AS(subp->send(&buf, sz), invalid_operation);
+            REQUIRE_THROWS_AS(subp->Send(bmp.get()), invalid_operation);
+            REQUIRE_THROWS_AS(subp->Send(&buf), invalid_operation);
+            REQUIRE_THROWS_AS(subp->Send(&buf, sz), invalid_operation);
         }
 
         SECTION("Socket can close") {
@@ -203,20 +204,20 @@ TEST_CASE("Publisher/subscriber pattern using C++ wrapper", Catch::Tags("pub", "
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
             REQUIRE_NOTHROW(*bmp << topics::some_like_it_hot);
-            REQUIRE_NOTHROW(pubp->send(bmp.get()));
-            REQUIRE_NOTHROW(subp->try_receive(bmp.get()));
+            REQUIRE_NOTHROW(pubp->Send(bmp.get()));
+            REQUIRE_NOTHROW(subp->TryReceive(bmp.get()));
             REQUIRE_THAT(bmp->GetBody()->Get(), Equals(topics::some_like_it_hot_buf));
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
             REQUIRE_NOTHROW(*bmp << topics::somewhere_over_the_rainbow);
             REQUIRE_THAT(bmp->GetBody()->Get(), Equals(topics::somewhere_over_the_rainbow_buf));
-            REQUIRE_NOTHROW(pubp->send(bmp.get()));
-            REQUIRE_THROWS_AS_MATCHING(subp->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
+            REQUIRE_NOTHROW(pubp->Send(bmp.get()));
+            REQUIRE_THROWS_AS_MATCHING(subp->TryReceive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
             REQUIRE_NOTHROW(*bmp << topics::some_day_some_how);
-            REQUIRE_NOTHROW(pubp->send(bmp.get()));
-            REQUIRE_NOTHROW(subp->try_receive(bmp.get()));
+            REQUIRE_NOTHROW(pubp->Send(bmp.get()));
+            REQUIRE_NOTHROW(subp->TryReceive(bmp.get()));
             REQUIRE_THAT(bmp->GetBody()->Get(), Equals(topics::some_day_some_how_buf));
         }
 
@@ -226,8 +227,8 @@ TEST_CASE("Publisher/subscriber pattern using C++ wrapper", Catch::Tags("pub", "
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
             REQUIRE_NOTHROW(*bmp << topics::some_do_not_like_it);
-            REQUIRE_NOTHROW(pubp->send(bmp.get()));
-            REQUIRE_THROWS_AS_MATCHING(subp->try_receive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
+            REQUIRE_NOTHROW(pubp->Send(bmp.get()));
+            REQUIRE_THROWS_AS_MATCHING(subp->TryReceive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
         }
 
         SECTION("Subscribers in raw receive") {
@@ -237,8 +238,8 @@ TEST_CASE("Publisher/subscriber pattern using C++ wrapper", Catch::Tags("pub", "
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
             REQUIRE_NOTHROW(*bmp << topics::some_like_it_raw);
-            REQUIRE_NOTHROW(pubp->send(bmp.get()));
-            REQUIRE_NOTHROW(subp->try_receive(bmp.get()));
+            REQUIRE_NOTHROW(pubp->Send(bmp.get()));
+            REQUIRE_NOTHROW(subp->TryReceive(bmp.get()));
             REQUIRE_THAT(bmp->GetBody()->Get(), Equals(topics::some_like_it_raw_buf));
         }
     }

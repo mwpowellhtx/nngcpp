@@ -120,16 +120,16 @@ TEST_CASE("Test that device functions properly", "[device]") {
                 SECTION("Device can send") {
 
                     REQUIRE_NOTHROW(bm << alpha);
-                    REQUIRE_NOTHROW(e1.send(&bm));
-                    REQUIRE_NOTHROW(e2.try_receive(&bm));
+                    REQUIRE_NOTHROW(e1.Send(&bm));
+                    REQUIRE_NOTHROW(e2.TryReceive(&bm));
                     REQUIRE_THAT(bm.GetBody()->Get(), Equals(alpha_buf));
                 }
 
                 SECTION("Device can receive") {
 
                     REQUIRE_NOTHROW(bm << omega);
-                    REQUIRE_NOTHROW(e2.send(&bm));
-                    REQUIRE_NOTHROW(e1.try_receive(&bm));
+                    REQUIRE_NOTHROW(e2.Send(&bm));
+                    REQUIRE_NOTHROW(e1.TryReceive(&bm));
                     REQUIRE_THAT(bm.GetBody()->Get(), Equals(omega_buf));
                 }
             }

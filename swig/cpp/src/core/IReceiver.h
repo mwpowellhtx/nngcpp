@@ -25,13 +25,14 @@ namespace nng {
         virtual ~IReceiver();
 
         // TODO: TBD: this one may get somewhat involved...
-        virtual std::unique_ptr<binary_message> receive(flag_type flags = flag_none) = 0;
-        virtual bool try_receive(binary_message* const bmp, flag_type flags = flag_none) = 0;
+        virtual std::unique_ptr<binary_message> Receive(flag_type flags = flag_none) = 0;
+        virtual bool TryReceive(binary_message* const bmp, flag_type flags = flag_none) = 0;
 
-        virtual buffer_vector_type receive(size_type& sz, flag_type flags = flag_none) = 0;
-        virtual bool try_receive(buffer_vector_type* const bufp, size_type& sz, flag_type flags = flag_none) = 0;
+        virtual buffer_vector_type Receive(size_type& sz, flag_type flags = flag_none) = 0;
+        virtual bool TryReceive(buffer_vector_type* const bufp, size_type& sz, flag_type flags = flag_none) = 0;
 
-        virtual void receive_async(basic_async_service* const svcp) = 0;
+        // TODO: TBD: ditto ISender re: extending even through send-only API.
+        virtual void ReceiveAsync(basic_async_service* const svcp) = 0;
     };
 }
 

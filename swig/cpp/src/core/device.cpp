@@ -3,7 +3,7 @@
 
 namespace nng {
 
-    device_path::device_path(socket* const asockp, socket* const bsockp, bool shouldClose)
+    device_path::device_path(_Socket* const asockp, _Socket* const bsockp, bool shouldClose)
         : _asockp(asockp)
             , _bsockp(bsockp)
             , _shouldClose(shouldClose) {
@@ -19,7 +19,7 @@ namespace nng {
         ::nng_device(dpp->_asockp->sid, dpp->_bsockp->sid);
     }
 
-    device::device(socket* const asockp, socket* const bsockp, bool shouldCloseSockets)
+    device::device(_Socket* const asockp, _Socket* const bsockp, bool shouldCloseSockets)
         : _pathp(std::make_unique<device_path>(asockp, bsockp, shouldCloseSockets))
             , _threadp(std::make_unique<std::thread>(nng::install_device_sockets_callback, _pathp.get())) {
     }

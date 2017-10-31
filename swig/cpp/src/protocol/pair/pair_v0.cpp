@@ -6,7 +6,7 @@ namespace nng {
 
             using std::placeholders::_1;
 
-            pair_socket::pair_socket() : socket(std::bind(&(::nng_pair0_open), _1)) {
+            pair_socket::pair_socket() : _Socket(std::bind(&(::nng_pair0_open), _1)) {
             }
 
             pair_socket::~pair_socket() {

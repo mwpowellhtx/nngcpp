@@ -9,7 +9,7 @@ namespace nng {
 
         namespace v0 {
             
-            class req_socket : public socket {
+            class req_socket : public _Socket {
                 public:
 
                     req_socket();

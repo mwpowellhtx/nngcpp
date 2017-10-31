@@ -54,7 +54,7 @@ namespace nng {
 
                 //INFO("Server: receiving...");
 
-                REQUIRE_NOTHROW(sp->try_receive(r, sz));
+                REQUIRE_NOTHROW(sp->TryReceive(r, sz));
 
                 //INFO("Server: received '" + r + "'");
 
@@ -62,7 +62,7 @@ namespace nng {
 
                 //INFO("Server: sending '" + s + "'");
 
-                REQUIRE_NOTHROW(sp->send(s));
+                REQUIRE_NOTHROW(sp->Send(s));
 
                 //INFO("Server: sent.");
             }
@@ -174,7 +174,7 @@ bool transact_clients(req_socket_vector& sockets) {
 
         //INFO("Client: sending '" + s + "'");
 
-        REQUIRE_NOTHROW(sp->send(s));
+        REQUIRE_NOTHROW(sp->Send(s));
 
         //INFO("Client: sent '" + s + "'");
 
@@ -183,7 +183,7 @@ bool transact_clients(req_socket_vector& sockets) {
 
         //INFO("Client: receiving...");
 
-        REQUIRE_NOTHROW(sp->try_receive(r, sz));
+        REQUIRE_NOTHROW(sp->TryReceive(r, sz));
 
         //INFO("Client: received '" + r + "'");
     });

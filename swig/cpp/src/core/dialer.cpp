@@ -14,7 +14,7 @@ namespace nng {
         configure_options(did);
     }
 
-    _Dialer::_Dialer(const socket& s, const std::string& addr) : _EndPoint(), did(0) {
+    _Dialer::_Dialer(const _Socket& s, const std::string& addr) : _EndPoint(), did(0) {
 
         const auto& op = bind(&::nng_dialer_create, &did, s.sid, _1);
         invocation::with_default_error_handling(op, addr.c_str());

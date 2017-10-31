@@ -9,7 +9,7 @@
 namespace nng {
 
 #ifndef NNGCPP_SOCKET_H
-    class socket;
+    class _Socket;
 #endif // NNGCPP_SOCKET_H
 
     class _Dialer : public _EndPoint {
@@ -19,7 +19,7 @@ namespace nng {
 
     private:
 
-        friend class socket;
+        friend class _Socket;
 
         nng_type did;
 
@@ -33,7 +33,7 @@ namespace nng {
 
         _Dialer();
 
-        _Dialer(const socket& s, const std::string& addr);
+        _Dialer(const _Socket& s, const std::string& addr);
 
         virtual ~_Dialer();
 
