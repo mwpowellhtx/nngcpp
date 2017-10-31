@@ -21,34 +21,44 @@ namespace nng {
         dur_default = NNG_DURATION_DEFAULT
     };
 
-    enum protocol_type {
-        protocol_none = ::NNG_PROTO_NONE,
+    /* We need to be very careful with these numbers owing to the underlying C API.
+    On account of SWIG comprehension, we must be careful to define these precisely
+    in agreement with the C code. Also leveraging the fact that Protocol is always
+    a 16-bit unsigned field. */
+    enum protocol_type : nng::uint16_t {
+        protocol_none = 0, // ::NNG_PROTO_NONE,
 
-        proto_bus_v0 = ::NNG_PROTO_BUS_V0,
-        proto_pair_v0 = ::NNG_PROTO_PAIR_V0,
-        proto_pair_v1 = ::NNG_PROTO_PAIR_V1,
-        proto_subscriber_v0 = ::NNG_PROTO_SUB_V0,
-        proto_publisher_v0 = ::NNG_PROTO_PUB_V0,
-        proto_requestor_v0 = ::NNG_PROTO_REQ_V0,
-        proto_replier_v0 = ::NNG_PROTO_REP_V0,
-        proto_pusher_v0 = ::NNG_PROTO_PUSH_V0,
-        proto_puller_v0 = ::NNG_PROTO_PULL_V0,
-        proto_surveyor_v0 = ::NNG_PROTO_SURVEYOR_V0,
-        proto_respondent_v0 = ::NNG_PROTO_RESPONDENT_V0,
-        proto_star_v0 = ::NNG_PROTO_STAR_V0,
+        /* TODO: TBD: these ought to be a little more robust definitions especially
+        approaching SWIG. If not, we will revisit at a later time. The C code multiplies
+        by 16, but it's the same as shifting left. Plus C# can support that, for starters. */
+        proto_pair_v0 = 1 << 4, // ::NNG_PROTO_PAIR_V0,
+        proto_pair_v1 = 1 << 4 | 1, // ::NNG_PROTO_PAIR_V1,
+        proto_publisher_v0 = 2 << 4, // ::NNG_PROTO_PUB_V0,
+        proto_subscriber_v0 = 2 << 4 | 1, // ::NNG_PROTO_SUB_V0,
+        proto_requestor_v0 = 3 << 4, // ::NNG_PROTO_REQ_V0,
+        proto_replier_v0 = 3 << 4 | 1, // ::NNG_PROTO_REP_V0,
+        proto_pusher_v0 = 5 << 4, // ::NNG_PROTO_PUSH_V0,
+        proto_puller_v0 = 5 << 4 | 1, // ::NNG_PROTO_PULL_V0,
+        proto_surveyor_v0 = 6 << 4, // ::NNG_PROTO_SURVEYOR_V0,
+        proto_respondent_v0 = 6 << 4 | 1, // ::NNG_PROTO_RESPONDENT_V0,
+        proto_bus_v0 = 1 << 4 | 0, // ::NNG_PROTO_BUS_V0,
+        proto_star_v0 = 100 << 4, // ::NNG_PROTO_STAR_V0,
 
-        proto_bus = ::NNG_PROTO_BUS,
-        proto_pair = ::NNG_PROTO_PAIR,
-        proto_subscriber = ::NNG_PROTO_SUB,
-        proto_publisher = ::NNG_PROTO_PUB,
-        proto_requestor = ::NNG_PROTO_REQ,
-        proto_replier = ::NNG_PROTO_REP,
-        proto_pusher = ::NNG_PROTO_PUSH,
-        proto_puller = ::NNG_PROTO_PULL,
-        proto_surveyor = ::NNG_PROTO_SURVEYOR,
-        proto_respondent = ::NNG_PROTO_RESPONDENT,
+        /* Ditto robustness. Instead of depending on the C definitions, we will leverage our
+        C++ definitons. SWIG should be able to rename these, but we will cross that bridge
+        when we get there as well and as necessary. */ 
+        proto_pair = proto_pair_v1,
+        proto_publisher = proto_publisher_v0,
+        proto_subscriber = proto_subscriber_v0,
+        proto_requestor = proto_requestor_v0,
+        proto_replier = proto_replier_v0,
+        proto_pusher = proto_pusher_v0,
+        proto_puller = proto_puller_v0,
+        proto_surveyor = proto_surveyor_v0,
+        proto_respondent = proto_respondent_v0,
+        proto_bus = proto_bus_v0,
         // TODO: TBD: NNG_PROTO_STAR undefined as of now; expecting NNG_PROTO_STAR moving forward? with protocol to boot?
-        proto_star = ::NNG_PROTO_STAR_V0
+        proto_star = proto_star_v0
     };
 
     // https://www.gnu.org/software/libc/manual/html_node/Error-Codes.html
