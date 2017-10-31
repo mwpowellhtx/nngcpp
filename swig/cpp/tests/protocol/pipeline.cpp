@@ -16,16 +16,15 @@
 #include "../catch/catch_macros.hpp"
 #include "../catch/catch_tags.h"
 
+#include "../helpers/basic_fixture.h"
 #include "../helpers/constants.h"
+#include "../helpers/protocol_boilerplate.hpp"
+
+// Defined for convenience throughout unit testing.
+DEFINE_SOCKET_FIXTURE_WITH_RECV_EXPOSURE(v0, push_socket_fixture, push_socket)
+DEFINE_SOCKET_FIXTURE_WITH_SEND_EXPOSURE(v0, pull_socket_fixture, pull_socket)
 
 #include <string>
-
-// TODO: TBD: this pattern is fairly common, should be a separate include/module...
-struct pipeline_fixture {
-    virtual ~pipeline_fixture() {
-        ::nng_fini();
-    }
-};
 
 namespace constants {
 
@@ -39,61 +38,55 @@ namespace constants {
     const auto def_buf = to_buffer(def);
 }
 
-namespace nng {
-    namespace protocol {
-        namespace v0 {
+TEST_CASE("Verify protocol and peer are correct", Catch::Tags("survey"
+    , "v0", "surveyor", "respondent", "protocol", "peer", "internal"
+    , "nng", "cxx").c_str()) {
 
-            class push_socket_inv_ops_fixture : public push_socket {
-            public:
+    using namespace std;
+    using namespace nng;
+    using namespace nng::protocol::v0;
 
-                push_socket_inv_ops_fixture() : push_socket() {
-                }
+    protocol_type actual;
+    basic_fixture fixture;
 
-                virtual ~push_socket_inv_ops_fixture() {
-                }
+    SECTION("Verify push protocol and peer is correct") {
 
-                virtual std::unique_ptr<binary_message> receive(flag_type flags = flag_none) override {
-                    return push_socket::receive(flags);
-                }
+        unique_ptr<push_socket_fixture> sp;
 
-                virtual bool try_receive(binary_message* const bmp, flag_type flags = flag_none) override {
-                    return push_socket::try_receive(bmp, flags);
-                }
+        REQUIRE_NOTHROW(sp = make_unique<push_socket_fixture>());
+        REQUIRE(sp.get() == nullptr);
 
-                virtual buffer_vector_type receive(size_type& sz, flag_type flags = flag_none) override {
-                    return push_socket::receive(sz, flags);
-                }
-
-                virtual bool try_receive(buffer_vector_type* const bufp, size_type& sz, flag_type flags = flag_none) override {
-                    return push_socket::try_receive(bufp, sz, flags);
-                }
-            };
-
-            class pull_socket_inv_ops_fixture : public pull_socket {
-            public:
-
-                pull_socket_inv_ops_fixture() : pull_socket() {
-                }
-
-                virtual ~pull_socket_inv_ops_fixture() {
-                }
-
-                virtual void send(binary_message* const bmp, flag_type flags = flag_none) override {
-                    pull_socket::send(bmp, flags);
-                }
-
-                virtual void send(const buffer_vector_type* const bufp, flag_type flags = flag_none) override {
-                    pull_socket::send(bufp, flags);
-                }
-
-                virtual void send(const buffer_vector_type* const bufp, size_type sz, flag_type flags = flag_none) override {
-                    pull_socket::send(bufp, sz, flags);
-                }
-            };
+        SECTION("Verify protocol is correct") {
+            actual = sp->get_protocol();
+            REQUIRE(actual == proto_pusher_v0);
+            REQUIRE(actual == proto_pusher);
         }
 
-        typedef v0::push_socket_inv_ops_fixture latest_push_socket_inv_ops_fixture;
-        typedef v0::pull_socket_inv_ops_fixture latest_pull_socket_inv_ops_fixture;
+        SECTION("Verify peer is correct") {
+            actual = sp->get_peer();
+            REQUIRE(actual == proto_puller_v0);
+            REQUIRE(actual == proto_puller);
+        }
+    }
+
+    SECTION("Verify pull protocol and peer is correct") {
+
+        unique_ptr<pull_socket_fixture> sp;
+
+        REQUIRE_NOTHROW(sp = make_unique<pull_socket_fixture>());
+        REQUIRE(sp.get() == nullptr);
+
+        SECTION("Verify protocol is correct") {
+            actual = sp->get_protocol();
+            REQUIRE(actual == proto_puller_v0);
+            REQUIRE(actual == proto_puller);
+        }
+
+        SECTION("Verify peer is correct") {
+            actual = sp->get_peer();
+            REQUIRE(actual == proto_pusher_v0);
+            REQUIRE(actual == proto_pusher);
+        }
     }
 }
 
@@ -102,6 +95,7 @@ TEST_CASE("Rule out the possibility of invalid operations", Catch::Tags("pipelin
 
     using namespace nng;
     using namespace nng::protocol;
+    using namespace nng::protocol::v0;
     using namespace nng::exceptions;
 
     // Even though we are technically doing nothing with these, we MUST initialize them anyhow.
@@ -111,7 +105,7 @@ TEST_CASE("Rule out the possibility of invalid operations", Catch::Tags("pipelin
 
     SECTION("Push sockets cannot receive messages") {
 
-        latest_push_socket_inv_ops_fixture push;
+        push_socket_fixture push;
 
         REQUIRE_THROWS_AS(push.receive(), invalid_operation);
         REQUIRE_THROWS_AS(push.try_receive(bmp), invalid_operation);
@@ -121,7 +115,7 @@ TEST_CASE("Rule out the possibility of invalid operations", Catch::Tags("pipelin
 
     SECTION("Pull sockets cannot send messages") {
 
-        latest_pull_socket_inv_ops_fixture pull;
+        pull_socket_fixture pull;
 
         REQUIRE_THROWS_AS(pull.send(bufp), invalid_operation);
         REQUIRE_THROWS_AS(pull.send(bmp), invalid_operation);
@@ -149,21 +143,6 @@ TEST_CASE("Pipeline (push/pull) pattern using C++ wrapper", Catch::Tags("pipelin
         REQUIRE_NOTHROW(pushsp = make_unique<latest_push_socket>());
         REQUIRE(pushsp != nullptr);
 
-        protocol_type actual_proto, actual_peer;
-
-        SECTION("Protocols match") {
-
-            REQUIRE_NOTHROW(actual_proto = pushsp->get_protocol());
-
-            REQUIRE(actual_proto == proto_pusher);
-            REQUIRE(actual_proto == proto_pusher_v0);
-
-            REQUIRE_NOTHROW(actual_peer = pushsp->get_peer());
-
-            REQUIRE(actual_peer == proto_puller);
-            REQUIRE(actual_peer == proto_puller_v0);
-        }
-
         SECTION("Can close socket") {
             REQUIRE_NOTHROW(pushsp.reset());
             REQUIRE(pushsp == nullptr);
@@ -176,18 +155,6 @@ TEST_CASE("Pipeline (push/pull) pattern using C++ wrapper", Catch::Tags("pipelin
 
         REQUIRE_NOTHROW(pullsp = make_unique<latest_pull_socket>());
         REQUIRE(pullsp != nullptr);
-
-        SECTION("Protocols match") {
-
-            const auto actual_proto = pullsp->get_protocol();
-
-            REQUIRE(actual_proto == nng::proto_puller);
-            REQUIRE(actual_proto == nng::proto_puller_v0);
-
-            const auto actual_peer = pullsp->get_peer();
-            REQUIRE(actual_peer == nng::proto_pusher);
-            REQUIRE(actual_peer == nng::proto_pusher_v0);
-        }
 
         SECTION("Can close socket") {
             REQUIRE_NOTHROW(pullsp.reset());

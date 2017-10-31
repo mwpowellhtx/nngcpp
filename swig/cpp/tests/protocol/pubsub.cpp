@@ -18,60 +18,11 @@
 
 #include "../helpers/basic_fixture.h"
 #include "../helpers/constants.h"
+#include "../helpers/protocol_boilerplate.hpp"
 
-namespace nng {
-    namespace protocol {
-        namespace v0 {
-
-            class pub_socket_fixture : public pub_socket {
-            public:
-
-                pub_socket_fixture() : pub_socket() {}
-
-                virtual ~pub_socket_fixture() {}
-
-                virtual std::unique_ptr<binary_message> receive(flag_type flags = flag_none) override {
-                    return pub_socket::receive(flags);
-                }
-
-                virtual bool try_receive(binary_message* const bmp, flag_type flags = flag_none) override {
-                    return pub_socket::try_receive(bmp, flags);
-                }
-
-                virtual buffer_vector_type receive(size_type& sz, flag_type flags = flag_none) override {
-                    return pub_socket::receive(sz, flags);
-                }
-
-                virtual bool try_receive(buffer_vector_type* const bufp, size_type& sz, flag_type flags = flag_none) override {
-                    return pub_socket::try_receive(bufp, sz, flags);
-                }
-            };
-
-            class sub_socket_fixture : public sub_socket {
-            public:
-
-                sub_socket_fixture() : sub_socket() {}
-
-                virtual ~sub_socket_fixture() {}
-
-                virtual void send(binary_message* const bmp, flag_type flags = flag_none) override {
-                    sub_socket::send(bmp, flags);
-                }
-
-                virtual void send(const buffer_vector_type* const bufp, flag_type flags = flag_none) override {
-                    sub_socket::send(bufp, flags);
-                }
-
-                virtual void send(const buffer_vector_type* const bufp, size_type sz, flag_type flags = flag_none) override {
-                    sub_socket::send(bufp, sz, flags);
-                }
-            };
-        }
-
-        typedef v0::pub_socket_fixture latest_pub_socket_fixture;
-        typedef v0::sub_socket_fixture latest_sub_socket_fixture;
-    }
-}
+// Defined for convenience throughout unit testing.
+DEFINE_SOCKET_FIXTURE_WITH_RECV_EXPOSURE(v0, pub_socket_fixture, pub_socket)
+DEFINE_SOCKET_FIXTURE_WITH_SEND_EXPOSURE(v0, sub_socket_fixture, sub_socket)
 
 namespace constants {
 
@@ -102,6 +53,58 @@ namespace constants {
     }
 }
 
+TEST_CASE("Verify protocol and peer are correct", Catch::Tags("survey"
+    , "v0", "surveyor", "respondent", "protocol", "peer", "internal"
+    , "nng", "cxx").c_str()) {
+
+    using namespace std;
+    using namespace nng;
+    using namespace nng::protocol::v0;
+
+    protocol_type actual;
+    basic_fixture fixture;
+
+    SECTION("Verify publisher protocol and peer is correct") {
+
+        unique_ptr<pub_socket_fixture> sp;
+
+        REQUIRE_NOTHROW(sp = make_unique<pub_socket_fixture>());
+        REQUIRE(sp.get() == nullptr);
+
+        SECTION("Verify protocol is correct") {
+            actual = sp->get_protocol();
+            REQUIRE(actual == proto_publisher_v0);
+            REQUIRE(actual == proto_publisher);
+        }
+
+        SECTION("Verify peer is correct") {
+            actual = sp->get_peer();
+            REQUIRE(actual == proto_subscriber_v0);
+            REQUIRE(actual == proto_subscriber);
+        }
+    }
+
+    SECTION("Verify subscriber protocol and peer is correct") {
+
+        unique_ptr<sub_socket_fixture> sp;
+
+        REQUIRE_NOTHROW(sp = make_unique<sub_socket_fixture>());
+        REQUIRE(sp.get() == nullptr);
+
+        SECTION("Verify protocol is correct") {
+            actual = sp->get_protocol();
+            REQUIRE(actual == proto_subscriber_v0);
+            REQUIRE(actual == proto_subscriber);
+        }
+
+        SECTION("Verify peer is correct") {
+            actual = sp->get_peer();
+            REQUIRE(actual == proto_publisher_v0);
+            REQUIRE(actual == proto_publisher);
+        }
+    }
+}
+
 TEST_CASE("Publisher/subscriber pattern using C++ wrapper", Catch::Tags("pub", "sub"
     , "v0", "protocol", "sockets", "patterns", "nng", "cxx").c_str()) {
 
@@ -109,6 +112,7 @@ TEST_CASE("Publisher/subscriber pattern using C++ wrapper", Catch::Tags("pub", "
     using namespace constants;
     using namespace nng;
     using namespace nng::protocol;
+    using namespace nng::protocol::v0;
     using namespace nng::exceptions;
     using namespace Catch::Matchers;
     using O = option_names;
@@ -117,30 +121,16 @@ TEST_CASE("Publisher/subscriber pattern using C++ wrapper", Catch::Tags("pub", "
 
     // Some of these need to be initialized to avoid garbage results, crash situations, etc.
     size_type sz = 0;
-    protocol_type actual_proto, actual_peer;
 
     unique_ptr<binary_message> bmp;
     buffer_vector_type buf;
 
-    unique_ptr<latest_pub_socket_fixture> pubp;
-    unique_ptr<latest_sub_socket_fixture> subp;
+    unique_ptr<pub_socket_fixture> pubp;
+    unique_ptr<sub_socket_fixture> subp;
 
     SECTION("We can create a publisher socket") {
 
-        REQUIRE_NOTHROW(pubp = make_unique<latest_pub_socket_fixture>());
-
-        SECTION("Protocols match") {
-
-            REQUIRE_NOTHROW(actual_proto = pubp->get_protocol());
-
-            REQUIRE(actual_proto == proto_publisher);
-            REQUIRE(actual_proto == proto_publisher_v0);
-
-            REQUIRE_NOTHROW(actual_peer = pubp->get_peer());
-
-            REQUIRE(actual_peer == proto_subscriber);
-            REQUIRE(actual_peer == proto_subscriber_v0);
-        }
+        REQUIRE_NOTHROW(pubp = make_unique<pub_socket_fixture>());
 
         SECTION("Receive throws invalid operation exception") {
 
@@ -158,20 +148,7 @@ TEST_CASE("Publisher/subscriber pattern using C++ wrapper", Catch::Tags("pub", "
 
     SECTION("We can create a subscriber socket") {
 
-        REQUIRE_NOTHROW(subp = make_unique<latest_sub_socket_fixture>());
-
-        SECTION("Protocols match") {
-
-            REQUIRE_NOTHROW(actual_proto = subp->get_protocol());
-
-            REQUIRE(actual_proto == proto_subscriber);
-            REQUIRE(actual_proto == proto_subscriber_v0);
-
-            REQUIRE_NOTHROW(actual_peer = subp->get_peer());
-
-            REQUIRE(actual_peer == proto_publisher);
-            REQUIRE(actual_peer == proto_publisher_v0);
-        }
+        REQUIRE_NOTHROW(subp = make_unique<sub_socket_fixture>());
 
         SECTION("Send throws invalid operation exception") {
 
@@ -188,8 +165,8 @@ TEST_CASE("Publisher/subscriber pattern using C++ wrapper", Catch::Tags("pub", "
 
     SECTION("We can create a linked pub/sub pair") {
 
-        REQUIRE_NOTHROW(pubp = make_unique<latest_pub_socket_fixture>());
-        REQUIRE_NOTHROW(subp = make_unique<latest_sub_socket_fixture>());
+        REQUIRE_NOTHROW(pubp = make_unique<pub_socket_fixture>());
+        REQUIRE_NOTHROW(subp = make_unique<sub_socket_fixture>());
 
         /* Most applications will usually have the pub listen and sub dial. However, this
         creates a problem for our tests, since we can wind up trying to push data before

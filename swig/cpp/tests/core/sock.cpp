@@ -17,7 +17,13 @@
 #include "../catch/catch_nng_exception_matcher.hpp"
 #include "../catch/catch_macros.hpp"
 #include "../catch/timed_section_impl.hpp"
+#include "../catch/catch_tags.h"
+
+#include "../helpers/basic_fixture.h"
 #include "../helpers/constants.h"
+#include "../helpers/protocol_boilerplate.hpp"
+
+DEFINE_SOCKET_FIXTURE(v1, pair_socket_fixture, pair_socket)
 
 // TODO: TBD: update this module: follow the C API grouping more or less closely, adapting for C+ wrapperisms
 // TODO: TBD: generally, update this taking into consideration updates; could "transaction" be useful now, in more broad sense? i.e. looking at constants::to_str for instance...
@@ -25,60 +31,6 @@
 #include <cctype>
 #include <memory>
 #include <algorithm>
-
-// TODO: TBD: these are a couple of interesting methods that might be interesting to include apart from the unit test itself.
-template<class It_ = std::string::const_iterator>
-std::string trim_right(It_ cbegin, It_ cend) {
-    std::string s;
-    It_ it = cend;
-    auto is_trimming = true;
-    do
-    {
-        // Trim while we are trimming.
-        if (is_trimming) {
-            if (iswspace(*it)) { continue; }
-            // Once we are no longer trimming, then accept everything else that we identity.
-            is_trimming = false;
-        }
-        s = *it + s;
-    } while (it-- != cbegin);
-    return s;
-}
-
-template<class It_ = std::string::const_iterator>
-std::string trim_left(It_ cbegin, It_ cend) {
-    std::string s;
-    It_ it = cbegin;
-    auto is_trimming = true;
-    do
-    {
-        // Trim while we are trimming.
-        if (is_trimming) {
-            if (iswspace(*it)) { continue; }
-            // Once we are no longer trimming, then accept everything else that we identity.
-            is_trimming = false;
-        }
-        s = s + *it;
-    } while (it++ != cend);
-    return s;
-}
-
-template<class It_ = std::string::const_iterator>
-std::string trim(It_ cbegin, It_ cend) {
-    auto s = trim_left(cbegin, cend);
-    return trim_right(s.cbegin(), s.cend());
-}
-
-template <class At_, class Bt_>
-bool starts_with(At_ abegin, At_ aend, Bt_ bbegin, Bt_ bend) {
-    At_ acurrent;
-    Bt_ bcurrent;
-    for (acurrent = abegin, bcurrent = bbegin; !(acurrent == aend || bcurrent == bend)
-        && *acurrent == *bcurrent; acurrent++, bcurrent++) {
-    }
-    // If we made it through the End of B, then the match is true.
-    return bcurrent == bend;
-}
 
 // TODO: TBD: debatable how many of the constants should be included apart from the unit test itself...
 namespace constants {
@@ -99,6 +51,40 @@ namespace constants {
 
     const nng::buffer_vector_type empty_buf = {};
     const auto data_buf = to_buffer("data");
+}
+
+// TODO: TBD: instead of "sock", this should perhaps go in "pair" ...
+
+TEST_CASE("Verify protocol and peer are correct", Catch::Tags("pair"
+    , "v1", "protocol", "peer", "internal", "nng", "cxx").c_str()) {
+
+    using namespace std;
+    using namespace nng;
+    using namespace nng::protocol::v1;
+
+    protocol_type actual;
+    basic_fixture fixture;
+
+    // Yes, we should still verify that Socket construction succeeds.
+    unique_ptr<pair_socket_fixture> sp;
+
+    SECTION("Given the created socket") {
+
+        REQUIRE_NOTHROW(sp = make_unique<pair_socket_fixture>());
+        REQUIRE(sp.get() != nullptr);
+
+        SECTION("Verify protocol is correct") {
+            actual = sp->get_protocol();
+            REQUIRE(actual == proto_pair_v1);
+            REQUIRE(actual == proto_pair);
+        }
+
+        SECTION("Verify peer is correct") {
+            actual = sp->get_peer();
+            REQUIRE(actual == proto_pair_v1);
+            REQUIRE(actual == proto_pair);
+        }
+    }
 }
 
 TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
@@ -185,12 +171,6 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
                     REQUIRE_NOTHROW(_session_.remove_listener_ep(lp.get()));
                 }
             }
-        }
-
-        SECTION("Its protocol and peer are still Pair") {
-
-            REQUIRE(s1->get_protocol() == proto_pair);
-            REQUIRE(s1->get_peer() == proto_pair);
         }
 
         SECTION("Receive with no Pipes times out correctly") {

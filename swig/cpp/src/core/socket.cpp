@@ -13,7 +13,7 @@ namespace nng {
     using std::bind;
 
     socket::socket(const nng_ctor_func& nng_ctor)
-        : IHaveOne(), ICanClose(), ISender(), IReceiver(), IHaveOptions()
+        : IHaveOne(), IProtocol(), ICanClose(), ISender(), IReceiver(), IHaveOptions()
         , sid(0) {
 
         invocation::with_default_error_handling(nng_ctor, &sid);
@@ -30,6 +30,13 @@ namespace nng {
 
     void socket::configure_options(nng_type sid) {
 
+        // Informs the Protcol of its "getters".
+        set_getters(
+            bind(&::nng_protocol, sid)
+            , bind(&::nng_peer, sid)
+        );
+
+        // As well as the Options API.
         auto op = GetOptions();
 
         op->set_getters(
@@ -176,20 +183,5 @@ namespace nng {
     void socket::receive_async(basic_async_service* const svcp) {
         const auto& op = bind(&::nng_recv_aio, sid, svcp->_aiop);
         invocation::with_void_return_value(op);
-    }
-
-    protocol_type socket::__get_protocol(const get_protocol_func& op) {
-        const auto value = op();
-        return static_cast<protocol_type>(value);
-    }
-
-    protocol_type socket::get_protocol() const {
-        const auto& op = bind(&::nng_protocol, sid);
-        return __get_protocol(op);
-    }
-
-    protocol_type socket::get_peer() const {
-        const auto& op = bind(&::nng_peer, sid);
-        return __get_protocol(op);
     }
 }

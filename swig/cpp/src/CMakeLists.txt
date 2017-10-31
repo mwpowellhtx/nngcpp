@@ -43,6 +43,8 @@ set (NNGCPP_CPP_SRCS
     core/ICanClose.hpp
     core/IEquatable.hpp
     core/IHaveOne.hpp
+    core/IProtocol.cpp
+    core/IProtocol.h
     core/IReceiver.cpp
     core/IReceiver.h
     core/ISender.cpp

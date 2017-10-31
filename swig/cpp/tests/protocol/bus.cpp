@@ -15,14 +15,13 @@
 #include "../catch/catch_exception_translations.hpp"
 #include "../catch/catch_macros.hpp"
 #include "../catch/catch_tags.h"
+
 #include "../helpers/constants.h"
+#include "../helpers/basic_fixture.h"
+#include "../helpers/protocol_boilerplate.hpp"
 
-struct bus_fixture {
-
-    virtual ~bus_fixture() {
-        ::nng_fini();
-    }
-};
+// Defined for convenience throughout unit testing.
+DEFINE_SOCKET_FIXTURE(v0, bus_socket_fixture, bus_socket)
 
 namespace constants {
     const std::string test_addr = "inproc://test";
@@ -32,8 +31,40 @@ namespace constants {
     const auto onthe_buf = to_buffer(onthe);
 }
 
+TEST_CASE("Verify protocol and peer are correct", Catch::Tags("bus"
+    , "v0", "protocol", "peer", "internal", "nng", "cxx").c_str()) {
+
+    using namespace std;
+    using namespace nng;
+    using namespace nng::protocol::v0;
+
+    protocol_type actual;
+    basic_fixture fixture;
+
+    // Yes, we should still verify that Socket construction succeeds.
+    unique_ptr<bus_socket_fixture> sp;
+
+    SECTION("Given the created socket") {
+
+        REQUIRE_NOTHROW(sp = make_unique<bus_socket_fixture>());
+        REQUIRE(sp.get() != nullptr);
+
+        SECTION("Verify protocol is correct") {
+            actual = sp->get_protocol();
+            REQUIRE(actual == proto_bus_v0);
+            REQUIRE(actual == proto_bus);
+        }
+
+        SECTION("Verify peer is correct") {
+            actual = sp->get_peer();
+            REQUIRE(actual == proto_bus_v0);
+            REQUIRE(actual == proto_bus);
+        }
+    }
+}
+
 TEST_CASE("Bus pattern using C++ wrappers", Catch::Tags("bus"
-    , "v1", "protocol", "sockets", "pattern", "nng", "cxx").c_str()) {
+    , "v0", "protocol", "sockets", "pattern", "nng", "cxx").c_str()) {
 
     using namespace std;
     using namespace std::chrono;
@@ -44,23 +75,13 @@ TEST_CASE("Bus pattern using C++ wrappers", Catch::Tags("bus"
     using namespace Catch::Matchers;
     using O = option_names;
 
-    bus_fixture fixture;
-
+    basic_fixture fixture;
 
 	SECTION("We can create a Bus socket") {
 
         auto busp = make_unique<latest_bus_socket>();
 
         REQUIRE(busp != nullptr);
-
-        SECTION("Protocols match") {
-
-            REQUIRE(busp->get_protocol() == proto_bus_v0);
-            REQUIRE(busp->get_protocol() == proto_bus);
-
-            REQUIRE(busp->get_peer() == proto_bus_v0);
-            REQUIRE(busp->get_peer() == proto_bus);
-		}
 
         SECTION("Can close") {
             REQUIRE_NOTHROW(busp.reset());

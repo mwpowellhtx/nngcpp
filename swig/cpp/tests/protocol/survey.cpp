@@ -17,6 +17,11 @@
 
 #include "../helpers/basic_fixture.h"
 #include "../helpers/constants.h"
+#include "../helpers/protocol_boilerplate.hpp"
+
+// Defined for convenience throughout unit testing.
+DEFINE_SOCKET_FIXTURE(v0, survey_socket_fixture, survey_socket)
+DEFINE_SOCKET_FIXTURE(v0, respond_socket_fixture, respond_socket)
 
 namespace constants {
 
@@ -27,6 +32,58 @@ namespace constants {
 
     const auto abc_buf = to_buffer(abc);
     const auto def_buf = to_buffer(def);
+}
+
+TEST_CASE("Verify protocol and peer are correct", Catch::Tags("survey"
+    , "v0", "surveyor", "respondent", "protocol", "peer", "internal"
+    , "nng", "cxx").c_str()) {
+
+    using namespace std;
+    using namespace nng;
+    using namespace nng::protocol::v0;
+
+    protocol_type actual;
+    basic_fixture fixture;
+
+    SECTION("Verify survey protocol and peer is correct") {
+
+        unique_ptr<survey_socket_fixture> sp;
+
+        REQUIRE_NOTHROW(sp = make_unique<survey_socket_fixture>());
+        REQUIRE(sp.get() == nullptr);
+
+        SECTION("Verify protocol is correct") {
+            actual = sp->get_protocol();
+            REQUIRE(actual == proto_surveyor_v0);
+            REQUIRE(actual == proto_surveyor);
+        }
+
+        SECTION("Verify peer is correct") {
+            actual = sp->get_peer();
+            REQUIRE(actual == proto_respondent_v0);
+            REQUIRE(actual == proto_respondent);
+        }
+    }
+
+    SECTION("Verify respondent protocol and peer is correct") {
+
+        unique_ptr<respond_socket_fixture> sp;
+
+        REQUIRE_NOTHROW(sp = make_unique<respond_socket_fixture>());
+        REQUIRE(sp.get() == nullptr);
+
+        SECTION("Verify protocol is correct") {
+            actual = sp->get_protocol();
+            REQUIRE(actual == proto_respondent_v0);
+            REQUIRE(actual == proto_respondent);
+        }
+
+        SECTION("Verify peer is correct") {
+            actual = sp->get_peer();
+            REQUIRE(actual == proto_surveyor_v0);
+            REQUIRE(actual == proto_surveyor);
+        }
+    }
 }
 
 TEST_CASE("Survey pattern using C++ wrapper", Catch::Tags("surveyor", "respondent"
@@ -42,8 +99,6 @@ TEST_CASE("Survey pattern using C++ wrapper", Catch::Tags("surveyor", "responden
 
     basic_fixture fixture;
 
-    protocol_type actual_proto, actual_peer;
-
     unique_ptr<binary_message> bmp;
     unique_ptr<latest_survey_socket> surp;
     unique_ptr<latest_respond_socket> resp;
@@ -51,19 +106,6 @@ TEST_CASE("Survey pattern using C++ wrapper", Catch::Tags("surveyor", "responden
     SECTION("We can create a Surveyor socket") {
 
         REQUIRE_NOTHROW(surp = make_unique<latest_survey_socket>());
-
-        SECTION("Protocols match") {
-
-            actual_proto = surp->get_protocol();
-
-            REQUIRE(actual_proto == proto_surveyor);
-            REQUIRE(actual_proto == proto_surveyor_v0);
-
-            actual_peer = surp->get_peer();
-
-            REQUIRE(actual_peer == proto_respondent);
-            REQUIRE(actual_peer == proto_respondent_v0);
-        }
 
 		SECTION("Receive without survey fails") {
 
@@ -88,19 +130,6 @@ TEST_CASE("Survey pattern using C++ wrapper", Catch::Tags("surveyor", "responden
 	SECTION("We can create a Respondent socket") {
 
         REQUIRE_NOTHROW(resp = make_unique<latest_respond_socket>());
-
-        SECTION("Protocols match") {
-
-            REQUIRE_NOTHROW(actual_proto = resp->get_protocol());
-
-            REQUIRE(actual_proto == proto_respondent);
-            REQUIRE(actual_proto == proto_respondent_v0);
-
-            REQUIRE_NOTHROW(actual_peer = resp->get_peer());
-
-            REQUIRE(actual_peer == proto_surveyor);
-            REQUIRE(actual_peer == proto_surveyor_v0);
-		}
 
         SECTION("Send fails with no suveyor") {
 

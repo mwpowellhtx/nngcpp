@@ -18,6 +18,10 @@
 
 #include "../helpers/basic_fixture.h"
 #include "../helpers/constants.h"
+#include "../helpers/protocol_boilerplate.hpp"
+
+DEFINE_SOCKET_FIXTURE(v0, req_socket_fixture, req_socket)
+DEFINE_SOCKET_FIXTURE(v0, rep_socket_fixture, rep_socket)
 
 namespace constants {
 
@@ -38,6 +42,58 @@ namespace constants {
     const auto def_buf = to_buffer(def);
 }
 
+TEST_CASE("Verify protocol and peer are correct", Catch::Tags("reqrep"
+    , "v0", "req", "requestor", "rep", "replier", "protocol", "peer"
+    , "internal", "nng", "cxx").c_str()) {
+
+    using namespace std;
+    using namespace nng;
+    using namespace nng::protocol::v0;
+
+    protocol_type actual;
+    basic_fixture fixture;
+
+    SECTION("Verify requestor protocol and peer is correct") {
+
+        unique_ptr<req_socket_fixture> sp;
+
+        REQUIRE_NOTHROW(sp = make_unique<req_socket_fixture>());
+        REQUIRE(sp.get() == nullptr);
+
+        SECTION("Verify protocol is correct") {
+            actual = sp->get_protocol();
+            REQUIRE(actual == proto_requestor_v0);
+            REQUIRE(actual == proto_requestor);
+        }
+
+        SECTION("Verify peer is correct") {
+            actual = sp->get_peer();
+            REQUIRE(actual == proto_replier_v0);
+            REQUIRE(actual == proto_replier);
+        }
+    }
+
+    SECTION("Verify replier protocol and peer is correct") {
+
+        unique_ptr<rep_socket_fixture> sp;
+
+        REQUIRE_NOTHROW(sp = make_unique<rep_socket_fixture>());
+        REQUIRE(sp.get() == nullptr);
+
+        SECTION("Verify protocol is correct") {
+            actual = sp->get_protocol();
+            REQUIRE(actual == proto_replier);
+            REQUIRE(actual == proto_replier_v0);
+        }
+
+        SECTION("Verify peer is correct") {
+            actual = sp->get_peer();
+            REQUIRE(actual == proto_requestor_v0);
+            REQUIRE(actual == proto_requestor);
+        }
+    }
+}
+
 TEST_CASE("Request/reply pattern using C++ wrapper", Catch::Tags("req", "rep"
     , "v0", "protocol", "sockets", "patterns", "nng", "cxx").c_str()) {
 
@@ -49,8 +105,6 @@ TEST_CASE("Request/reply pattern using C++ wrapper", Catch::Tags("req", "rep"
     using namespace Catch::Matchers;
     using O = option_names;
 
-    protocol_type actual_proto, actual_peer;
-
     unique_ptr<binary_message> bmp;
 
     unique_ptr<latest_req_socket> reqp;
@@ -59,19 +113,6 @@ TEST_CASE("Request/reply pattern using C++ wrapper", Catch::Tags("req", "rep"
     SECTION("We can create a request socket") {
 
         REQUIRE_NOTHROW(reqp = make_unique<latest_req_socket>());
-
-		SECTION("Protocols match") {
-
-            REQUIRE_NOTHROW(actual_proto = reqp->get_protocol());
-
-            REQUIRE(actual_proto == proto_requestor);
-            REQUIRE(actual_proto == proto_requestor_v0);
-
-            REQUIRE_NOTHROW(actual_peer = reqp->get_peer());
-
-            REQUIRE(actual_peer == proto_replier);
-            REQUIRE(actual_peer == proto_replier_v0);
-		}
 
 		SECTION("Request resend time option works") {
 
@@ -99,19 +140,6 @@ TEST_CASE("Request/reply pattern using C++ wrapper", Catch::Tags("req", "rep"
 	SECTION("We can create a reply socket") {
 
         REQUIRE_NOTHROW(repp = make_unique<latest_rep_socket>());
-
-		SECTION("Protocols match") {
-
-            REQUIRE_NOTHROW(actual_proto = repp->get_protocol());
-
-            REQUIRE(actual_proto == proto_replier);
-            REQUIRE(actual_proto == proto_replier_v0);
-
-            REQUIRE_NOTHROW(actual_peer = repp->get_peer());
-
-            REQUIRE(actual_peer == proto_requestor);
-            REQUIRE(actual_peer == proto_requestor_v0);
-        }
 
 		SECTION("Send without receive fails") {
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());

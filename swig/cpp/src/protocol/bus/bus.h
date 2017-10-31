@@ -10,13 +10,13 @@ namespace nng {
     namespace protocol {
 
         namespace v0 {
-            
+
             class bus_socket : public socket {
-                public:
+            public:
 
-                    bus_socket();
+                bus_socket();
 
-                    virtual ~bus_socket();
+                virtual ~bus_socket();
             };
         }
 

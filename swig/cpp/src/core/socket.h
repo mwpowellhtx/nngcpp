@@ -6,6 +6,7 @@
 #include "enums.h"
 #include "ISender.h"
 #include "IReceiver.h"
+#include "IProtocol.h"
 #include "../options/options.h"
 
 #include "IHaveOne.hpp"
@@ -23,6 +24,7 @@ namespace nng {
 
     class socket
         : public IHaveOne
+        , public IProtocol
         , public ICanClose
         , public ISender
         , public IReceiver
@@ -81,18 +83,6 @@ namespace nng {
         virtual bool try_receive(buffer_vector_type* const bufp, size_type& sz, flag_type flags = flag_none) override;
 
         virtual void receive_async(basic_async_service* const svcp) override;
-
-    private:
-
-        // TODO: TBD: rearranging this a little bit. Plan is to make get_protocol/get_peer protected and to expose these for test purposes only.
-        typedef std::function<nng::uint16_t()> get_protocol_func;
-
-        static protocol_type __get_protocol(const get_protocol_func& op);
-
-    public: // TODO: TBD: make me protected and define test fixtures for internal verification only
-
-        protocol_type get_protocol() const;
-        protocol_type get_peer() const;
     };
 }
 
