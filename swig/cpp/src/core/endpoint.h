@@ -19,15 +19,27 @@ namespace nng {
 
     protected:
 
+        typedef _EndPoint ep_type;
+
+        typedef std::function<int(int)> start_func;
+        typedef std::function<int()> close_func;
+
+        const start_func __start;
+        const close_func __close;
+
+        void configure_endpoint(
+            const start_func& start
+            , const close_func& close);
+
         _EndPoint();
 
     public:
 
         virtual ~_EndPoint();
 
-        virtual void start(flag_type flags = flag_none) = 0;
+        virtual void Start() = 0;
 
-        virtual _OptionReaderWriter* const GetOptions() override;
+        virtual void Start(SocketFlag flags) = 0;
     };
 }
 

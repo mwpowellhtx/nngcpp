@@ -12,7 +12,7 @@ namespace nng {
     class socket;
 #endif // NNGCPP_SOCKET_H
 
-    class listener : public _EndPoint {
+    class _Listener : public _EndPoint {
     public:
 
         typedef ::nng_listener nng_type;
@@ -31,20 +31,24 @@ namespace nng {
 
     public:
 
-        listener();
+        _Listener();
 
-        listener(const socket* const sp, const std::string& addr);
+        _Listener(const socket& s, const std::string& addr);
 
-        virtual ~listener();
+        virtual ~_Listener();
 
-        virtual _OptionReaderWriter* const GetOptions() override;
+        virtual void Start() override;
 
-        virtual void start(flag_type flags = flag_none);
+        virtual void Start(SocketFlag flags) override;
 
         virtual void Close() override;
 
         virtual bool HasOne() const override;
+
+        virtual _OptionReaderWriter* const GetOptions() override;
     };
+
+    typedef _Listener listener;
 }
 
 #endif // NNGCPP_LISTENER_H

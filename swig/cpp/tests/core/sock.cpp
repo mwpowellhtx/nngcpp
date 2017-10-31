@@ -321,7 +321,7 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
                     SECTION("We cannot try to Start a Listener again") {
 
                         // TODO: TBD: this will work for now as a rough cut Exception match...
-                        REQUIRE_THROWS_AS_MATCHING(lp->start(), nng_exception, THROWS_NNG_EXCEPTION(ec_estate));
+                        REQUIRE_THROWS_AS_MATCHING(lp->Start(), nng_exception, THROWS_NNG_EXCEPTION(ec_estate));
                     }
 
                     SECTION("We can connect to it") {

@@ -10,47 +10,34 @@ namespace nng {
     using std::bind;
 
     // TODO: TBD: is "listener" its own thing? or simply another kind of "socket"? i.e. perhaps a receive-only socket, as the name would suggest
-    listener::listener() : _EndPoint(), lid(0) {
+    _Listener::_Listener() : _EndPoint(), lid(0) {
         configure_options(lid);
     }
 
-    listener::listener(const socket* const sp, const std::string& addr) : _EndPoint(), lid(0) {
+    _Listener::_Listener(const socket& s, const std::string& addr) : _EndPoint(), lid(0) {
 
-        const auto op = bind(&::nng_listener_create, &lid, sp->sid, _1);
+        const auto op = bind(&::nng_listener_create, &lid, s.sid, _1);
         invocation::with_default_error_handling(op, addr.c_str());
         configure_options(lid);
     }
 
-    listener::~listener() {
+    _Listener::~_Listener() {
         Close();
     }
 
-    listener::options_type* const listener::GetOptions() {
-        return _EndPoint::GetOptions();
-    }
-
-    void listener::start(flag_type flags) {
-        const auto op = bind(&::nng_listener_start, lid, _1);
-        invocation::with_default_error_handling(op, static_cast<int>(flags));
-    }
-
-    void listener::Close() {
-        if (!HasOne()) { return; }
-        const auto op = bind(&::nng_listener_close, lid);
-        invocation::with_default_error_handling(op);
-        configure_options(lid = 0);
-    }
-
-    bool listener::HasOne() const {
-        return lid != 0;
-    }
-
-    void listener::on_listened() {
+    void _Listener::on_listened() {
         configure_options(lid);
     }
 
-    void listener::configure_options(nng_type lid) {
+    void _Listener::configure_options(nng_type lid) {
 
+        // Configure the EP related bindings.
+        configure_endpoint(
+            bind(&::nng_listener_start, lid, _1)
+            , bind(&::nng_listener_close, lid)
+        );
+
+        // Also convey the Options bindings.
         auto op = GetOptions();
 
         op->set_getters(
@@ -66,5 +53,27 @@ namespace nng {
             , bind(&::nng_listener_setopt_size, lid, _1, _2)
             , bind(&::nng_listener_setopt_ms, lid, _1, _2)
         );
+    }
+
+    bool _Listener::HasOne() const {
+        return lid != 0;
+    }
+
+    void _Listener::Start() {
+        Start(flag_none);
+    }
+
+    void _Listener::Start(SocketFlag flags) {
+        invocation::with_default_error_handling(__start, flags);
+    }
+
+    void _Listener::Close() {
+        if (!HasOne()) { return; }
+        invocation::with_default_error_handling(__close);
+        configure_options(lid = 0);
+    }
+
+    _Listener::options_type* const _Listener::GetOptions() {
+        return have_options_type::GetOptions();
     }
 }

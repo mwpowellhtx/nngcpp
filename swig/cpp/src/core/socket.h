@@ -18,8 +18,8 @@
 
 namespace nng {
 
-    class listener;
-    class dialer;
+    class _Listener;
+    class _Dialer;
     struct device_path;
 
     class socket
@@ -35,8 +35,8 @@ namespace nng {
 
     private:
 
-        friend class listener;
-        friend class dialer;
+        friend class _Listener;
+        friend class _Dialer;
 
         // For use with Device Thread Callback.
         friend void install_device_sockets_callback(const device_path* const);
@@ -59,10 +59,10 @@ namespace nng {
 
         // TODO: TBD: may want to comprehend nng's NNG_MAXADDRLEN at some level... expose as a static constant, for instance, bare minimum
         void listen(const std::string& addr, flag_type flags = flag_none);
-        void listen(const std::string& addr, listener* const lp, flag_type flags = flag_none);
+        void listen(const std::string& addr, _Listener* const lp, flag_type flags = flag_none);
 
         void dial(const std::string& addr, flag_type flags = flag_none);
-        void dial(const std::string& addr, dialer* const dp, flag_type flags = flag_none);
+        void dial(const std::string& addr, _Dialer* const dp, flag_type flags = flag_none);
 
         void Close();
         void shutdown();

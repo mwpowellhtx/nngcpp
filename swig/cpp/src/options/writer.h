@@ -13,11 +13,11 @@ namespace nng {
 #endif // NNGCPP_SOCKET_H
 
 #ifndef NNGCPP_LISTENER_H
-    class listener;
+    class _Listener;
 #endif // NNGCPP_LISTENER_H
 
 #ifndef NNGCPP_DIALER_H
-    class dialer;
+    class _Dialer;
 #endif // NNGCPP_DIALER_H
 
     class _OptionWriter;
@@ -49,8 +49,8 @@ namespace nng {
     protected:
 
         friend class socket;
-        friend class listener;
-        friend class dialer;
+        friend class _Listener;
+        friend class _Dialer;
 
         // TODO: TBD: ditto sticky friendship web...
         void set_setters(const setopt_func& setopt

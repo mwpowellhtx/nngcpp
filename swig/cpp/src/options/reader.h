@@ -17,11 +17,11 @@ namespace nng {
 #endif // NNGCPP_ADDRESS_H
 
 #ifndef NNGCPP_LISTENER_H
-    class listener;
+    class _Listener;
 #endif // NNGCPP_LISTENER_H
 
 #ifndef NNGCPP_DIALER_H
-    class dialer;
+    class _Dialer;
 #endif // NNGCPP_DIALER_H
 
 #ifndef NNGCPP_DIALER_H
@@ -57,8 +57,8 @@ namespace nng {
     protected:
 
         friend class socket;
-        friend class listener;
-        friend class dialer;
+        friend class _Listener;
+        friend class _Dialer;
         friend class message_pipe;
 
         // TODO: TBD: making them public against my better judgment; however friendship web is getting kind of sticky IMHO...

@@ -80,7 +80,7 @@ namespace nng {
         invocation::with_default_error_handling(op, addr.c_str(), nullptr, static_cast<int>(flags));
     }
 
-    void socket::listen(const std::string& addr, listener* const lp, flag_type flags) {
+    void socket::listen(const std::string& addr, _Listener* const lp, flag_type flags) {
         const auto& op = bind(&::nng_listen, sid, _1, _2, _3);
         invocation::with_default_error_handling(op, addr.c_str()
             , lp ? &(lp->lid) : nullptr, static_cast<int>(flags));
@@ -92,7 +92,7 @@ namespace nng {
         invocation::with_default_error_handling(op, addr.c_str(), nullptr, flags);
     }
 
-    void socket::dial(const std::string& addr, dialer* const dp, flag_type flags) {
+    void socket::dial(const std::string& addr, _Dialer* const dp, flag_type flags) {
         const auto& op = bind(&::nng_dial, sid, _1, _2, _3);
         invocation::with_default_error_handling(op, addr.c_str()
             , dp ? &(dp->did) : nullptr, static_cast<int>(flags));

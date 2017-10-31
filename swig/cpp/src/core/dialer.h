@@ -12,7 +12,7 @@ namespace nng {
     class socket;
 #endif // NNGCPP_SOCKET_H
 
-    class dialer : public _EndPoint {
+    class _Dialer : public _EndPoint {
     public:
 
         typedef ::nng_dialer nng_type;
@@ -31,20 +31,24 @@ namespace nng {
 
     public:
 
-        dialer();
+        _Dialer();
 
-        dialer(const socket* const sp, const std::string& addr);
+        _Dialer(const socket& s, const std::string& addr);
 
-        virtual ~dialer();
+        virtual ~_Dialer();
 
-        virtual void start(flag_type flags = flag_none);
+        virtual void Start() override;
 
-        virtual _OptionReaderWriter* const GetOptions() override;
+        virtual void Start(SocketFlag flags) override;
 
         virtual void Close() override;
 
         virtual bool HasOne() const override;
+
+        virtual _OptionReaderWriter* const GetOptions() override;
     };
+
+    typedef _Dialer dialer;
 }
 
 #endif // NNGCPP_DIALER_H
