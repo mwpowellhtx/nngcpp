@@ -44,8 +44,8 @@ namespace nng {
         proto_replier_v0 = 3 << 4 | 1, // ::NNG_PROTO_REP_V0,
         proto_pusher_v0 = 5 << 4, // ::NNG_PROTO_PUSH_V0,
         proto_puller_v0 = 5 << 4 | 1, // ::NNG_PROTO_PULL_V0,
-        proto_surveyor_v0 = 6 << 4, // ::NNG_PROTO_SURVEYOR_V0,
-        proto_respondent_v0 = 6 << 4 | 1, // ::NNG_PROTO_RESPONDENT_V0,
+        proto_surveyor_v0 = 6 << 4 | 2, // ::NNG_PROTO_SURVEYOR_V0,
+        proto_respondent_v0 = 6 << 4 | 3, // ::NNG_PROTO_RESPONDENT_V0,
         proto_bus_v0 = 7 << 4 | 0, // ::NNG_PROTO_BUS_V0,
         proto_star_v0 = 100 << 4, // ::NNG_PROTO_STAR_V0,
 
