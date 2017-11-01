@@ -14,15 +14,15 @@ namespace nng {
             pull_socket::~pull_socket() {
             }
 
-            void pull_socket::Send(binary_message* const bmp, flag_type flags) {
+            void pull_socket::Send(binary_message& m, flag_type flags) {
                 THROW_SOCKET_INV_OP(Pullers, Send);
             }
 
-            void pull_socket::Send(const buffer_vector_type* const bufp, flag_type flags) {
+            void pull_socket::Send(const buffer_vector_type& buf, flag_type flags) {
                 THROW_SOCKET_INV_OP(Pullers, Send);
             }
 
-            void pull_socket::Send(const buffer_vector_type* const bufp, size_type sz, flag_type flags) {
+            void pull_socket::Send(const buffer_vector_type& buf, size_type sz, flag_type flags) {
                 THROW_SOCKET_INV_OP(Pullers, Send);
             }
 

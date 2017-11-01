@@ -22,7 +22,7 @@ namespace nng {
             std::vector<std::shared_ptr<dialer>> _dialer_eps;
             std::vector<std::shared_ptr<listener>> _listener_eps;
 
-            std::vector<std::shared_ptr<protocol::latest_bus_socket>> _bus_sockets;
+            std::vector<std::shared_ptr<protocol::_LatestBusSocket>> _bus_sockets;
 
             std::vector<std::shared_ptr<protocol::latest_pair_socket>> _pair_sockets;
 
@@ -52,8 +52,8 @@ namespace nng {
             void remove_dialer_ep(const dialer* const dp);
             void remove_listener_ep(const listener* const lp);
 
-            std::shared_ptr<protocol::latest_bus_socket> create_bus_socket();
-            void remove_bus_socket(const protocol::latest_bus_socket* const sp);
+            std::shared_ptr<protocol::_LatestBusSocket> create_bus_socket();
+            void remove_bus_socket(const protocol::_LatestBusSocket* const sp);
 
             std::shared_ptr<protocol::latest_pair_socket> create_pair_socket();
             void remove_pair_socket(const protocol::latest_pair_socket* const sp);

@@ -77,11 +77,11 @@ namespace nng {
         __remove(_listener_eps, lp);
     }
 
-    std::shared_ptr<protocol::latest_bus_socket> session::create_bus_socket() {
+    std::shared_ptr<protocol::_LatestBusSocket> session::create_bus_socket() {
         return __create(_bus_sockets);
     }
 
-    void session::remove_bus_socket(const protocol::latest_bus_socket* const sp) {
+    void session::remove_bus_socket(const protocol::_LatestBusSocket* const sp) {
         __remove(_bus_sockets, sp);
     }
 

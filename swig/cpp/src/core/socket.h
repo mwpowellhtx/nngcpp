@@ -11,7 +11,6 @@
 
 #include "IHaveOne.hpp"
 #include "ICanClose.hpp"
-#include "ICanShutdown.hpp"
 #include "ICanListen.hpp"
 #include "ICanDial.hpp"
 
@@ -33,7 +32,6 @@ namespace nng {
         : public IHaveOne
         , public IProtocol
         , public ICanClose
-        , public ICanShutdown
         , public ICanListen
         , public ICanDial
         , public ISender
@@ -52,6 +50,8 @@ namespace nng {
         friend void install_device_sockets_callback(const device_path* const);
 
         nng_type sid;
+
+        friend nng_type get_sid(const _Socket&);
 
         void configure_options(nng_type sid);
 
@@ -75,14 +75,13 @@ namespace nng {
         virtual void Dial(const std::string& addr, _Dialer* const dp, flag_type flags = flag_none) override;
 
         virtual void Close() override;
-        virtual void Shutdown() override;
 
         virtual bool HasOne() const override;
 
-        virtual void Send(binary_message* const bmp, flag_type flags = flag_none) override;
+        virtual void Send(binary_message& m, flag_type flags = flag_none) override;
 
-        virtual void Send(const buffer_vector_type* const bufp, flag_type flags = flag_none) override;
-        virtual void Send(const buffer_vector_type* const bufp, size_type sz, flag_type flags = flag_none) override;
+        virtual void Send(const buffer_vector_type& buf, flag_type flags = flag_none) override;
+        virtual void Send(const buffer_vector_type& buf, size_type sz, flag_type flags = flag_none) override;
 
         virtual void SendAsync(const basic_async_service* const svcp) override;
 

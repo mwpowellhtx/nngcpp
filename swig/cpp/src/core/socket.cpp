@@ -13,7 +13,7 @@ namespace nng {
     using std::bind;
 
     _Socket::_Socket(const nng_ctor_func& nng_ctor) : IHaveOne(), IProtocol(), ICanClose()
-        , ICanShutdown(), ICanListen(), ICanDial(), ISender(), IReceiver(), IHaveOptions()
+        , ICanListen(), ICanDial(), ISender(), IReceiver(), IHaveOptions()
         , sid(0) {
 
         invocation::with_default_error_handling(nng_ctor, &sid);
@@ -29,12 +29,6 @@ namespace nng {
     }
 
     void _Socket::configure_options(nng_type sid) {
-
-        // Informs the Protcol of its "getters".
-        set_getters(
-            bind(&::nng_protocol, sid)
-            , bind(&::nng_peer, sid)
-        );
 
         // As well as the Options API.
         auto op = GetOptions();
@@ -61,13 +55,6 @@ namespace nng {
         invocation::with_default_error_handling(op);
         // Closed is closed.
         configure_options(sid = 0);
-    }
-
-    void _Socket::Shutdown() {
-        // Shutdown is its own operation apart from Closed.
-        const auto op = bind(&::nng_shutdown, sid);
-        invocation::with_default_error_handling(op);
-        // Which socket can still be in operation.
     }
 
     bool _Socket::HasOne() const {
@@ -107,16 +94,16 @@ namespace nng {
             , static_cast<int>(flags));
     }
     
-    void _Socket::Send(const buffer_vector_type* const bufp, flag_type flags) {
-        nng::send(sid, *bufp, bufp->size(), flags);
+    void _Socket::Send(const buffer_vector_type& buf, flag_type flags) {
+        nng::send(sid, buf, buf.size(), flags);
     }
 
-    void _Socket::Send(const buffer_vector_type* const bufp, size_type sz, flag_type flags) {
-        nng::send(sid, *bufp, sz, flags);
+    void _Socket::Send(const buffer_vector_type& buf, size_type sz, flag_type flags) {
+        nng::send(sid, buf, std::min(buf.size(), sz), flags);
     }
 
-    void _Socket::Send(binary_message* const bmp, flag_type flags) {
-        auto* msgp = bmp->cede_message();
+    void _Socket::Send(binary_message& m, flag_type flags) {
+        auto* msgp = m.cede_message();
         if (msgp == nullptr) { return; }
         const auto op = bind(&::nng_sendmsg, sid, msgp, _1);
         invocation::with_default_error_handling(op, static_cast<int>(flags));

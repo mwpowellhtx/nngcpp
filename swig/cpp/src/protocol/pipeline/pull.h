@@ -18,10 +18,10 @@ namespace nng {
 
             protected:
 
-                virtual void Send(binary_message* const bmp, flag_type flags = flag_none) override;
+                virtual void Send(binary_message& m, flag_type flags = flag_none) override;
 
-                virtual void Send(const buffer_vector_type* const bufp, flag_type flags = flag_none) override;
-                virtual void Send(const buffer_vector_type* const bufp, size_type sz, flag_type flags = flag_none) override;
+                virtual void Send(const buffer_vector_type& buf, flag_type flags = flag_none) override;
+                virtual void Send(const buffer_vector_type& buf, size_type sz, flag_type flags = flag_none) override;
 
                 virtual void SendAsync(const basic_async_service* const svcp) override;
             };

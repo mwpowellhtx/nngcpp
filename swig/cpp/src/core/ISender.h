@@ -23,10 +23,10 @@ namespace nng {
 
         virtual ~ISender();
 
-        virtual void Send(binary_message* const bmp, flag_type flags = flag_none) = 0;
+        virtual void Send(binary_message& m, flag_type flags = flag_none) = 0;
 
-        virtual void Send(const buffer_vector_type* const bufp, flag_type flags = flag_none) = 0;
-        virtual void Send(const buffer_vector_type* const bufp, size_type sz, flag_type flags = flag_none) = 0;
+        virtual void Send(const buffer_vector_type& buf, flag_type flags = flag_none) = 0;
+        virtual void Send(const buffer_vector_type& buf, size_type sz, flag_type flags = flag_none) = 0;
 
         // TODO: TBD: make sure that the async coverage extends, even through the recv-only API.
         virtual void SendAsync(const basic_async_service* const svcp) = 0;

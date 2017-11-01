@@ -14,6 +14,8 @@ namespace nng {
 
         IProtocol();
 
+        virtual void set_enabled(bool state);
+
         virtual void set_getters(
             const get_protocol_func& protocol_getter
             , const get_protocol_func& peer_getter);
@@ -23,8 +25,12 @@ namespace nng {
 
     private:
 
+        bool _enabled;
+
         const get_protocol_func _protocol_getter;
         const get_protocol_func _peer_getter;
+
+        void throw_if_not_enabled() const;
 
     public:
 
