@@ -54,7 +54,15 @@ TEST_CASE("Verify protocol and peer are correct", Catch::Tags("survey"
         unique_ptr<push_socket_fixture> sp;
 
         REQUIRE_NOTHROW(sp = make_unique<push_socket_fixture>());
-        REQUIRE(sp.get() == nullptr);
+        REQUIRE(sp.get() != nullptr);
+
+        SECTION("Requires protocol exposure") {
+            REQUIRE_NOTHROW(sp->get_protocol());
+        }
+
+        SECTION("Requires peer exposure") {
+            REQUIRE_NOTHROW(sp->get_peer());
+        }
 
         SECTION("Verify protocol is correct") {
             actual = sp->get_protocol();
@@ -74,7 +82,15 @@ TEST_CASE("Verify protocol and peer are correct", Catch::Tags("survey"
         unique_ptr<pull_socket_fixture> sp;
 
         REQUIRE_NOTHROW(sp = make_unique<pull_socket_fixture>());
-        REQUIRE(sp.get() == nullptr);
+        REQUIRE(sp.get() != nullptr);
+
+        SECTION("Requires protocol exposure") {
+            REQUIRE_NOTHROW(sp->get_protocol());
+        }
+
+        SECTION("Requires peer exposure") {
+            REQUIRE_NOTHROW(sp->get_peer());
+        }
 
         SECTION("Verify protocol is correct") {
             actual = sp->get_protocol();
@@ -100,8 +116,8 @@ TEST_CASE("Rule out the possibility of invalid operations", Catch::Tags("pipelin
 
     // Even though we are technically doing nothing with these, we MUST initialize them anyhow.
     size_type sz = 0;
-    binary_message* bmp = nullptr;
-    buffer_vector_type* bufp = nullptr;
+    binary_message m;
+    buffer_vector_type buf;
 
     SECTION("Push sockets cannot receive messages") {
 
@@ -109,18 +125,18 @@ TEST_CASE("Rule out the possibility of invalid operations", Catch::Tags("pipelin
 
         // TODO: TBD: add send/receive async verification...
         REQUIRE_THROWS_AS(push.Receive(), invalid_operation);
-        REQUIRE_THROWS_AS(push.TryReceive(bmp), invalid_operation);
+        REQUIRE_THROWS_AS(push.TryReceive(&m), invalid_operation);
         REQUIRE_THROWS_AS(push.Receive(sz), invalid_operation);
-        REQUIRE_THROWS_AS(push.TryReceive(bufp, sz), invalid_operation);
+        REQUIRE_THROWS_AS(push.TryReceive(&buf, sz), invalid_operation);
     }
 
     SECTION("Pull sockets cannot send messages") {
 
         pull_socket_fixture pull;
 
-        REQUIRE_THROWS_AS(pull.Send(bufp), invalid_operation);
-        REQUIRE_THROWS_AS(pull.Send(bmp), invalid_operation);
-        REQUIRE_THROWS_AS(pull.Send(bufp, sz), invalid_operation);
+        REQUIRE_THROWS_AS(pull.Send(buf), invalid_operation);
+        REQUIRE_THROWS_AS(pull.Send(m), invalid_operation);
+        REQUIRE_THROWS_AS(pull.Send(buf, sz), invalid_operation);
     }
 }
 
@@ -198,7 +214,7 @@ TEST_CASE("We can create a linked push/pull pair", Catch::Tags("linked"
         _Message bm;
 
         REQUIRE_NOTHROW(bm << hello);
-        REQUIRE_NOTHROW(pushsp->Send(&bm));
+        REQUIRE_NOTHROW(pushsp->Send(bm));
         REQUIRE_NOTHROW(pullsp->TryReceive(&bm));
         REQUIRE_THAT(bm.GetBody()->Get(), Equals(hello_buf));
     }
@@ -270,7 +286,7 @@ TEST_CASE("Load balancing works", Catch::Tags("load", "balancing", "pipeline"
     REQUIRE_NOTHROW(pullsp1->Dial(test_addr));
     REQUIRE_NOTHROW(pullsp2->Dial(test_addr));
     REQUIRE_NOTHROW(pullsp3->Dial(test_addr));
-    REQUIRE_NOTHROW(pullsp3->Shutdown());
+    REQUIRE_NOTHROW(pullsp3->Close());
 
     /* So pullsp3 may not be done accepting yet, but pullsp1 and pullsp2 definitely
     are. Otherwise the server could not have reached accept. The accept logic is
@@ -278,8 +294,8 @@ TEST_CASE("Load balancing works", Catch::Tags("load", "balancing", "pipeline"
 
     this_thread::sleep_for(100ms);
 
-    REQUIRE_NOTHROW(pushsp->Send(abcsp.get()));
-    REQUIRE_NOTHROW(pushsp->Send(defsp.get()));
+    REQUIRE_NOTHROW(pushsp->Send(*abcsp));
+    REQUIRE_NOTHROW(pushsp->Send(*defsp));
 
     REQUIRE_NOTHROW(pullsp1->TryReceive(abcsp.get()));
     REQUIRE_THAT(abcsp->GetBody()->Get(), Equals(abc_buf));

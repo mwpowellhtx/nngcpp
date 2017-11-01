@@ -47,6 +47,7 @@ if (NNGCPP_ENABLE_TESTS)
         helpers/constants.cpp
         helpers/constants.h
 
+        helpers/protocol_boilerplate.cpp
         helpers/protocol_boilerplate.hpp
 
         messaging/binary_message_part_fixtures.hpp

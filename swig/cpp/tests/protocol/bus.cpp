@@ -41,13 +41,21 @@ TEST_CASE("Verify protocol and peer are correct", Catch::Tags("bus"
     protocol_type actual;
     basic_fixture fixture;
 
-    // Yes, we should still verify that Socket construction succeeds.
-    unique_ptr<bus_socket_fixture> sp;
-
     SECTION("Given the created socket") {
+
+        // Yes, we should still verify that Socket construction succeeds.
+        unique_ptr<bus_socket_fixture> sp;
 
         REQUIRE_NOTHROW(sp = make_unique<bus_socket_fixture>());
         REQUIRE(sp.get() != nullptr);
+
+        SECTION("Requires protocol exposure") {
+            REQUIRE_NOTHROW(sp->get_protocol());
+        }
+
+        SECTION("Requires peer exposure") {
+            REQUIRE_NOTHROW(sp->get_peer());
+        }
 
         SECTION("Verify protocol is correct") {
             actual = sp->get_protocol();
@@ -79,7 +87,7 @@ TEST_CASE("Bus pattern using C++ wrappers", Catch::Tags("bus"
 
 	SECTION("We can create a Bus socket") {
 
-        auto busp = make_unique<latest_bus_socket>();
+        auto busp = make_unique<_LatestBusSocket>();
 
         REQUIRE(busp != nullptr);
 
@@ -90,9 +98,9 @@ TEST_CASE("Bus pattern using C++ wrappers", Catch::Tags("bus"
 
     SECTION("We can create a linked Bus topology") {
 
-        auto busp1 = make_unique<latest_bus_socket>()
-            , busp2 = make_unique<latest_bus_socket>()
-            , busp3 = make_unique<latest_bus_socket>()
+        auto busp1 = make_unique<_LatestBusSocket>()
+            , busp2 = make_unique<_LatestBusSocket>()
+            , busp3 = make_unique<_LatestBusSocket>()
             ;
 
         REQUIRE(busp1 != nullptr);
@@ -121,7 +129,7 @@ TEST_CASE("Bus pattern using C++ wrappers", Catch::Tags("bus"
             SECTION("Bus2 delivers message to Bus1, Bus3 times out") {
 
                 REQUIRE_NOTHROW(*bmp << _99bits);
-                REQUIRE_NOTHROW(busp2->Send(bmp.get()));
+                REQUIRE_NOTHROW(busp2->Send(*bmp));
                 REQUIRE_NOTHROW(busp1->TryReceive(bmp.get()));
                 REQUIRE_THAT(bmp->GetBody()->Get(), Equals(_99bits_buf));
 
@@ -132,7 +140,7 @@ TEST_CASE("Bus pattern using C++ wrappers", Catch::Tags("bus"
             SECTION ("Bus1 delivers message to both Bus2 and Bus3") {
 
                 REQUIRE_NOTHROW(*bmp << onthe);
-                REQUIRE_NOTHROW(busp1->Send(bmp.get()));
+                REQUIRE_NOTHROW(busp1->Send(*bmp));
 
                 REQUIRE_NOTHROW(busp2->TryReceive(bmp.get()));
                 // Will compare with the second received message.

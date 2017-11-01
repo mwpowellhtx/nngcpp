@@ -59,7 +59,7 @@ TEST_CASE("Check some properties", "[check][properties][nng][cxx][bonus]") {
         SLEEP_FOR(20ms); // Allow listener to catch up from being slightly behind.
 
         REQUIRE_NOTHROW(*sendp << props);
-        REQUIRE_NOTHROW(req->Send(sendp.get()));
+        REQUIRE_NOTHROW(req->Send(*sendp));
         REQUIRE(sendp->HasOne() == false);
 
         REQUIRE_NOTHROW(rep->TryReceive(recvp.get()));

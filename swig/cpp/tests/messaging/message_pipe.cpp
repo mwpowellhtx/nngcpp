@@ -110,7 +110,7 @@ TEST_CASE("Message pipe subordinates properly", Catch::Tags("message", "pipe"
         SLEEP_FOR(50ms);
 
         REQUIRE_NOTHROW(*sendp << a_message_was_sent);
-        REQUIRE_NOTHROW(sp1->Send(sendp.get()));
+        REQUIRE_NOTHROW(sp1->Send(*sendp));
         REQUIRE(sendp->HasOne() == false);
         REQUIRE_NOTHROW(sp2->TryReceive(recvp.get()));
         REQUIRE(recvp->HasOne() == true);

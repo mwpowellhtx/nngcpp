@@ -221,7 +221,7 @@ TEST_CASE("NNG C++ wrapper reconnect works", Catch::Tags(
                 this_thread::sleep_for(100ms);
                 // And with a little C++ operator overloading help:
                 REQUIRE_NOTHROW(*bmp << hello);
-                REQUIRE_NOTHROW(push->Send(bmp.get()));
+                REQUIRE_NOTHROW(push->Send(*bmp));
                 /* Ditto message passing semantics. The Send() operation effectively
                 nullifies the internal message. */
                 REQUIRE(bmp->HasOne() == false);
@@ -256,7 +256,7 @@ TEST_CASE("NNG C++ wrapper reconnect works", Catch::Tags(
 
                 this_thread::sleep_for(100ms);
                 REQUIRE_NOTHROW(*bmp << hello);
-                REQUIRE_NOTHROW(push->Send(bmp.get()));
+                REQUIRE_NOTHROW(push->Send(*bmp));
                 REQUIRE(bmp->HasOne() == false);
 
                 // See notes above. Sending transfers ownership of the internal message to NNG.
@@ -286,7 +286,7 @@ TEST_CASE("NNG C++ wrapper reconnect works", Catch::Tags(
                     auto bmp2 = std::make_unique<binary_message>();
                     REQUIRE_NOTHROW(*bmp2 << again);
                     // TODO: TBD: send/no-message -> receive/message is a pattern that deserves its own focused unit test...
-                    REQUIRE_NOTHROW(push->Send(bmp2.get()));
+                    REQUIRE_NOTHROW(push->Send(*bmp2));
                     REQUIRE(bmp2->HasOne() == false);
 
                     REQUIRE_NOTHROW(pull->TryReceive(bmp2.get()));

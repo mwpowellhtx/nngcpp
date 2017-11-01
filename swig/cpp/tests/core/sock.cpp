@@ -73,6 +73,14 @@ TEST_CASE("Verify protocol and peer are correct", Catch::Tags("pair"
         REQUIRE_NOTHROW(sp = make_unique<pair_socket_fixture>());
         REQUIRE(sp.get() != nullptr);
 
+        SECTION("Requires protocol exposure") {
+            REQUIRE_NOTHROW(sp->get_protocol());
+        }
+
+        SECTION("Requires peer exposure") {
+            REQUIRE_NOTHROW(sp->get_peer());
+        }
+
         SECTION("Verify protocol is correct") {
             actual = sp->get_protocol();
             REQUIRE(actual == proto_pair_v1);
@@ -115,63 +123,66 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
         REQUIRE_NOTHROW(s1 = _session_.create_pair_socket());
         REQUIRE(s1.get());
 
-        SECTION("And we can shut it down") {
+        //// TODO: TBD: the same section in the C code was removed, but I wonder if we call Close and expect the same behavior?
+        //// TODO: TBD: see: https://github.com/nanomsg/nng/issues/136 and follow up comments
+        //// TODO: TBD: Call Close instead of Shutdown and expect the same behavior?
+        //SECTION("And we can shut it down") {
 
-            REQUIRE_NOTHROW(s1->Shutdown());
-            // TODO: TBD: this will work for now as a rough cut Exception match...
-            REQUIRE_THROWS_AS_MATCHING(s1->Shutdown(), nng_exception, THROWS_NNG_EXCEPTION(ec_eclosed));
+        //    REQUIRE_NOTHROW(s1->Shutdown());
+        //    // TODO: TBD: this will work for now as a rough cut Exception match...
+        //    REQUIRE_THROWS_AS_MATCHING(s1->Shutdown(), nng_exception, THROWS_NNG_EXCEPTION(ec_eclosed));
 
-            SECTION("It cannot receive") {
+        //    SECTION("It cannot receive") {
 
-                size_type sz = 0;
-                buffer_vector_type buf;
+        //        size_type sz = 0;
+        //        buffer_vector_type buf;
 
-                // TODO: TBD: was using flag_alloc
-                // TODO: TBD: this will work for now as a rough cut Exception match...
-                REQUIRE_THROWS_AS_MATCHING(s1->TryReceive(&buf, sz), nng_exception, THROWS_NNG_EXCEPTION(ec_eclosed));
-            }
+        //        // TODO: TBD: was using flag_alloc
+        //        // TODO: TBD: this will work for now as a rough cut Exception match...
+        //        REQUIRE_THROWS_AS_MATCHING(s1->TryReceive(&buf, sz), nng_exception, THROWS_NNG_EXCEPTION(ec_eclosed));
+        //    }
 
-            SECTION("It cannot send") {
+        //    SECTION("It cannot send") {
 
-                // TODO: TBD: this will work for now as a rough cut Exception match...
-                REQUIRE_THROWS_AS_MATCHING(s1->Send(&empty_buf), nng_exception, THROWS_NNG_EXCEPTION(ec_eclosed));
-            }
+        //        // TODO: TBD: this will work for now as a rough cut Exception match...
+        //        REQUIRE_THROWS_AS_MATCHING(s1->Send(empty_buf), nng_exception, THROWS_NNG_EXCEPTION(ec_eclosed));
+        //    }
 
-            SECTION("Cannot create Endpoints based on Socket") {
+        //    SECTION("Cannot create Endpoints based on Socket") {
 
-                SECTION("Session cannot create Dialer given Socket and Address") {
+        //        SECTION("Session cannot create Dialer given Socket and Address") {
 
-                    // Do not keep track of these pointers.
-                    // TODO: TBD: this will work for now as a rough cut Exception match...
-                    REQUIRE_THROWS_AS_MATCHING(_session_.create_dialer_ep(*s1, closed_addr), nng_exception, THROWS_NNG_EXCEPTION(ec_eclosed));
-                }
+        //            // Do not keep track of these pointers.
+        //            // TODO: TBD: this will work for now as a rough cut Exception match...
+        //            REQUIRE_THROWS_AS_MATCHING(_session_.create_dialer_ep(*s1, closed_addr), nng_exception, THROWS_NNG_EXCEPTION(ec_eclosed));
+        //        }
 
-                SECTION("Session cannot create Listener given Socket and Address") {
+        //        SECTION("Session cannot create Listener given Socket and Address") {
 
-                    // Do not keep track of these pointers.
-                    // TODO: TBD: this will work for now as a rough cut Exception match...
-                    REQUIRE_THROWS_AS_MATCHING(_session_.create_listener_ep(*s1, closed_addr), nng_exception, THROWS_NNG_EXCEPTION(ec_eclosed));
-                }
+        //            // Do not keep track of these pointers.
+        //            // TODO: TBD: this will work for now as a rough cut Exception match...
+        //            REQUIRE_THROWS_AS_MATCHING(_session_.create_listener_ep(*s1, closed_addr), nng_exception, THROWS_NNG_EXCEPTION(ec_eclosed));
+        //        }
 
-                SECTION("Cannot Dial Socket and receive Dialer back") {
+        //        SECTION("Cannot Dial Socket and receive Dialer back") {
 
-                    auto dp = _session_.create_dialer_ep();
-                    REQUIRE(dp != nullptr);
-                    // TODO: TBD: this will work for now as a rough cut Exception match...
-                    REQUIRE_THROWS_AS_MATCHING(s1->Dial(closed_addr, dp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_eclosed));
-                    REQUIRE_NOTHROW(_session_.remove_dialer_ep(dp.get()));
-                }
+        //            auto dp = _session_.create_dialer_ep();
+        //            REQUIRE(dp != nullptr);
+        //            // TODO: TBD: this will work for now as a rough cut Exception match...
+        //            REQUIRE_THROWS_AS_MATCHING(s1->Dial(closed_addr, dp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_eclosed));
+        //            REQUIRE_NOTHROW(_session_.remove_dialer_ep(dp.get()));
+        //        }
 
-                SECTION("Cannot Listen Socket and receive Listener back") {
+        //        SECTION("Cannot Listen Socket and receive Listener back") {
 
-                    auto lp = _session_.create_listener_ep();
-                    REQUIRE(lp != nullptr);
-                    // TODO: TBD: this will work for now as a rough cut Exception match...
-                    REQUIRE_THROWS_AS_MATCHING(s1->Listen(closed_addr, lp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_eclosed));
-                    REQUIRE_NOTHROW(_session_.remove_listener_ep(lp.get()));
-                }
-            }
-        }
+        //            auto lp = _session_.create_listener_ep();
+        //            REQUIRE(lp != nullptr);
+        //            // TODO: TBD: this will work for now as a rough cut Exception match...
+        //            REQUIRE_THROWS_AS_MATCHING(s1->Listen(closed_addr, lp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_eclosed));
+        //            REQUIRE_NOTHROW(_session_.remove_listener_ep(lp.get()));
+        //        }
+        //    }
+        //}
 
         SECTION("Receive with no Pipes times out correctly") {
 
@@ -207,7 +218,7 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
 
                 REQUIRE_NOTHROW(s1->GetOptions()->SetDuration(O::send_timeout_duration, timeout));
                 // TODO: TBD: this will work for now as a rough cut Exception match...
-                REQUIRE_THROWS_AS_MATCHING(s1->Send(&empty_buf), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
+                REQUIRE_THROWS_AS_MATCHING(s1->Send(empty_buf), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
 
             });
         }
@@ -291,7 +302,7 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
                     // TODO: TBD: had to increase this from 100ms; and then, I'm not sure that was enough, or there might actually be something blocking
                     this_thread::sleep_for(1000ms);
 
-                    REQUIRE_NOTHROW(s1->Send(&data_buf, data_buf.size()));
+                    REQUIRE_NOTHROW(s1->Send(data_buf, data_buf.size()));
 
                     /* This is a departure from the original unit testing in which allocation was expected,
                     i.e. was being called with flags = flag_alloc. In this case, we fully expect the client
@@ -476,7 +487,7 @@ TEST_CASE("Socket Operations", "[socket][operations][ngg][cxx]") {
                     size_t sz = 4;
                     const auto expected = data_buf;
 
-                    REQUIRE_NOTHROW(s1->Send(&data_buf, sz));
+                    REQUIRE_NOTHROW(s1->Send(data_buf, sz));
 
                     buffer_vector_type actual;
                     actual.resize(sz);

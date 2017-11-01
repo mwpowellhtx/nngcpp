@@ -69,7 +69,15 @@ TEST_CASE("Verify protocol and peer are correct", Catch::Tags("survey"
         unique_ptr<pub_socket_fixture> sp;
 
         REQUIRE_NOTHROW(sp = make_unique<pub_socket_fixture>());
-        REQUIRE(sp.get() == nullptr);
+        REQUIRE(sp.get() != nullptr);
+
+        SECTION("Requires protocol exposure") {
+            REQUIRE_NOTHROW(sp->get_protocol());
+        }
+
+        SECTION("Requires peer exposure") {
+            REQUIRE_NOTHROW(sp->get_peer());
+        }
 
         SECTION("Verify protocol is correct") {
             actual = sp->get_protocol();
@@ -89,7 +97,15 @@ TEST_CASE("Verify protocol and peer are correct", Catch::Tags("survey"
         unique_ptr<sub_socket_fixture> sp;
 
         REQUIRE_NOTHROW(sp = make_unique<sub_socket_fixture>());
-        REQUIRE(sp.get() == nullptr);
+        REQUIRE(sp.get() != nullptr);
+
+        SECTION("Requires protocol exposure") {
+            REQUIRE_NOTHROW(sp->get_protocol());
+        }
+
+        SECTION("Requires peer exposure") {
+            REQUIRE_NOTHROW(sp->get_peer());
+        }
 
         SECTION("Verify protocol is correct") {
             actual = sp->get_protocol();
@@ -153,9 +169,9 @@ TEST_CASE("Publisher/subscriber pattern using C++ wrapper", Catch::Tags("pub", "
 
         SECTION("Send throws invalid operation exception") {
 
-            REQUIRE_THROWS_AS(subp->Send(bmp.get()), invalid_operation);
-            REQUIRE_THROWS_AS(subp->Send(&buf), invalid_operation);
-            REQUIRE_THROWS_AS(subp->Send(&buf, sz), invalid_operation);
+            REQUIRE_THROWS_AS(subp->Send(*bmp), invalid_operation);
+            REQUIRE_THROWS_AS(subp->Send(buf), invalid_operation);
+            REQUIRE_THROWS_AS(subp->Send(buf, sz), invalid_operation);
         }
 
         SECTION("Socket can close") {
@@ -204,19 +220,19 @@ TEST_CASE("Publisher/subscriber pattern using C++ wrapper", Catch::Tags("pub", "
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
             REQUIRE_NOTHROW(*bmp << topics::some_like_it_hot);
-            REQUIRE_NOTHROW(pubp->Send(bmp.get()));
+            REQUIRE_NOTHROW(pubp->Send(*bmp));
             REQUIRE_NOTHROW(subp->TryReceive(bmp.get()));
             REQUIRE_THAT(bmp->GetBody()->Get(), Equals(topics::some_like_it_hot_buf));
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
             REQUIRE_NOTHROW(*bmp << topics::somewhere_over_the_rainbow);
             REQUIRE_THAT(bmp->GetBody()->Get(), Equals(topics::somewhere_over_the_rainbow_buf));
-            REQUIRE_NOTHROW(pubp->Send(bmp.get()));
+            REQUIRE_NOTHROW(pubp->Send(*bmp));
             REQUIRE_THROWS_AS_MATCHING(subp->TryReceive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
             REQUIRE_NOTHROW(*bmp << topics::some_day_some_how);
-            REQUIRE_NOTHROW(pubp->Send(bmp.get()));
+            REQUIRE_NOTHROW(pubp->Send(*bmp));
             REQUIRE_NOTHROW(subp->TryReceive(bmp.get()));
             REQUIRE_THAT(bmp->GetBody()->Get(), Equals(topics::some_day_some_how_buf));
         }
@@ -227,7 +243,7 @@ TEST_CASE("Publisher/subscriber pattern using C++ wrapper", Catch::Tags("pub", "
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
             REQUIRE_NOTHROW(*bmp << topics::some_do_not_like_it);
-            REQUIRE_NOTHROW(pubp->Send(bmp.get()));
+            REQUIRE_NOTHROW(pubp->Send(*bmp));
             REQUIRE_THROWS_AS_MATCHING(subp->TryReceive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
         }
 
@@ -238,7 +254,7 @@ TEST_CASE("Publisher/subscriber pattern using C++ wrapper", Catch::Tags("pub", "
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
             REQUIRE_NOTHROW(*bmp << topics::some_like_it_raw);
-            REQUIRE_NOTHROW(pubp->Send(bmp.get()));
+            REQUIRE_NOTHROW(pubp->Send(*bmp));
             REQUIRE_NOTHROW(subp->TryReceive(bmp.get()));
             REQUIRE_THAT(bmp->GetBody()->Get(), Equals(topics::some_like_it_raw_buf));
         }

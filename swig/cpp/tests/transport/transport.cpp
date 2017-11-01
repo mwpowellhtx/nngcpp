@@ -204,7 +204,7 @@ TEST_CASE("Test the transport using C++ wrappers", Catch::Tags(constants::prefix
 
         REQUIRE_NOTHROW(sendp = make_unique<binary_message>());
         REQUIRE_NOTHROW(*sendp << ping);
-        REQUIRE_NOTHROW(reqp->Send(sendp.get()));
+        REQUIRE_NOTHROW(reqp->Send(*sendp));
 
         REQUIRE_NOTHROW(recvp = make_unique<binary_message>(nullptr));
         REQUIRE_NOTHROW(repp->TryReceive(recvp.get()));
@@ -212,7 +212,7 @@ TEST_CASE("Test the transport using C++ wrappers", Catch::Tags(constants::prefix
 
         REQUIRE_NOTHROW(recvp->GetBody()->TrimLeft(ping.length()));
         REQUIRE_NOTHROW(*recvp << acknowledge);
-        REQUIRE_NOTHROW(repp->Send(recvp.get()));
+        REQUIRE_NOTHROW(repp->Send(*recvp));
         REQUIRE_NOTHROW(reqp->TryReceive(sendp.get()));
         REQUIRE_THAT(sendp->GetBody()->Get(), Equals(acknowledge_buf));
 
@@ -253,7 +253,7 @@ TEST_CASE("Test the transport using C++ wrappers", Catch::Tags(constants::prefix
 
         REQUIRE_NOTHROW(sendp = make_unique<binary_message>());
         REQUIRE_NOTHROW(*sendp << data);
-        REQUIRE_NOTHROW(reqp->Send(sendp.get()));
+        REQUIRE_NOTHROW(reqp->Send(*sendp));
         REQUIRE_NOTHROW(recvp = make_unique<binary_message>(nullptr));
         REQUIRE_NOTHROW(repp->TryReceive(recvp.get()));
         // Heaven help us if this fails: expect report to be truncated due to excessive size.
@@ -262,7 +262,7 @@ TEST_CASE("Test the transport using C++ wrappers", Catch::Tags(constants::prefix
         REQUIRE_NOTHROW(twos_compliment_buffer(data));
         REQUIRE_NOTHROW(recvp = make_unique<binary_message>());
         REQUIRE_NOTHROW(*recvp << data);
-        REQUIRE_NOTHROW(repp->Send(recvp.get()));
+        REQUIRE_NOTHROW(repp->Send(*recvp));
         REQUIRE_NOTHROW(sendp = make_unique<binary_message>(nullptr));
         REQUIRE_NOTHROW(reqp->TryReceive(sendp.get()));
         // Ditto excessive size truncation.

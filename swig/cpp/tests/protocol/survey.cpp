@@ -50,7 +50,15 @@ TEST_CASE("Verify protocol and peer are correct", Catch::Tags("survey"
         unique_ptr<survey_socket_fixture> sp;
 
         REQUIRE_NOTHROW(sp = make_unique<survey_socket_fixture>());
-        REQUIRE(sp.get() == nullptr);
+        REQUIRE(sp.get() != nullptr);
+
+        SECTION("Requires protocol exposure") {
+            REQUIRE_NOTHROW(sp->get_protocol());
+        }
+
+        SECTION("Requires peer exposure") {
+            REQUIRE_NOTHROW(sp->get_peer());
+        }
 
         SECTION("Verify protocol is correct") {
             actual = sp->get_protocol();
@@ -70,7 +78,15 @@ TEST_CASE("Verify protocol and peer are correct", Catch::Tags("survey"
         unique_ptr<respond_socket_fixture> sp;
 
         REQUIRE_NOTHROW(sp = make_unique<respond_socket_fixture>());
-        REQUIRE(sp.get() == nullptr);
+        REQUIRE(sp.get() != nullptr);
+
+        SECTION("Requires protocol exposure") {
+            REQUIRE_NOTHROW(sp->get_protocol());
+        }
+
+        SECTION("Requires peer exposure") {
+            REQUIRE_NOTHROW(sp->get_peer());
+        }
 
         SECTION("Verify protocol is correct") {
             actual = sp->get_protocol();
@@ -118,7 +134,7 @@ TEST_CASE("Survey pattern using C++ wrapper", Catch::Tags("surveyor", "responden
             REQUIRE_NOTHROW(surp->GetOptions()->SetDuration(O::surveyor_survey_duration, 50ms));
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
-            REQUIRE_NOTHROW(surp->Send(bmp.get()));
+            REQUIRE_NOTHROW(surp->Send(*bmp));
             REQUIRE_THROWS_AS_MATCHING(surp->TryReceive(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_etimedout));
 		}
 
@@ -134,7 +150,7 @@ TEST_CASE("Survey pattern using C++ wrapper", Catch::Tags("surveyor", "responden
         SECTION("Send fails with no suveyor") {
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
-            REQUIRE_THROWS_AS_MATCHING(resp->Send(bmp.get()), nng_exception, THROWS_NNG_EXCEPTION(ec_estate));
+            REQUIRE_THROWS_AS_MATCHING(resp->Send(*bmp), nng_exception, THROWS_NNG_EXCEPTION(ec_estate));
         }
 
         SECTION("Socket can close") {
@@ -171,13 +187,13 @@ TEST_CASE("Survey pattern using C++ wrapper", Catch::Tags("surveyor", "responden
 
             // ...
             REQUIRE_NOTHROW(*bmp << abc);
-            REQUIRE_NOTHROW(surp->Send(bmp.get()));
+            REQUIRE_NOTHROW(surp->Send(*bmp));
             REQUIRE_NOTHROW(resp->TryReceive(bmp.get()));
             REQUIRE_THAT(bmp->GetBody()->Get(), Equals(abc_buf));
 
             REQUIRE_NOTHROW(bmp->GetBody()->TrimLeft(abc.length()));
             REQUIRE_NOTHROW(*bmp << def);
-            REQUIRE_NOTHROW(resp->Send(bmp.get()));
+            REQUIRE_NOTHROW(resp->Send(*bmp));
             REQUIRE_NOTHROW(surp->TryReceive(bmp.get()));
             REQUIRE_THAT(bmp->GetBody()->Get(), Equals(def_buf));
 
