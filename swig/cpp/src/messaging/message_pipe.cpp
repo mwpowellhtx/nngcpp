@@ -49,6 +49,7 @@ namespace nng {
     }
 
     void message_pipe::set(msg_type* const msgp) {
+        // TODO: TBD: rethink what I was driving for with the whole set/reset paradigm: actually reset the PID itself? because that ain't happening here currently...
         // Re-bind the getter to keep aligned with the new message.
         __getter = bind(&::nng_msg_get_pipe, _msgp = msgp);
         // Except in this case we want to preserve the current PID.
