@@ -72,15 +72,15 @@ TEST_CASE("Asynchronous operations using C++ wrapper", Catch::Tags(
 
             REQUIRE_NOTHROW(sp2->ReceiveAsync(async_rxp.get()));
 
-            REQUIRE_NOTHROW(async_txp->retain_message(bmp.get()));
+            REQUIRE_NOTHROW(*bmp >> *async_txp);
             REQUIRE_NOTHROW(sp1->SendAsync(async_txp.get()));
 
-            REQUIRE_NOTHROW(async_rxp->wait());
+            REQUIRE_NOTHROW(async_rxp->Wait());
 
-            REQUIRE(async_rxp->success() == true);
-            REQUIRE(async_txp->success() == true);
+            REQUIRE(async_rxp->Success() == true);
+            REQUIRE(async_txp->Success() == true);
 
-            REQUIRE_NOTHROW(async_rxp->cede_message(bmp.get()));
+            REQUIRE_NOTHROW(*async_rxp >> *bmp);
             REQUIRE_THAT(bmp->GetBody()->Get(), Equals(hello_buf));
 
             REQUIRE(tx_count == 1);
@@ -100,9 +100,9 @@ TEST_CASE("Asynchronous operations using C++ wrapper", Catch::Tags(
         REQUIRE_NOTHROW(axp = make_unique<basic_async_service>([&done]() { done++; }));
 
         const auto& wait_for_done_and_success = [&done, &axp](const error_code_type expected_ec) {
-            REQUIRE_NOTHROW(axp->wait());
+            REQUIRE_NOTHROW(axp->Wait());
             REQUIRE(done == 1);
-            REQUIRE_THROWS_AS_MATCHING(axp->success(), nng_exception, THROWS_NNG_EXCEPTION(expected_ec));
+            REQUIRE_THROWS_AS_MATCHING(axp->Success(), nng_exception, THROWS_NNG_EXCEPTION(expected_ec));
         };
 
         REQUIRE(done == 0);
@@ -129,7 +129,7 @@ TEST_CASE("Asynchronous operations using C++ wrapper", Catch::Tags(
         SECTION("Cancellation works") {
             REQUIRE_NOTHROW(axp->GetOptions()->SetTimeoutMilliseconds(dur_infinite));
             REQUIRE_NOTHROW(sp->ReceiveAsync(axp.get()));
-            REQUIRE_NOTHROW(axp->cancel());
+            REQUIRE_NOTHROW(axp->Cancel());
             wait_for_done_and_success(ec_ecanceled);
         }
     }

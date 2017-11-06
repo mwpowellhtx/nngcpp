@@ -72,27 +72,27 @@ namespace nng {
 
         virtual void Close(bool force);
 
-        virtual void start(const basic_callback_func& on_cb);
+        virtual void Start(const basic_callback_func& on_cb);
 
-        virtual void start();
+        virtual void Start();
 
-        virtual void wait() const;
+        virtual void Wait() const;
 
-        virtual void stop() const;
+        virtual void Stop() const;
 
-        virtual void cancel() const;
+        virtual void Cancel() const;
 
-        virtual bool success() const;
+        virtual bool Success() const;
 
-        virtual bool try_success() const;
+        virtual bool TrySuccess() const;
 
-        virtual void timed_wait(const duration_type& timeout);
+        virtual void TimedWait(const duration_type& timeout);
 
-        virtual void timed_wait(duration_rep_type val);
+        virtual void TimedWait(duration_rep_type val);
 
-        virtual void retain_message(_Message* const bmp) const;
+        virtual void Retain(_Message& m) const;
 
-        virtual void cede_message(_Message* const bmp) const;
+        virtual void Cede(_Message& m) const;
 
     private:
 
@@ -102,6 +102,12 @@ namespace nng {
     };
 
     typedef _BasicAsyncService basic_async_service;
+
+    _Message& operator<<(_Message& m, _BasicAsyncService& svc);
+    _Message& operator >> (_BasicAsyncService& svc, _Message& m);
+
+    _BasicAsyncService& operator<<(_BasicAsyncService& svc, _Message& m);
+    _BasicAsyncService& operator >> (_Message& m, _BasicAsyncService& svc);
 }
 
 #endif // NNGCPP_BASIC_ASYNC_SERVICE_H

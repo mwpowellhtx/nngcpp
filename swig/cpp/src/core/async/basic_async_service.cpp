@@ -18,7 +18,7 @@ namespace nng {
         , _free(), _wait(), _stop(), _cancel()
         , _result(), _get_msg(), _set_msg() {
 
-        start(on_cb);
+        Start(on_cb);
     }
 
     _BasicAsyncService::~_BasicAsyncService() {
@@ -64,20 +64,20 @@ namespace nng {
     }
 
     void _BasicAsyncService::Close(bool force) {
-        if (force) { cancel(); }
-        else { stop(); }
+        if (force) { Cancel(); }
+        else { Stop(); }
         // TODO: TBD: this is probably sufficient; may need to wait() however.
         free();
         configure(_aiop = nullptr);
     }
 
-    void _BasicAsyncService::start(const basic_callback_func& on_cb) {
+    void _BasicAsyncService::Start(const basic_callback_func& on_cb) {
         // Calling this version of Start means we at least want to re-set the Callback.
         _on_cb = on_cb;
-        start();
+        Start();
     }
 
-    void _BasicAsyncService::start() {
+    void _BasicAsyncService::Start() {
         // This version of Start leaves the Callback intact, whatever was once upon a time.
         if (HasOne()) { return; }
         auto alloc = bind(&::nng_aio_alloc, _1, &basic_async_service::_aoi_cb, this);
@@ -85,26 +85,26 @@ namespace nng {
         configure(_aiop);
     }
 
-    void _BasicAsyncService::wait() const {
+    void _BasicAsyncService::Wait() const {
         invocation::with_void_return_value(_wait);
     }
     
-    void _BasicAsyncService::stop() const {
+    void _BasicAsyncService::Stop() const {
         invocation::with_void_return_value(_stop);
     }
     
-    void _BasicAsyncService::cancel() const {
+    void _BasicAsyncService::Cancel() const {
         invocation::with_void_return_value(_cancel);
     }
 
-    bool _BasicAsyncService::success() const {
+    bool _BasicAsyncService::Success() const {
         invocation::with_default_error_handling(_result);
         return true;
     }
 
-    bool _BasicAsyncService::try_success() const {
+    bool _BasicAsyncService::TrySuccess() const {
         try {
-            return success();
+            return Success();
         }
         catch (...) {
             // TODO: TBD: may log the exception here...
@@ -112,35 +112,47 @@ namespace nng {
         }
     }
 
-    void _BasicAsyncService::timed_wait(const duration_type& timeout) {
+    void _BasicAsyncService::TimedWait(const duration_type& timeout) {
         GetOptions()->SetTimeoutDuration(timeout);
-        wait();
+        Wait();
     }
 
-    void _BasicAsyncService::timed_wait(duration_rep_type val) {
+    void _BasicAsyncService::TimedWait(duration_rep_type val) {
         GetOptions()->SetTimeoutMilliseconds(val);
-        wait();
+        Wait();
     }
 
     // TODO: TBD: really, these should probably be more an effect of engaging the Socket with the AIO service.
-    void _BasicAsyncService::retain_message(_Message* const bmp) const {
-        if (!bmp) { return; }
+    void _BasicAsyncService::Retain(_Message& m) const {
         // Similarly with Socket send/receive, Message Cedes ownership to the AIO.
-        invocation::with_void_return_value(_set_msg, bmp->cede_message());
+        invocation::with_void_return_value(_set_msg, m.cede_message());
     }
 
-    void _BasicAsyncService::cede_message(_Message* const bmp) const {
+    void _BasicAsyncService::Cede(_Message& m) const {
         msg_type* msgp = nullptr;
         // Ditto re: Ceding/resuming ownership.
         invocation::with_result(_get_msg, &msgp);
         if (!msgp) { return; }
-        if (bmp) {
-            bmp->retain(msgp);
-        }
-        else {
-            // This could be an unusual use case in which we should just free the message (probably).
-            const auto& op = bind(&::nng_msg_free, msgp);
-            invocation::with_void_return_value(op);
-        }
+        m.retain(msgp);
+    }
+
+    _Message& operator<<(_Message& m, _BasicAsyncService& svc) {
+        svc.Cede(m);
+        return m;
+    }
+
+    _Message& operator >> (_BasicAsyncService& svc, _Message& m) {
+        svc.Cede(m);
+        return m;
+    }
+
+    _BasicAsyncService& operator<<(_BasicAsyncService& svc, _Message& m) {
+        svc.Retain(m);
+        return svc;
+    }
+
+    _BasicAsyncService& operator >> (_Message& m, _BasicAsyncService& svc) {
+        svc.Retain(m);
+        return svc;
     }
 }
