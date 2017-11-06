@@ -94,7 +94,9 @@ TEST_CASE("Poll FDs", "[pollfd]") {
                 const buffer_vector_type _kick_buf = { 'k','i','c','k','\0' };
                 REQUIRE_NOTHROW(s2->Send(_kick_buf, _kick_buf.size())); // TODO: TBD: was blocking prior to this...
                 REQUIRE(::poll(&pfd, 1, 1000) == 1);
+                // TODO: TBD: so this is actually more specific than just the POLLIN mask
                 REQUIRE((pfd.revents&POLLIN));
+                REQUIRE((pfd.revents&POLLIN) == POLLRDNORM);
             }
         }
 
@@ -104,6 +106,7 @@ TEST_CASE("Poll FDs", "[pollfd]") {
             std::size_t sz;
 
             sz = sizeof(fd);
+            // TODO: TBD: I'm not sure what this really proves. This belongs more in an Options unit testing that we can get the same value different ways...
             REQUIRE_NOTHROW(fd = s1->GetOptions()->GetInt32(_opt_::send_fd));
             REQUIRE_NOTHROW(s1->GetOptions()->get(_opt_::send_fd, &fd, sz));
             REQUIRE(fd != inv_sock);
@@ -114,6 +117,7 @@ TEST_CASE("Poll FDs", "[pollfd]") {
             REQUIRE_NOTHROW(s1->Send(buf, sz));
         }
 
+        // TODO: TBD: again, this whole section isn't really a "Poll" test so much as it is an Options test..
         SECTION("Must have big enough size") {
 
             int fd;
@@ -127,6 +131,7 @@ TEST_CASE("Poll FDs", "[pollfd]") {
             REQUIRE(sz == sizeof(fd));
         }
 
+        // TODO: TBD: actually, I'm not sure this isn't a pull test...
         SECTION("We cannot get a Send File Descriptor for Pull Socket") {
 
             std::unique_ptr<latest_pull_socket> s3;
@@ -144,6 +149,7 @@ TEST_CASE("Poll FDs", "[pollfd]") {
             REQUIRE(s3 == nullptr);
         }
 
+        // TODO: TBD: actually, I'm not sure this isn't a push test...
         SECTION("We cannot get a Receive File Descriptor for Push Socket") {
 
             std::unique_ptr<latest_push_socket> s3;
@@ -160,6 +166,8 @@ TEST_CASE("Poll FDs", "[pollfd]") {
             REQUIRE_NOTHROW(s3.reset());
             REQUIRE(s3 == nullptr);
         }
+
+        // TODO: TBD: additionally, why are push/pull (pipeline) represented here when pub/sub are not?
     }
 
     SECTION("Destructors do not throw") {
