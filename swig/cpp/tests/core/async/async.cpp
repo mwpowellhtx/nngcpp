@@ -53,13 +53,13 @@ TEST_CASE("Asynchronous operations using C++ wrapper", Catch::Tags(
 
         SECTION("Asynchronous send and receive works") {
 
-            int tx_count = 0, rx_count = 0;
+            int tx_surplus = 0, rx_deficit = 1;
             unique_ptr<binary_message> bmp;
             unique_ptr<basic_async_service> async_txp, async_rxp;
             const auto timeout = 100ms;
 
-            REQUIRE_NOTHROW(async_txp = make_unique<basic_async_service>([&tx_count]() { tx_count++; }));
-            REQUIRE_NOTHROW(async_rxp = make_unique<basic_async_service>([&rx_count]() { rx_count++; }));
+            REQUIRE_NOTHROW(async_txp = make_unique<basic_async_service>([&tx_surplus]() { tx_surplus++; }));
+            REQUIRE_NOTHROW(async_rxp = make_unique<basic_async_service>([&rx_deficit]() { --rx_deficit; }));
 
             REQUIRE_NOTHROW(async_txp->GetOptions()->SetTimeoutDuration(timeout));
             REQUIRE_NOTHROW(async_rxp->GetOptions()->SetTimeoutDuration(timeout));
@@ -67,8 +67,8 @@ TEST_CASE("Asynchronous operations using C++ wrapper", Catch::Tags(
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
             REQUIRE_NOTHROW(*bmp << hello);
 
-            REQUIRE(tx_count == 0);
-            REQUIRE(rx_count == 0);
+            REQUIRE(tx_surplus == 0);
+            REQUIRE(rx_deficit == 1);
 
             REQUIRE_NOTHROW(sp2->ReceiveAsync(async_rxp.get()));
 
@@ -83,8 +83,9 @@ TEST_CASE("Asynchronous operations using C++ wrapper", Catch::Tags(
             REQUIRE_NOTHROW(*async_rxp >> *bmp);
             REQUIRE_THAT(bmp->GetBody()->Get(), Equals(hello_buf));
 
-            REQUIRE(tx_count == 1);
-            REQUIRE(rx_count == 1);
+            // This is the kind of deficit spending we like.
+            REQUIRE(tx_surplus == 1);
+            REQUIRE(rx_deficit == 0);
         }
     }
 
