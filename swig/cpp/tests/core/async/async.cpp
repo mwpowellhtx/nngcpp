@@ -61,8 +61,8 @@ TEST_CASE("Asynchronous operations using C++ wrapper", Catch::Tags(
             REQUIRE_NOTHROW(async_txp = make_unique<basic_async_service>([&tx_count]() { tx_count++; }));
             REQUIRE_NOTHROW(async_rxp = make_unique<basic_async_service>([&rx_count]() { rx_count++; }));
 
-            REQUIRE_NOTHROW(async_txp->set(timeout));
-            REQUIRE_NOTHROW(async_rxp->set(timeout));
+            REQUIRE_NOTHROW(async_txp->GetOptions()->SetTimeoutDuration(timeout));
+            REQUIRE_NOTHROW(async_rxp->GetOptions()->SetTimeoutDuration(timeout));
 
             REQUIRE_NOTHROW(bmp = make_unique<binary_message>());
             REQUIRE_NOTHROW(*bmp << hello);
@@ -109,7 +109,7 @@ TEST_CASE("Asynchronous operations using C++ wrapper", Catch::Tags(
 
         SECTION("Explicit timeout works") {
 
-            REQUIRE_NOTHROW(axp->set(nominal_timeout));
+            REQUIRE_NOTHROW(axp->GetOptions()->SetTimeoutDuration(nominal_timeout));
             REQUIRE_NOTHROW(sp->ReceiveAsync(axp.get()));
             wait_for_done_and_success(ec_etimedout);
         }
@@ -121,13 +121,13 @@ TEST_CASE("Asynchronous operations using C++ wrapper", Catch::Tags(
         }
 
         SECTION("Zero timeout works") {
-            REQUIRE_NOTHROW(axp->set_timeout(dur_zero));
+            REQUIRE_NOTHROW(axp->GetOptions()->SetTimeoutMilliseconds(dur_zero));
             REQUIRE_NOTHROW(sp->ReceiveAsync(axp.get()));
             wait_for_done_and_success(ec_etimedout);
         }
 
         SECTION("Cancellation works") {
-            REQUIRE_NOTHROW(axp->set_timeout(dur_infinite));
+            REQUIRE_NOTHROW(axp->GetOptions()->SetTimeoutMilliseconds(dur_infinite));
             REQUIRE_NOTHROW(sp->ReceiveAsync(axp.get()));
             REQUIRE_NOTHROW(axp->cancel());
             wait_for_done_and_success(ec_ecanceled);

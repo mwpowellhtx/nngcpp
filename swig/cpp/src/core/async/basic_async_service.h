@@ -9,6 +9,9 @@
 #include "../IHaveOne.hpp"
 #include "../ICanClose.hpp"
 
+#include "async_writer.h"
+#include "../../options/IHaveOptions.hpp"
+
 #include <functional>
 
 namespace nng {
@@ -21,7 +24,10 @@ namespace nng {
     class _Message;
 #endif // NNGCPP_BINARY_MESSAGE_H
 
-    class basic_async_service : public IHaveOne, public ICanClose {
+    class _BasicAsyncService
+        : public IHaveOne
+        , public ICanClose
+        , public IHaveOptions<_AsyncOptionWriter> {
 
         friend class _Socket;
 
@@ -33,7 +39,6 @@ namespace nng {
 
         typedef std::function<void()> void_noarg_func;
         typedef std::function<int()> int_noarg_func;
-        typedef std::function<void(duration_rep_type)> set_timeout_func;
 
         typedef std::function<msg_type*()> msg_ptr_func;
         typedef std::function<void(msg_type*)> void_ptr_msg_func;
@@ -43,7 +48,6 @@ namespace nng {
         void_noarg_func _stop;
         void_noarg_func _cancel;
         int_noarg_func _result;
-        set_timeout_func _set_timeout;
 
         msg_ptr_func _get_msg;
         void_ptr_msg_func _set_msg;
@@ -56,11 +60,11 @@ namespace nng {
         nothing. That could change downstream from here, but for now it's K.I.S.S. as well as Y.A.G.N.I.. */
         typedef std::function<void()> basic_callback_func;
 
-        basic_async_service();
+        _BasicAsyncService();
 
-        basic_async_service(const basic_callback_func& on_cb);
+        _BasicAsyncService(const basic_callback_func& on_cb);
 
-        virtual ~basic_async_service();
+        virtual ~_BasicAsyncService();
 
         virtual bool HasOne() const override;
 
@@ -86,10 +90,6 @@ namespace nng {
 
         virtual void timed_wait(duration_rep_type val);
 
-        virtual void set(const duration_type& timeout);
-
-        virtual void set_timeout(duration_rep_type val);
-
         virtual void retain_message(_Message* const bmp) const;
 
         virtual void cede_message(_Message* const bmp) const;
@@ -100,6 +100,8 @@ namespace nng {
 
         void free();
     };
+
+    typedef _BasicAsyncService basic_async_service;
 }
 
 #endif // NNGCPP_BASIC_ASYNC_SERVICE_H

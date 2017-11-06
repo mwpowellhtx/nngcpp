@@ -71,6 +71,8 @@ set (NNGCPP_CPP_SRCS
     core/socket.h
     core/async/basic_async_service.cpp
     core/async/basic_async_service.h
+    core/async/async_writer.cpp
+    core/async/async_writer.h
     core/exceptions.hpp
     core/exceptions/nng_exception.cpp
     core/exceptions/nng_exception.h
