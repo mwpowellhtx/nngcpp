@@ -101,7 +101,7 @@ namespace nng {
         /* These are less of an enumeration and more of a mask... potentially.
         Especially these two, SYSERR and TRANERR. */
         ec_esyserr = 0x10000000, // NNG_ESYSERR,
-        ec_etranerr = 0x2000000, // NNG_ETRANERR,
+        ec_etranerr = 0x20000000, // NNG_ETRANERR,
     };
 }
 
