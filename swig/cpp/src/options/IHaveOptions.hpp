@@ -7,6 +7,10 @@ namespace nng {
     class _Socket;
 #endif // NNGCPP_SOCKET_H
 
+#ifndef NNGCPP_BASIC_ASYNC_SERVICE_H
+    class _BasicAsyncService;
+#endif // NNGCPP_BASIC_ASYNC_SERVICE_H
+
     template<class Options_>
     struct IHaveOptions {
 
